@@ -37,8 +37,7 @@ typedef void (*unwind_error_action_fn)(void *data,
 struct unwind_unwinder_t {
 	const char *name;
 
-	/* Initialize the unwinder. */
-	void   (*init)(bool);
+	void   (*init)(bool, int);
 
 	/* Make/destroy the context data attached to tcb. */
 	void * (*tcb_init)(struct tcb *);

@@ -37,10 +37,10 @@ static void queue_print(struct unwind_queue_t *queue);
 static const char asprintf_error_str[] = "???";
 
 void
-unwind_init(bool with_srcinfo)
+unwind_init(bool with_srcinfo, int stacktrace_limit)
 {
 	if (unwinder.init)
-		unwinder.init(with_srcinfo);
+		unwinder.init(with_srcinfo, stacktrace_limit);
 }
 
 void

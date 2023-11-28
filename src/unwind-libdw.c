@@ -52,6 +52,7 @@ struct ctx {
 static unsigned long long mapping_generation = 1;
 static unsigned long long uwcache_clock;
 static bool with_srcinfo;
+static int stacktrace_limit;
 
 static void
 update_mapping_generation(struct tcb *tcp, void *unused)
@@ -60,9 +61,10 @@ update_mapping_generation(struct tcb *tcp, void *unused)
 }
 
 static void
-init(bool with_srcinfo_)
+init(bool with_srcinfo_, int stacktrace_limit_)
 {
 	with_srcinfo = with_srcinfo_;
+	stacktrace_limit = stacktrace_limit_;
 	mmap_notify_register_client(update_mapping_generation, NULL);
 }
 
@@ -255,7 +257,7 @@ tcb_walk(struct tcb *tcp,
 		.call_action = call_action,
 		.error_action = error_action,
 		.data = data,
-		.stack_depth = 256,
+		.stack_depth = stacktrace_limit,
 		.ctx = ctx,
 	};
 

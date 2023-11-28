@@ -400,6 +400,9 @@ Output format:\n\
 "\
   -k, --stack-traces[=symbol]\n\
                  obtain stack trace between each syscall\n\
+  --stacktrace-frames-limit=limit\n\
+                 obtain no more than this amount of frames\n\
+                 when backtracing a syscall (default %d)\n\
 "
 #ifdef USE_LIBDW
 "\
@@ -515,7 +518,11 @@ Miscellaneous:\n\
 /* ancient, no one should use it
 -F -- attempt to follow vforks (deprecated, use -f)\n\
  */
-, DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
+, DEFAULT_ACOLUMN,
+#ifdef ENABLE_STACKTRACE
+ DEFAULT_STACKTRACE_FRAMES_LIMIT,
+#endif
+ DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(0);
 
 #undef K_OPT
@@ -2243,6 +2250,9 @@ init(int argc, char *argv[])
 	bool columns_set = false;
 	bool sortby_set = false;
 	bool opt_kill_on_exit = false;
+#ifdef ENABLE_STACKTRACE
+	int stacktrace_frames_limit = DEFAULT_STACKTRACE_FRAMES_LIMIT;
+#endif
 
 	/*
 	 * We can initialise global_path_set only after tracing backend
@@ -2311,6 +2321,7 @@ init(int argc, char *argv[])
 		GETOPT_TS,
 		GETOPT_TIPS,
 		GETOPT_ARGV0,
+		GETOPT_STACKTRACE_FRAMES_LIMIT,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
@@ -2348,6 +2359,7 @@ init(int argc, char *argv[])
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "kill-on-exit",	no_argument,	   0, GETOPT_KILL_ON_EXIT },
 		{ "stack-traces" ,	optional_argument, 0, GETOPT_STACK },
+		{ "stacktrace-frames-limit", required_argument, 0, GETOPT_STACKTRACE_FRAMES_LIMIT },
 		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
@@ -2530,6 +2542,19 @@ init(int argc, char *argv[])
 					  "option) are not supported by this "
 					  "build of strace");
 #endif /* ENABLE_STACKTRACE */
+			break;
+		case GETOPT_STACKTRACE_FRAMES_LIMIT:
+			i = string_to_uint(optarg);
+			if (i <= 0 || (unsigned int) i > -1U / 4)
+				error_opt_arg(c, lopt, optarg);
+#ifdef ENABLE_STACKTRACE
+			stacktrace_frames_limit = i;
+#else
+			error_msg_and_die("Stack traces "
+					  "(--stacktrace-frames-limit "
+					  "option) are not supported "
+					  "by this build of strace");
+#endif
 			break;
 		case GETOPT_KILL_ON_EXIT:
 			opt_kill_on_exit = true;
@@ -2919,7 +2944,8 @@ init(int argc, char *argv[])
 
 #ifdef ENABLE_STACKTRACE
 	if (stack_trace_mode)
-		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO);
+		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO,
+			    stacktrace_frames_limit);
 #endif
 
 	/* See if they want to run as another user. */
