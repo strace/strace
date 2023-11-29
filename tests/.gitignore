@@ -91,6 +91,7 @@ count-f
 creat
 delay
 delete_module
+detach-vfork
 dev--decode-fds-all
 dev--decode-fds-dev
 dev--decode-fds-none
