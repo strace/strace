@@ -25,6 +25,8 @@ while [ "\$attempt" -lt "$max_wait_attempts" ] && [ ! -s signalled ]; do
 	attempt=\$((attempt + 1))
 done
 $SLEEP_A_BIT
+"\$@"
+kill \$\$
 EOF
 chmod +x script
 rm -f signalled
@@ -32,7 +34,7 @@ rm -f signalled
 > "$OUT"
 (
 	./script &
-	exec $STRACE -o'|./script' -I2 -f --trace=none --quiet=personality \
+	exec $STRACE -o'|./script exit' -I2 -f --trace=none --quiet=personality \
 		../$NAME $! > "$EXP" 2> "$OUT"
 ) &
 pid=$!

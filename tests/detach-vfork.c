@@ -45,7 +45,7 @@ main(int ac, char **av)
 	const char *exe = getenv("STRACE_EXE") ?: "strace";
 	printf("%s: Process %d attached\n"
 	       "%s: Process %d detached\n"
-	       "%s: Exit of unknown pid %s ignored\n"
+	       "%s: Termination of unknown pid %s ignored\n"
 	       "%s: Process %d detached\n",
 	       exe, pid,
 	       exe, pid,
