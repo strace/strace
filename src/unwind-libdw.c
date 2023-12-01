@@ -235,7 +235,7 @@ frame_callback(Dwfl_Frame *state, void *arg)
 	}
 
 	/* Max number of frames to print reached? */
-	if (user_data->stack_depth-- == 0)
+	if (--user_data->stack_depth == 0)
 		return DWARF_CB_ABORT;
 
 	return DWARF_CB_OK;
