@@ -9,6 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
 * Bug fixes
   * Fix strace -r during the first second after booting to show correct relative
     timestamps.
+  * Fix strace -f entering deadlock on exit if there are tracee processes
+    spawned using vfork semantics.
 
 Noteworthy changes in release 6.6 (2023-10-31)
 ==============================================

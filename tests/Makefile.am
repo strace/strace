@@ -140,6 +140,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	close_range \
 	count-f \
 	delay \
+	detach-vfork \
 	execve-v \
 	execveat-v \
 	fcntl--pidns-translation \
@@ -591,6 +592,7 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
+	detach-vfork.test \
 	exec-PATH.test \
 	fflush.test \
 	filter-unavailable.test \
