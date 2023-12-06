@@ -17,8 +17,11 @@
 #include <sys/wait.h>
 
 int
-main(void)
+main(int ac, char **av)
 {
+	if (ac != 2)
+		error_msg_and_fail("ac = %d", ac);
+
 	signal(SIGTERM, SIG_IGN);
 
 	pid_t pid = vfork();
@@ -42,8 +45,12 @@ main(void)
 	const char *exe = getenv("STRACE_EXE") ?: "strace";
 	printf("%s: Process %d attached\n"
 	       "%s: Process %d detached\n"
+	       "%s: Termination of unknown pid %s ignored\n"
 	       "%s: Process %d detached\n",
-	       exe, pid, exe, pid, exe, getpid());
+	       exe, pid,
+	       exe, pid,
+	       exe, av[1],
+	       exe, getpid());
 
 	return WIFEXITED(s) ? WEXITSTATUS(s)
 			    : (WIFSIGNALED(s) ? 128 + WTERMSIG(s) : 9);

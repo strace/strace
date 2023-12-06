@@ -11,29 +11,52 @@
 
 max_wait_attempts=100
 
+check_prog grep
 run_prog_skip_if_failed \
 	kill -0 $$
-run_prog > /dev/null
+run_prog ../$NAME 0 > /dev/null
 
-> "$LOG"
-$STRACE -I2 -f --trace=none --quiet=personality $args > "$OUT" 2> "$LOG" &
+cat >script <<EOF
+#!/bin/sh -efu
+# Do not wait forever, stop waiting after a few iterations.
+attempt=1
+while [ "\$attempt" -lt "$max_wait_attempts" ] && [ ! -s signalled ]; do
+	$SLEEP_A_BIT
+	attempt=\$((attempt + 1))
+done
+$SLEEP_A_BIT
+"\$@"
+kill \$\$
+EOF
+chmod +x script
+rm -f signalled
+
+> "$OUT"
+(
+	./script &
+	exec $STRACE -o'|./script exit' -I2 -f --trace=none --quiet=personality \
+		../$NAME $! > "$EXP" 2> "$OUT"
+) &
 pid=$!
 
 # Do not wait for strace output forever,
 # stop waiting after $max_wait_attempts iterations.
 attempt=0
-while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$LOG" ]; do
+while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$OUT" ]; do
 	$SLEEP_A_BIT
 	attempt=$((attempt + 1))
 done
-[ -s "$LOG" ] || {
+[ -s "$OUT" ] || {
 	kill -9 $pid
 	fail_ 'timeout waiting for strace output'
 }
 
-# Non-empty $LOG means the vfork'ed process has been attached
+# Non-empty $OUT means the vfork'ed process has been attached
 # and it's time to send SIGTERM to strace.
 kill $pid
+
+# Wake up ./script invocations.
+echo > signalled
 
 # Do not wait for strace termination forever,
 # stop waiting after $max_wait_attempts iterations.
@@ -56,11 +79,11 @@ wait $pid ||
 # Do not wait for expected output forever,
 # stop waiting after $max_wait_attempts iterations.
 attempt=0
-while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$OUT" ]; do
+while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$EXP" ]; do
 	$SLEEP_A_BIT
 	attempt=$((attempt + 1))
 done
-[ -s "$OUT" ] ||
+[ -s "$EXP" ] ||
 	fail_ 'timeout waiting for expected output'
 
-match_diff "$LOG" "$OUT"
+match_diff "$OUT" "$EXP"

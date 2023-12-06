@@ -3120,6 +3120,18 @@ pid2tcb(const int pid)
 	return NULL;
 }
 
+static const char *
+status2str(int status)
+{
+	if (WIFEXITED(status))
+		return "Exit";
+	if (WIFSIGNALED(status))
+		return "Termination";
+	if (WIFSTOPPED(status))
+		return "Stop";
+	return "Wait event";
+}
+
 static void
 print_debug_info(const int pid, int status)
 {
@@ -3212,7 +3224,8 @@ cleanup(int fatal_sig)
 				/*
 				 * This can happen if we inherited an unknown child.
 				 */
-				error_msg("Exit of unknown pid %u ignored", pid);
+				error_msg("%s of unknown pid %u ignored",
+					  status2str(status), pid);
 			}
 			continue;
 		}
@@ -3244,7 +3257,8 @@ maybe_allocate_tcb(const int pid, int status)
 			 * This can happen if we inherited an unknown child.
 			 * Example: (sleep 1 & exec strace true)
 			 */
-			error_msg("Exit of unknown pid %u ignored", pid);
+			error_msg("%s of unknown pid %u ignored",
+				  status2str(status), pid);
 		}
 		return NULL;
 	}
