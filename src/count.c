@@ -316,7 +316,7 @@ call_summary_pers(FILE *outf)
 
 
 	/* sort, calculate statistics */
-	indices = xcalloc(sizeof(indices[0]), nsyscalls);
+	indices = xcalloc(nsyscalls, sizeof(indices[0]));
 	for (size_t i = 0; i < nsyscalls; ++i) {
 		indices[i] = i;
 		if (counts[i].calls == 0)
