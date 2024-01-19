@@ -2,7 +2,7 @@
  * Check decoding of pread64 and pwrite64 syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -140,12 +140,12 @@ main(void)
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1 EFAULT"
 				    ", returned %ld", rc);
-	tprintf("pwrite64(1, %p, 1, 0) = -1 EFAULT (%m)\n", efault);
+	tprintf("pwrite64(1, %p, 1, 0)" RVAL_EFAULT, efault);
 
 	rc = pwrite(1, nil, 1, -3);
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1, returned %ld", rc);
-	tprintf("pwrite64(1, \"\\0\", 1, -3) = -1 EINVAL (%m)\n");
+	tprintf("pwrite64(1, \"\\0\", 1, -3)" RVAL_EINVAL);
 	dump_str(nil, 1);
 
 	rc = pwrite(1, w, w_len, 0);
@@ -165,12 +165,12 @@ main(void)
 	rc = pread(0, efault, 1, 0);
 	if (rc != -1)
 		perror_msg_and_fail("pread64: expected -1, returned %ld", rc);
-	tprintf("pread64(0, %p, 1, 0) = -1 EFAULT (%m)\n", efault);
+	tprintf("pread64(0, %p, 1, 0)" RVAL_EFAULT, efault);
 
 	rc = pread(0, efault, 2, -7);
 	if (rc != -1)
 		perror_msg_and_fail("pread64: expected -1, returned %ld", rc);
-	tprintf("pread64(0, %p, 2, -7) = -1 EINVAL (%m)\n", efault);
+	tprintf("pread64(0, %p, 2, -7)" RVAL_EINVAL, efault);
 
 	rc = pread(0, r0, r0_len, 0);
 	if (rc != (int) r0_len)

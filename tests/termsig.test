@@ -2,7 +2,7 @@
 #
 # Check termination signal forwarding.
 #
-# Copyright (c) 2017-2019 The strace developers.
+# Copyright (c) 2017-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -14,15 +14,14 @@ unblock_reset_raise="../unblock_reset_raise 15"
 block_reset_run="../block_reset_run 15"
 orig_STRACE="$STRACE"
 
-run_prog $run_expect_termsig $block_reset_run $unblock_reset_raise
 run_prog $run_expect_termsig $unblock_reset_raise
+run_prog $run_expect_termsig $block_reset_run $unblock_reset_raise
 
-STRACE="$run_expect_termsig $orig_STRACE"
 for i in 1 2 3 4; do
-	run_strace -I$i -enone -esignal=none $unblock_reset_raise
-done
-
-STRACE="$run_expect_termsig $block_reset_run $orig_STRACE"
-for i in 1 2 3 4; do
-	run_strace -I$i -enone -esignal=none $unblock_reset_raise
+	for D in '' -D; do
+		for STRACE in "$run_expect_termsig $orig_STRACE" \
+			      "$run_expect_termsig $block_reset_run $orig_STRACE"; do
+			run_strace -I$i $D -enone -esignal=none $unblock_reset_raise
+		done
+	done
 done

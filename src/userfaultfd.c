@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -23,9 +23,12 @@ SYS_FUNC(userfaultfd)
 
 #include "xlat/uffd_api_features.h"
 #include "xlat/uffd_api_flags.h"
+#include "xlat/uffd_continue_mode_flags.h"
 #include "xlat/uffd_copy_flags.h"
+#include "xlat/uffd_poison_mode_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
+#include "xlat/uffd_writeprotect_mode_flags.h"
 #include "xlat/uffd_zeropage_flags.h"
 
 static void
@@ -177,6 +180,78 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (!syserror(tcp) && !umove(tcp, arg, &uz)) {
 			tprint_struct_next();
 			PRINT_FIELD_X(uz, zeropage);
+		}
+
+		tprint_struct_end();
+
+		break;
+	}
+
+	case UFFDIO_WRITEPROTECT: {
+		struct uffdio_writeprotect uwp;
+
+		tprint_arg_next();
+		if (!umove_or_printaddr(tcp, arg, &uwp)) {
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(uwp, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uwp, mode,
+					  uffd_writeprotect_mode_flags,
+					  "UFFDIO_WRITEPROTECT_MODE_WP???");
+			tprint_struct_end();
+		}
+
+		break;
+	}
+
+	case UFFDIO_CONTINUE: {
+		struct uffdio_continue uc;
+
+		if (entering(tcp)) {
+			tprint_arg_next();
+			if (umove_or_printaddr(tcp, arg, &uc))
+				return RVAL_IOCTL_DECODED;
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(uc, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uc, mode, uffd_continue_mode_flags,
+					  "UFFDIO_CONTINUE_MODE_???");
+
+			return 0;
+		}
+
+		if (!syserror(tcp) && !umove(tcp, arg, &uc)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(uc, mapped);
+		}
+
+		tprint_struct_end();
+
+		break;
+	}
+
+	case UFFDIO_POISON: {
+		struct uffdio_poison up;
+
+		if (entering(tcp)) {
+			tprint_arg_next();
+			if (umove_or_printaddr(tcp, arg, &up))
+				return RVAL_IOCTL_DECODED;
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(up, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(up, mode, uffd_poison_mode_flags,
+					  "UFFDIO_POISON_MODE_???");
+
+			return 0;
+		}
+
+		if (!syserror(tcp) && !umove(tcp, arg, &up)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(up, updated);
 		}
 
 		tprint_struct_end();

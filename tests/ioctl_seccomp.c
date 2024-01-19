@@ -2,7 +2,7 @@
  * Check decoding of SECCOMP_IOCTL_* commands of ioctl syscall.
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>.
- * Copyright (c) 2021-2022 The strace developers.
+ * Copyright (c) 2021-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -101,7 +101,7 @@ main(int argc, char **argv)
 	 */
 	pidns_print_leader();
 	errno = EBADF;
-	printf("ioctl(-1, " XLAT_FMT ", NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, " XLAT_FMT ", NULL)" RVAL_EBADF,
 	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_RECV));
 	fflush(NULL);
 	sys_ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, 0);
@@ -146,13 +146,13 @@ main(int argc, char **argv)
 	/* Unknown seccomp ioctl */
 	for (size_t i = 0; i < ARRAY_SIZE(dirs); i++) {
 		for (unsigned int j = 0; j < 32; j += 4) {
-			sys_ioctl(-1, _IOC(dirs[i].val, '!', 4, j), magic);
+			sys_ioctl(-1, _IOC(dirs[i].val, '!', 5, j), magic);
 			pidns_print_leader();
 			printf("ioctl(-1, "
-			       XLAT_KNOWN(%#x, "_IOC(%s, 0x21, 0x4, %#x)")
+			       XLAT_KNOWN(%#x, "_IOC(%s, 0x21, 0x5, %#x)")
 			       ", %#lx) = %s" INJ_STR "\n",
 #if XLAT_RAW || XLAT_VERBOSE
-			       (unsigned int) _IOC(dirs[i].val, '!', 4, j),
+			       (unsigned int) _IOC(dirs[i].val, '!', 5, j),
 #endif
 #if !XLAT_RAW
 			       dirs[i].str, j,
@@ -475,6 +475,26 @@ main(int argc, char **argv)
 	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_ADDFD),
 	       ZERO_FD, PRINT_PATHS ? zero_path : "",
 	       XLAT_ARGS(O_DIRECT), errstr);
+
+
+	/* SECCOMP_IOCTL_NOTIF_SET_FLAGS */
+	sys_ioctl(-1, SECCOMP_IOCTL_NOTIF_SET_FLAGS, 0);
+	pidns_print_leader();
+	printf("ioctl(-1, " XLAT_FMT ", 0) = %s" INJ_STR "\n",
+	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_SET_FLAGS), errstr);
+
+	sys_ioctl(-1, SECCOMP_IOCTL_NOTIF_SET_FLAGS, 1);
+	pidns_print_leader();
+	printf("ioctl(-1, " XLAT_FMT ", " XLAT_FMT_L ") = %s" INJ_STR "\n",
+	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_SET_FLAGS),
+	       XLAT_ARGS(SECCOMP_USER_NOTIF_FD_SYNC_WAKE_UP), errstr);
+
+	sys_ioctl(-1, SECCOMP_IOCTL_NOTIF_SET_FLAGS, 0xfffffffeU);
+	pidns_print_leader();
+	printf("ioctl(-1, " XLAT_FMT ", "
+	       XLAT_UNKNOWN(0xfffffffe, "SECCOMP_USER_NOTIF_???")
+	       ") = %s" INJ_STR "\n",
+	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_SET_FLAGS), errstr);
 
 	pidns_print_leader();
 	puts("+++ exited with 0 +++");

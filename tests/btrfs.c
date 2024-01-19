@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -208,10 +208,10 @@ static void
 btrfs_test_trans_ioctls(void)
 {
 	ioctl(-1, BTRFS_IOC_TRANS_START, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_TRANS_START));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_TRANS_START));
 
 	ioctl(-1, BTRFS_IOC_TRANS_END, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_TRANS_END));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_TRANS_END));
 }
 
 /*
@@ -227,14 +227,14 @@ btrfs_test_sync_ioctls(void)
 	uint64_t u64val = 0xdeadbeefbadc0dedULL;
 
 	ioctl(-1, BTRFS_IOC_SYNC, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_SYNC));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_SYNC));
 
 	ioctl(-1, BTRFS_IOC_WAIT_SYNC, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_WAIT_SYNC));
 
 	ioctl(-1, BTRFS_IOC_WAIT_SYNC, &u64val);
-	printf("ioctl(-1, %s, [%" PRIu64 "]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%" PRIu64 "])" RVAL_EBADF,
 	       ioc(BTRFS_IOC_WAIT_SYNC), u64val);
 
 	/*
@@ -328,32 +328,32 @@ btrfs_test_subvol_ioctls(void)
 	strcpy(vol_args.name, subvol_name);
 
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_CREATE));
 
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_CREATE), vol_args.name);
 
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SUBVOL_CREATE), vol_args.name);
 
 	ioctl(-1, BTRFS_IOC_SNAP_DESTROY, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_DESTROY), vol_args.name);
 
 	strncpy(vol_args.name, long_subvol_name, BTRFS_PATH_NAME_MAX);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_CREATE), vol_args.name);
 
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SUBVOL_CREATE), vol_args.name);
 
 	ioctl(-1, BTRFS_IOC_SNAP_DESTROY, &vol_args);
-	printf("ioctl(-1, %s, {fd=0, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=0, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_DESTROY), vol_args.name);
 
 	long_subvol_name = realloc(long_subvol_name, BTRFS_SUBVOL_NAME_MAX);
@@ -361,34 +361,34 @@ btrfs_test_subvol_ioctls(void)
 		perror_msg_and_fail("realloc failed");
 
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SNAP_CREATE_V2));
 
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SUBVOL_CREATE_V2));
 
 	strcpy(vol_args_v2.name, subvol_name);
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SNAP_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SUBVOL_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	strncpy(vol_args_v2.name, long_subvol_name, BTRFS_SUBVOL_NAME_MAX);
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SNAP_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SUBVOL_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	strcpy(vol_args_v2.name, subvol_name);
 	vol_args_v2.qgroup_inherit = bad_pointer;
@@ -396,12 +396,12 @@ btrfs_test_subvol_ioctls(void)
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SNAP_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 0);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SUBVOL_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 0);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	const unsigned int n_qgroups = 8;
 	struct btrfs_qgroup_inherit *inherit;
@@ -425,26 +425,26 @@ btrfs_test_subvol_ioctls(void)
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SNAP_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SUBVOL_CREATE_V2));
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	ioctl(-1, BTRFS_IOC_DEFAULT_SUBVOL, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEFAULT_SUBVOL));
 
 	ioctl(-1, BTRFS_IOC_DEFAULT_SUBVOL, &u64val);
-	printf("ioctl(-1, %s, [%" PRIu64 "]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%" PRIu64 "])" RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEFAULT_SUBVOL), u64val);
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_SUBVOL_SETFLAGS));
 	prfl_btrfs(btrfs_snap_flags_v2, vol_args_v2.flags,
 		   "BTRFS_SUBVOL_???");
 	ioctl(-1, BTRFS_IOC_SUBVOL_SETFLAGS, &vol_args_v2.flags);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	if (write_ok) {
 		struct btrfs_ioctl_vol_args_v2 args_passed;
@@ -557,27 +557,27 @@ btrfs_test_balance_ioctls(void)
 	struct btrfs_ioctl_vol_args vol_args = {};
 
 	ioctl(-1, BTRFS_IOC_BALANCE_CTL, 1);
-	printf("ioctl(-1, %s, %sBTRFS_BALANCE_CTL_PAUSE%s) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %sBTRFS_BALANCE_CTL_PAUSE%s)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_BALANCE_CTL),
 	       verbose_xlat ? "0x1 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	ioctl(-1, BTRFS_IOC_BALANCE_CTL, 2);
 	printf("ioctl(-1, %s, "
-	       "%sBTRFS_BALANCE_CTL_CANCEL%s) = -1 EBADF (%m)\n",
+	       "%sBTRFS_BALANCE_CTL_CANCEL%s)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_BALANCE_CTL),
 	       verbose_xlat ? "0x2 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	ioctl(-1, BTRFS_IOC_BALANCE, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_BALANCE));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_BALANCE));
 
 	ioctl(-1, BTRFS_IOC_BALANCE, &vol_args);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_BALANCE));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_BALANCE));
 
 	/* struct btrfs_ioctl_balance_args */
 	ioctl(-1, BTRFS_IOC_BALANCE_V2, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_BALANCE_V2));
 
 	printf("ioctl(-1, %s, {flags=", ioc(BTRFS_IOC_BALANCE_V2));
@@ -589,7 +589,7 @@ btrfs_test_balance_ioctls(void)
 	printf(", sys=");
 	btrfs_print_balance_args(&args.sys);
 	ioctl(-1, BTRFS_IOC_BALANCE_V2, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	if (write_ok) {
 		long ret;
@@ -661,43 +661,43 @@ btrfs_test_device_ioctls(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_RESIZE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_RESIZE));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_RESIZE));
 
 	strcpy(args.name, devid);
 	ioctl(-1, BTRFS_IOC_RESIZE, &args);
-	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_RESIZE), (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_SCAN_DEV, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SCAN_DEV));
 
 	strcpy(args.name, devname);
 	ioctl(-1, BTRFS_IOC_SCAN_DEV, &args);
-	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SCAN_DEV), (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_FORGET_DEV, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_FORGET_DEV));
 
 	strcpy(args.name, devname);
 	ioctl(-1, BTRFS_IOC_FORGET_DEV, &args);
-	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_FORGET_DEV), (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_ADD_DEV, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_ADD_DEV));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_ADD_DEV));
 
 	ioctl(-1, BTRFS_IOC_ADD_DEV, &args);
-	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_ADD_DEV), (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_RM_DEV, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_RM_DEV));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_RM_DEV));
 
 	ioctl(-1, BTRFS_IOC_RM_DEV, &args);
-	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_RM_DEV), (int) args.fd, args.name);
 
 }
@@ -719,19 +719,19 @@ btrfs_test_clone_ioctls(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_CLONE, clone_fd);
-	printf("ioctl(-1, %s, %x) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %x)" RVAL_EBADF,
 	       sprint_xlat_(BTRFS_IOC_CLONE, "BTRFS_IOC_CLONE or FICLONE"),
 	       clone_fd);
 
 	ioctl(-1, BTRFS_IOC_CLONE_RANGE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       sprint_xlat_(BTRFS_IOC_CLONE_RANGE,
 			    "BTRFS_IOC_CLONE_RANGE or FICLONERANGE"));
 
 	ioctl(-1, BTRFS_IOC_CLONE_RANGE, &args);
 	printf("ioctl(-1, %s, "
 	       "{src_fd=%d, src_offset=%" PRI__u64 ", src_length=%" PRI__u64
-	       ", dest_offset=%" PRI__u64 "}) = -1 EBADF (%m)\n",
+	       ", dest_offset=%" PRI__u64 "})" RVAL_EBADF,
 	       sprint_xlat_(BTRFS_IOC_CLONE_RANGE,
 			    "BTRFS_IOC_CLONE_RANGE or FICLONERANGE"),
 		(int) args.src_fd, args.src_offset, args.src_length,
@@ -778,32 +778,32 @@ btrfs_test_defrag_ioctls(void)
 	 * actually consume it.
 	 */
 	ioctl(-1, BTRFS_IOC_DEFRAG, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_DEFRAG));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_DEFRAG));
 
 	ioctl(-1, BTRFS_IOC_DEFRAG, &vol_args);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_DEFRAG));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_DEFRAG));
 
 	/* struct btrfs_ioctl_defrag_range_args */
 	ioctl(-1, BTRFS_IOC_DEFRAG_RANGE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEFRAG_RANGE));
 
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_DEFRAG_RANGE));
 	btrfs_print_defrag_range_args(&args, true);
 	ioctl(-1, BTRFS_IOC_DEFRAG_RANGE, &args);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	args.compress_type = BTRFS_INVALID_COMPRESS;
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_DEFRAG_RANGE));
 	btrfs_print_defrag_range_args(&args, false);
 	ioctl(-1, BTRFS_IOC_DEFRAG_RANGE, &args);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	args.len--;
 	printf("ioctl(-1, %s, ", ioc(BTRFS_IOC_DEFRAG_RANGE));
 	btrfs_print_defrag_range_args(&args, false);
 	ioctl(-1, BTRFS_IOC_DEFRAG_RANGE, &args);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 }
 
 static const char *
@@ -918,24 +918,24 @@ btrfs_test_search_ioctls(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_TREE_SEARCH));
 
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_TREE_SEARCH_V2));
 
 	search_args.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH));
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	search_args_v2.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH_V2));
 	btrfs_print_search_key(&search_args_v2.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, &search_args_v2);
-	printf(", buf_size=%" PRIu64 "}) = -1 EBADF (%m)\n",
+	printf(", buf_size=%" PRIu64 "})" RVAL_EBADF,
 	       (uint64_t)search_args_v2.buf_size);
 
 	key_reference.min_objectid = 6;
@@ -944,13 +944,13 @@ btrfs_test_search_ioctls(void)
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH));
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	search_args_v2.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH_V2));
 	btrfs_print_search_key(&search_args_v2.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, &search_args_v2);
-	printf(", buf_size=%" PRIu64 "}) = -1 EBADF (%m)\n",
+	printf(", buf_size=%" PRIu64 "})" RVAL_EBADF,
 	       (uint64_t)search_args_v2.buf_size);
 
 	key_reference.min_offset++;
@@ -959,13 +959,13 @@ btrfs_test_search_ioctls(void)
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH));
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	search_args_v2.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH_V2));
 	btrfs_print_search_key(&search_args_v2.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, &search_args_v2);
-	printf(", buf_size=%" PRIu64 "}) = -1 EBADF (%m)\n",
+	printf(", buf_size=%" PRIu64 "})" RVAL_EBADF,
 	       (uint64_t)search_args_v2.buf_size);
 
 	key_reference.min_transid++;
@@ -974,13 +974,13 @@ btrfs_test_search_ioctls(void)
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH));
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	search_args_v2.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH_V2));
 	btrfs_print_search_key(&search_args_v2.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, &search_args_v2);
-	printf(", buf_size=%" PRIu64 "}) = -1 EBADF (%m)\n",
+	printf(", buf_size=%" PRIu64 "})" RVAL_EBADF,
 	       (uint64_t)search_args_v2.buf_size);
 
 	key_reference.min_type = 1;
@@ -989,13 +989,13 @@ btrfs_test_search_ioctls(void)
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH));
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	search_args_v2.key = key_reference;
 	printf("ioctl(-1, %s, {", ioc(BTRFS_IOC_TREE_SEARCH_V2));
 	btrfs_print_search_key(&search_args_v2.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, &search_args_v2);
-	printf(", buf_size=%" PRIu64 "}) = -1 EBADF (%m)\n",
+	printf(", buf_size=%" PRIu64 "})" RVAL_EBADF,
 	       (uint64_t)search_args_v2.buf_size);
 
 	if (btrfs_test_root) {
@@ -1045,7 +1045,7 @@ btrfs_test_search_ioctls(void)
 		btrfs_print_search_key(&args->key);
 		printf(", buf_size=%" PRIu64 "}", (uint64_t)args->buf_size);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH_V2, args);
-		printf(" => {buf_size=%" PRIu64 "}) = -1 EOVERFLOW (%m)\n",
+		printf(" => {buf_size=%" PRIu64 "})" RVAL_EOVERFLOW,
 			(uint64_t)args->buf_size);
 		free(args);
 	}
@@ -1064,7 +1064,7 @@ btrfs_test_ino_lookup_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_INO_LOOKUP, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_INO_LOOKUP));
 
 	printf("ioctl(-1, %s, {treeid=", ioc(BTRFS_IOC_INO_LOOKUP));
@@ -1072,7 +1072,7 @@ btrfs_test_ino_lookup_ioctl(void)
 	printf(", objectid=");
 	btrfs_print_objectid(args.objectid);
 	ioctl(-1, BTRFS_IOC_INO_LOOKUP, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	if (btrfs_test_root) {
 		printf("ioctl(%d, %s, {treeid=",
@@ -1095,11 +1095,11 @@ btrfs_test_space_info_ioctl(void)
 	struct btrfs_ioctl_space_args args = {};
 
 	ioctl(-1, BTRFS_IOC_SPACE_INFO, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SPACE_INFO));
 
 	ioctl(-1, BTRFS_IOC_SPACE_INFO, &args);
-	printf("ioctl(-1, %s, {space_slots=%" PRI__u64 "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {space_slots=%" PRI__u64 "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SPACE_INFO), args.space_slots);
 
 	if (btrfs_test_root) {
@@ -1167,10 +1167,10 @@ btrfs_test_scrub_ioctls(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_SCRUB, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_SCRUB));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_SCRUB));
 
 	ioctl(-1, BTRFS_IOC_SCRUB_CANCEL, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_SCRUB_CANCEL));
+	printf("ioctl(-1, %s)" RVAL_EBADF, ioc(BTRFS_IOC_SCRUB_CANCEL));
 
 	printf("ioctl(-1, %s, {devid=%s",
 	       ioc(BTRFS_IOC_SCRUB), sprint_makedev(args.devid));
@@ -1179,14 +1179,14 @@ btrfs_test_scrub_ioctls(void)
 	printf(", flags=");
 	prfl_btrfs(btrfs_scrub_flags, args.flags, "BTRFS_SCRUB_???");
 	ioctl(-1, BTRFS_IOC_SCRUB, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	ioctl(-1, BTRFS_IOC_SCRUB_PROGRESS, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SCRUB_PROGRESS));
 
 	ioctl(-1, BTRFS_IOC_SCRUB_PROGRESS, &args);
-	printf("ioctl(-1, %s, {devid=%s}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {devid=%s})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SCRUB_PROGRESS),
 	       sprint_makedev(args.devid));
 }
@@ -1204,12 +1204,12 @@ btrfs_test_dev_info_ioctl(void)
 	memcpy(&args.uuid, uuid_reference, BTRFS_UUID_SIZE);
 
 	ioctl(-1, BTRFS_IOC_DEV_INFO, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEV_INFO));
 
 	ioctl(-1, BTRFS_IOC_DEV_INFO, &args);
 	printf("ioctl(-1, %s, "
-	       "{devid=%s, uuid=%s}) = -1 EBADF (%m)\n",
+	       "{devid=%s, uuid=%s})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEV_INFO), sprint_makedev(args.devid),
 	       uuid_reference_string);
 }
@@ -1237,22 +1237,22 @@ btrfs_test_ino_path_ioctls(void)
 	args.reserved[3] = 0xdeadc0defacefeeeULL;
 
 	ioctl(-1, BTRFS_IOC_INO_PATHS, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_INO_PATHS));
 
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_LOGICAL_INO));
 
 	ioctl(-1, BTRFS_IOC_INO_PATHS, &args);
 	printf("ioctl(-1, %s, {inum=%" PRI__u64 ", size=%" PRI__u64
-	       ", fspath=NULL}) = -1 EBADF (%m)\n",
+	       ", fspath=NULL})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_INO_PATHS), args.inum, args.size);
 
 	args.fspath = (uintptr_t) buf;
 	ioctl(-1, BTRFS_IOC_INO_PATHS, &args);
 	printf("ioctl(-1, %s, {inum=%" PRI__u64 ", size=%" PRI__u64
-	       ", fspath=0x%" PRI__x64 "}) = -1 EBADF (%m)\n",
+	       ", fspath=0x%" PRI__x64 "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_INO_PATHS), args.inum, args.size, args.fspath);
 
 	args.fspath = 0;
@@ -1261,7 +1261,7 @@ btrfs_test_ino_path_ioctls(void)
 	       ", size=%" PRI__u64 ", reserved=[0xdeadc0defacefeeb"
 	       ", 0xdeadc0defacefeec, 0xdeadc0defacefeed]"
 	       ", flags=0xdeadc0defacefeee /* BTRFS_LOGICAL_INO_ARGS_??? */"
-	       ", inodes=NULL}) = -1 EBADF (%m)\n",
+	       ", inodes=NULL})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_LOGICAL_INO), args.inum, args.size);
 
 	args.fspath = (uintptr_t) buf;
@@ -1273,7 +1273,7 @@ btrfs_test_ino_path_ioctls(void)
 	printf("ioctl(-1, %s, {logical=%" PRI__u64
 	       ", size=%" PRI__u64 ", reserved=[0, 0xdeadc0defacefeec, 0]"
 	       ", flags=%sBTRFS_LOGICAL_INO_ARGS_IGNORE_OFFSET%s"
-	       ", inodes=0x%" PRI__x64 "}) = -1 EBADF (%m)\n",
+	       ", inodes=0x%" PRI__x64 "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_LOGICAL_INO), args.inum, args.size,
 	       verbose_xlat ? "0x1 /* " : "", verbose_xlat ? " */" : "",
 	       args.fspath);
@@ -1284,7 +1284,7 @@ btrfs_test_ino_path_ioctls(void)
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
 	printf("ioctl(-1, %s, {logical=%" PRI__u64
 	       ", size=%" PRI__u64 ", flags=0, inodes=0x%" PRI__x64
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_LOGICAL_INO), args.inum, args.size, args.fspath);
 
 	if (btrfs_test_root) {
@@ -1416,7 +1416,7 @@ btrfs_test_set_received_subvol_ioctl(void)
 	memcpy(&args.uuid, uuid_reference, BTRFS_UUID_SIZE);
 
 	ioctl(-1, BTRFS_IOC_SET_RECEIVED_SUBVOL, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SET_RECEIVED_SUBVOL));
 
 	ioctl(-1, BTRFS_IOC_SET_RECEIVED_SUBVOL, &args);
@@ -1427,7 +1427,7 @@ btrfs_test_set_received_subvol_ioctl(void)
 	       args.stransid, args.stime.sec, args.stime.nsec);
 	print_time_t_nsec(args.stime.sec, args.stime.nsec, true);
 	errno = saved_errno;
-	printf(", flags=0}) = -1 EBADF (%m)\n");
+	printf(", flags=0})" RVAL_EBADF);
 }
 
 /*
@@ -1445,7 +1445,7 @@ btrfs_test_send_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_SEND, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_SEND));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_SEND));
 
 	printf("ioctl(-1, %s, {send_fd=%d, clone_sources_count=%" PRI__u64
 	       ", clone_sources=NULL",
@@ -1456,7 +1456,7 @@ btrfs_test_send_ioctl(void)
 	printf(", flags=");
 	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAGS_???");
 	ioctl(-1, BTRFS_IOC_SEND, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	args.clone_sources_count = 2;
 	args.clone_sources = (__u64 *) (void *) u64_array;
@@ -1478,7 +1478,7 @@ btrfs_test_send_ioctl(void)
 	printf(", flags=");
 	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAGS_???");
 	ioctl(-1, BTRFS_IOC_SEND, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 }
 
 /*
@@ -1493,20 +1493,18 @@ btrfs_test_quota_ctl_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL));
 
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
-	printf("ioctl(-1, %s, {cmd=%sBTRFS_QUOTA_CTL_ENABLE%s}) "
-	       "= -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {cmd=%sBTRFS_QUOTA_CTL_ENABLE%s})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL),
 	       verbose_xlat ? "0x1 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	args.cmd = 2;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
-	printf("ioctl(-1, %s, {cmd=%sBTRFS_QUOTA_CTL_DISABLE%s}) "
-	       "= -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {cmd=%sBTRFS_QUOTA_CTL_DISABLE%s})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL),
 	       verbose_xlat ? "0x2 /* " : "",
 	       verbose_xlat ? " */" : "");
@@ -1514,7 +1512,7 @@ btrfs_test_quota_ctl_ioctl(void)
 	args.cmd = 3;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, %s, "
-	       "{cmd=%sBTRFS_QUOTA_CTL_RESCAN__NOTUSED%s}) = -1 EBADF (%m)\n",
+	       "{cmd=%sBTRFS_QUOTA_CTL_RESCAN__NOTUSED%s})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL),
 	       verbose_xlat ? "0x3 /* " : "",
 	       verbose_xlat ? " */" : "");
@@ -1522,7 +1520,15 @@ btrfs_test_quota_ctl_ioctl(void)
 	args.cmd = 4;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, %s, "
-	       "{cmd=0x4 /* BTRFS_QUOTA_CTL_??? */}) = -1 EBADF (%m)\n",
+	       "{cmd=%sBTRFS_QUOTA_CTL_ENABLE_SIMPLE_QUOTA%s})" RVAL_EBADF,
+	       ioc(BTRFS_IOC_QUOTA_CTL),
+	       verbose_xlat ? "0x4 /* " : "",
+	       verbose_xlat ? " */" : "");
+
+	args.cmd = 5;
+	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
+	printf("ioctl(-1, %s, "
+	       "{cmd=0x5 /* BTRFS_QUOTA_CTL_??? */})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL));
 }
 
@@ -1540,13 +1546,13 @@ btrfs_test_qgroup_assign_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_QGROUP_ASSIGN, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QGROUP_ASSIGN));
 
 	ioctl(-1, BTRFS_IOC_QGROUP_ASSIGN, &args);
 	printf("ioctl(-1, %s, "
 	       "{assign=%" PRI__u64 ", src=%" PRI__u64 ", dst=%" PRI__u64
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QGROUP_ASSIGN), args.assign, args.src, args.dst);
 }
 
@@ -1563,12 +1569,12 @@ btrfs_test_qgroup_create_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_QGROUP_CREATE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_QGROUP_CREATE));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_QGROUP_CREATE));
 
 	ioctl(-1, BTRFS_IOC_QGROUP_CREATE, &args);
 	printf("ioctl(-1, %s, "
 	       "{create=%" PRI__u64 ", qgroupid=%" PRI__u64
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QGROUP_CREATE), args.create, args.qgroupid);
 }
 
@@ -1586,14 +1592,14 @@ btrfs_test_quota_rescan_ioctl(void)
 	};
 
 	ioctl(-1, BTRFS_IOC_QUOTA_RESCAN, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_RESCAN));
 
 	ioctl(-1, BTRFS_IOC_QUOTA_RESCAN, &args);
-	printf("ioctl(-1, %s, {flags=0}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {flags=0})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_RESCAN));
 	ioctl(-1, BTRFS_IOC_QUOTA_RESCAN_WAIT, NULL);
-	printf("ioctl(-1, %s) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_RESCAN_WAIT));
 
 }
@@ -1611,11 +1617,11 @@ btrfs_test_label_ioctls(void)
 	char label[BTRFS_LABEL_SIZE] = "btrfs-label";
 
 	ioctl(-1, FS_IOC_SETFSLABEL, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(FS_IOC_SETFSLABEL));
 
 	ioctl(-1, FS_IOC_SETFSLABEL, label);
-	printf("ioctl(-1, %s, \"%s\") = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, \"%s\")" RVAL_EBADF,
 	       ioc(FS_IOC_SETFSLABEL), label);
 
 	if (write_ok) {
@@ -1642,7 +1648,7 @@ btrfs_test_get_dev_stats_ioctl(void)
 		.flags = max_flags_plus_one(0),
 	};
 	ioctl(-1, BTRFS_IOC_GET_DEV_STATS, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_GET_DEV_STATS));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_GET_DEV_STATS));
 
 	printf("ioctl(-1, %s, {devid=%s"
 	       ", nr_items=%" PRI__u64 ", flags=",
@@ -1651,7 +1657,7 @@ btrfs_test_get_dev_stats_ioctl(void)
 	prfl_btrfs(btrfs_dev_stats_flags, args.flags,
 		     "BTRFS_DEV_STATS_???");
 	ioctl(-1, BTRFS_IOC_GET_DEV_STATS, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	if (write_ok) {
 		args.flags = BTRFS_DEV_STATS_RESET;
@@ -1705,7 +1711,7 @@ btrfs_test_dev_replace_ioctl(void)
 
 	/* struct btrfs_ioctl_dev_replace_args */
 	ioctl(-1, BTRFS_IOC_DEV_REPLACE, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_DEV_REPLACE));
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF, ioc(BTRFS_IOC_DEV_REPLACE));
 
 	for (unsigned long i = 0; i < 3; i++) {
 		int saved_errno;
@@ -1726,16 +1732,15 @@ btrfs_test_dev_replace_ioctl(void)
 			     "BTRFS_IOCTL_DEV_REPLACE_CONT_READING_FROM_SRCDEV"
 			     "_MODE_???", i < 2);
 		errno = saved_errno;
-		printf(", srcdev_name=\"%s\", tgtdev_name=\"%s\"}}) "
-		       "= -1 EBADF (%m)\n",
+		printf(", srcdev_name=\"%s\", tgtdev_name=\"%s\"}})" RVAL_EBADF,
 		       (char *)args.start.srcdev_name,
 		       (char *)args.start.tgtdev_name);
 	}
 
 	args.cmd = 1;
 	ioctl(-1, BTRFS_IOC_DEV_REPLACE, &args);
-	printf("ioctl(-1, %s, {cmd=%sBTRFS_IOCTL_DEV_REPLACE_CMD_STATUS%s}) "
-	       "= -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {cmd=%sBTRFS_IOCTL_DEV_REPLACE_CMD_STATUS%s})"
+	       RVAL_EBADF,
 	       ioc(BTRFS_IOC_DEV_REPLACE),
 	       verbose_xlat ? "0x1 /* " : "", verbose_xlat ? " */" : "");
 }
@@ -1750,7 +1755,7 @@ btrfs_test_extent_same_ioctl(void)
 	struct file_dedupe_range *argsp;
 
 	ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       sprint_xlat_(BTRFS_IOC_FILE_EXTENT_SAME,
 			    "BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE"));
 
@@ -1763,7 +1768,7 @@ btrfs_test_extent_same_ioctl(void)
 		(uint64_t)args.src_offset,
 		(uint64_t)args.src_length, args.dest_count);
 	ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME, &args);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	argsp = malloc(sizeof(*argsp) + sizeof(argsp->info[0]) * 3);
 	if (!argsp)
@@ -1801,7 +1806,7 @@ btrfs_test_extent_same_ioctl(void)
 		printf(", ...");
 	printf("]");
 	ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME, argsp);
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	if (write_ok) {
 		int fd1, fd2;
@@ -1932,7 +1937,7 @@ btrfs_test_features_ioctls(void)
 	struct btrfs_ioctl_feature_flags supported_features[3];
 
 	ioctl(-1, BTRFS_IOC_SET_FEATURES, NULL);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       ioc(BTRFS_IOC_SET_FEATURES));
 
 	printf("ioctl(-1, %s, [", ioc(BTRFS_IOC_SET_FEATURES));
@@ -1940,7 +1945,7 @@ btrfs_test_features_ioctls(void)
 	printf(", ");
 	btrfs_print_features(&args[1]);
 	ioctl(-1, BTRFS_IOC_SET_FEATURES, &args);
-	printf("]) = -1 EBADF (%m)\n");
+	printf("])" RVAL_EBADF);
 
 	if (btrfs_test_root) {
 		printf("ioctl(%d, %s, ",
@@ -1982,7 +1987,7 @@ btrfs_test_read_ioctls(void)
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(btrfs_read_cmd); ++i) {
 		ioctl(-1, (unsigned long) btrfs_read_cmd[i].val, 0);
-		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+		printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 		       sprint_xlat_(btrfs_read_cmd[i].val,
 				    btrfs_read_cmd[i].str));
 	}

@@ -10,6 +10,19 @@
 
 #include <linux/fs.h>
 #include <linux/types.h>
+/*
+ * this file is shared with liburing and that has to autodetect
+ * if linux/time_types.h is available or not, it can
+ * define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
+ * if linux/time_types.h is not available
+ */
+#ifndef UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
+#include <linux/time_types.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * IO submission data structure (Submission Queue Entry)
@@ -30,6 +43,10 @@ struct io_uring_sqe {
 	union {
 		__u64	addr;	/* pointer to buffer or iovecs */
 		__u64	splice_off_in;
+		struct {
+			__u32	level;
+			__u32	optname;
+		};
 	};
 	__u32	len;		/* buffer size or number of iovecs */
 	union {
@@ -50,6 +67,10 @@ struct io_uring_sqe {
 		__u32		unlink_flags;
 		__u32		hardlink_flags;
 		__u32		xattr_flags;
+		__u32		msg_ring_flags;
+		__u32		uring_cmd_flags;
+		__u32		waitid_flags;
+		__u32		futex_flags;
 	};
 	__u64	user_data;	/* data to be passed back at completion time */
 	/* pack this to avoid bogus arm OABI complaints */
@@ -64,12 +85,18 @@ struct io_uring_sqe {
 	union {
 		__s32	splice_fd_in;
 		__u32	file_index;
+		__u32	optlen;
+		struct {
+			__u16	addr_len;
+			__u16	__pad3[1];
+		};
 	};
 	union {
 		struct {
 			__u64	addr3;
 			__u64	__pad2[1];
 		};
+		__u64	optval;
 		/*
 		 * If the ring is initialized with IORING_SETUP_SQE128, then
 		 * this field is used for 80 bytes of arbitrary command data
@@ -140,9 +167,36 @@ enum {
  * IORING_SQ_TASKRUN in the sq ring flags. Not valid with COOP_TASKRUN.
  */
 #define IORING_SETUP_TASKRUN_FLAG	(1U << 9)
-
 #define IORING_SETUP_SQE128		(1U << 10) /* SQEs are 128 byte */
 #define IORING_SETUP_CQE32		(1U << 11) /* CQEs are 32 byte */
+/*
+ * Only one task is allowed to submit requests
+ */
+#define IORING_SETUP_SINGLE_ISSUER	(1U << 12)
+
+/*
+ * Defer running task work to get events.
+ * Rather than running bits of task work whenever the task transitions
+ * try to do it just before it is needed.
+ */
+#define IORING_SETUP_DEFER_TASKRUN	(1U << 13)
+
+/*
+ * Application provides the memory for the rings
+ */
+#define IORING_SETUP_NO_MMAP		(1U << 14)
+
+/*
+ * Register the ring fd in itself for use with
+ * IORING_REGISTER_USE_REGISTERED_RING; return a registered fd index rather
+ * than an fd.
+ */
+#define IORING_SETUP_REGISTERED_FD_ONLY	(1U << 15)
+
+/*
+ * Removes indirection through the SQ index array.
+ */
+#define IORING_SETUP_NO_SQARRAY		(1U << 16)
 
 enum io_uring_op {
 	IORING_OP_NOP,
@@ -192,10 +246,26 @@ enum io_uring_op {
 	IORING_OP_GETXATTR,
 	IORING_OP_SOCKET,
 	IORING_OP_URING_CMD,
+	IORING_OP_SEND_ZC,
+	IORING_OP_SENDMSG_ZC,
+	IORING_OP_READ_MULTISHOT,
+	IORING_OP_WAITID,
+	IORING_OP_FUTEX_WAIT,
+	IORING_OP_FUTEX_WAKE,
+	IORING_OP_FUTEX_WAITV,
 
 	/* this goes last, obviously */
 	IORING_OP_LAST,
 };
+
+/*
+ * sqe->uring_cmd_flags		top 8bits aren't available for userspace
+ * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
+ *				along with setting sqe->buf_index.
+ */
+#define IORING_URING_CMD_FIXED	(1U << 0)
+#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
+
 
 /*
  * sqe->fsync_flags
@@ -211,6 +281,7 @@ enum io_uring_op {
 #define IORING_TIMEOUT_REALTIME		(1U << 3)
 #define IORING_LINK_TIMEOUT_UPDATE	(1U << 4)
 #define IORING_TIMEOUT_ETIME_SUCCESS	(1U << 5)
+#define IORING_TIMEOUT_MULTISHOT	(1U << 6)
 #define IORING_TIMEOUT_CLOCK_MASK	(IORING_TIMEOUT_BOOTTIME | IORING_TIMEOUT_REALTIME)
 #define IORING_TIMEOUT_UPDATE_MASK	(IORING_TIMEOUT_UPDATE | IORING_LINK_TIMEOUT_UPDATE)
 /*
@@ -229,10 +300,13 @@ enum io_uring_op {
  *
  * IORING_POLL_UPDATE		Update existing poll request, matching
  *				sqe->addr as the old user_data field.
+ *
+ * IORING_POLL_LEVEL		Level triggered poll.
  */
 #define IORING_POLL_ADD_MULTI	(1U << 0)
 #define IORING_POLL_UPDATE_EVENTS	(1U << 1)
 #define IORING_POLL_UPDATE_USER_DATA	(1U << 2)
+#define IORING_POLL_ADD_LEVEL		(1U << 3)
 
 /*
  * ASYNC_CANCEL flags.
@@ -241,10 +315,16 @@ enum io_uring_op {
  * IORING_ASYNC_CANCEL_FD	Key off 'fd' for cancelation rather than the
  *				request 'user_data'
  * IORING_ASYNC_CANCEL_ANY	Match any request
+ * IORING_ASYNC_CANCEL_FD_FIXED	'fd' passed in is a fixed descriptor
+ * IORING_ASYNC_CANCEL_USERDATA	Match on user_data, default for no other key
+ * IORING_ASYNC_CANCEL_OP	Match request based on opcode
  */
 #define IORING_ASYNC_CANCEL_ALL	(1U << 0)
 #define IORING_ASYNC_CANCEL_FD	(1U << 1)
 #define IORING_ASYNC_CANCEL_ANY	(1U << 2)
+#define IORING_ASYNC_CANCEL_FD_FIXED	(1U << 3)
+#define IORING_ASYNC_CANCEL_USERDATA	(1U << 4)
+#define IORING_ASYNC_CANCEL_OP	(1U << 5)
 
 /*
  * send/sendmsg and recv/recvmsg flags (sqe->ioprio)
@@ -253,13 +333,58 @@ enum io_uring_op {
  *				or receive and arm poll if that yields an
  *				-EAGAIN result, arm poll upfront and skip
  *				the initial transfer attempt.
+ *
+ * IORING_RECV_MULTISHOT	Multishot recv. Sets IORING_CQE_F_MORE if
+ *				the handler will continue to report
+ *				CQEs on behalf of the same SQE.
+ *
+ * IORING_RECVSEND_FIXED_BUF	Use registered buffers, the index is stored in
+ *				the buf_index field.
+ *
+ * IORING_SEND_ZC_REPORT_USAGE
+ *				If set, SEND[MSG]_ZC should report
+ *				the zerocopy usage in cqe.res
+ *				for the IORING_CQE_F_NOTIF cqe.
+ *				0 is reported if zerocopy was actually possible.
+ *				IORING_NOTIF_USAGE_ZC_COPIED if data was copied
+ *				(at least partially).
  */
 #define IORING_RECVSEND_POLL_FIRST	(1U << 0)
+#define IORING_RECV_MULTISHOT		(1U << 1)
+#define IORING_RECVSEND_FIXED_BUF	(1U << 2)
+#define IORING_SEND_ZC_REPORT_USAGE	(1U << 3)
+
+/*
+ * cqe.res for IORING_CQE_F_NOTIF if
+ * IORING_SEND_ZC_REPORT_USAGE was requested
+ *
+ * It should be treated as a flag, all other
+ * bits of cqe.res should be treated as reserved!
+ */
+#define IORING_NOTIF_USAGE_ZC_COPIED    (1U << 31)
 
 /*
  * accept flags stored in sqe->ioprio
  */
 #define IORING_ACCEPT_MULTISHOT	(1U << 0)
+
+/*
+ * IORING_OP_MSG_RING command types, stored in sqe->addr
+ */
+enum {
+	IORING_MSG_DATA,	/* pass sqe->len as 'res' and off as user_data */
+	IORING_MSG_SEND_FD,	/* send a registered fd to another ring */
+};
+
+/*
+ * IORING_OP_MSG_RING flags (sqe->msg_ring_flags)
+ *
+ * IORING_MSG_RING_CQE_SKIP	Don't post a CQE to the target ring. Not
+ *				applicable for IORING_MSG_DATA, obviously.
+ */
+#define IORING_MSG_RING_CQE_SKIP	(1U << 0)
+/* Pass through the flags from sqe->file_index to cqe->flags */
+#define IORING_MSG_RING_FLAGS_PASS	(1U << 1)
 
 /*
  * IO completion data structure (Completion Queue Entry)
@@ -282,10 +407,13 @@ struct io_uring_cqe {
  * IORING_CQE_F_BUFFER	If set, the upper 16 bits are the buffer ID
  * IORING_CQE_F_MORE	If set, parent SQE will generate more CQE entries
  * IORING_CQE_F_SOCK_NONEMPTY	If set, more data to read after socket recv
+ * IORING_CQE_F_NOTIF	Set for notification CQEs. Can be used to distinct
+ * 			them from sends.
  */
 #define IORING_CQE_F_BUFFER		(1U << 0)
 #define IORING_CQE_F_MORE		(1U << 1)
 #define IORING_CQE_F_SOCK_NONEMPTY	(1U << 2)
+#define IORING_CQE_F_NOTIF		(1U << 3)
 
 enum {
 	IORING_CQE_BUFFER_SHIFT		= 16,
@@ -297,6 +425,9 @@ enum {
 #define IORING_OFF_SQ_RING		0ULL
 #define IORING_OFF_CQ_RING		0x8000000ULL
 #define IORING_OFF_SQES			0x10000000ULL
+#define IORING_OFF_PBUF_RING		0x80000000ULL
+#define IORING_OFF_PBUF_SHIFT		16
+#define IORING_OFF_MMAP_MASK		0xf8000000ULL
 
 /*
  * Filled with the offset for mmap(2)
@@ -310,7 +441,7 @@ struct io_sqring_offsets {
 	__u32 dropped;
 	__u32 array;
 	__u32 resv1;
-	__u64 resv2;
+	__u64 user_addr;
 };
 
 /*
@@ -329,7 +460,7 @@ struct io_cqring_offsets {
 	__u32 cqes;
 	__u32 flags;
 	__u32 resv1;
-	__u64 resv2;
+	__u64 user_addr;
 };
 
 /*
@@ -380,6 +511,7 @@ struct io_uring_params {
 #define IORING_FEAT_RSRC_TAGS		(1U << 10)
 #define IORING_FEAT_CQE_SKIP		(1U << 11)
 #define IORING_FEAT_LINKED_FILE		(1U << 12)
+#define IORING_FEAT_REG_REG_RING	(1U << 13)
 
 /*
  * io_uring_register(2) opcodes and arguments
@@ -420,8 +552,17 @@ enum {
 	IORING_REGISTER_PBUF_RING		= 22,
 	IORING_UNREGISTER_PBUF_RING		= 23,
 
+	/* sync cancelation API */
+	IORING_REGISTER_SYNC_CANCEL		= 24,
+
+	/* register a range of fixed file slots for automatic slot allocation */
+	IORING_REGISTER_FILE_ALLOC_RANGE	= 25,
+
 	/* this goes last */
-	IORING_REGISTER_LAST
+	IORING_REGISTER_LAST,
+
+	/* flag added to the opcode to use a registered ring fd */
+	IORING_REGISTER_USE_REGISTERED_RING	= 1U << 31
 };
 
 /* io-wq worker categories */
@@ -483,7 +624,7 @@ struct io_uring_probe {
 	__u8 ops_len;	/* length of ops[] array below */
 	__u16 resv;
 	__u32 resv2[3];
-	struct io_uring_probe_op ops[0];
+	struct io_uring_probe_op ops[];
 };
 
 struct io_uring_restriction {
@@ -520,12 +661,26 @@ struct io_uring_buf_ring {
 	};
 };
 
+/*
+ * Flags for IORING_REGISTER_PBUF_RING.
+ *
+ * IOU_PBUF_RING_MMAP:	If set, kernel will allocate the memory for the ring.
+ *			The application must not set a ring_addr in struct
+ *			io_uring_buf_reg, instead it must subsequently call
+ *			mmap(2) with the offset set as:
+ *			IORING_OFF_PBUF_RING | (bgid << IORING_OFF_PBUF_SHIFT)
+ *			to get a virtual mapping for the ring.
+ */
+enum {
+	IOU_PBUF_RING_MMAP	= 1,
+};
+
 /* argument for IORING_(UN)REGISTER_PBUF_RING */
 struct io_uring_buf_reg {
 	__u64	ring_addr;
 	__u32	ring_entries;
 	__u16	bgid;
-	__u16	pad;
+	__u16	flags;
 	__u64	resv[3];
 };
 
@@ -554,5 +709,49 @@ struct io_uring_getevents_arg {
 	__u32	pad;
 	__u64	ts;
 };
+
+/*
+ * Argument for IORING_REGISTER_SYNC_CANCEL
+ */
+struct io_uring_sync_cancel_reg {
+	__u64				addr;
+	__s32				fd;
+	__u32				flags;
+	struct __kernel_timespec	timeout;
+	__u8				opcode;
+	__u8				pad[7];
+	__u64				pad2[3];
+};
+
+/*
+ * Argument for IORING_REGISTER_FILE_ALLOC_RANGE
+ * The range is specified as [off, off + len)
+ */
+struct io_uring_file_index_range {
+	__u32	off;
+	__u32	len;
+	__u64	resv;
+};
+
+struct io_uring_recvmsg_out {
+	__u32 namelen;
+	__u32 controllen;
+	__u32 payloadlen;
+	__u32 flags;
+};
+
+/*
+ * Argument for IORING_OP_URING_CMD when file is a socket
+ */
+enum {
+	SOCKET_URING_OP_SIOCINQ		= 0,
+	SOCKET_URING_OP_SIOCOUTQ,
+	SOCKET_URING_OP_GETSOCKOPT,
+	SOCKET_URING_OP_SETSOCKOPT,
+};
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

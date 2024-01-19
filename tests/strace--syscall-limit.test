@@ -1,0 +1,33 @@
+#!/bin/sh -e
+#
+# Check --syscall-limit option.
+#
+# Copyright (c) 2016-2023 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+prog_args="../$NAME"
+set -- --syscall-limit=3 --trace='chdir,unlinkat' "$@"
+
+run_prog > /dev/null
+echo 0 > exp_status
+match_diff exp_status parent_status 'parent_status does not match expectations'
+rm parent_status
+
+run_strace --signal='!SIGCHLD,SIGCONT' --quiet=path-resolution,personality \
+	-f -a9 "$@" $prog_args > "$EXP"
+
+# Do not wait forever, stop waiting
+# if the file won't appear after 10 iterations.
+attempt=1
+while [ "$attempt" -le 10 ] && [ ! -s 'parent_status' ]; do
+	$SLEEP_A_BIT
+	attempt=$((attempt + 1))
+done
+
+match_diff "$LOG" "$EXP"
+match_diff exp_status parent_status 'parent_status does not match expectations'
+rm parent_status exp_status

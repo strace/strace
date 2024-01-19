@@ -2,6 +2,7 @@
  * Check decoding of move_mount syscall.
  *
  * Copyright (c) 2019-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -96,15 +97,22 @@ main(void)
 	printf("move_mount(AT_FDCWD<%s>, \"\", %d<%s>, \"%s\", %s) = %s\n",
 	       cwd, dfd, path, fname, set_group_str, errstr);
 
-	k_move_mount(-1, path, -100, empty, 0x177);
+#define beneath_str "MOVE_MOUNT_BENEATH"
+	k_move_mount(-100, empty, dfd, fname, 0x200);
+	printf("move_mount(AT_FDCWD<%s>, \"\", %d<%s>, \"%s\", %s) = %s\n",
+	       cwd, dfd, path, fname, beneath_str, errstr);
+
+	k_move_mount(-1, path, -100, empty, 0x377);
 	printf("move_mount(-1, \"%s\", AT_FDCWD<%s>, \"\", %s) = %s\n",
-	       path, cwd, f_flags_str "|" t_flags_str "|" set_group_str,
+	       path, cwd,
+	       f_flags_str "|" t_flags_str "|" set_group_str "|" beneath_str,
 	       errstr);
 
 	k_move_mount(-100, empty, -1, path, -1);
 	printf("move_mount(AT_FDCWD<%s>, \"\", -1, \"%s\", %s) = %s\n",
 	       cwd, path,
-	       f_flags_str "|" t_flags_str "|" set_group_str "|0xfffffe88",
+	       f_flags_str "|" t_flags_str "|" set_group_str "|" beneath_str
+	       "|0xfffffc88",
 	       errstr);
 
 	puts("+++ exited with 0 +++");

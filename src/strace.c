@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2022 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -29,6 +29,7 @@
 #include <sys/prctl.h>
 
 #include "kill_save_errno.h"
+#include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
 #include "mmap_cache.h"
@@ -51,7 +52,7 @@ extern char *optarg;
 
 #ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
-bool stack_trace_enabled;
+enum stack_trace_modes stack_trace_mode;
 #endif
 
 #define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
@@ -70,8 +71,8 @@ const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 cflag_t cflag = CFLAG_NONE;
 bool followfork;
 bool output_separately;
-unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
-	| PTRACE_O_TRACEEXIT;
+static unsigned int ptrace_setoptions =
+	PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT;
 static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NONE,			"none" },
 	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
@@ -84,8 +85,10 @@ bool Tflag;
 int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
-bool nflag;
 bool count_wallclock;
+bool tracing_fds;
+long long syscall_limit = -1;
+static bool nflag;
 static int tflag_scale = 1000000000;
 static unsigned tflag_width = 0;
 static const char *tflag_format = NULL;
@@ -183,6 +186,8 @@ static size_t tcb_wait_tab_size;
 #ifndef HAVE_PROGRAM_INVOCATION_NAME
 char *program_invocation_name;
 #endif
+
+char *argv0; /* override argv[0] on execve */
 
 unsigned os_release; /* generated from uname()'s u.release */
 
@@ -351,7 +356,11 @@ static void
 usage(void)
 {
 #ifdef ENABLE_STACKTRACE
+# ifdef USE_LIBDW
+# define K_OPT "kk"
+# else
 # define K_OPT "k"
+# endif
 #else
 # define K_OPT ""
 #endif
@@ -386,7 +395,12 @@ Startup:\n\
   -p PID, --attach=PID\n\
 		 trace process with process id PID, may be repeated\n\
   -u USERNAME, --user=USERNAME\n\
+<<<<<<< HEAD
 		 run command as USERNAME handling setuid and/or setgid\n\
+=======
+                 run command as USERNAME handling setuid and/or setgid\n\
+  --argv0=NAME   set PROG argv[0] to NAME\n\
+>>>>>>> upstream/master
 \n\
 Tracing:\n\
   -b execve, --detach-on=execve\n\
@@ -406,7 +420,8 @@ Tracing:\n\
      2, waiting:    fatal signals are blocked while decoding syscall (default)\n\
      3, never:	    fatal signals are always blocked (default if '-o FILE PROG')\n\
      4, never_tstp: fatal signals and SIGTSTP (^Z) are always blocked\n\
-		    (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+                    (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+  --kill-on-exit kill all tracees if strace is killed\n\
 \n\
 Filtering:\n\
   -e trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none},\n\
@@ -419,8 +434,10 @@ Filtering:\n\
 		 trace only the specified set of signals\n\
 		 print only the signals from SET\n\
   -e status=SET, --status=SET\n\
-		 print only system calls with the return statuses in SET\n\
-     statuses:	 successful, failed, unfinished, unavailable, detached\n\
+                 print only system calls with the return statuses in SET\n\
+     statuses:   successful, failed, unfinished, unavailable, detached\n\
+  -e trace-fds=SET, --trace-fds=SET\n\
+                 trace operations on file descriptors from SET\n\
   -P PATH, --trace-path=PATH\n\
 		 trace accesses to PATH\n\
   -z, --successful-only\n\
@@ -447,11 +464,12 @@ Output format:\n\
   -e kvm=vcpu, --kvm=vcpu\n\
 		 print exit reason of kvm vcpu\n\
   -e decode-fds=SET, --decode-fds=SET\n\
-		 what kinds of file descriptor information details to decode\n\
-     details:	 dev (device major/minor for block/char device files)\n\
-		 path (file path),\n\
-		 pidfd (associated PID for pidfds),\n\
-		 socket (protocol-specific information for socket descriptors)\n\
+                 what kinds of file descriptor information details to decode\n\
+     details:    dev (device major/minor for block/char device files)\n\
+                 path (file path),\n\
+                 pidfd (associated PID for pidfds),\n\
+                 socket (protocol-specific information for socket descriptors),\n\
+                 signalfd (signal masks for signalfds)\n\
 "
 #ifdef ENABLE_SECONTEXT
 	       "\
@@ -469,10 +487,16 @@ Output format:\n\
 		 print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
-	       "\
-  -k, --stack-traces\n\
-		 obtain stack trace between each syscall\n\
+"\
+  -k, --stack-traces[=symbol]\n\
+                 obtain stack trace between each syscall\n\
 "
+#ifdef USE_LIBDW
+"\
+  -kk, --stack-traces=source\n\
+                 obtain stack trace and source info between each syscall\n\
+"
+#endif
 #endif
 	       "\
   -n, --syscall-number\n\
@@ -548,6 +572,10 @@ Statistics:\n\
 		 (default time-percent,total-time,avg-time,calls,errors,name)\n\
   -w, --summary-wall-clock\n\
 		 summarise syscall latency (default is system time)\n\
+\n\
+Stop condition:\n\
+  --syscall-limit=LIMIT\n\
+                 Detach all tracees after tracing LIMIT syscalls\n\
 \n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
@@ -940,15 +968,17 @@ printleader(struct tcb *tcp)
 		printing_tcp = tcp;
 
 	if (printing_tcp) {
-		set_current_tcp(printing_tcp);
-		if (!tcp->staged_output_data && printing_tcp->curcol != 0 &&
-		    (!output_separately || printing_tcp == tcp)) {
+		if (printing_tcp->curcol != 0 &&
+		    (printing_tcp == tcp ||
+		     (!output_separately &&
+		      !printing_tcp->staged_output_data))) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
 			 * wasn't finished (same or different tcb, doesn't matter).
 			 * case 2: split log, we are the same tcb, but our last line
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
+			set_current_tcp(printing_tcp);
 
 			tprints_dummy(" <");
 			tprint_unfinished(1);
@@ -1015,7 +1045,7 @@ printleader(struct tcb *tcp)
 		clock_gettime(CLOCK_MONOTONIC, &ts);
 
 		static struct timespec ots;
-		if (ots.tv_sec == 0)
+		if (ots.tv_sec == 0 && ots.tv_nsec == 0)
 			ots = ts;
 
 		struct timespec dts;
@@ -1062,7 +1092,7 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stack_trace_mode)
 		unwind_tcb_init(tcp);
 #endif
 }
@@ -1141,7 +1171,7 @@ alloctcb(int pid)
 	if (nprocs == tcbtabsize)
 		expand_tcbtab();
 
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+	for (size_t i = 0; i < tcbtabsize; ++i) {
 		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid) {
 			memset(tcp, 0, sizeof(*tcp));
@@ -1214,7 +1244,7 @@ droptcb(struct tcb *tcp)
 	free_tcb_priv_data(tcp);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stack_trace_mode)
 		unwind_tcb_fin(tcp);
 #endif
 
@@ -1256,17 +1286,20 @@ droptcb(struct tcb *tcp)
 	memset(tcp, 0, sizeof(*tcp));
 }
 
-/* Detach traced process.
- * Never call DETACH twice on the same process as both unattached and
- * attached-unstopped processes give the same ESRCH.  For unattached process we
- * would SIGSTOP it and wait for its SIGSTOP notification forever.
- */
 static void
-detach(struct tcb *tcp)
+droptcb_verbose(struct tcb *tcp)
 {
-	int error;
-	int status;
+	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
+	    && (tcp->flags & TCB_ATTACHED))
+		error_msg("Process %u detached", tcp->pid);
 
+	droptcb(tcp);
+}
+
+/* Returns true when the tracee has to be waited for. */
+static bool
+interrupt_or_stop(struct tcb *tcp)
+{
 	/*
 	 * Linux wrongly insists the child be stopped
 	 * before detaching.  Arghh.  We go through hoops
@@ -1274,24 +1307,24 @@ detach(struct tcb *tcp)
 	 */
 
 	if (!(tcp->flags & TCB_ATTACHED))
-		goto drop;
+		return false;
 
 	/* We attached but possibly didn't see the expected SIGSTOP.
 	 * We must catch exactly one as otherwise the detached process
 	 * would be left stopped (process state T).
 	 */
 	if (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)
-		goto wait_loop;
+		return true;
 
-	error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
+	int error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
 	if (!error) {
 		/* On a clear day, you can see forever. */
-		goto drop;
+		return false;
 	}
 	if (errno != ESRCH) {
 		/* Shouldn't happen. */
 		perror_func_msg("ptrace(PTRACE_DETACH,%u)", tcp->pid);
-		goto drop;
+		return false;
 	}
 	/* ESRCH: process is either not stopped or doesn't exist. */
 	if (my_tkill(tcp->pid, 0) < 0) {
@@ -1299,7 +1332,7 @@ detach(struct tcb *tcp)
 			/* Shouldn't happen. */
 			perror_func_msg("tkill(%u,0)", tcp->pid);
 		/* else: process doesn't exist. */
-		goto drop;
+		return false;
 	}
 	/* Process is not stopped, need to stop it. */
 	if (use_seize) {
@@ -1311,27 +1344,111 @@ detach(struct tcb *tcp)
 		 */
 		error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
 		if (!error)
-			goto wait_loop;
+			return true;
 		if (errno != ESRCH)
 			perror_func_msg("ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
 	} else {
 		error = my_tkill(tcp->pid, SIGSTOP);
 		if (!error)
-			goto wait_loop;
+			return true;
 		if (errno != ESRCH)
 			perror_func_msg("tkill(%u,SIGSTOP)", tcp->pid);
 	}
-	/* Either process doesn't exist, or some weird error. */
-	goto drop;
 
-wait_loop:
-	/* We end up here in three cases:
+	/* Either process doesn't exist, or some weird error. */
+	return false;
+}
+
+/* Returns true if the tracee can be passed to droptcb. */
+static bool
+detach_interrupted_or_stopped(struct tcb *tcp, int status)
+{
+	if (!WIFSTOPPED(status)) {
+		/*
+		 * Tracee exited or was killed by signal.
+		 * We shouldn't normally reach this place:
+		 * we don't want to consume exit status.
+		 * Consider "strace -p PID" being ^C-ed:
+		 * we want merely to detach from PID.
+		 *
+		 * However, we _can_ end up here if tracee
+		 * was SIGKILLed.
+		 */
+		return true;
+	}
+	unsigned int sig = WSTOPSIG(status);
+	debug_msg("detach wait: event:%d sig:%d",
+		  (unsigned) status >> 16, sig);
+	if (use_seize) {
+		unsigned event = (unsigned)status >> 16;
+		if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
+			/*
+			 * sig == SIGTRAP: PTRACE_INTERRUPT stop.
+			 * sig == other: process was already stopped
+			 * with this stopping sig (see tests/detach-stopped).
+			 * Looks like re-injecting this sig is not necessary
+			 * in DETACH for the tracee to remain stopped.
+			 */
+			sig = 0;
+		}
+		/*
+		 * PTRACE_INTERRUPT is not guaranteed to produce
+		 * the above event if other ptrace-stop is pending.
+		 * See tests/detach-sleeping testcase:
+		 * strace got SIGINT while tracee is sleeping.
+		 * We sent PTRACE_INTERRUPT.
+		 * We see syscall exit, not PTRACE_INTERRUPT stop.
+		 * We won't get PTRACE_INTERRUPT stop
+		 * if we would CONT now. Need to DETACH.
+		 */
+		if (sig == syscall_trap_sig)
+			sig = 0;
+		/* else: not sure in which case we can be here.
+		 * Signal stop? Inject it while detaching.
+		 */
+		ptrace_restart(PTRACE_DETACH, tcp, sig);
+		return true;
+	}
+	/* Note: this check has to be after use_seize check */
+	/* (else, in use_seize case SIGSTOP will be mistreated) */
+	if (sig == SIGSTOP) {
+		/* Detach, suppressing SIGSTOP */
+		ptrace_restart(PTRACE_DETACH, tcp, 0);
+		return true;
+	}
+	if (sig == syscall_trap_sig)
+		sig = 0;
+	/* Can't detach just yet, may need to wait for SIGSTOP */
+	int error = ptrace_restart(PTRACE_CONT, tcp, sig);
+	if (error < 0) {
+		/* Should not happen.
+		 * Note: ptrace_restart returns 0 on ESRCH, so it's not it.
+		 * ptrace_restart already emitted error message.
+		 */
+		return true;
+	}
+	return false;
+}
+
+/* Detach traced process.
+ * Never call DETACH twice on the same process as both unattached and
+ * attached-unstopped processes give the same ESRCH.  For unattached process we
+ * would SIGSTOP it and wait for its SIGSTOP notification forever.
+ */
+static void
+detach(struct tcb *tcp)
+{
+	if (!interrupt_or_stop(tcp))
+		goto drop;
+
+	/*
+	 * We end up here in three cases:
 	 * 1. We sent PTRACE_INTERRUPT (use_seize case)
 	 * 2. We sent SIGSTOP (!use_seize)
 	 * 3. Attach SIGSTOP was already pending (TCB_IGNORE_ONE_SIGSTOP set)
 	 */
 	for (;;) {
-		unsigned int sig;
+		int status;
 		if (waitpid(tcp->pid, &status, __WALL) < 0) {
 			if (errno == EINTR)
 				continue;
@@ -1343,78 +1460,12 @@ wait_loop:
 			perror_func_msg("waitpid(%u)", tcp->pid);
 			break;
 		}
-		if (!WIFSTOPPED(status)) {
-			/*
-			 * Tracee exited or was killed by signal.
-			 * We shouldn't normally reach this place:
-			 * we don't want to consume exit status.
-			 * Consider "strace -p PID" being ^C-ed:
-			 * we want merely to detach from PID.
-			 *
-			 * However, we _can_ end up here if tracee
-			 * was SIGKILLed.
-			 */
+		if (detach_interrupted_or_stopped(tcp, status))
 			break;
-		}
-		sig = WSTOPSIG(status);
-		debug_msg("detach wait: event:%d sig:%d",
-			  (unsigned) status >> 16, sig);
-		if (use_seize) {
-			unsigned event = (unsigned)status >> 16;
-			if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
-				/*
-				 * sig == SIGTRAP: PTRACE_INTERRUPT stop.
-				 * sig == other: process was already stopped
-				 * with this stopping sig (see tests/detach-stopped).
-				 * Looks like re-injecting this sig is not necessary
-				 * in DETACH for the tracee to remain stopped.
-				 */
-				sig = 0;
-			}
-			/*
-			 * PTRACE_INTERRUPT is not guaranteed to produce
-			 * the above event if other ptrace-stop is pending.
-			 * See tests/detach-sleeping testcase:
-			 * strace got SIGINT while tracee is sleeping.
-			 * We sent PTRACE_INTERRUPT.
-			 * We see syscall exit, not PTRACE_INTERRUPT stop.
-			 * We won't get PTRACE_INTERRUPT stop
-			 * if we would CONT now. Need to DETACH.
-			 */
-			if (sig == syscall_trap_sig)
-				sig = 0;
-			/* else: not sure in which case we can be here.
-			 * Signal stop? Inject it while detaching.
-			 */
-			ptrace_restart(PTRACE_DETACH, tcp, sig);
-			break;
-		}
-		/* Note: this check has to be after use_seize check */
-		/* (else, in use_seize case SIGSTOP will be mistreated) */
-		if (sig == SIGSTOP) {
-			/* Detach, suppressing SIGSTOP */
-			ptrace_restart(PTRACE_DETACH, tcp, 0);
-			break;
-		}
-		if (sig == syscall_trap_sig)
-			sig = 0;
-		/* Can't detach just yet, may need to wait for SIGSTOP */
-		error = ptrace_restart(PTRACE_CONT, tcp, sig);
-		if (error < 0) {
-			/* Should not happen.
-			 * Note: ptrace_restart returns 0 on ESRCH, so it's not it.
-			 * ptrace_restart already emitted error message.
-			 */
-			break;
-		}
 	}
 
-drop:
-	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
-	    && (tcp->flags & TCB_ATTACHED))
-		error_msg("Process %u detached", tcp->pid);
-
-	droptcb(tcp);
+ drop:
+	droptcb_verbose(tcp);
 }
 
 static void
@@ -1551,9 +1602,11 @@ startup_attach(void)
 						   " session");
 			break;
 		}
+
+		debug_msg("new tracer pid is %d", strace_tracer_pid);
 	}
 
-	for (unsigned int tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
+	for (size_t tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
 		tcp = tcbtab[tcbi];
 
 		if (!tcp->pid)
@@ -1586,6 +1639,15 @@ startup_attach(void)
 	}
 }
 
+static void
+maybe_init_seccomp_filter(void)
+{
+	debug_msg("seccomp filter %s",
+		  seccomp_filtering ? "enabled" : "disabled");
+	if (seccomp_filtering)
+		init_seccomp_filter();
+}
+
 /* Stack-o-phobic exec helper, in the hope to work around
  * NOMMU + "daemonized tracer" difficulty.
  */
@@ -1607,10 +1669,13 @@ exec_or_die(void)
 
 	if (params->fd_to_close >= 0)
 		close(params->fd_to_close);
-	if (!daemonized_tracer && !use_seize) {
-		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
+
+	if (!daemonized_tracer) {
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
+
+		if (!use_seize && ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
-		}
 	}
 
 	if (username != NULL) {
@@ -1618,19 +1683,20 @@ exec_or_die(void)
 		 * It is important to set groups before we
 		 * lose privileges on setuid.
 		 */
-		if (initgroups(username, run_gid) < 0) {
+		if (initgroups(username, run_gid) < 0)
 			perror_msg_and_die("initgroups");
-		}
-		if (setregid(run_gid, params->run_egid) < 0) {
+		if (setregid(run_gid, params->run_egid) < 0)
 			perror_msg_and_die("setregid");
-		}
-		if (setreuid(run_uid, params->run_euid) < 0) {
+
+		/*
+		 * If there is a seccomp filter to be installed, this should
+		 * be done before CAP_SYS_ADMIN is dropped by setreuid.
+		 */
+		maybe_init_seccomp_filter();
+
+		if (setreuid(run_uid, params->run_euid) < 0)
 			perror_msg_and_die("setreuid");
-		}
-	} else if (geteuid() != 0)
-		if (setreuid(run_uid, run_uid) < 0) {
-			perror_msg_and_die("setreuid");
-		}
+	}
 
 	if (!daemonized_tracer) {
 		/*
@@ -1649,15 +1715,12 @@ exec_or_die(void)
 		while (wait(NULL) < 0 && errno == EINTR)
 			;
 		alarm(0);
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
 	}
 
-	if (params_for_tracee.child_sa.sa_handler != SIG_DFL)
-		sigaction(SIGCHLD, &params_for_tracee.child_sa, NULL);
-
-	debug_msg("seccomp filter %s",
-		  seccomp_filtering ? "enabled" : "disabled");
-	if (seccomp_filtering)
-		init_seccomp_filter();
+	if (!username)
+		maybe_init_seccomp_filter();
 	execve(params->pathname, params->argv, params->env);
 	perror_msg_and_die("exec");
 }
@@ -1743,17 +1806,7 @@ startup_child(char **argv, char **env)
 	}
 	if (strchr(filename, '/')) {
 		strcpy(pathname, filename);
-	}
-#ifdef USE_DEBUGGING_EXEC
-	/*
-	 * Debuggers customarily check the current directory
-	 * first regardless of the path but doing that gives
-	 * security geeks a panic attack.
-	 */
-	else if (stat_file(filename, &statbuf) == 0)
-		strcpy(pathname, filename);
-#endif /* USE_DEBUGGING_EXEC */
-	else {
+	} else {
 		const char *path;
 		size_t m, n, len;
 
@@ -1790,14 +1843,17 @@ startup_child(char **argv, char **env)
 		if (!path || !*path)
 			pathname[0] = '\0';
 	}
-	if (stat_file(pathname, &statbuf) < 0) {
-		perror_msg_and_die("Can't stat '%s'", filename);
-	}
+	if (filename && !*pathname)
+		error_msg_and_die("Cannot find executable '%s'", filename);
+	if (stat_file(pathname, &statbuf) < 0)
+		perror_msg_and_die("Cannot stat '%s'", pathname);
 
 	params_for_tracee.fd_to_close = (shared_log != stderr) ? fileno(shared_log) : -1;
 	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
 	params_for_tracee.run_egid = (statbuf.st_mode & S_ISGID) ? statbuf.st_gid : run_gid;
 	params_for_tracee.argv = argv;
+	if (argv0)
+		params_for_tracee.argv[0] = argv0;
 	params_for_tracee.env = env;
 	/*
 	 * On NOMMU, can be safely freed only after execve in tracee.
@@ -2324,6 +2380,7 @@ init(int argc, char *argv[])
 	int tflag_short = 0;
 	bool columns_set = false;
 	bool sortby_set = false;
+	bool opt_kill_on_exit = false;
 
 	/*
 	 * We can initialise global_path_set only after tracing backend
@@ -2384,12 +2441,17 @@ init(int argc, char *argv[])
 		GETOPT_DAEMONIZE,
 		GETOPT_HEX_STR,
 		GETOPT_FOLLOWFORKS,
+		GETOPT_KILL_ON_EXIT,
 		GETOPT_OUTPUT_SEPARATELY,
-		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
+		GETOPT_SYSCALL_LIMIT,
+		GETOPT_STACK,
+		GETOPT_TS,
 		GETOPT_TIPS,
+		GETOPT_ARGV0,
 
 		GETOPT_QUAL_TRACE,
+		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
 		GETOPT_QUAL_VERBOSE,
 		GETOPT_QUAL_RAW,
@@ -2423,7 +2485,9 @@ init(int argc, char *argv[])
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,	   0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
-		{ "stack-traces",	no_argument,	   0, 'k' },
+		{ "kill-on-exit",	no_argument,	   0, GETOPT_KILL_ON_EXIT },
+		{ "stack-traces" ,	optional_argument, 0, GETOPT_STACK },
+		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
@@ -2448,8 +2512,10 @@ init(int argc, char *argv[])
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
+		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
+		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
 		{ "verbose",	required_argument, 0, GETOPT_QUAL_VERBOSE },
 		{ "raw",	required_argument, 0, GETOPT_QUAL_RAW },
@@ -2571,12 +2637,54 @@ init(int argc, char *argv[])
 			break;
 		case 'k':
 #ifdef ENABLE_STACKTRACE
-			stack_trace_enabled = true;
+			switch (stack_trace_mode) {
+			case STACK_TRACE_OFF:
+				stack_trace_mode = STACK_TRACE_ON;
+				break;
+			case STACK_TRACE_ON:
+# ifdef USE_LIBDW
+				stack_trace_mode = STACK_TRACE_WITH_SRCINFO;
+# else
+				error_msg_and_die("Stack traces with "
+						  "source line information (-kk/"
+						  "--stack-traces=source option) "
+						  "are not supported by this "
+						  "build of strace");
+# endif	/* USE_LIBDW */
+				break;
+			default:
+				error_msg_and_die("Too many -k options");
+			}
 #else
 			error_msg_and_die("Stack traces (-k/--stack-traces "
 					  "option) are not supported by this "
 					  "build of strace");
-#endif
+#endif /* ENABLE_STACKTRACE */
+			break;
+		case GETOPT_STACK:
+#ifdef ENABLE_STACKTRACE
+			if (optarg == NULL || strcmp(optarg, "symbol") == 0)
+				stack_trace_mode = STACK_TRACE_ON;
+			else if (strcmp(optarg, "source") == 0) {
+# ifdef USE_LIBDW
+				stack_trace_mode = STACK_TRACE_WITH_SRCINFO;
+# else
+				error_msg_and_die("Stack traces with "
+						  "source line information "
+						  "(-kk/--stack-traces=source option) "
+						  "are not supported by this "
+						  "build of strace");
+# endif /* USE_LIBDW */
+			} else
+				error_opt_arg(c, lopt, optarg);
+#else
+			error_msg_and_die("Stack traces (-k/--stack-traces "
+					  "option) are not supported by this "
+					  "build of strace");
+#endif /* ENABLE_STACKTRACE */
+			break;
+		case GETOPT_KILL_ON_EXIT:
+			opt_kill_on_exit = true;
 			break;
 		case 'n':
 			nflag = 1;
@@ -2688,15 +2796,26 @@ init(int argc, char *argv[])
 		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
 			break;
+		case GETOPT_SYSCALL_LIMIT:
+			syscall_limit = string_to_ulonglong(optarg);
+			if (syscall_limit <= 0)
+				error_opt_arg(c, lopt, optarg);
+			break;
 		case GETOPT_TIPS:
 			if (parse_tips_arg(optarg ?: ""))
 				error_opt_arg(c, lopt, optarg);
+			break;
+		case GETOPT_ARGV0:
+			argv0 = optarg;
 			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
 		case GETOPT_QUAL_TRACE:
 			qualify_trace(optarg);
+			break;
+		case GETOPT_QUAL_TRACE_FD:
+			qualify_trace_fd(optarg);
 			break;
 		case GETOPT_QUAL_ABBREV:
 			qualify_abbrev(optarg);
@@ -2752,8 +2871,15 @@ init(int argc, char *argv[])
 	argc -= optind;
 
 	if (argc < 0 || (!nprocs && !argc)) {
+		if (show_tips != TIPS_NONE) {
+			print_totd();
+			exit(exit_code);
+		}
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
+
+	if (!argc && argv0)
+		error_msg_and_help("PROG [ARGS] must be specified with --argv0");
 
 	if (daemonized_tracer_long) {
 		if (daemonized_tracer) {
@@ -2808,17 +2934,11 @@ init(int argc, char *argv[])
 		 * of tcbs are not filled though tcbs are initialized.
 		 * We must fill the fields here.
 		 */
-		for (unsigned int i = 0; i < tcbtabsize; ++i) {
+		for (size_t i = 0; i < tcbtabsize; ++i) {
 			struct tcb *tcp = tcbtab[i];
 			if (tcp->comm[0] == 0)
 				maybe_load_task_comm(tcp);
 		}
-	}
-
-	if (seccomp_filtering && detach_on_execve) {
-		error_msg("--seccomp-bpf is not enabled because"
-			  " it is not compatible with -b");
-		seccomp_filtering = false;
 	}
 
 	if (followfork_short) {
@@ -2834,15 +2954,29 @@ init(int argc, char *argv[])
 		}
 	}
 
-	if (seccomp_filtering) {
-		if (nprocs && (!argc || debug_flag))
-			error_msg("--seccomp-bpf is not enabled for processes"
-				  " attached with -p");
-		if (!followfork) {
-			error_msg("--seccomp-bpf cannot be used without "
-				  "-f/--follow-forks, disabling");
+	if (seccomp_filtering && !followfork) {
+		error_msg("--seccomp-bpf cannot be used without"
+			  " -f/--follow-forks, disabling");
+		seccomp_filtering = false;
+	}
+
+	if (seccomp_filtering && detach_on_execve) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with -b");
+		seccomp_filtering = false;
+	}
+
+	if (seccomp_filtering && syscall_limit > 0) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with --syscall-limit");
+		seccomp_filtering = false;
+	}
+
+	if (seccomp_filtering && nprocs) {
+		error_msg("--seccomp-bpf is not enabled for processes"
+			  " attached with -p");
+		if (argc == 0)
 			seccomp_filtering = false;
-		}
 	}
 
 	if (optF) {
@@ -2880,7 +3014,7 @@ init(int argc, char *argv[])
 		if (iflag)
 			error_msg("-i/--instruction-pointer has no effect "
 				  "with -c/--summary-only");
-		if (stack_trace_enabled)
+		if (stack_trace_mode)
 			error_msg("-k/--stack-traces has no effect "
 				  "with -c/--summary-only");
 		if (nflag)
@@ -2936,8 +3070,8 @@ init(int argc, char *argv[])
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
-		unwind_init();
+	if (stack_trace_mode)
+		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO);
 #endif
 
 	/* See if they want to run as another user. */
@@ -2966,8 +3100,21 @@ init(int argc, char *argv[])
 
 	if (seccomp_filtering)
 		check_seccomp_filter();
-	if (seccomp_filtering)
+	if (seccomp_filtering) {
 		ptrace_setoptions |= PTRACE_O_TRACESECCOMP;
+		if (nprocs == 0 && is_exitkill_supported())
+			ptrace_setoptions |= PTRACE_O_EXITKILL;
+	}
+
+	if (opt_kill_on_exit) {
+		if (nprocs)
+			error_msg_and_die("--kill-on-exit and -p/--attach"
+					  " are mutually exclusive options");
+		if (!is_exitkill_supported())
+			error_msg_and_die("PTRACE_O_EXITKILL is not supported"
+					  " by the kernel");
+		ptrace_setoptions |= PTRACE_O_EXITKILL;
+	}
 
 	debug_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
@@ -3116,7 +3263,7 @@ pid2tcb(const int pid)
 	if (tcp && tcp->pid == pid)
 		return tcp;
 
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+	for (size_t i = 0; i < tcbtabsize; ++i) {
 		tcp = tcbtab[i];
 		if (tcp->pid == pid)
 			return *ptcp = tcp;
@@ -3125,29 +3272,16 @@ pid2tcb(const int pid)
 	return NULL;
 }
 
-static void
-cleanup(int fatal_sig)
+static const char *
+status2str(int status)
 {
-	if (!fatal_sig)
-		fatal_sig = SIGTERM;
-
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
-		struct tcb *tcp = tcbtab[i];
-		if (!tcp->pid)
-			continue;
-		debug_func_msg("looking at pid %u", tcp->pid);
-		if (tcp->pid == strace_child) {
-			kill(tcp->pid, SIGCONT);
-			kill(tcp->pid, fatal_sig);
-		}
-		detach(tcp);
-	}
-}
-
-static void
-interrupt(int sig)
-{
-	interrupted = sig;
+	if (WIFEXITED(status))
+		return "Exit";
+	if (WIFSIGNALED(status))
+		return "Termination";
+	if (WIFSTOPPED(status))
+		return "Stop";
+	return "Wait event";
 }
 
 static void
@@ -3189,6 +3323,78 @@ print_debug_info(const int pid, int status)
 	error_msg("[wait(0x%06x) = %u] %s%s", status, pid, buf, evbuf);
 }
 
+static void
+cleanup(int fatal_sig)
+{
+	if (ptrace_setoptions & PTRACE_O_EXITKILL)
+		return;
+
+	if (!fatal_sig)
+		fatal_sig = SIGTERM;
+
+	size_t num_to_wait = 0;
+
+	for (size_t i = 0; i < tcbtabsize; ++i) {
+		struct tcb *tcp = tcbtab[i];
+		if (!tcp->pid)
+			continue;
+		debug_func_msg("looking at pid %u", tcp->pid);
+		if (tcp->pid == strace_child) {
+			kill(tcp->pid, SIGCONT);
+			kill(tcp->pid, fatal_sig);
+		}
+		if (interrupt_or_stop(tcp))
+			++num_to_wait;
+		else
+			droptcb_verbose(tcp);
+	}
+
+	while (num_to_wait) {
+		int status;
+		pid_t pid = waitpid(-1, &status, __WALL);
+
+		if (pid < 0) {
+			if (errno == EINTR)
+				continue;
+			/* ECHILD is not expected */
+			perror_func_msg("waitpid(-1, __WALL)");
+			break;
+		}
+
+		if (pid == popen_pid) {
+			if (!WIFSTOPPED(status))
+				popen_pid = 0;
+			continue;
+		}
+
+		if (debug_flag)
+			print_debug_info(pid, status);
+
+		struct tcb *tcp = pid2tcb(pid);
+		if (!tcp) {
+			if (!is_number_in_set(QUIET_EXIT, quiet_set)) {
+				/*
+				 * This can happen if we inherited an unknown child.
+				 */
+				error_msg("%s of unknown pid %u ignored",
+					  status2str(status), pid);
+			}
+			continue;
+		}
+
+		if (detach_interrupted_or_stopped(tcp, status)) {
+			droptcb_verbose(tcp);
+			--num_to_wait;
+		}
+	}
+}
+
+static void
+interrupt(int sig)
+{
+	interrupted = sig;
+}
+
 static struct tcb *
 maybe_allocate_tcb(const int pid, int status)
 {
@@ -3203,7 +3409,8 @@ maybe_allocate_tcb(const int pid, int status)
 			 * This can happen if we inherited an unknown child.
 			 * Example: (sleep 1 & exec strace true)
 			 */
-			error_msg("Exit of unknown pid %u ignored", pid);
+			error_msg("%s of unknown pid %u ignored",
+				  status2str(status), pid);
 		}
 		return NULL;
 	}
@@ -3397,7 +3604,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
-		if (stack_trace_enabled)
+		if (stack_trace_mode)
 			unwind_tcb_print(tcp);
 #endif
 	}
@@ -3438,7 +3645,7 @@ print_event_exit(struct tcb *tcp)
 	}
 
 	if (!output_separately && printing_tcp && printing_tcp != tcp
-	    && printing_tcp->curcol != 0) {
+	    && printing_tcp->curcol != 0 && !printing_tcp->staged_output_data) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
 		tprints_dummy("<");
@@ -3465,12 +3672,13 @@ print_event_exit(struct tcb *tcp)
 	}
 
 	printing_tcp = tcp;
+
 	tprint_argspace_end();
-	tprint_space();
-	tabto();
-	tprints_dummy("= ");
-	tprints_field_string("return", "?");
-	tprint_syscall_end();
+
+	tprint_sysret_begin();
+	tprints_sysret_next("retval");
+	tprint_sysret_pseudo_rval();
+	tprint_sysret_end();
 	tprint_newline();
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);
@@ -3522,6 +3730,13 @@ next_event(void)
 {
 	if (interrupted)
 		return NULL;
+
+	if (syscall_limit == 0) {
+		if (!is_number_in_set(QUIET_ATTACH, quiet_set))
+			error_msg("System call limit has been reached, detaching tracees");
+		strace_child = 0;
+		return NULL;
+	}
 
 	invalidate_umove_cache();
 

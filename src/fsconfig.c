@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2019-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -34,6 +34,7 @@ SYS_FUNC(fsconfig)
 			break;
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			printaddr(key);
 			break;
@@ -58,6 +59,7 @@ SYS_FUNC(fsconfig)
 		case FSCONFIG_SET_FD:
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			printaddr(value);
 			break;
@@ -77,6 +79,7 @@ SYS_FUNC(fsconfig)
 		case FSCONFIG_SET_BINARY:
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			PRINT_VAL_D(aux);
 			break;

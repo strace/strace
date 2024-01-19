@@ -13,7 +13,7 @@ Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
- a trace of all the system calls made by a another process/program.
+ a trace of all the system calls made by another process/program.
  The program to be traced need not be recompiled for this, so you can
  use it on binaries for which you don't have source.
  .
@@ -27,7 +27,7 @@ Priority: optional
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer for 64bit binaries
  strace is a system call tracer, i.e. a debugging tool which prints out
- a trace of all the system calls made by a another process/program.
+ a trace of all the system calls made by another process/program.
  The program to be traced need not be recompiled for this, so you can
  use it on binaries for which you don't have source.
  .
@@ -46,7 +46,7 @@ Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
- a trace of all the system calls made by a another process/program.
+ a trace of all the system calls made by another process/program.
  The program to be traced need not be recompiled for this, so you can
  use it on binaries for which you don't have source.
  .

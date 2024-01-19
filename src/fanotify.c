@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2022 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -58,10 +58,6 @@ SYS_FUNC(fanotify_mark)
 	 */
 	unsigned long long mask = 0;
 	unsigned int argn = getllval(tcp, &mask, 2);
-#ifdef HPPA
-	/* Parsic is weird.  See arch/parisc/kernel/sys_parisc32.c.  */
-	mask = (mask << 32) | (mask >> 32);
-#endif
 	printflags64(fan_event_flags, mask, "FAN_???");
 	tprint_arg_next();
 

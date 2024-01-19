@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -286,6 +286,7 @@ static const nla_decoder_t tcmsg_nla_decoders[] = {
 	[TCA_INGRESS_BLOCK]	= decode_nla_u32,
 	[TCA_EGRESS_BLOCK]	= decode_nla_u32,
 	[TCA_DUMP_FLAGS]	= decode_nla_u32,
+	[TCA_EXT_WARN_MSG]	= decode_nla_str,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)

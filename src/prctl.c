@@ -3,7 +3,7 @@
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2005-2007 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2008-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2022 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -20,6 +20,7 @@
 #include "xlat/pr_fp_mode.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
+#include "xlat/pr_mdwe_flags.h"
 #include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
 #include "xlat/pr_sched_core_cmds.h"
@@ -360,6 +361,18 @@ SYS_FUNC(prctl)
 
 		return RVAL_HEX | RVAL_STR;
 
+	case PR_GET_MDWE:
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			break;
+		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprintflags_ex("", pr_mdwe_flags,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
+
 	/* PR_TASK_PERF_EVENTS_* take no arguments. */
 	case PR_TASK_PERF_EVENTS_DISABLE:
 	case PR_TASK_PERF_EVENTS_ENABLE:
@@ -495,6 +508,12 @@ SYS_FUNC(prctl)
 	case PR_SET_UNALIGN:
 		tprint_arg_next();
 		printflags(pr_unalign_flags, arg2, "PR_UNALIGN_???");
+		return RVAL_DECODED;
+
+	case PR_SET_MDWE:
+		tprint_arg_next();
+		printflags(pr_mdwe_flags, arg2, "PR_MDWE_???");
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_SET_NO_NEW_PRIVS:

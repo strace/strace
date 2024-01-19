@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Comtrol Corp.
- * Copyright (c) 2011-2022 The strace developers.
+ * Copyright (c) 2011-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -27,6 +27,9 @@ struct path_set global_path_set;
 static bool
 pathmatch(const char *path, struct path_set *set)
 {
+	if (!set)
+		return false;
+
 	for (unsigned int i = 0; i < set->num_selected; ++i) {
 		if (strcmp(path, set->paths_selected[i].path) == 0)
 			return true;
@@ -41,6 +44,9 @@ static bool
 upathmatch(struct tcb *const tcp, const kernel_ulong_t upath,
 	   struct path_set *set)
 {
+	if (!set)
+		return false;
+
 	char path[PATH_MAX + 1];
 
 	return umovestr(tcp, upath, sizeof(path), path) > 0 &&
@@ -51,8 +57,13 @@ upathmatch(struct tcb *const tcp, const kernel_ulong_t upath,
  * Return true if specified fd maps to a path we're tracing.
  */
 static bool
-fdmatch(struct tcb *tcp, int fd, struct path_set *set)
+fdmatch(struct tcb *tcp, int fd, struct path_set *set, struct number_set *fdset)
 {
+	if (fdset && fd >= 0 && is_number_in_set(fd, fdset))
+		return true;
+	if (!set)
+		return false;
+
 	char path[PATH_MAX + 1];
 	int n = getfdpath(tcp, fd, path, sizeof(path));
 
@@ -194,7 +205,7 @@ pathtrace_select_set(const char *path, struct path_set *set)
 
 static bool
 match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
-		   struct path_set *set)
+		   struct path_set *set, struct number_set *fdset)
 {
 	/* Kernel truncates arg[0] to int, we do the same. */
 	int nfds = (int) args[0];
@@ -216,7 +227,7 @@ match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
 			j = next_set_bit(fds, j, nfds);
 			if (j < 0)
 				break;
-			if (fdmatch(tcp, j, set)) {
+			if (fdmatch(tcp, j, set, fdset)) {
 				free(fds);
 				return true;
 			}
@@ -232,7 +243,8 @@ match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
  * (or if no paths have been specified for tracing).
  */
 bool
-pathtrace_match_set(struct tcb *tcp, struct path_set *set)
+pathtrace_match_set(struct tcb *tcp, struct path_set *set,
+		    struct number_set *fdset)
 {
 	const struct_sysent *s;
 
@@ -254,13 +266,14 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_sendfile64:
 	case SEN_tee:
 		/* fd, fd */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[1], set);
+		return fdmatch(tcp, tcp->u_arg[0], set, fdset) ||
+			fdmatch(tcp, tcp->u_arg[1], set, fdset);
 
 	case SEN_execveat:
 	case SEN_faccessat:
 	case SEN_faccessat2:
 	case SEN_fchmodat:
+	case SEN_fchmodat2:
 	case SEN_fchownat:
 	case SEN_fspick:
 	case SEN_fstatat64:
@@ -280,7 +293,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_utimensat_time32:
 	case SEN_utimensat_time64:
 		/* fd, path */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
+		return fdmatch(tcp, tcp->u_arg[0], set, fdset) ||
 			upathmatch(tcp, tcp->u_arg[1], set);
 
 	case SEN_link:
@@ -300,8 +313,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_renameat2:
 	case SEN_renameat:
 		/* fd, path, fd, path */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[2], set) ||
+		return fdmatch(tcp, tcp->u_arg[0], set, fdset) ||
+			fdmatch(tcp, tcp->u_arg[2], set, fdset) ||
 			upathmatch(tcp, tcp->u_arg[1], set) ||
 			upathmatch(tcp, tcp->u_arg[3], set);
 
@@ -314,7 +327,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		kernel_ulong_t *args =
 			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
 
-		return args && fdmatch(tcp, args[4], set);
+		return args && fdmatch(tcp, args[4], set, fdset);
 	}
 #endif /* HAVE_ARCH_OLD_MMAP */
 
@@ -323,22 +336,22 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_mmap_pgoff:
 	case SEN_ARCH_mmap:
 		/* x, x, x, x, fd */
-		return fdmatch(tcp, tcp->u_arg[4], set);
+		return fdmatch(tcp, tcp->u_arg[4], set, fdset);
 
 	case SEN_symlinkat:
 		/* x, fd, path */
-		return fdmatch(tcp, tcp->u_arg[1], set) ||
+		return fdmatch(tcp, tcp->u_arg[1], set, fdset) ||
 			upathmatch(tcp, tcp->u_arg[2], set);
 
 	case SEN_copy_file_range:
 	case SEN_splice:
 		/* fd, x, fd, x, x, x */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[2], set);
+		return fdmatch(tcp, tcp->u_arg[0], set, fdset) ||
+			fdmatch(tcp, tcp->u_arg[2], set, fdset);
 
 	case SEN_epoll_ctl:
 		/* x, x, fd, x */
-		return fdmatch(tcp, tcp->u_arg[2], set);
+		return fdmatch(tcp, tcp->u_arg[2], set, fdset);
 
 
 	case SEN_fanotify_mark:
@@ -346,7 +359,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		/* x, x, mask (64 bit), fd, path */
 		unsigned long long mask = 0;
 		unsigned int argn = getllval(tcp, &mask, 2);
-		return fdmatch(tcp, tcp->u_arg[argn], set) ||
+		return fdmatch(tcp, tcp->u_arg[argn], set, fdset) ||
 			upathmatch(tcp, tcp->u_arg[argn + 1], set);
 	}
 #if HAVE_ARCH_OLD_SELECT
@@ -355,13 +368,13 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		kernel_ulong_t *args =
 			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
 
-		return args && match_xselect_args(tcp, args, set);
+		return args && match_xselect_args(tcp, args, set, fdset);
 	}
 #endif
 	case SEN_pselect6_time32:
 	case SEN_pselect6_time64:
 	case SEN_select:
-		return match_xselect_args(tcp, tcp->u_arg, set);
+		return match_xselect_args(tcp, tcp->u_arg, set, fdset);
 	case SEN_poll_time32:
 	case SEN_poll_time64:
 	case SEN_ppoll_time32:
@@ -381,7 +394,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		for (kernel_ulong_t cur = start; cur < end; cur += sizeof(fds)) {
 			if (umove(tcp, cur, &fds))
 				break;
-			if (fdmatch(tcp, fds.fd, set))
+			if (fdmatch(tcp, fds.fd, set, fdset))
 				return true;
 		}
 
@@ -394,56 +407,37 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		switch (cmd) {
 			case 3 /* FSCONFIG_SET_PATH */:
 			case 4 /* FSCONFIG_SET_PATH_EMPTY */:
-				return fdmatch(tcp, tcp->u_arg[4], set) ||
-					upathmatch(tcp, tcp->u_arg[3], set);
+				return fdmatch(tcp, tcp->u_arg[4], set, fdset)
+					|| upathmatch(tcp, tcp->u_arg[3], set);
 			case 5 /* FSCONFIG_SET_FD */:
-				return fdmatch(tcp, tcp->u_arg[4], set);
+				return fdmatch(tcp, tcp->u_arg[4], set, fdset);
 		}
 
 		return false;
 	}
 
-	case SEN_accept4:
-	case SEN_accept:
 	case SEN_bpf:
 	case SEN_epoll_create:
 	case SEN_epoll_create1:
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
-	case SEN_fsmount:
 	case SEN_fsopen:
 	case SEN_inotify_init:
 	case SEN_inotify_init1:
-	case SEN_io_uring_enter:
-	case SEN_io_uring_register:
 	case SEN_io_uring_setup:
-	case SEN_landlock_add_rule:
 	case SEN_landlock_create_ruleset:
-	case SEN_landlock_restrict_self:
 	case SEN_memfd_create:
 	case SEN_memfd_secret:
-	case SEN_mq_getsetattr:
-	case SEN_mq_notify:
 	case SEN_mq_open:
-	case SEN_mq_timedreceive_time32:
-	case SEN_mq_timedreceive_time64:
-	case SEN_mq_timedsend_time32:
-	case SEN_mq_timedsend_time64:
 	case SEN_perf_event_open:
 	case SEN_pidfd_open:
 	case SEN_pipe:
 	case SEN_pipe2:
 	case SEN_printargs:
-	case SEN_signalfd4:
-	case SEN_signalfd:
 	case SEN_socket:
 	case SEN_socketpair:
 	case SEN_timerfd_create:
-	case SEN_timerfd_gettime32:
-	case SEN_timerfd_gettime64:
-	case SEN_timerfd_settime32:
-	case SEN_timerfd_settime64:
 	case SEN_userfaultfd:
 		/*
 		 * These have TRACE_FILE or TRACE_DESC or TRACE_NETWORK set,
@@ -461,7 +455,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return upathmatch(tcp, tcp->u_arg[0], set);
 
 	if (s->sys_flags & (TRACE_DESC | TRACE_NETWORK))
-		return fdmatch(tcp, tcp->u_arg[0], set);
+		return fdmatch(tcp, tcp->u_arg[0], set, fdset);
 
 	return false;
 }

@@ -2,7 +2,7 @@
  * Check decoding of rt_sigsuspend syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -39,11 +39,11 @@ iterate(const char *const text, const int sig,
 		} else {
 			if (size < sizeof(long))
 				tprintf("rt_sigsuspend(%p, %u)"
-					" = -1 EINVAL (%m)\n",
+					RVAL_EINVAL,
 					mask, size);
 			else
 				tprintf("rt_sigsuspend(%s, %u)"
-					" = -1 EINVAL (%m)\n",
+					RVAL_EINVAL,
 					set == mask ? text : "~[]", size);
 		}
 		if (!size)
@@ -83,7 +83,7 @@ main(void)
 		assert(k_sigsuspend(k_set, set_size) == -1);
 		if (EINTR == errno)
 			break;
-		tprintf("rt_sigsuspend(%p, %u) = -1 EINVAL (%m)\n",
+		tprintf("rt_sigsuspend(%p, %u)" RVAL_EINVAL,
 			k_set, set_size);
 	}
 	if (!set_size)
@@ -126,7 +126,7 @@ main(void)
 		" (To be restarted if no handler)\n", set_size);
 
 	assert(k_sigsuspend(k_set - set_size, set_size << 1) == -1);
-	tprintf("rt_sigsuspend(%p, %u) = -1 EINVAL (%m)\n",
+	tprintf("rt_sigsuspend(%p, %u)" RVAL_EINVAL,
 		k_set - set_size, set_size << 1);
 
 	iterate("~[USR1]", SIGUSR1, k_set, set_size >> 1);

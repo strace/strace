@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017-2022 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -39,7 +39,7 @@ main(void)
 		{ ENUM_KNOWN(0, IFLA_BRPORT_UNSPEC) },
 		{ ENUM_KNOWN(0x18, IFLA_BRPORT_FLUSH) },
 		{ ENUM_KNOWN(0x1a, IFLA_BRPORT_PAD) },
-		{ ARG_XLAT_UNKNOWN(0x28, "IFLA_BRPORT_???") },
+		{ ARG_XLAT_UNKNOWN(0x2d, "IFLA_BRPORT_???") },
 		{ ARG_XLAT_UNKNOWN(0xbad, "IFLA_BRPORT_???") },
 	};
 	for (size_t i = 0; i < ARRAY_SIZE(un_attrs); i++) {
@@ -75,6 +75,8 @@ main(void)
 		{ ENUM_KNOWN(0x23, IFLA_BRPORT_MRP_RING_OPEN) },
 		{ ENUM_KNOWN(0x24, IFLA_BRPORT_MRP_IN_OPEN) },
 		{ ENUM_KNOWN(0x27, IFLA_BRPORT_LOCKED) },
+		{ ENUM_KNOWN(0x28, IFLA_BRPORT_MAB) },
+		{ ENUM_KNOWN(0x2b, IFLA_BRPORT_NEIGH_VLAN_SUPPRESS) },
 	};
 	void *nlh_u8 = midtail_alloc(NLMSG_SPACE(hdrlen),
 				     NLA_HDRLEN * 2 + sizeof(uint8_t));
@@ -122,6 +124,9 @@ main(void)
 		{ ENUM_KNOWN(0x3, IFLA_BRPORT_COST) },
 		{ ENUM_KNOWN(0x25, IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT) },
 		{ ENUM_KNOWN(0x26, IFLA_BRPORT_MCAST_EHT_HOSTS_CNT) },
+		{ ENUM_KNOWN(0x29, IFLA_BRPORT_MCAST_N_GROUPS) },
+		{ ENUM_KNOWN(0x2a, IFLA_BRPORT_MCAST_MAX_GROUPS) },
+		{ ENUM_KNOWN(0x2c, IFLA_BRPORT_BACKUP_NHID) },
 	};
 	void *nlh_u32 = midtail_alloc(NLMSG_SPACE(hdrlen),
 				     NLA_HDRLEN * 2 + sizeof(uint32_t));

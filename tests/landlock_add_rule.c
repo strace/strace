@@ -2,7 +2,7 @@
  * Check decoding of landlock_add_rule syscall.
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2021-2022 The strace developers.
+ * Copyright (c) 2021-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -77,8 +77,8 @@ main(void)
 	       ", 0xfacebeef /* LANDLOCK_RULE_??? */, %p, 0x1) = %s\n",
 	       attr + 1, errstr);
 
-	sys_landlock_add_rule(1729, 2, attr + 1, 0xffffffff);
-	printf("landlock_add_rule(1729, 0x2 /* LANDLOCK_RULE_??? */, %p"
+	sys_landlock_add_rule(1729, 3, attr + 1, 0xffffffff);
+	printf("landlock_add_rule(1729, 0x3 /* LANDLOCK_RULE_??? */, %p"
 	       ", 0xffffffff) = %s\n",
 	       attr + 1, errstr);
 
@@ -90,10 +90,10 @@ main(void)
 	       attr + 1, errstr);
 
 	/* Short read */
-	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_PATH_BENEATH,
+	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_NET_PORT,
 			      (char *) attr + 4, 0);
 	printf("landlock_add_rule(" RULESET_FD_STR
-	       ", LANDLOCK_RULE_PATH_BENEATH, %p, 0) = %s\n",
+	       ", LANDLOCK_RULE_NET_PORT, %p, 0) = %s\n",
 	       (char *) attr + 4, errstr);
 
 	/* Valid attr ptr */
@@ -102,8 +102,8 @@ main(void)
 		const char *str;
 	} attr_vals[] = {
 		{ ARG_STR(LANDLOCK_ACCESS_FS_EXECUTE) },
-		{ ARG_ULL_STR(LANDLOCK_ACCESS_FS_EXECUTE|LANDLOCK_ACCESS_FS_READ_FILE|LANDLOCK_ACCESS_FS_READ_DIR|LANDLOCK_ACCESS_FS_REMOVE_FILE|LANDLOCK_ACCESS_FS_MAKE_CHAR|LANDLOCK_ACCESS_FS_MAKE_DIR|LANDLOCK_ACCESS_FS_MAKE_SOCK|LANDLOCK_ACCESS_FS_MAKE_FIFO|LANDLOCK_ACCESS_FS_MAKE_BLOCK|LANDLOCK_ACCESS_FS_MAKE_SYM|LANDLOCK_ACCESS_FS_REFER|0xdebeefeddecac000) },
-		{ ARG_ULL_STR(0xdebeefeddecac000)
+		{ ARG_ULL_STR(LANDLOCK_ACCESS_FS_EXECUTE|LANDLOCK_ACCESS_FS_READ_FILE|LANDLOCK_ACCESS_FS_READ_DIR|LANDLOCK_ACCESS_FS_REMOVE_FILE|LANDLOCK_ACCESS_FS_MAKE_CHAR|LANDLOCK_ACCESS_FS_MAKE_DIR|LANDLOCK_ACCESS_FS_MAKE_SOCK|LANDLOCK_ACCESS_FS_MAKE_FIFO|LANDLOCK_ACCESS_FS_MAKE_BLOCK|LANDLOCK_ACCESS_FS_MAKE_SYM|LANDLOCK_ACCESS_FS_REFER|LANDLOCK_ACCESS_FS_TRUNCATE|0xdebeefeddeca8000) },
+		{ ARG_ULL_STR(0xdebeefeddeca8000)
 			" /* LANDLOCK_ACCESS_FS_??? */" },
 	};
 	static const struct {

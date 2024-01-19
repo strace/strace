@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# Check detaching from vfork'ed processes.
+#
+# Copyright (c) 2023 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+max_wait_attempts=100
+
+check_prog grep
+run_prog_skip_if_failed \
+	kill -0 $$
+run_prog ../$NAME 0 > /dev/null
+
+cat >script <<EOF
+#!/bin/sh -efu
+# Do not wait forever, stop waiting after a few iterations.
+attempt=1
+while [ "\$attempt" -lt "$max_wait_attempts" ] && [ ! -s signalled ]; do
+	$SLEEP_A_BIT
+	attempt=\$((attempt + 1))
+done
+$SLEEP_A_BIT
+"\$@"
+kill \$\$
+EOF
+chmod +x script
+rm -f signalled
+
+> "$OUT"
+(
+	./script &
+	exec $STRACE -o'|./script exit' -I2 -f --trace=none --quiet=personality \
+		../$NAME $! > "$EXP" 2> "$OUT"
+) &
+pid=$!
+
+# Do not wait for strace output forever,
+# stop waiting after $max_wait_attempts iterations.
+attempt=0
+while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$OUT" ]; do
+	$SLEEP_A_BIT
+	attempt=$((attempt + 1))
+done
+[ -s "$OUT" ] || {
+	kill -9 $pid
+	fail_ 'timeout waiting for strace output'
+}
+
+# Non-empty $OUT means the vfork'ed process has been attached
+# and it's time to send SIGTERM to strace.
+kill $pid
+
+# Wake up ./script invocations.
+echo > signalled
+
+# Do not wait for strace termination forever,
+# stop waiting after $max_wait_attempts iterations.
+attempt=0
+while [ "$attempt" -lt "$max_wait_attempts" ] && kill -0 "$pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+	attempt=$((attempt + 1))
+done
+[ "$attempt" -lt "$max_wait_attempts" ] || {
+	kill -9 $pid
+	fail_ 'timeout waiting for strace to terminate'
+}
+
+rc=0
+wait $pid ||
+	rc=$?
+[ "$rc" = 143 ] ||
+	fail_ "expected exit status 143, got $rc"
+
+# Do not wait for expected output forever,
+# stop waiting after $max_wait_attempts iterations.
+attempt=0
+while [ "$attempt" -lt "$max_wait_attempts" ] && [ ! -s "$EXP" ]; do
+	$SLEEP_A_BIT
+	attempt=$((attempt + 1))
+done
+[ -s "$EXP" ] ||
+	fail_ 'timeout waiting for expected output'
+
+match_diff "$OUT" "$EXP"

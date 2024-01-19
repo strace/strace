@@ -2,7 +2,7 @@
  * This file is part of net-yy-inet strace test.
  *
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,8 +19,6 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-
-#include "accept_compat.h"
 
 #ifndef ADDR_FAMILY
 # define ADDR_FAMILY_FIELD sin_family
@@ -104,14 +103,15 @@ main(void)
 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	const int accept_fd = do_accept(listen_fd, accept_sa, len);
+	const int accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	const unsigned int connect_port =
 		ntohs(((struct SOCKADDR_TYPE *) accept_sa)->INPORT);
-	printf("accept(%d<" TCP_STR ":[" LOOPBACK ":%u]>, {sa_family=" AF_STR
-	       ", " INPORT_STR "=htons(%u), " INADDR_STR SA_FIELDS "}"
-	       ", [%u]) = %d<" TCP_STR ":[" LOOPBACK ":%u->" LOOPBACK ":%u]>\n",
+	printf("accept4(%d<" TCP_STR ":[" LOOPBACK ":%u]>, {sa_family=" AF_STR
+	       ", " INPORT_STR "=htons(%u), " INADDR_STR SA_FIELDS "}, [%u]"
+	       ", SOCK_CLOEXEC) = %d<" TCP_STR ":[" LOOPBACK ":%u->" LOOPBACK
+	       ":%u]>\n",
 	       listen_fd, listen_port, connect_port, (unsigned) *len,
 	       accept_fd, listen_port, connect_port);
 

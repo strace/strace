@@ -2,7 +2,7 @@
  * Check decoding of NS_* commands of ioctl syscall.
  *
  * Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -27,13 +27,13 @@ static void
 test_no_namespace(void)
 {
 	ioctl(-1, NS_GET_USERNS);
-	printf("ioctl(-1, NS_GET_USERNS) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_USERNS)" RVAL_EBADF);
 	ioctl(-1, NS_GET_PARENT);
-	printf("ioctl(-1, NS_GET_PARENT) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_PARENT)" RVAL_EBADF);
 	ioctl(-1, NS_GET_NSTYPE);
-	printf("ioctl(-1, NS_GET_NSTYPE) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_NSTYPE)" RVAL_EBADF);
 	ioctl(-1, NS_GET_OWNER_UID, NULL);
-	printf("ioctl(-1, NS_GET_OWNER_UID, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_OWNER_UID, NULL)" RVAL_EBADF);
 }
 
 static void

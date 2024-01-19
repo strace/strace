@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -17,7 +17,7 @@ int
 main(void)
 {
 	long rc = syscall(__NR_iopl, 4);
-	printf("iopl(4) = %ld %s (%m)\n", rc, errno2name());
+	printf("iopl(4) = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

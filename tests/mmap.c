@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -39,14 +39,14 @@ main(int ac, char **av)
 	(void) close(0);
 	(void) close(0);
 #if XLAT_RAW
-	printf("%s(NULL, 0, %#x, %#x, 0, 0) = -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, %#x, %#x, 0, 0)" RVAL_EBADF,
 	       name, PROT_NONE, MAP_FILE);
 #elif XLAT_VERBOSE
-	printf("%s(NULL, 0, %#x /* PROT_NONE */, %#x /* MAP_FILE */, 0, 0) "
-	       "= -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, %#x /* PROT_NONE */, %#x /* MAP_FILE */, 0, 0)"
+	       RVAL_EBADF,
 	       name, PROT_NONE, MAP_FILE);
 #else
-	printf("%s(NULL, 0, PROT_NONE, MAP_FILE, 0, 0) = -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, PROT_NONE, MAP_FILE, 0, 0)" RVAL_EBADF,
 	       name);
 #endif
 	mmap(NULL, 0, PROT_NONE, MAP_FILE, 0, 0);

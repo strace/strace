@@ -2,7 +2,7 @@
  * Check decoding of readv and writev syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -39,12 +39,12 @@ main(void)
 	long rc;
 
 	rc = writev(fds[1], efault, 42);
-	tprintf("writev(%d, %p, 42) = %ld %s (%m)\n",
-		fds[1], efault, rc, errno2name());
+	tprintf("writev(%d, %p, 42) = %s\n",
+		fds[1], efault, sprintrc(rc));
 
 	rc = readv(fds[0], efault, 42);
-	tprintf("readv(%d, %p, 42) = %ld %s (%m)\n",
-		fds[0], efault, rc, errno2name());
+	tprintf("readv(%d, %p, 42) = %s\n",
+		fds[0], efault, sprintrc(rc));
 
 	static const char r0_c[] = "01234567";
 	const char *r0_d = hexdump_strdup(r0_c);
@@ -70,9 +70,9 @@ main(void)
 
 	rc = writev(fds[1], w_iov + ARRAY_SIZE(w_iov_) - 1, 2);
 	tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2)"
-		" = %ld %s (%m)\n",
+		" = %s\n",
 		fds[1], w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
-		rc, errno2name());
+		sprintrc(rc));
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);

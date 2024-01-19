@@ -2,7 +2,7 @@
  * Check decoding of ptrace syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -1836,7 +1836,7 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x4, "TRAP_HWBKPT") },
 #endif
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 		  ", si_trapno=0 /* GEN_??? */"
 		},
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"),
@@ -1847,7 +1847,7 @@ main(void)
 		  ", si_trapno=-26 /* GEN_??? */" },
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
 		  ", si_trapno=-1234567890 /* GEN_??? */"
-#endif /* __alpha__ */
+#endif /* __alpha__ && HAVE_SIGINFO_T_SI_TRAPNO */
 		},
 		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
 #ifdef HAVE_SIGINFO_T_SI_PERF_DATA
@@ -1917,7 +1917,7 @@ main(void)
 
 		switch (sip->si_code) {
 		case 5: /* TRAP_UNK */
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 			sip->si_trapno = trap_unk_vecs[trap_unk_pos];
 #endif
 			trap_unk_pos = (trap_unk_pos + 1)
@@ -1981,7 +1981,7 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
 	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p"
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 	       ", si_trapno=" XLAT_KNOWN(-7, "GEN_FLTINE")
 #endif
 	       "}) = %s\n",
@@ -2004,9 +2004,9 @@ main(void)
 		},
 #endif
 		{ ARG_XLAT_KNOWN(0x5, "BUS_MCEERR_AO"),
-# if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
+#if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
 		  ", si_addr_lsb=0xdead"
-# endif
+#endif
 		},
 		{ ARG_STR(0x6) },
 		{ ARG_STR(0x499602d2) },
@@ -2067,7 +2067,7 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"),
 		  ", si_lower=0x" UP64BIT("beefface") "cafedead"
 		  ", si_upper=0x" UP64BIT("badc0ded") "dadfaced",
-#endif /* HAVE_SIGINFO_T_SI_LOWER */
+# endif /* HAVE_SIGINFO_T_SI_LOWER */
 		},
 #endif /* SEGV_STACKFLOW */
 #ifdef __SEGV_PSTKOVF
@@ -2087,7 +2087,8 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x7, "SEGV_ADIPERR") },
 		{ ARG_XLAT_KNOWN(0x8, "SEGV_MTEAERR") },
 		{ ARG_XLAT_KNOWN(0x9, "SEGV_MTESERR") },
-		{ ARG_STR(0xa) },
+		{ ARG_XLAT_KNOWN(0xa, "SEGV_CPERR") },
+		{ ARG_STR(0xb) },
 		{ ARG_STR(0x499602d2) },
 	};
 	uint32_t segv_pkey_vecs[] = { 0, 1234567890, 3141592653U };

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -20,8 +20,8 @@ main(void)
 	const off_t len = 0xdefaceddeadbeefULL;
 
 	int rc = ftruncate(-1, len);
-	printf("ftruncate64(-1, %llu) = %d %s (%m)\n",
-	       (unsigned long long) len, rc, errno2name());
+	printf("ftruncate64(-1, %llu) = %s\n",
+	       (unsigned long long) len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

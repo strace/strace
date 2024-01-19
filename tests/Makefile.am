@@ -1,7 +1,7 @@
 # Automake input for strace tests.
 #
 # Copyright (c) 2011-2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2011-2022 The strace developers.
+# Copyright (c) 2011-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -140,6 +140,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	close_range \
 	count-f \
 	delay \
+	detach-vfork \
 	execve-v \
 	execveat-v \
 	fcntl--pidns-translation \
@@ -152,9 +153,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	fsync-y \
 	get_process_reaper \
 	getpgrp--pidns-translation	\
-	getpid	\
 	getpid--pidns-translation	\
-	getppid	\
 	getsid--pidns-translation \
 	gettid \
 	gettid--pidns-translation \
@@ -244,6 +243,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_v4l2-success-v-Xraw \
 	ioctl_v4l2-success-v-Xverbose \
 	ioprio--pidns-translation \
+	ip_local_port_range-success \
+	ip_local_port_range-success-Xabbrev \
+	ip_local_port_range-success-Xraw \
+	ip_local_port_range-success-Xverbose \
 	is_linux_mips_n64 \
 	kcmp-y--pidns-translation \
 	kill--pidns-translation \
@@ -251,6 +254,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ksysent \
 	landlock_create_ruleset-success \
 	landlock_create_ruleset-success-y \
+	link-P \
 	list_sigaction_signum \
 	localtime \
 	looping_threads \
@@ -282,8 +286,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	pidns-cache \
 	poll-P \
 	ppoll-P \
+	ppoll-e-trace-fds-23 \
+	ppoll-e-trace-fds-23-42 \
+	ppoll-e-trace-fds-not-9-42-P \
 	ppoll-v \
 	prctl-fp-mode \
+	prctl-mdwe \
 	prctl-pac-enabled-keys-success \
 	prctl-pac-enabled-keys-success-Xabbrev \
 	prctl-pac-enabled-keys-success-Xraw \
@@ -361,6 +369,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	segv_accerr \
 	segv_pkuerr \
 	select-P \
+	select-trace-fd-7 \
+	select-trace-fd-7-9 \
+	select-trace-fd-7-P \
 	set_ptracer_any \
 	set_sigblock \
 	set_sigign \
@@ -376,12 +387,22 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	stack-fcall \
 	stack-fcall-attach \
 	stack-fcall-mangled \
+	status-detached-threads \
 	status-none-threads \
+	status-successful-threads \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
+	strace--syscall-limit \
+	strace--syscall-limit-c \
+	strace--syscall-limit-path \
+	strace--syscall-limit-status \
+	strace--syscall-limit-status-c \
+	strace--syscall-limit-status-summary \
+	strace--syscall-limit-summary \
 	strace-Y-0123456789 \
 	strace-p-Y-p2 \
 	strace-p1-Y-p \
+	symlink-P \
 	syslog-success \
 	tgkill--pidns-translation \
 	threads-execve \
@@ -435,7 +456,9 @@ preadv_pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+status_detached_threads_LDADD = -lpthread $(LDADD)
 status_none_threads_LDADD = -lpthread $(LDADD)
+status_successful_threads_LDADD = -lpthread $(LDADD)
 status_unfinished_threads_LDADD = -lpthread $(LDADD)
 threads_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 threads_execve__quiet_thread_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
@@ -451,9 +474,19 @@ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
+if USE_LIBDW
+if ACCEPT_GDWARF_ARANGES
+stack_fcall_CFLAGS = $(AM_CFLAGS) -gdwarf-aranges
+endif
+endif
 
 stack_fcall_attach_SOURCES = stack-fcall-attach.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
+if USE_LIBDW
+if ACCEPT_GDWARF_ARANGES
+stack_fcall_attach_CFLAGS = $(AM_CFLAGS) -gdwarf-aranges
+endif
+endif
 
 stack_fcall_mangled_SOURCES = stack-fcall-mangled.c \
 	stack-fcall-mangled-0.c stack-fcall-mangled-1.c \
@@ -468,6 +501,9 @@ include gen_tests.am
 
 if ENABLE_STACKTRACE
 STACKTRACE_TESTS = strace-k.test strace-k-p.test
+if USE_LIBDW
+STACKTRACE_TESTS += strace-kk.test strace-kk-p.test
+endif
 if USE_DEMANGLE
 STACKTRACE_TESTS += strace-k-demangle.test
 endif
@@ -497,13 +533,13 @@ DECODER_TESTS = \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
-	fadvise64.test \
 	faccessat.test \
 	faccessat2.test \
+	fadvise64.test \
 	futex.test \
 	getuid.test \
-	int_0x80.test \
 	inotify_init-y.test \
+	int_0x80.test \
 	ioctl.test \
 	ioctl_block--pidns-translation.test \
 	ioctl_evdev-success.test \
@@ -556,9 +592,12 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
+	detach-vfork.test \
+	exec-PATH.test \
 	fflush.test \
-	filter_seccomp-perf.test \
 	filter-unavailable.test \
+	filter_seccomp-exitkill.test \
+	filter_seccomp-perf.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
 	first_exec_failure.test \
@@ -567,6 +606,7 @@ MISC_TESTS = \
 	gettid--pidns-translation.test \
 	inject-nf.test \
 	interactive_block.test \
+	kill-on-exit.test \
 	kill_child.test \
 	legacy_syscall_info.test \
 	localtime.test \
@@ -576,10 +616,10 @@ MISC_TESTS = \
 	options-syntax.test \
 	pc.test \
 	pidns-cache.test \
-	poke.test \
 	poke-ptrace.test \
 	poke-range.test \
 	poke-unaligned.test \
+	poke.test \
 	printpath-umovestr-legacy.test \
 	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
@@ -599,18 +639,23 @@ MISC_TESTS = \
 	restart_syscall.test \
 	sigblock.test \
 	sigign.test \
+	status-detached-threads.test \
 	status-detached.test \
 	status-none-threads.test \
+	status-successful-threads.test \
 	status-unfinished-threads.test \
-	strace--tips.test \
+	strace--argv0.test \
+	strace--syscall-limit.test \
+	strace--syscall-limit--seccomp-bpf.test \
 	strace--tips-full.test \
+	strace--tips.test \
 	strace-C.test \
 	strace-D.test \
 	strace-DD.test \
 	strace-DDD.test \
-	strace-E.test \
 	strace-E-override.test \
 	strace-E-unset.test \
+	strace-E.test \
 	strace-S.test \
 	strace-T_upper.test \
 	strace-V.test \
@@ -619,6 +664,7 @@ MISC_TESTS = \
 	strace-log-merge-suffix.test \
 	strace-p-Y-p.test \
 	strace-r.test \
+	strace-self.test \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
@@ -645,114 +691,88 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) STRACE_NATIVE_ARCH=$(NATIVE_ARCH) \
 VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
-EXTRA_DIST = \
+check_SCRIPTS = \
+	PTRACE_SEIZE.sh \
+	arch_prctl.sh \
+	filter_seccomp.sh \
+	init.sh \
+	ioctl-success.sh \
+	ipc.sh \
+	prctl-success.sh \
+	prctl.sh \
+	print_scno_getcwd.sh \
+	qualify_personality.sh \
+	qualify_personality_all.sh \
+	run.sh \
+	scno_tampering.sh \
+	strace-k-demangle.test \
+	strace-k-p.test \
+	strace-k.test \
+	strace-kk-p.test \
+	strace-kk.test \
+	syntax.sh \
+	# end of check_SCRIPTS
+
+check_DATA = \
 	COPYING \
 	GPL-2.0-or-later \
-	PTRACE_SEIZE.sh \
-	accept_compat.h \
-	arch_prctl.sh \
-	attach-p-cmd.h \
 	caps-abbrev.awk \
 	caps.awk \
 	clock.in \
-	clock_adjtime-common.c \
-	clock_xettime-common.c \
 	count-f.expected \
-	cur_audit_arch.h \
 	eventfd.expected \
-	fadvise.h \
-	fcntl-common.c \
-	filter_seccomp.in \
-	filter_seccomp.sh \
 	filter-unavailable.expected \
+	filter_seccomp.in \
 	fork--pidns-translation.awk \
-	fstatat.c \
-	fstatx.c \
-	gen_pure_executables.sh \
-	gen_tests.in \
-	gen_tests.sh \
-	getresugid.c \
-	init.sh \
-	init_delete_module.h \
-	ioctl-success.sh \
-	ioctl_kvm_run_common.c \
-	ipc.sh \
-	kernel_old_timespec.h \
-	kernel_old_timex.h \
-	ksysent.sed \
-	lstatx.c \
 	match.awk \
 	net.expected \
-	nlattr_ifla.h \
-	nlattr_ifla_af_inet6.h \
 	pipe.expected \
 	poke-range.expected \
 	poke-unaligned.expected \
-	prctl.sh \
-	prctl-success.sh \
-	print_scno_getcwd.sh \
-	print_user_desc.c \
-	printsignal.c \
-	printxval.c \
-	process_vm_readv_writev.c \
-	pselect6-common.c \
 	pure_executables.list \
 	qual_fault-exit_group.expected \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
-	qualify_personality.sh \
-	qualify_personality_all.sh \
 	qualify_personality_empty.in \
-	quotactl.h \
 	regex.in \
 	rt_sigaction.awk \
-	run.sh \
 	sched.in \
-	scno_tampering.sh \
-	semop-common.c \
-	semtimedop-common.c \
-	semtimedop-syscall.c \
-	setfsugid.c \
-	setresugid.c \
-	setreugid.c \
-	setugid.c \
 	sigaltstack.expected \
-	sockaddr_xlat.c \
-	sockname.c \
-	stack-fcall.h \
 	status-detached.expected \
+	strace--argv0.expected \
 	strace--follow-forks-output-separately.expected \
-	strace--relative-timestamps.expected \
-	strace--relative-timestamps-s.expected \
 	strace--relative-timestamps-ms.expected \
-	strace--relative-timestamps-us.expected \
 	strace--relative-timestamps-ns.expected \
-	strace--syscall-times.expected \
-	strace--syscall-times-s.expected \
+	strace--relative-timestamps-s.expected \
+	strace--relative-timestamps-us.expected \
+	strace--relative-timestamps.expected \
+	strace--syscall-limit--seccomp-bpf-1.expected \
+	strace--syscall-limit--seccomp-bpf-2.expected \
+	strace--syscall-limit--seccomp-bpf-3.expected \
 	strace--syscall-times-ms.expected \
-	strace--syscall-times-us.expected \
 	strace--syscall-times-ns.expected \
+	strace--syscall-times-s.expected \
+	strace--syscall-times-us.expected \
+	strace--syscall-times.expected \
+	strace--tips-0.exp \
 	strace--tips.exp \
 	strace-C.expected \
 	strace-D.expected \
 	strace-DDD.expected \
-	strace-E.expected \
 	strace-E-unset.expected \
+	strace-E.expected \
 	strace-T_upper.expected \
 	strace-ff.expected \
 	strace-k-demangle.expected \
-	strace-k-demangle.test \
 	strace-k-p.expected \
-	strace-k-p.test \
 	strace-k.expected \
-	strace-k.test \
+	strace-kk-p.expected \
+	strace-kk.expected \
 	strace-r.expected \
 	strace.supp \
 	strauss_body.exp \
 	strauss_head.exp \
 	sun_path.expected \
-	syntax.sh \
-	time_enjoyment.h \
 	trace_clock.in \
 	trace_creds.in \
 	trace_fstat.in \
@@ -776,10 +796,51 @@ EXTRA_DIST = \
 	trace_statfs.in \
 	trace_statfs_like.in \
 	uio.expected \
-	umode_t.c \
 	umovestr.expected \
 	unix-pair-send-recv.expected \
 	unix-pair-sendto-recvfrom.expected \
+	# end of check_DATA
+
+EXTRA_DIST = \
+	attach-p-cmd.h \
+	clock_adjtime-common.c \
+	clock_xettime-common.c \
+	cur_audit_arch.h \
+	fadvise.h \
+	fcntl-common.c \
+	fstatat.c \
+	fstatx.c \
+	gen_pure_executables.sh \
+	gen_tests.in \
+	gen_tests.sh \
+	getresugid.c \
+	init_delete_module.h \
+	ioctl_kvm_run_common.c \
+	kernel_old_timespec.h \
+	kernel_old_timex.h \
+	kill-on-exit.sh \
+	ksysent.sed \
+	lstatx.c \
+	nlattr_ifla.h \
+	nlattr_ifla_af_inet6.h \
+	print_user_desc.c \
+	printsignal.c \
+	printxval.c \
+	process_vm_readv_writev.c \
+	pselect6-common.c \
+	quotactl.h \
+	semop-common.c \
+	semtimedop-common.c \
+	semtimedop-syscall.c \
+	setfsugid.c \
+	setresugid.c \
+	setreugid.c \
+	setugid.c \
+	sockaddr_xlat.c \
+	sockname.c \
+	stack-fcall.h \
+	time_enjoyment.h \
+	umode_t.c \
 	xchownx.c \
 	xgetdents.c \
 	xgetrlimit.c \
@@ -789,12 +850,22 @@ EXTRA_DIST = \
 	xstatfsx.c \
 	xstatx.c \
 	xutimes.c \
-	$(TESTS)
+	$(check_DATA) \
+	$(check_SCRIPTS) \
+	$(TESTS) \
+	# end of EXTRA_DIST
+
+if ENABLE_INSTALL_TESTS
+testslibexecdir = $(libexecdir)/strace/tests$(MPERS_NAME)
+testslibexec_PROGRAMS = $(check_PROGRAMS)
+testslibexec_DATA = $(check_DATA)
+testslibexec_SCRIPTS = $(check_SCRIPTS) $(TESTS)
+endif
 
 ksysent.h: $(srcdir)/ksysent.sed
 	echo '#include <asm/unistd.h>' | \
 		$(CPP) $(AM_CPPFLAGS) $(CPPFLAGS) -dM - > $@.t1
-	LC_COLLATE=C sed -r -n -f $(srcdir)/ksysent.sed < $@.t1 > $@.t2
+	LC_COLLATE=C sed -E -n -f $(srcdir)/ksysent.sed < $@.t1 > $@.t2
 	mv -f $@.t2 $@
 	rm -f $@.t1
 

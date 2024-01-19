@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2001 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2022 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -242,7 +242,7 @@ hiddev_decode_number(const unsigned int code)
 }
 
 static int
-ioctl_decode_command_number(struct tcb *tcp)
+ioctl_decode_command_number(struct tcb *tcp, const struct finfo *finfo)
 {
 	const unsigned int code = tcp->u_arg[1];
 
@@ -270,6 +270,8 @@ ioctl_decode_command_number(struct tcb *tcp)
 			return 1;
 		}
 		return 0;
+	case 'T':
+		return term_ioctl_decode_command_number(tcp, finfo, code);
 	case 'U':
 		if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x2c) {
 			tprints_arg_begin("UI_GET_SYSNAME");
@@ -321,6 +323,11 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
 /**
  * Decode arg parameter of the ioctl call.
  *
+ * @param finfo The target file descriptor related information.
+ *              finfo is NULL when
+ *              - ioctl_decode() is called in leaving stages, or
+ *              - the file descriptor is not valid (e.g. -1).
+ *
  * @return There are two flags of the return value important for the purposes of
  *	   processing by SYS_FUNC(ioctl):
  *	    - RVAL_IOCTL_DECODED: indicates that ioctl decoder code
@@ -346,7 +353,7 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
  *	   and passes all other bits of ioctl_decode return value unchanged.
  */
 static int
-ioctl_decode(struct tcb *tcp)
+ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 {
 	const unsigned int code = tcp->u_arg[1];
 	const kernel_ulong_t arg = tcp->u_arg[2];
@@ -431,13 +438,35 @@ ioctl_decode(struct tcb *tcp)
 	return 0;
 }
 
+/*
+ * Return true if the specified ioctl command may overlap.
+ */
+static bool
+ioctl_command_overlaps(unsigned int code)
+{
+	/* see <asm-generic/ioctls.h> and <linux/soundcard.h> */
+	return (0x5401 <= code && code <= 0x5408);
+}
+
 SYS_FUNC(ioctl)
 {
 	const struct_ioctlent *iop;
 	int ret;
 
 	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
+		struct finfo finfoa;
+		struct finfo *finfo = NULL;
+		char path[PATH_MAX + 1];
+		bool deleted;
+		if (ioctl_command_overlaps(tcp->u_arg[1]) &&
+		    getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
+				  &deleted) >= 0) {
+			finfo = get_finfo_for_dev(path, &finfoa);
+			finfo->deleted = deleted;
+			printfd_with_finfo(tcp, tcp->u_arg[0], finfo);
+		} else
+			printfd(tcp, tcp->u_arg[0]);
+
 		tprint_arg_next();
 
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)
@@ -445,7 +474,7 @@ SYS_FUNC(ioctl)
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
 		if (xlat_verbosity != XLAT_STYLE_RAW) {
-			ret = ioctl_decode_command_number(tcp);
+			ret = ioctl_decode_command_number(tcp, finfo);
 			if (!(ret & IOCTL_NUMBER_STOP_LOOKUP)) {
 				iop = ioctl_lookup(tcp->u_arg[1]);
 				if (iop) {
@@ -464,9 +493,9 @@ SYS_FUNC(ioctl)
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();
 
-		ret = ioctl_decode(tcp);
+		ret = ioctl_decode(tcp, finfo);
 	} else {
-		ret = ioctl_decode(tcp) | RVAL_DECODED;
+		ret = ioctl_decode(tcp, NULL) | RVAL_DECODED;
 	}
 
 	if (ret & RVAL_IOCTL_DECODED) {

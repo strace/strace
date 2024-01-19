@@ -4,7 +4,7 @@
  *
  * kvmtest.c author: Josh Triplett <josh@joshtriplett.org>
  * Copyright (c) 2015 Intel Corporation
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -376,7 +376,7 @@ main(void)
 
 	cpuid->nent = 0;
 	ioctl(kvm, KVM_GET_SUPPORTED_CPUID, cpuid);
-	printf("ioctl(%d<%s>, KVM_GET_SUPPORTED_CPUID, %p) = -1 E2BIG (%m)\n",
+	printf("ioctl(%d<%s>, KVM_GET_SUPPORTED_CPUID, %p)" RVAL_E2BIG,
 	       kvm, dev, cpuid);
 
 	cpuid->nent = cpuid_nent;
@@ -393,7 +393,7 @@ main(void)
 	print_cpuid_ioctl(vcpu_fd, vcpu_dev, "KVM_SET_CPUID2", cpuid);
 
 	ioctl(vcpu_fd, KVM_SET_CPUID2, NULL);
-	printf("ioctl(%d<%s>, KVM_SET_CPUID2, NULL) = -1 EFAULT (%m)\n",
+	printf("ioctl(%d<%s>, KVM_SET_CPUID2, NULL)" RVAL_EFAULT,
 	       vcpu_fd, vcpu_dev);
 
 	run_kvm(vcpu_fd, run, mmap_size, mem);

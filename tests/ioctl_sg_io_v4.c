@@ -2,7 +2,7 @@
  * Check decoding of ioctl SG_IO v4 commands.
  *
  * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -22,22 +22,22 @@ int
 main(void)
 {
 	ioctl(-1, SG_IO, 0);
-	printf("ioctl(-1, SG_IO, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, SG_IO, NULL)" RVAL_EBADF);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sg_io_v4, sg_io);
 	fill_memory(sg_io, sizeof(*sg_io));
 
 	const void *const efault = sg_io + 1;
 	ioctl(-1, SG_IO, efault);
-	printf("ioctl(-1, SG_IO, %p) = -1 EBADF (%m)\n", efault);
+	printf("ioctl(-1, SG_IO, %p)" RVAL_EBADF, efault);
 
 	ioctl(-1, SG_IO, sg_io);
-	printf("ioctl(-1, SG_IO, [%u]) = -1 EBADF (%m)\n", sg_io->guard);
+	printf("ioctl(-1, SG_IO, [%u])" RVAL_EBADF, sg_io->guard);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, pguard);
 	*pguard = (unsigned char) 'Q';
 	ioctl(-1, SG_IO, pguard);
-	printf("ioctl(-1, SG_IO, {guard='Q', %p}) = -1 EBADF (%m)\n", pguard + 1);
+	printf("ioctl(-1, SG_IO, {guard='Q', %p})" RVAL_EBADF, pguard + 1);
 
 	sg_io->guard = (unsigned char) 'Q';
 	sg_io->protocol = 0;
@@ -79,7 +79,7 @@ main(void)
 	       ", response_len=%u"
 	       ", din_resid=%d"
 	       ", dout_resid=%d"
-	       ", generated_tag=%#" PRI__x64 "}) = -1 EBADF (%m)\n",
+	       ", generated_tag=%#" PRI__x64 "})" RVAL_EBADF,
 	       sg_io->request_len,
 	       (unsigned long long) (kernel_ulong_t) sg_io->request,
 	       sg_io->request_tag,
@@ -166,7 +166,7 @@ main(void)
 	       ", response_len=%u"
 	       ", din_resid=%d"
 	       ", dout_resid=%d"
-	       ", generated_tag=%#" PRI__x64 "}) = -1 EBADF (%m)\n",
+	       ", generated_tag=%#" PRI__x64 "})" RVAL_EBADF,
 	       sg_io->request_len,
 	       *(unsigned char *) ((unsigned long) sg_io->request + 0),
 	       *(unsigned char *) ((unsigned long) sg_io->request + 1),

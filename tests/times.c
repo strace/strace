@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2022 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -69,7 +69,7 @@ main(void)
 		     : "memory", "cc", "r11", "cx");
 	if (llres > 0xfffffffffffff000)
 		return 77;
-#elif defined LINUX_MIPSN32
+#elif defined __s390__ || defined LINUX_MIPSN32
 	clock_t res = times(&tbuf);
 
 	if ((clock_t) -1 == res)

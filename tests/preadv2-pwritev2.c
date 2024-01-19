@@ -2,7 +2,7 @@
  * Check decoding of preadv2 and pwritev2 syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -82,9 +82,9 @@ dumpio(void)
 
 	rc = pw(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
 	tprintf("pwritev2(1, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2, 0, 0)"
-		" = %ld %s (%m)\n",
+		" = %s\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
-		rc, errno2name());
+		sprintrc(rc));
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);

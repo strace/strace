@@ -5,7 +5,7 @@
 # Copyright (c) 2006-2016 Dmitry V. Levin <ldv@strace.io>
 # Copyright (c) 2008-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
-# Copyright (c) 2002-2022 The strace developers.
+# Copyright (c) 2002-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
@@ -37,7 +37,6 @@ DEB_CHANGELOGTIME="$(LC_TIME=C date -u -R)"
 AC_SUBST(DEB_CHANGELOGTIME)
 
 AC_PROG_CC
-AC_PROG_CC_STDC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
@@ -149,10 +148,9 @@ powerpc*)
 	karch=powerpc
 	karch_m32=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
-	AC_TRY_COMPILE(
-[#ifndef __LP64__
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __LP64__
 # error 32 bit
-#endif], [], arch=powerpc64, arch=powerpc)
+#endif]], [[]])], [arch=powerpc64], [arch=powerpc])
 	if test "$arch" = "powerpc64"; then
 		# $ac_cv_c_bigendian is defined by AC_C_BIGENDIAN
 		case "$ac_cv_c_bigendian" in
@@ -212,10 +210,9 @@ x86?64*)
 	karch_m32=x86
 	karch_mx32=x86
 	arch_m32=i386
-	AC_TRY_COMPILE(
-[#ifndef __ILP32__
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __ILP32__
 # error not x32
-#endif], [], arch=x32, arch=x86_64)
+#endif]], [[]])], [arch=x32], [arch=x86_64])
 	if test "$arch" = "x86_64"; then
 		arch_mx32=x32
 		AC_DEFINE([X86_64], 1, [Define for the 64bit AMD x86-64 architecture.])
@@ -277,8 +274,8 @@ AC_CACHE_CHECK(
 	[st_cv_use_bundled_headers],
 	[AS_IF([test $enable_bundled = check],
 	       [AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([#include <linux/version.h>
-#define USE_OS_HEADERS (LINUX_VERSION_CODE > ]linux_version_code[ ? 1 : -1)],
+			[AC_LANG_PROGRAM([[#include <linux/version.h>
+#define USE_OS_HEADERS ((LINUX_VERSION_CODE >> 8) > (]]linux_version_code[[ >> 8) ? 1 : -1)]],
 					 [[int i[USE_OS_HEADERS];]]
 			 )
 			],
@@ -340,6 +337,7 @@ AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 		   [Define to 1 if you want OABI support on ARM EABI.])
 
 st_WARN_CFLAGS
+st_DEBUG_CFLAGS
 AX_PROG_CC_FOR_BUILD
 AM_PROG_AR
 
@@ -431,6 +429,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_timerid,
 	siginfo_t.si_overrun,
 	siginfo_t.si_pkey,
+	siginfo_t.si_trapno,
 	siginfo_t.si_addr_lsb,
 	siginfo_t.si_lower,
 	siginfo_t.si_upper,
@@ -569,7 +568,7 @@ saved_CPPFLAGS="$CPPFLAGS"
 
 AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
 	       [st_cv_linux_signal],
-	       [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+	       [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <signal.h>
 #include <linux/signal.h>]],[])],
 				  [st_cv_linux_signal=yes],
@@ -795,6 +794,19 @@ m4_foreach([pers], [M32, MX32], dnl
 
 st_MPERS([m32], [aarch64|powerpc64|s390x|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
+
+AC_ARG_ENABLE([install-tests],
+	[AS_HELP_STRING([--enable-install-tests=yes|no],
+		[whether to install tests into libexec/strace,
+		 default is no.])],
+	[case "$enableval" in
+		yes|no) enable_install_tests="$enableval" ;;
+		*) AC_MSG_ERROR([bad value $enableval for enable-install-tests option.
+Valid options are: yes, no.])
+		;;
+	 esac],
+	[enable_install_tests=no])
+AM_CONDITIONAL([ENABLE_INSTALL_TESTS], [test x$enable_install_tests = xyes])
 
 AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK

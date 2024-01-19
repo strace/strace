@@ -2,7 +2,7 @@
  * Check decoding of memfd_create syscall.
  *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -37,19 +37,20 @@ main(void)
 	printf("memfd_create(\"%.*s\"..., 0) = %s\n",
 	       (int) size, pattern, errstr);
 
-	kernel_ulong_t flags = (kernel_ulong_t) 0xfacefeed00000007ULL;
-#define flags1_str "MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB"
+	kernel_ulong_t flags = (kernel_ulong_t) 0xfacefeed0000001fULL;
+#define flags1_str \
+	"MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB|MFD_NOEXEC_SEAL|MFD_EXEC"
 
 	k_memfd_create((uintptr_t) pattern, flags);
 #if XLAT_VERBOSE
 	printf("memfd_create(\"%.*s\"..., %s /* %s */) = %s\n",
 	       (int) size, pattern,
-	       "0x7", flags1_str, errstr);
+	       "0x1f", flags1_str, errstr);
 #else
 	printf("memfd_create(\"%.*s\"..., %s) = %s\n",
 	       (int) size, pattern,
 # if XLAT_RAW
-	       "0x7",
+	       "0x1f",
 # else
 	       flags1_str,
 # endif
@@ -72,7 +73,7 @@ main(void)
 
 	flags = (kernel_ulong_t) -1ULL;
 	k_memfd_create(0, flags);
-	flags = -1U & ~(7 | (MFD_HUGE_MASK << MFD_HUGE_SHIFT));
+	flags = -1U & ~(0x1f | (MFD_HUGE_MASK << MFD_HUGE_SHIFT));
 
 #define memfd_create_fmt "%s|%#x|%u<<MFD_HUGE_SHIFT"
 

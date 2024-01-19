@@ -2,7 +2,7 @@
  * Check decoding of utimensat syscall.
  *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -60,7 +60,7 @@
 # endif
 
 static void
-print_ts(const struct timespec *ts)
+print_ts(const kernel_old_timespec_t *ts)
 {
 	printf("{tv_sec=%lld, tv_nsec=%llu}", (long long) ts->tv_sec,
 		zero_extend_signed_to_ull(ts->tv_nsec));
@@ -93,7 +93,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	struct timespec *const ts = tail_alloc(sizeof(*ts) * 2);
+	kernel_old_timespec_t *const ts = tail_alloc(sizeof(*ts) * 2);
 
 	(void) close(0);
 
@@ -152,7 +152,7 @@ main(void)
 
 	ts[0].tv_sec = -1;
 	ts[0].tv_nsec = 2000000000;
-	ts[1].tv_sec = (time_t) -0x100000001LL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) -0x100000001LL;
 	ts[1].tv_nsec = 2345678900U;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
@@ -164,7 +164,7 @@ main(void)
 
 	ts[0].tv_sec = 0;
 	ts[0].tv_nsec = 0;
-	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	ts[1].tv_nsec = 0;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
@@ -176,7 +176,7 @@ main(void)
 
 	ts[0].tv_sec = 0xdeadbeefU;
 	ts[0].tv_nsec = 0xfacefeedU;
-	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	ts[1].tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);

@@ -3,7 +3,7 @@
 # Check -i option.
 #
 # Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2015-2020 The strace developers.
+# Copyright (c) 2015-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -18,19 +18,20 @@ args="--quiet=attach,personality -if $args"
 $STRACE $args 2> "$LOG" ||
 	dump_log_and_fail_with "$STRACE $args failed"
 
-len="$(sed -r -n 's/^\[[[:xdigit:]]+\] write\(-1, 0x8, ([[:digit:]]{1,2})\)[[:space:]]+= -1 .*/\1/p' "$LOG")" &&
+len="$(sed -E -n 's/^\[[[:xdigit:]]+\] write\(-1, 0x8, ([[:digit:]]{1,2})\)[[:space:]]+= -1 .*/\1/p' "$LOG")" &&
 [ -n "$len" ] &&
-pid="$(sed -r -n 's/^\[[[:xdigit:]]{'"$len"'}\] --- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_(KILLED|DUMPED), si_pid=([[:digit:]]+), .*/\2/p' "$LOG")" &&
+pid="$(sed -E -n 's/^\[[[:xdigit:]]{'"$len"'}\] --- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_(KILLED|DUMPED), si_pid=([[:digit:]]+), .*/\2/p' "$LOG")" &&
 [ -n "$pid" ] &&
-ip="$(sed -r -n 's/^\[pid +'"$pid"'\] \[([[:xdigit:]]{'"$len"'})] --- SIGSEGV \{.*\} ---$/\1/p' "$LOG")" &&
+ip="$(sed -E -n 's/^\[pid +'"$pid"'\] \[([[:xdigit:]]{'"$len"'})] --- SIGSEGV \{.*\} ---$/\1/p' "$LOG")" &&
 [ -n "$ip" ] &&
-addr="$(echo "$ip" |sed -r 's/^0+//')" &&
+# strip the last nibble of the address. On hppa the lowest 2 bits encode the address space.
+addr="$(echo "$ip" |sed -E 's/^0+//')" && addr=${addr%?} &&
 [ -n "$addr" ] ||
 	dump_log_and_fail_with
 
 cat > "$EXP" << __EOF__
 \\[[[:xdigit:]]{$len}\\] munmap\\(0x[[:xdigit:]]+, 0\\) += -1 .*
-\\[pid +$pid\\] \\[$ip\\] --- SIGSEGV \\{si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=0x$addr\\} ---
+\\[pid +$pid\\] \\[$ip\\] --- SIGSEGV \\{si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=0x$addr[[:xdigit:]]\\} ---
 \\[pid +$pid\\] \\[\\?{$len}\\] \\+\\+\\+ killed by SIGSEGV( \\(core dumped\\))? \\+\\+\\+
 \\[\\?{$len}\\] \\+\\+\\+ exited with 0 \\+\\+\\+
 __EOF__

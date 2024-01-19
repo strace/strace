@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2018 Chen Jingpiao <chenjingpiao@gmail.com>
  * Copyright (c) 2019 Paul Chaignon <paul.chaignon@gmail.com>
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -257,7 +257,7 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 {
 	unsigned int always_trace_flags =
 		TRACE_INDIRECT_SUBCALL | TRACE_SECCOMP_DEFAULT |
-		(stack_trace_enabled ? MEMORY_MAPPING_CHANGE : 0) |
+		(stack_trace_mode ? MEMORY_MAPPING_CHANGE : 0) |
 		(is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
 		 COMM_CHANGE : 0);
 	return sysent_vec[p][scno].sys_flags & always_trace_flags ||
@@ -679,14 +679,20 @@ dump_seccomp_bpf(void)
 void
 init_seccomp_filter(void)
 {
-	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
-		perror_func_msg_and_die("prctl(PR_SET_NO_NEW_PRIVS)");
-
 	if (debug_flag)
 		dump_seccomp_bpf();
 
-	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) < 0)
-		perror_func_msg_and_die("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
+	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) == 0)
+		return;
+
+	if (errno == EACCES) {
+		if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
+			perror_func_msg_and_die("prctl(PR_SET_NO_NEW_PRIVS)");
+		if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) == 0)
+			return;
+	}
+
+	perror_func_msg_and_die("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
 }
 
 int

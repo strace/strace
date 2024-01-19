@@ -3,14 +3,14 @@
 # Check -e inject= syntax.
 #
 # Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2017-2022 The strace developers.
+# Copyright (c) 2017-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
-zeroes=; i=0; while [ $i -lt 2050 ]; do zeroes="0$zeroes"; i=$(($i+1)); done
+zeroes=; i=0; while [ $i -lt 2050 ]; do zeroes="0$zeroes"; i=$((i+1)); done
 
 #
 # F

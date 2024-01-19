@@ -3,7 +3,7 @@
 # Check decoding of threads when a non-leader thread invokes execve.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2016-2020 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -33,7 +33,7 @@ while :; do
 	sed 1d < "$LOG" > "$OUT"
 	diff -- "$EXP" "$OUT" && exit 0
 	s1="$(date +%s)"
-	if [ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ]; then
+	if [ "$((s1-s0))" -gt "$((TIMEOUT_DURATION/2))" ]; then
 		fail_ "$STRACE $* output mismatch"
 	fi
 done

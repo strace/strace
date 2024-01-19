@@ -1,7 +1,7 @@
 /*
  * Check decoding of fsconfig syscall.
  *
- * Copyright (c) 2019-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2019-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -58,9 +58,9 @@ static int fd;
 static void
 test_fsconfig_unknown(void)
 {
-	k_fsconfig(fd, 8, empty, val, -100);
+	k_fsconfig(fd, 9, empty, val, -100);
 #ifndef PATH_TRACING
-	printf("fsconfig(%d<%s>, 0x8 /* FSCONFIG_??? */, %p, %p, -100) = %s\n",
+	printf("fsconfig(%d<%s>, 0x9 /* FSCONFIG_??? */, %p, %p, -100) = %s\n",
 	       fd, fd_path, empty, val, errstr);
 #endif
 
@@ -284,6 +284,7 @@ main(void)
 	test_fsconfig_set_fd(ARG_STR(FSCONFIG_SET_FD));
 	test_fsconfig_cmd(ARG_STR(FSCONFIG_CMD_CREATE));
 	test_fsconfig_cmd(ARG_STR(FSCONFIG_CMD_RECONFIGURE));
+	test_fsconfig_cmd(ARG_STR(FSCONFIG_CMD_CREATE_EXCL));
 
 	puts("+++ exited with 0 +++");
 	return 0;

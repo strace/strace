@@ -1,7 +1,7 @@
 /*
  * Check decoding of setresuid/setresgid/setresuid32/setresgid32 syscalls.
  *
- * Copyright (c) 2016-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -68,7 +68,7 @@ main(void)
 
 		if (syscall(SYSCALL_NR, tests[i].r, tests[i].e, tests[i].s)) {
 			if (!i && ENOSYS == errno) {
-				printf("%s(%u, %u, %u) = -1 ENOSYS (%m)\n",
+				printf("%s(%u, %u, %u)" RVAL_ENOSYS,
 				       SYSCALL_NAME, ugid, ugid, ugid);
 				break;
 			}

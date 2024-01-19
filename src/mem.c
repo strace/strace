@@ -5,7 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
- * Copyright (c) 1999-2022 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -292,6 +292,11 @@ SYS_FUNC(mremap)
 }
 
 #include "xlat/madvise_cmds.h"
+#include "xlat/madvise_hppa_generic_cmds.h"
+
+#if defined HPPA
+# include "xlat/madvise_hppa_old_cmds.h"
+#endif
 
 SYS_FUNC(madvise)
 {
@@ -304,7 +309,40 @@ SYS_FUNC(madvise)
 	tprint_arg_next();
 
 	/* advice */
-	printxval(madvise_cmds, tcp->u_arg[2], "MADV_???");
+	const unsigned int advice = tcp->u_arg[2];
+#if defined HPPA
+	/*
+	 * hppa decided to be very special:  it used to have its own
+	 * definitions for some MADV_* constants (just like Alpha,
+	 * for example), but then (see Linux commit v6.2-rc1~39^2~7)
+	 * decided to change their values, so their symbolic names
+	 * are meaningless for the user now (which would also probably
+	 * add spice to debugging old binaries with the newer kernels
+	 * "in year 2025 (or later)"), and that forces us to state
+	 * explicitly which variant of the constant value is used.
+	 */
+	const char *old_cmd = xlookup(madvise_hppa_old_cmds, advice);
+
+	if (old_cmd) {
+		PRINT_VAL_X(advice);
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW)
+			tprintf_comment("old %s", old_cmd);
+	} else {
+		const char *new_cmd = xlookup(madvise_hppa_generic_cmds,
+					      advice);
+
+		if (new_cmd) {
+			PRINT_VAL_X(advice);
+			if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW)
+				tprintf_comment("generic %s", new_cmd);
+		} else {
+			printxval(madvise_cmds, advice, "MADV_???");
+		}
+	}
+#else
+	printxvals(advice, "MADV_???",
+		   madvise_cmds, madvise_hppa_generic_cmds, NULL);
+#endif
 
 	return RVAL_DECODED;
 }

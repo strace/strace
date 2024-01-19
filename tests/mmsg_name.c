@@ -3,7 +3,7 @@
  * of sendmmsg and recvmmsg syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -112,8 +112,8 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 		printf("}");
 	}
 	errno = saved_errno;
-	printf("], %u, MSG_DONTWAIT) = %d %s (%m)\n",
-	       IOV_MAX1, rc, errno2name());
+	printf("], %u, MSG_DONTWAIT) = %s\n",
+	       IOV_MAX1, sprintrc(rc));
 
 	for (int i = 0; i < IOV_MAX1; ++i) {
 		send_mh[i].msg_hdr.msg_name = 0;
@@ -132,8 +132,8 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 	printf("sendmmsg(-1, [{msg_hdr=");
 	print_msghdr(&send_mh[IOV_MAX].msg_hdr, 0);
 	errno = saved_errno;
-	printf("}, ... /* %p */], %u, MSG_DONTWAIT) = %d %s (%m)\n",
-	       &send_mh[IOV_MAX1], 2, rc, errno2name());
+	printf("}, ... /* %p */], %u, MSG_DONTWAIT) = %s\n",
+	       &send_mh[IOV_MAX1], 2, sprintrc(rc));
 
 	rc = send_mmsg(send_fd, send_mh, IOV_MAX1, MSG_DONTWAIT);
 	if (rc < 0)

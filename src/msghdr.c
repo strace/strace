@@ -4,7 +4,7 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -71,6 +71,15 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 		   const unsigned int data_len)
 {
 	print_quoted_string(cmsg_data, data_len, 0);
+}
+
+static void
+print_scm_pidfd(struct tcb *tcp, const void *cmsg_data,
+		const unsigned int data_len)
+{
+	const int *fd = cmsg_data;
+
+	printfd(tcp, *fd);
 }
 
 static void
@@ -212,6 +221,17 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 	print_sockaddr(tcp, cmsg_data, addr_len);
 }
 
+static void
+print_cmsg_ip_protocol(struct tcb *tcp, const void *cmsg_data,
+		       const unsigned int data_len)
+{
+	const unsigned int *protocol = cmsg_data;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, *protocol, "IP_???");
+	tprint_indirect_end();
+}
+
 typedef void (* const cmsg_printer)(struct tcb *, const void *, unsigned int);
 
 static const struct {
@@ -221,6 +241,7 @@ static const struct {
 	[SCM_RIGHTS] = { print_scm_rights, sizeof(int) },
 	[SCM_CREDENTIALS] = { print_scm_creds, sizeof(struct ucred) },
 	[SCM_SECURITY] = { print_scm_security, 1 },
+	[SCM_PIDFD] = { print_scm_pidfd, sizeof(int) },
 	[SO_TIMESTAMP_OLD] = { print_scm_timestamp_old, 1 },
 	[SO_TIMESTAMPNS_OLD] = { print_scm_timestampns_old, 1 },
 	[SO_TIMESTAMPING_OLD] = { print_scm_timestamping_old, 1 },
@@ -236,6 +257,7 @@ static const struct {
 	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
 	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
 	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },
+	[IP_PROTOCOL] = { print_cmsg_ip_protocol, sizeof(unsigned int) },
 	[SCM_SECURITY] = { print_scm_security, 1 }
 };
 
@@ -244,6 +266,8 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		     const void *cmsg_data, const unsigned int data_len)
 {
 	const unsigned int utype = cmsg_type;
+	bool cmsg_data_printed = false;
+
 	switch (cmsg_level) {
 	case SOL_SOCKET:
 		printxval(scmvals, cmsg_type, "SCM_???");
@@ -253,6 +277,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			tprint_struct_next();
 			tprints_field_name("cmsg_data");
 			cmsg_socket_printers[utype].printer(tcp, cmsg_data, data_len);
+			cmsg_data_printed = true;
 		}
 		break;
 	case SOL_IP:
@@ -263,10 +288,17 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			tprint_struct_next();
 			tprints_field_name("cmsg_data");
 			cmsg_ip_printers[utype].printer(tcp, cmsg_data, data_len);
+			cmsg_data_printed = true;
 		}
 		break;
 	default:
 		PRINT_VAL_X(cmsg_type);
+	}
+
+	if (!cmsg_data_printed && data_len) {
+		tprint_struct_next();
+		tprints_field_name("cmsg_data");
+		print_quoted_string(cmsg_data, data_len, QUOTE_FORCE_HEX);
 	}
 }
 
@@ -397,10 +429,13 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints_field_name("msg_name");
 	const int family =
 		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
-	const print_obj_by_addr_size_fn print_func =
-		(family == AF_NETLINK) ? iov_decode_netlink : iov_decode_str;
 	/* Assume that the descriptor is the 1st syscall argument. */
 	int fd = tcp->u_arg[0];
+	const enum sock_proto proto =
+		(family == -1) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN;
+	const print_obj_by_addr_size_fn print_func =
+		(family == AF_NETLINK || proto == SOCK_PROTO_NETLINK)
+		? iov_decode_netlink : iov_decode_str;
 
 	tprint_struct_next();
 	tprints_field_name("msg_namelen");

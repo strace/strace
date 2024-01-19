@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -349,6 +349,8 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_GETOBJ:
 		case NFT_MSG_GETOBJ_RESET:
 		case NFT_MSG_GETFLOWTABLE:
+		case NFT_MSG_GETRULE_RESET:
+		case NFT_MSG_GETSETELEM_RESET:
 			return netlink_get_flags;
 		case NFT_MSG_DELTABLE:
 		case NFT_MSG_DELCHAIN:
@@ -357,6 +359,13 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_DELSETELEM:
 		case NFT_MSG_DELOBJ:
 		case NFT_MSG_DELFLOWTABLE:
+		case NFT_MSG_DESTROYTABLE:
+		case NFT_MSG_DESTROYCHAIN:
+		case NFT_MSG_DESTROYRULE:
+		case NFT_MSG_DESTROYSET:
+		case NFT_MSG_DESTROYSETELEM:
+		case NFT_MSG_DESTROYOBJ:
+		case NFT_MSG_DESTROYFLOWTABLE:
 			return netlink_delete_flags;
 		}
 		break;

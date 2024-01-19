@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -17,8 +17,6 @@
 #include "xlat/nbd_ioctl_cmds.h"
 #include "xlat/nbd_ioctl_flags.h"
 #undef XLAT_MACROS_ONLY
-
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
 
 int
 main(void)

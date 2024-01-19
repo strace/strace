@@ -3,7 +3,7 @@
 # Check strace options syntax.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2016-2022 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -12,6 +12,8 @@
 
 compiled_with_secontext=$(get_config_option ENABLE_SECONTEXT "y")
 compiled_with_stacktrace="$(get_config_option ENABLE_STACKTRACE 1)"
+compiled_with_libunwind="$(get_config_option USE_LIBUNWIND 1)"
+compiled_with_libdw="$(get_config_option USE_LIBDW 1)"
 
 check_e "Invalid process id: '0'" -p 0
 check_e "Invalid process id: '0'" --attach=0
@@ -95,9 +97,10 @@ for opt in '--tips' \
 	   '--tips=format:compact --tips' \
 	   '--tips --tips=format:full,3,none,id:42,compact'
 do
-	check_h "must have PROG [ARGS] or -p PID" $opt
+	check_h "invalid -a argument: '-42'" $opt -a -42
 done
 
+check_h 'PROG [ARGS] must be specified with --argv0' --argv0=sample -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$
@@ -186,6 +189,10 @@ check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=non-ascii
 check_h "invalid --strings-in-hex argument: 'al'" --strings-in-hex=al
 check_h "invalid --strings-in-hex argument: 'alll'" --strings-in-hex=alll
 check_h "invalid --strings-in-hex argument: 'ascii'" --strings-in-hex=ascii
+check_h "invalid --syscall-limit argument: '-5'" --syscall-limit -5
+check_h "invalid --syscall-limit argument: '0'" --syscall-limit=0
+check_h "must have PROG [ARGS] or -p PID" --syscall-limit=2
+check_h "must have PROG [ARGS] or -p PID" --syscall-limit 5
 check_h "must have PROG [ARGS] or -p PID" --quiet=all
 check_h "must have PROG [ARGS] or -p PID" --quiet=none
 check_h "must have PROG [ARGS] or -p PID" --quiet=\!attach
@@ -196,6 +203,8 @@ check_e "invalid quiet 'detach'" --quiet=detach -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
+check_e '--kill-on-exit and -p/--attach are mutually exclusive options' --kill-on-exit -p $$
+check_e '--kill-on-exit and -p/--attach are mutually exclusive options' --kill-on-exit -p $$ true
 
 check_h 'must have PROG [ARGS] or -p PID' -P .
 check_h 'must have PROG [ARGS] or -p PID' -P . -P..
@@ -208,7 +217,7 @@ $STRACE_EXE: -q and -e quiet/--quiet cannot be provided simultaneously" -q --qui
 for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
-	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
+	if [ "$i" != none ] && [ "$i" != nothing ]; then
 		check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
 		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 	fi
@@ -286,6 +295,13 @@ check_e "invalid decode-pids ''" -e decode-pids=
 check_e "invalid decode-pids 'chdir'" --decode-pids=chdir
 check_e "invalid decode-pids 'gettid'" -e decode-pid=comm,gettid
 
+check_h "must have PROG [ARGS] or -p PID" -e trace-fds=0
+check_h "must have PROG [ARGS] or -p PID" -e trace-fd=1,2,3
+check_h "must have PROG [ARGS] or -p PID" -e fd='!1'
+check_h "must have PROG [ARGS] or -p PID" -e fds='!0,2147483647'
+check_e "invalid descriptor '-1'" --trace-fds=-1
+check_e "invalid descriptor '2147483648'" --trace-fd=2147483648
+
 case "$STRACE_NATIVE_ARCH" in
 x86_64)
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
@@ -331,6 +347,13 @@ if [ "$uid" -ge 0 ]; then
 	if [ "$uid" -eq 0 ]; then
 		umsg="Cannot find user ':nosuchuser:'"
 	else
+		if [ "$(fakeroot ../block_reset_run 15 id -u 2>&1)" = 0 ]; then
+			saved_STRACE=$STRACE
+			STRACE="fakeroot -- $STRACE"
+			umsg="Cannot find user ':nosuchuser:'"
+			check_e "$umsg" -u :nosuchuser: true
+			STRACE=$saved_STRACE
+		fi
 		umsg='You must be root to use the -u/--username option'
 	fi
 
@@ -397,6 +420,15 @@ check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
 if [ -z "$compiled_with_stacktrace" ]; then
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=symbol
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=source
+else
+	if [ -n "$compiled_with_libunwind" ]; then
+		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" -kk
+		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" --stack-traces=source
+	elif [ -n "$compiled_with_libdw" ]; then
+		check_e "Too many -k options" -kkk
+	fi
 fi
 
 args='-p 2147483647'

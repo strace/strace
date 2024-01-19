@@ -159,7 +159,6 @@
 { "linux/kvm.h", "KVM_SET_GUEST_DEBUG", _IOC_WRITE, 0xae9b, 0x108 },
 { "linux/kvm.h", "KVM_SET_IDENTITY_MAP_ADDR", _IOC_WRITE, 0xae48, 0x08 },
 { "linux/kvm.h", "KVM_SET_IRQCHIP", _IOC_READ, 0xae63, 0x208 },
-{ "linux/kvm.h", "KVM_SET_MEMORY_REGION", _IOC_WRITE, 0xae40, 0x18 },
 { "linux/kvm.h", "KVM_SET_MP_STATE", _IOC_WRITE, 0xae99, 0x04 },
 { "linux/kvm.h", "KVM_SET_NR_MMU_PAGES", _IOC_NONE, 0xae44, 0x00 },
 { "linux/kvm.h", "KVM_SET_ONE_REG", _IOC_WRITE, 0xaeac, 0x10 },

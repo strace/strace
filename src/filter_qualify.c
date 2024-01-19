@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -24,6 +24,7 @@ struct number_set *quiet_set;
 struct number_set *decode_fd_set;
 struct number_set *decode_pid_set;
 struct number_set *trace_set;
+struct number_set *trace_fd_set;
 
 bool quiet_set_updated = false;
 bool decode_fd_set_updated = false;
@@ -105,6 +106,7 @@ decode_fd_str_to_uint(const char *str)
 		{ DECODE_FD_SOCKET,    "socket" },
 		{ DECODE_FD_DEV,       "dev" },
 		{ DECODE_FD_PIDFD,     "pidfd" },
+		{ DECODE_FD_SIGNALFD,  "signalfd" },
 	};
 
 	return (int) find_arg_val(str, decode_fd_strs, -1ULL, -1ULL);
@@ -496,6 +498,15 @@ qualify_trace(const char *const str)
 }
 
 void
+qualify_trace_fd(const char *const str)
+{
+	if (!trace_fd_set)
+		trace_fd_set = alloc_number_set_array(1);
+	qualify_tokens(str, trace_fd_set, string_to_uint, "descriptor");
+	tracing_fds = true;
+}
+
+void
 qualify_abbrev(const char *const str)
 {
 	if (!abbrev_set)
@@ -655,6 +666,10 @@ static const struct qual_options {
 } qual_options[] = {
 	{ "trace",	qualify_trace	},
 	{ "t",		qualify_trace	},
+	{ "trace-fd",	qualify_trace_fd },
+	{ "trace-fds",	qualify_trace_fd },
+	{ "fd",		qualify_trace_fd },
+	{ "fds",	qualify_trace_fd },
 	{ "abbrev",	qualify_abbrev	},
 	{ "a",		qualify_abbrev	},
 	{ "verbose",	qualify_verbose	},

@@ -860,7 +860,8 @@ main(void)
 			const char *cmd_str;
 			bool write;
 			bool can_fail;
-		} cmds[6];
+			bool pass_invalid_fd;
+		} cmds[9];
 		struct {
 			kernel_ulong_t data;
 			const char *data_str;
@@ -889,22 +890,33 @@ main(void)
 #endif
 		{
 			{
-				/* XXX */
+				/*
+				 * If the fd is valid and points to a tty,
+				 * the potential ioctl command collision is resolved.
+				 */
+				{ ARG_STR(TCSETS),  true },
+				{ ARG_STR(TCSETSW), true },
+				{ ARG_STR(TCSETSF), true },
+
+				/*
+				 * If the fd is invalid, it is impossible
+				 * to distinguish the overlapping ioctl commands.
+				 */
 				{ TCSETS,
 #if IOCTL_CLASHED
 					"SNDCTL_TMR_START or "
 #endif
-					"TCSETS", true },
+					"TCSETS", true, true, true },
 				{ TCSETSW,
 #if IOCTL_CLASHED
 					"SNDCTL_TMR_STOP or "
 #endif
-					"TCSETSW", true },
+					"TCSETSW", true, true, true },
 				{ TCSETSF,
 #if IOCTL_CLASHED
 					"SNDCTL_TMR_CONTINUE or "
 #endif
-					"TCSETSF", true },
+					"TCSETSF", true, true, true },
 
 				{ ARG_STR(TCGETS),  false },
 				{ ARG_STR(TIOCSLCKTRMIOS), true,  true },
@@ -963,7 +975,7 @@ main(void)
 
 				do_ioctl(checks[i].cmds[j].cmd,
 					 checks[i].cmds[j].cmd_str,
-					 ret,
+					 checks[i].cmds[j].pass_invalid_fd? -1: ret,
 					 checks[i].printer,
 					 checks[i].args[k].data,
 					 checks[i].args[k].valid,

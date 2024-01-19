@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2019-2022 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -8,6 +8,8 @@
 
 #include "defs.h"
 
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
 #include "xlat/uring_enter_flags.h"
@@ -43,10 +45,8 @@ print_io_sqring_offsets(const struct io_sqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv1);
 	}
-	if (p->resv2) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*p, resv2);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, user_addr);
 	tprint_struct_end();
 }
 
@@ -71,10 +71,8 @@ print_io_cqring_offsets(const struct io_cqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv1);
 	}
-	if (p->resv2) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*p, resv2);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, user_addr);
 	tprint_struct_end();
 }
 
@@ -565,7 +563,7 @@ print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_buf_reg arg;
 	CHECK_TYPE_SIZE(arg, 40);
-	CHECK_TYPE_SIZE(arg.pad, sizeof(uint16_t));
+	CHECK_TYPE_SIZE(arg.flags, sizeof(uint16_t));
 	CHECK_TYPE_SIZE(arg.resv, sizeof(uint64_t) * 3);
 
 	if (umove_or_printaddr(tcp, addr, &arg))
@@ -580,10 +578,8 @@ print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(arg, bgid);
 
-	if (arg.pad) {
-		tprint_struct_next();
-		PRINT_FIELD_X(arg, pad);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(arg, flags);
 
 	if (!IS_ARRAY_ZERO(arg.resv)) {
 		tprint_struct_next();

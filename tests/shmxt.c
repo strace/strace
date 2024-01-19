@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -50,8 +50,7 @@ main(void)
 	       sprintrc(rc));
 
 	shmat(id, NULL, SHM_REMAP);
-	printf("%s(%d, NULL, SHM_REMAP) = -1 %s (%m)\n",
-	       SHMAT, id, errno2name());
+	printf("%s(%d, NULL, SHM_REMAP) = %s\n", SHMAT, id, sprintrc(-1));
 
 	void *shmaddr = shmat(id, NULL, SHM_RDONLY);
 	if (shmaddr == (void *)(-1))
@@ -67,8 +66,8 @@ main(void)
 	++shmaddr;
 	void *shmaddr2 = shmat(id, shmaddr, SHM_RND);
 	if (shmaddr2 == (void *)(-1))
-		printf("%s(%d, %p, SHM_RND) = -1 %s (%m)\n",
-		       SHMAT, id, shmaddr, errno2name());
+		printf("%s(%d, %p, SHM_RND) = %s\n",
+		       SHMAT, id, shmaddr, sprintrc(-1));
 	else {
 		printf("%s(%d, %p, SHM_RND) = %p\n",
 		       SHMAT, id, shmaddr, shmaddr2);

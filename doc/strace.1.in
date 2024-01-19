@@ -38,22 +38,28 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
-.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyzZ
-.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyzZ
-.OP \-I n
+.\" -kk option is available:
+.if '@ENABLE_STACKTRACE_FALSE@'#' .if '@USE_LIBDW_FALSE@'#' .OP \-ACdffhikkqqrtttTvVwxxyyYzZ
+.\" only -k option is available:
+.if '@ENABLE_STACKTRACE_FALSE@'#' .if '@USE_LIBUNWIND_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyYzZ
+.\" no -k option is available:
+.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyYzZ
+.OP \-a column
 .OP \-b execve
 .OM \-e expr
+.OP \-I n
+.OP \-o file
 .OP \-O overhead
+.OM \-p pid
+.OM \-P path
+.OP \-s strsize
 .OP \-S sortby
 .OP \-U columns
-.OP \-a column
-.OP \-o file
-.OP \-s strsize
 .OP \-X format
-.OM \-P path
-.OM \-p pid
 .OP \-\-seccomp\-bpf
+.OP \-\-syscall\-limit limit
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
+.OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -66,15 +72,17 @@ strace \- trace system calls and signals
 .SY strace
 .B \-c
 .OP \-dfwzZ
-.OP \-I n
 .OP \-b execve
 .OM \-e expr
+.OP \-I n
 .OP \-O overhead
+.OM \-p pid
+.OM \-P path
 .OP \-S sortby
 .OP \-U columns
-.OM \-P path
-.OM \-p pid
 .OP \-\-seccomp\-bpf
+.OP \-\-syscall\-limit limit
+.OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -83,6 +91,9 @@ strace \- trace system calls and signals
 .OP -u username
 .IR command " [" args ]
 .BR "" }
+.YS
+.SY strace
+.B \-\-tips\fR[=\fIformat\fR]
 .YS
 .SH DESCRIPTION
 .IX "strace command" "" "\fLstrace\fR command"
@@ -249,6 +260,7 @@ where
 .I qualifier
 is one of
 .BR trace " (or " t ),
+.BR trace\-fds " (or " trace\-fd " or " fd " or " fds ),
 .BR abbrev " (or " a ),
 .BR verbose " (or " v ),
 .BR raw " (or " x ),
@@ -345,6 +357,12 @@ This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
+.TP
+.BR "\-\-argv0" = \fIname\fR
+Set argv[0] of the command being executed to
+.IR name .
+Useful for tracing multi-call executables which interpret argv[0],
+such as busybox or kmod.
 .SS Tracing
 .TP 12
 .BI "\-b " syscall
@@ -465,6 +483,27 @@ not stop on
 default if
 .BR \-D ).
 .RE
+.TP
+.BR "\-\-syscall\-limit" = \fIlimit\fR
+Detach all tracees when
+.I limit
+number of syscalls have been captured. Syscalls filtered out via
+.BR \-\-trace ,
+.B \-\-trace\-path
+or
+.B \-\-status
+options are not considered when keeping track of the number of syscalls that are captured.
+.TP
+.B \-\-kill\-on\-exit
+Set
+.B PTRACE_O_EXITKILL
+ptrace option to all tracee processes (which send a SIGKILL signal to
+the tracee if the tracer exits) and do not detach them on cleanup so
+they will not be left running after the tracer exit.
+.B \-\-kill\-on\-exit
+is not compatible with
+.BR \-p / \-\-attach
+options.
 .SS Filtering
 .TP 12
 \fB\-e\ trace\fR=\,\fIsyscall_set\fR
@@ -645,6 +684,21 @@ about the user/kernel boundary if only a subset of system calls
 are being monitored.  The default is
 .BR trace = all .
 .TP
+\fB\-e\ trace\-fd\fR=\,\fIset\fR
+.TQ
+\fB\-e\ trace\-fds\fR=\,\fIset\fR
+.TQ
+\fB\-e\ fd\fR=\,\fIset\fR
+.TQ
+\fB\-e\ fds\fR=\,\fIset\fR
+.TQ
+\fB\-\-trace\-fds\fR=\,\fIset\fR
+Trace only the syscalls that operate
+on the specified subset of (non-negative) file descriptors.
+Note that usage of this option also filters out all the syscalls
+that do not operate on file descriptors at all.
+Applies in (inclusive) disjunction with the \fB\-\-trace\-path\fR option.
+.TP
 \fB\-e\ signal\fR=\,\fIset\fR
 .TQ
 \fB\-e\ signals\fR=\,\fIset\fR
@@ -725,6 +779,7 @@ Trace only system calls accessing
 Multiple
 .B \-P
 options can be used to specify several paths.
+Applies in (inclusive) disjunction with the \fB\-\-trace\-fds\fR option.
 .TP
 .B \-z
 .TQ
@@ -888,7 +943,7 @@ Decode various information associated with file descriptors.  The default is
 .I set
 can include the following elements:
 .RS
-.TP 8
+.TP 9
 .B path
 Print file paths.
 Also enables printing of tracee's current working directory when
@@ -903,6 +958,9 @@ Print character/block device numbers.
 .TQ
 .B pidfd
 Print PIDs associated with pidfd file descriptors.
+.TQ
+.B signalfd
+Print signal masks associated with signalfd file descriptors.
 .RE
 .TP
 \fB\-e\ decode\-pids\fR=\,\fIset\fR
@@ -942,9 +1000,16 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ
-.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces [= symbol ]
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
 .if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
+.if '@USE_LIBDW_FALSE@'#' .TP
+.if '@USE_LIBDW_FALSE@'#' .B \-kk
+.if '@USE_LIBDW_FALSE@'#' .TQ
+.if '@USE_LIBDW_FALSE@'#' .B \-\-stack\-traces [= source ]
+.if '@USE_LIBDW_FALSE@'#' Print the execution stack trace and source code information of the traced
+.if '@USE_LIBDW_FALSE@'#' processes after each system call. This option expects the target program is compiled
+.if '@USE_LIBDW_FALSE@'#' with appropriate debug options: "\-g" (gcc), or "\-g \-gdwarf-aranges" (clang).
 .TP
 .BI "\-o " filename
 .TQ
@@ -1576,7 +1641,11 @@ This option has no effect unless
 .BR \-f / \-\-follow\-forks
 is also specified.
 .B \-\-seccomp\-bpf
-is also not applicable to processes attached using
+is not compatible with
+.B \-\-syscall\-limit
+and
+.BR \-b / \-\-detach\-on
+options.  It is also not applicable to processes attached using
 .BR \-p / \-\-attach
 option.  An attempt to enable system calls filtering using seccomp-bpf may
 fail for various reasons, e.g. there are too many system calls to filter,
@@ -1586,6 +1655,13 @@ itself is being traced.
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
+When
+.B \-\-seccomp\-bpf
+is activated and
+.BR \-p / \-\-attach
+option is not used,
+.B \-\-kill\-on\-exit
+option is activated as well.
 .TP
 .BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
 Show strace tips, tricks, and tweaks before exit.
@@ -1855,7 +1931,13 @@ A traced process runs slowly (but check out the
 .B \-\-seccomp\-bpf
 option).
 .LP
-Traced processes which are descended from
+Unless
+.B \-\-kill\-on\-exit
+option is used (or
+.B \-\-seccomp\-bpf
+option is used in a way that implies
+.BR \-\-kill\-on\-exit ),
+traced processes which are descended from
 .I command
 may be left running after an interrupt signal
 .RB ( CTRL\-C ).

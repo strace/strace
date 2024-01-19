@@ -2,7 +2,7 @@
  * This file is part of ioctl_evdev strace test.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -57,7 +57,7 @@ print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 #define TEST_NULL_ARG_EX(cmd, str)					\
 	do {								\
 		ioctl(-1, cmd, 0);					\
-		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",		\
+		printf("ioctl(-1, %s, NULL)" RVAL_EBADF,		\
 		       sprintxlat(str, cmd, NULL));			\
 	} while (0)
 
@@ -139,18 +139,18 @@ main(void)
 #else
 	printf("EVIOCGBIT(%#x /* EV_??? */, 42)", EV_MAX);
 #endif
-	printf(", NULL) = -1 EBADF (%m)\n");
+	printf(", NULL)" RVAL_EBADF);
 
 	ioctl(-1, EVIOCRMFF, lmagic);
-	printf("ioctl(-1, %s, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %d)" RVAL_EBADF,
 	       XLAT_STR(EVIOCRMFF), (int) lmagic);
 
 	ioctl(-1, EVIOCGRAB, lmagic);
-	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %lu)" RVAL_EBADF,
 	       XLAT_STR(EVIOCGRAB), lmagic);
 
 	ioctl(-1, EVIOCREVOKE, lmagic);
-	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %lu)" RVAL_EBADF,
 	       XLAT_STR(EVIOCREVOKE), lmagic);
 
 	const unsigned int size = get_page_size();
@@ -161,7 +161,7 @@ main(void)
 	*val_int = magic;
 
 	ioctl(-1, EVIOCSCLOCKID, val_int);
-	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%u])" RVAL_EBADF,
 	       XLAT_STR(EVIOCSCLOCKID), *val_int);
 
 	int *pair_int = tail_alloc(sizeof(*pair_int) * 2);
@@ -169,12 +169,12 @@ main(void)
 	pair_int[1] = 0xbadc0ded;
 
 	ioctl(-1, EVIOCSREP, pair_int);
-	printf("ioctl(-1, %s, [%u, %u]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%u, %u])" RVAL_EBADF,
 	       XLAT_STR(EVIOCSREP), pair_int[0], pair_int[1]);
 
 	pair_int[1] = 1;
 	ioctl(-1, EVIOCSKEYCODE, pair_int);
-	printf("ioctl(-1, %s, [%u, %s]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%u, %s])" RVAL_EBADF,
 	       XLAT_STR(EVIOCSKEYCODE), pair_int[0],
 	       XLAT_KNOWN(0x1, "KEY_ESC"));
 
@@ -198,7 +198,7 @@ main(void)
 	printf("...");
 #endif
 	errno = EBADF;
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct ff_effect, ffe);
 	fill_memory(ffe, sizeof(*ffe));
@@ -215,7 +215,7 @@ main(void)
 	printf("...");
 #endif
 	errno = EBADF;
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 #if VERBOSE
 	ffe->type = FF_RAMP;
@@ -225,7 +225,7 @@ main(void)
 	       ffe->u.ramp.start_level, ffe->u.ramp.end_level);
 	print_envelope(&ffe->u.ramp.envelope);
 	errno = EBADF;
-	printf("}}) = -1 EBADF (%m)\n");
+	printf("}})" RVAL_EBADF);
 
 	ffe->type = FF_PERIODIC;
 	ioctl(-1, EVIOCSFF, ffe);
@@ -239,7 +239,7 @@ main(void)
 	printf(", custom_len=%u, custom_data=%p}",
 	       ffe->u.periodic.custom_len, ffe->u.periodic.custom_data);
 	errno = EBADF;
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	ffe->type = FF_RUMBLE;
 	ioctl(-1, EVIOCSFF, ffe);
@@ -247,7 +247,7 @@ main(void)
 	printf(", rumble={strong_magnitude=%hu, weak_magnitude=%hu}",
 	       ffe->u.rumble.strong_magnitude, ffe->u.rumble.weak_magnitude);
 	errno = EBADF;
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 
 	ffe->type = 0xff;
 	ioctl(-1, EVIOCSFF, ffe);
@@ -264,23 +264,23 @@ main(void)
 # endif
 		);
 	errno = EBADF;
-	printf("}) = -1 EBADF (%m)\n");
+	printf("})" RVAL_EBADF);
 #endif
 
 	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x1, 0xff), lmagic);
-	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %#lx)" RVAL_EBADF,
 	       XLAT_STR(_IOC(_IOC_READ, 0x45, 0x1, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_WRITE, 0x45, 0x1, 0xff), lmagic);
-	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %#lx)" RVAL_EBADF,
 	       XLAT_STR(_IOC(_IOC_WRITE, 0x45, 0x1, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff), lmagic);
-	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %#lx)" RVAL_EBADF,
 	       XLAT_STR(_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0), lmagic);
-	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %#lx)" RVAL_EBADF,
 	       XLAT_STR(_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0)), lmagic);
 
 	puts("+++ exited with 0 +++");

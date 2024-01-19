@@ -2,7 +2,7 @@
  * Check decoding of sigaction syscall.
  *
  * Copyright (c) 2014-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2021 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -102,23 +102,23 @@ main(void)
 	puts("sigaction(" SIG_STR ", NULL, NULL) = 0");
 
 	k_sigaction(signo, (uintptr_t) (new_act + 1), 0);
-	printf("sigaction(" SIG_STR ", %p, NULL) = -1 EFAULT (%m)\n",
+	printf("sigaction(" SIG_STR ", %p, NULL)" RVAL_EFAULT,
 	       new_act + 1);
 
 	k_sigaction(signo, (uintptr_t) new_act + 2, 0);
-	printf("sigaction(" SIG_STR ", %#lx, NULL) = -1 EFAULT (%m)\n",
+	printf("sigaction(" SIG_STR ", %#lx, NULL)" RVAL_EFAULT,
 	       (unsigned long) new_act + 2);
 
 	k_sigaction(signo, 0, (uintptr_t) (old_act + 1));
-	printf("sigaction(" SIG_STR ", NULL, %p) = -1 EFAULT (%m)\n",
+	printf("sigaction(" SIG_STR ", NULL, %p)" RVAL_EFAULT,
 	       old_act + 1);
 
 	k_sigaction(signo, 0, (uintptr_t) old_act + 2);
-	printf("sigaction(" SIG_STR ", NULL, %#lx) = -1 EFAULT (%m)\n",
+	printf("sigaction(" SIG_STR ", NULL, %#lx)" RVAL_EFAULT,
 	       (unsigned long) old_act + 2);
 
 	k_sigaction(addr, 0, 0);
-	printf("sigaction(%d, NULL, NULL) = -1 EINVAL (%m)\n", ADDR_INT);
+	printf("sigaction(%d, NULL, NULL)" RVAL_EINVAL, ADDR_INT);
 
 	memset(new_act, 0, sizeof(*new_act));
 

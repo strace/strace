@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014 Stefan Sørensen <stefan.sorensen@spectralink.com>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2021 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -9,12 +9,12 @@
 
 #include "defs.h"
 
-# include <linux/ioctl.h>
-# include <linux/ptp_clock.h>
+#include <linux/ioctl.h>
+#include <linux/ptp_clock.h>
 
-# include "xlat/ptp_extts_flags.h"
-# include "xlat/ptp_perout_flags.h"
-# include "xlat/ptp_pin_funcs.h"
+#include "xlat/ptp_extts_flags.h"
+#include "xlat/ptp_perout_flags.h"
+#include "xlat/ptp_pin_funcs.h"
 
 static void
 print_ptp_clock_time(const struct ptp_clock_time *const p, bool rtc)
@@ -78,7 +78,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PTP_CLOCK_GETCAPS:
 	case PTP_CLOCK_GETCAPS2: {
 		struct ptp_clock_caps caps;
-		CHECK_TYPE_SIZE(caps.rsv, sizeof(unsigned int) * 12);
+		CHECK_TYPE_SIZE(caps.rsv, sizeof(unsigned int) * 11);
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS, 80);
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS2, 80);
 
@@ -106,6 +106,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D(caps, cross_timestamping);
 		tprint_struct_next();
 		PRINT_FIELD_D(caps, adjust_phase);
+		tprint_struct_next();
+		PRINT_FIELD_TICKS_D(caps, max_phase_adj, 1000000000, 9);
 		PRINT_RSV(caps, rsv);
 		tprint_struct_end();
 		break;

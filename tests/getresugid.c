@@ -2,7 +2,7 @@
  * Check decoding of getresuid/getresgid/getresuid32/getresgid32 syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -26,13 +26,13 @@ main(void)
 	       (unsigned) *r, (unsigned) *e, (unsigned) *s);
 
 	assert(syscall(SYSCALL_NR, NULL, e, s) == -1);
-	printf("%s(NULL, %p, %p) = -1 EFAULT (%m)\n", SYSCALL_NAME, e, s);
+	printf("%s(NULL, %p, %p)" RVAL_EFAULT, SYSCALL_NAME, e, s);
 
 	assert(syscall(SYSCALL_NR, r, NULL, s) == -1);
-	printf("%s(%p, NULL, %p) = -1 EFAULT (%m)\n", SYSCALL_NAME, r, s);
+	printf("%s(%p, NULL, %p)" RVAL_EFAULT, SYSCALL_NAME, r, s);
 
 	assert(syscall(SYSCALL_NR, r, e, NULL) == -1);
-	printf("%s(%p, %p, NULL) = -1 EFAULT (%m)\n", SYSCALL_NAME, r, e);
+	printf("%s(%p, %p, NULL)" RVAL_EFAULT, SYSCALL_NAME, r, e);
 
 	puts("+++ exited with 0 +++");
 	return 0;

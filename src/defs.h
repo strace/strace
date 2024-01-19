@@ -2,7 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1999-2022 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -40,6 +40,7 @@
 # include "list.h"
 # include "macros.h"
 # include "mpers_type.h"
+# include "number_set.h"
 # include "string_to_uint.h"
 # include "sysent.h"
 # include "xmalloc.h"
@@ -515,6 +516,8 @@ extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
+extern bool tracing_fds;
+extern long long syscall_limit;
 
 struct path_set_item {
 	const char *path;
@@ -543,13 +546,17 @@ enum xflag_opts {
 extern unsigned xflag;
 extern bool followfork;
 extern bool output_separately;
+enum stack_trace_modes {
+	STACK_TRACE_OFF,
+	STACK_TRACE_ON,
+	STACK_TRACE_WITH_SRCINFO,
+};
 # ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
-extern bool stack_trace_enabled;
+extern enum stack_trace_modes stack_trace_mode;
 # else
-#  define stack_trace_enabled 0
+#  define stack_trace_mode STACK_TRACE_OFF
 # endif
-extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
 extern unsigned os_release;
 # undef KERNEL_VERSION
@@ -659,6 +666,27 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 {
 	return set_tcb_priv_data(tcp, (void *) val, 0);
 }
+
+struct finfo {
+	const char *path;
+	enum {
+		FINFO_UNSET,
+		FINFO_DEV_BLK,
+		FINFO_DEV_CHR,
+	} type;
+	bool deleted;
+	struct {
+		unsigned int major, minor;
+	} dev;
+};
+
+extern struct finfo *
+get_finfo_for_dev(const char *path, struct finfo *finfo);
+
+extern int
+term_ioctl_decode_command_number(struct tcb *tcp,
+				 const struct finfo *finfo,
+				 unsigned int code);
 
 /**
  * @return 0 on success, -1 on error.
@@ -779,7 +807,8 @@ extern const char *signame(const int);
 extern const char *sprintsigname(const int);
 
 extern void pathtrace_select_set(const char *, struct path_set *);
-extern bool pathtrace_match_set(struct tcb *, struct path_set *);
+extern bool pathtrace_match_set(struct tcb *, struct path_set *,
+				struct number_set *);
 
 static inline void
 pathtrace_select(const char *path)
@@ -790,7 +819,7 @@ pathtrace_select(const char *path)
 static inline bool
 pathtrace_match(struct tcb *tcp)
 {
-	return pathtrace_match_set(tcp, &global_path_set);
+	return pathtrace_match_set(tcp, &global_path_set, trace_fd_set);
 }
 
 /**
@@ -824,7 +853,7 @@ extern const char *xlookup(const struct xlat *, const uint64_t);
 extern const char *xlookup_le(const struct xlat *, uint64_t *);
 
 struct dyxlat;
-struct dyxlat *dyxlat_alloc(size_t nmemb);
+struct dyxlat *dyxlat_alloc(size_t nmemb, enum xlat_type type);
 void dyxlat_free(struct dyxlat *);
 const struct xlat *dyxlat_get(const struct dyxlat *);
 void dyxlat_add_pair(struct dyxlat *, uint64_t val, const char *str, size_t len);
@@ -1214,8 +1243,14 @@ extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracer).
  */
-extern void printfd_pid(const char* field,
-                        struct tcb *tcp, pid_t pid, int fd); /* util.c */
+extern void printfd_pid_with_finfo(const char* field, struct tcb *tcp,
+		pid_t pid, int fd, const struct finfo *finfo);
+
+static inline void
+printfd_pid(const char* field, struct tcb *tcp, pid_t pid, int fd)
+{
+	printfd_pid_with_finfo(field, tcp, pid, fd, NULL);
+}
 
 static inline void
 printfd(struct tcb *tcp, int fd)
@@ -1227,6 +1262,12 @@ static inline void
 printfd_field(const char* field, struct tcb *tcp, int fd)
 {
   printfd_pid(field, tcp, tcp->pid, fd);
+}
+
+static inline void
+printfd_with_finfo(struct tcb *tcp, int fd, const struct finfo *finfo)
+{
+	printfd_pid_with_finfo(tcp, tcp->pid, fd, finfo);
 }
 
 /**
@@ -1379,6 +1420,7 @@ extern void print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 
 extern void qualify(const char *);
 extern void qualify_trace(const char *);
+extern void qualify_trace_fd(const char *);
 extern void qualify_abbrev(const char *);
 extern void qualify_verbose(const char *);
 extern void qualify_raw(const char *);
@@ -1527,11 +1569,14 @@ extern const struct timespec *ts_min(const struct timespec *, const struct times
 extern const struct timespec *ts_max(const struct timespec *, const struct timespec *);
 extern int parse_ts(const char *s, struct timespec *t);
 
+/** Print a time interval value specified as a number 1/freq-sized ticks. */
+extern void print_ticks(uint64_t val, long freq, unsigned int precision);
+extern void print_ticks_d(int64_t val, long freq, unsigned int precision);
 /** Print a clock_t value, as used by times(2) (and not clock(3)). */
 extern void print_clock_t(uint64_t val);
 
 # ifdef ENABLE_STACKTRACE
-extern void unwind_init(void);
+extern void unwind_init(bool);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
 extern void unwind_tcb_print(struct tcb *);

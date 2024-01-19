@@ -2,7 +2,7 @@
  * Check decoding of rt_sigpending syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -28,7 +28,7 @@ iterate(const char *const text, unsigned int size, void *set)
 {
 	for (;;) {
 		if (k_sigpending(set, size)) {
-			tprintf("rt_sigpending(%p, %u) = -1 EFAULT (%m)\n",
+			tprintf("rt_sigpending(%p, %u)" RVAL_EFAULT,
 				set, size);
 			break;
 		}
@@ -68,7 +68,7 @@ main(void)
 	for (; set_size; set_size >>= 1, k_set += set_size) {
 		if (!k_sigpending(k_set, set_size))
 			break;
-		tprintf("rt_sigpending(%p, %u) = -1 EINVAL (%m)\n",
+		tprintf("rt_sigpending(%p, %u)" RVAL_EINVAL,
 			k_set, set_size);
 	}
 	if (!set_size)
@@ -79,7 +79,7 @@ main(void)
 
 	void *const efault = k_set + (set_size >> 1);
 	assert(k_sigpending(efault, set_size) == -1);
-	tprintf("rt_sigpending(%p, %u) = -1 EFAULT (%m)\n",
+	tprintf("rt_sigpending(%p, %u)" RVAL_EFAULT,
 		efault, set_size);
 
 	sigaddset(libc_set, SIGHUP);

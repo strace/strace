@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 JingPiao Chen <chenjingpiao@gmail.com>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -191,8 +191,8 @@ main(void)
 
 	/* Unknown loop commands */
 	sys_ioctl(-1, unknown_loop_cmd, magic);
-	printf("ioctl(-1, _IOC(%s_IOC_READ|_IOC_WRITE, 0x4c, %#x, %#x), "
-	       "%#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(%s_IOC_READ|_IOC_WRITE, 0x4c, %#x, %#x), %#lx)"
+	       RVAL_EBADF,
 	       _IOC_DIR((unsigned int) unknown_loop_cmd) & _IOC_NONE ?
 	       "_IOC_NONE|" : "",
 	       _IOC_NR((unsigned int) unknown_loop_cmd),
@@ -200,16 +200,14 @@ main(void)
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, LOOP_CONFIGURE + 1, magic);
-	printf("ioctl(-1, _IOC(%s, 0x4c, %#x, %#x), %#lx) = "
-	       "-1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(%s, 0x4c, %#x, %#x), %#lx)" RVAL_EBADF,
 	       _IOC_NONE ? "0" : "_IOC_NONE",
 	       _IOC_NR(LOOP_CONFIGURE + 1),
 	       _IOC_SIZE(LOOP_CONFIGURE + 1),
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, LOOP_CTL_GET_FREE + 1, magic);
-	printf("ioctl(-1, _IOC(%s, 0x4c, %#x, %#x), %#lx) = "
-	       "-1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(%s, 0x4c, %#x, %#x), %#lx)" RVAL_EBADF,
 	       _IOC_NONE ? "0" : "_IOC_NONE",
 	       _IOC_NR(LOOP_CTL_GET_FREE + 1),
 	       _IOC_SIZE(LOOP_CTL_GET_FREE + 1),
@@ -217,16 +215,16 @@ main(void)
 
 	/* LOOP_SET_FD */
 	sys_ioctl(-1, LOOP_SET_FD, magic);
-	printf("ioctl(-1, LOOP_SET_FD, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_SET_FD, %d)" RVAL_EBADF,
 	       (unsigned int) magic);
 
 	/* LOOP_CLR_FD */
 	ioctl(-1, LOOP_CLR_FD);
-	printf("ioctl(-1, LOOP_CLR_FD) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_CLR_FD)" RVAL_EBADF);
 
 	/* LOOP_SET_STATUS */
 	ioctl(-1, LOOP_SET_STATUS, NULL);
-	printf("ioctl(-1, LOOP_SET_STATUS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_SET_STATUS, NULL)" RVAL_EBADF);
 
 	fill_memory(info, sizeof(*info));
 	info->lo_flags = 0xdeface00;
@@ -237,7 +235,7 @@ main(void)
 	printf("ioctl(-1, LOOP_SET_STATUS, ");
 	print_loop_info(info, true, NULL, "\\0", NULL);
 	ioctl(-1, LOOP_SET_STATUS, info);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	fill_memory(info, sizeof(*info));
 	info->lo_encrypt_type = LO_CRYPT_NONE;
@@ -246,25 +244,25 @@ main(void)
 	memset(info->lo_encrypt_key, 'B', sizeof(info->lo_encrypt_key));
 
 	ioctl(-1, LOOP_SET_STATUS, (void *) info + ALIGNOF(info));
-	printf("ioctl(-1, LOOP_SET_STATUS, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_SET_STATUS, %p)" RVAL_EBADF,
 	       (void *) info + ALIGNOF(info));
 
 	printf("ioctl(-1, LOOP_SET_STATUS, ");
 	print_loop_info(info, false, "LO_CRYPT_NONE", NULL,
 			"LO_FLAGS_READ_ONLY");
 	ioctl(-1, LOOP_SET_STATUS, info);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	/* LOOP_GET_STATUS */
 	ioctl(-1, LOOP_GET_STATUS, NULL);
-	printf("ioctl(-1, LOOP_GET_STATUS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_GET_STATUS, NULL)" RVAL_EBADF);
 
 	ioctl(-1, LOOP_GET_STATUS, (unsigned long) info | kernel_mask);
-	printf("ioctl(-1, LOOP_GET_STATUS, %p) = -1 EBADF (%m)\n", info);
+	printf("ioctl(-1, LOOP_GET_STATUS, %p)" RVAL_EBADF, info);
 
 	/* LOOP_SET_STATUS64 */
 	ioctl(-1, LOOP_SET_STATUS64, NULL);
-	printf("ioctl(-1, LOOP_SET_STATUS64, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_SET_STATUS64, NULL)" RVAL_EBADF);
 
 	fill_memory(info64, sizeof(*info64));
 	info64->lo_flags = 0xdec0de00;
@@ -276,7 +274,7 @@ main(void)
 	printf("ioctl(-1, LOOP_SET_STATUS64, ");
 	print_loop_info64(info64, true, NULL, "\\0", NULL);
 	ioctl(-1, LOOP_SET_STATUS64, info64);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	fill_memory(info64, sizeof(*info64));
 	info64->lo_flags = LO_FLAGS_READ_ONLY;
@@ -286,25 +284,25 @@ main(void)
 	memset(info64->lo_encrypt_key, 'E', sizeof(info64->lo_encrypt_key));
 
 	ioctl(-1, LOOP_SET_STATUS64, (void *) info64 + ALIGNOF(info64));
-	printf("ioctl(-1, LOOP_SET_STATUS64, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_SET_STATUS64, %p)" RVAL_EBADF,
 	       (void *) info64 + ALIGNOF(info64));
 
 	printf("ioctl(-1, LOOP_SET_STATUS64, ");
 	print_loop_info64(info64, false, "LO_CRYPT_NONE", NULL,
 			  "LO_FLAGS_READ_ONLY");
 	ioctl(-1, LOOP_SET_STATUS64, info64);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	/* LOOP_GET_STATUS64 */
 	ioctl(-1, LOOP_GET_STATUS64, NULL);
-	printf("ioctl(-1, LOOP_GET_STATUS64, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_GET_STATUS64, NULL)" RVAL_EBADF);
 
 	ioctl(-1, LOOP_GET_STATUS64, (unsigned long) info64 | kernel_mask);
-	printf("ioctl(-1, LOOP_GET_STATUS64, %p) = -1 EBADF (%m)\n", info64);
+	printf("ioctl(-1, LOOP_GET_STATUS64, %p)" RVAL_EBADF, info64);
 
 	/* LOOP_CONFIGURE */
 	ioctl(-1, LOOP_CONFIGURE, NULL);
-	printf("ioctl(-1, LOOP_CONFIGURE, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_CONFIGURE, NULL)" RVAL_EBADF);
 
 	fill_memory(config, sizeof(*config));
 	config->info.lo_flags = LO_FLAGS_READ_ONLY;
@@ -314,52 +312,52 @@ main(void)
 	memset(config->info.lo_encrypt_key, 'E', sizeof(config->info.lo_encrypt_key));
 
 	ioctl(-1, LOOP_CONFIGURE, (void *) config + ALIGNOF(config));
-	printf("ioctl(-1, LOOP_CONFIGURE, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_CONFIGURE, %p)" RVAL_EBADF,
 	       (void *) config + ALIGNOF(config));
 
 	printf("ioctl(-1, LOOP_CONFIGURE, ");
 	print_loop_config(config, true);
 	ioctl(-1, LOOP_CONFIGURE, config);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	memset(config->__reserved, 0, sizeof(config->__reserved));
 	printf("ioctl(-1, LOOP_CONFIGURE, ");
 	print_loop_config(config, false);
 	ioctl(-1, LOOP_CONFIGURE, config);
-	printf(") = -1 EBADF (%m)\n");
+	printf(")" RVAL_EBADF);
 
 	/* LOOP_CHANGE_FD */
 	sys_ioctl(-1, LOOP_CHANGE_FD, magic);
-	printf("ioctl(-1, LOOP_CHANGE_FD, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_CHANGE_FD, %d)" RVAL_EBADF,
 	       (unsigned int) magic);
 
 	/* LOOP_SET_CAPACITY */
 	ioctl(-1, LOOP_SET_CAPACITY);
-	printf("ioctl(-1, LOOP_SET_CAPACITY) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_SET_CAPACITY)" RVAL_EBADF);
 
 	/* LOOP_SET_DIRECT_IO */
 	sys_ioctl(-1, LOOP_SET_DIRECT_IO, magic);
-	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu)" RVAL_EBADF,
 	       (unsigned long) magic);
 
 	/* LOOP_SET_BLOCK_SIZE */
 	sys_ioctl(-1, LOOP_SET_BLOCK_SIZE, magic);
-	printf("ioctl(-1, LOOP_SET_BLOCK_SIZE, %lu) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_SET_BLOCK_SIZE, %lu)" RVAL_EBADF,
 	       (unsigned long) magic);
 
 	/* LOOP_CTL_ADD */
 	sys_ioctl(-1, LOOP_CTL_ADD, magic);
-	printf("ioctl(-1, LOOP_CTL_ADD, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_CTL_ADD, %d)" RVAL_EBADF,
 	       (unsigned int) magic);
 
 	/* LOOP_CTL_REMOVE */
 	sys_ioctl(-1, LOOP_CTL_REMOVE, magic);
-	printf("ioctl(-1, LOOP_CTL_REMOVE, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, LOOP_CTL_REMOVE, %d)" RVAL_EBADF,
 	       (unsigned int) magic);
 
 	/* LOOP_CTL_GET_FREE */
 	ioctl(-1, LOOP_CTL_GET_FREE);
-	printf("ioctl(-1, LOOP_CTL_GET_FREE) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, LOOP_CTL_GET_FREE)" RVAL_EBADF);
 
 	puts("+++ exited with 0 +++");
 	return 0;

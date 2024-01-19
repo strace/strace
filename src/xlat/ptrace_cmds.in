@@ -40,6 +40,8 @@ PTRACE_SECCOMP_GET_FILTER	0x420c
 PTRACE_SECCOMP_GET_METADATA	0x420d
 PTRACE_GET_SYSCALL_INFO		0x420e
 PTRACE_GET_RSEQ_CONFIGURATION	0x420f
+PTRACE_SET_SYSCALL_USER_DISPATCH_CONFIG	0x4210
+PTRACE_GET_SYSCALL_USER_DISPATCH_CONFIG	0x4211
 
 /* arch-specific */
 #if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
@@ -115,7 +117,7 @@ PTRACE_SETREGS64	0x17
 PTRACE_SETREGS64
 #endif
 
-#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __unicore32__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_GET_THREAD_AREA	0x16
 #elif defined __arc__ || defined __m68k__ || defined __mips__ || defined __x86_64__ || defined __i386__
 PTRACE_GET_THREAD_AREA	0x19
@@ -129,15 +131,19 @@ PTRACE_SET_THREAD_AREA	0x1a
 PTRACE_SET_THREAD_AREA
 #endif
 
-#if defined __arm__ || defined __c6x__ || defined __sh__
-PTRACE_GETFDPIC	0x1f
+#if defined __xtensa__
+PTRACE_GETFDPIC        0x16
+#elif defined __arm__ || defined __m68k__ || defined __sh__
+PTRACE_GETFDPIC        0x1f
+#elif defined __riscv__
+PTRACE_GETFDPIC        0x21
 #else
 PTRACE_GETFDPIC
 #endif
 
 #if defined __powerpc__
 PTRACE_SYSEMU	0x1d
-#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__ || defined __s390__
+#elif defined __arm64__ || defined __aarch64__ || defined __loongarch__ || defined __s390__ || defined __x86_64__ || defined __i386__
 PTRACE_SYSEMU	0x1f
 #else
 PTRACE_SYSEMU
@@ -145,7 +151,7 @@ PTRACE_SYSEMU
 
 #if defined __powerpc__
 PTRACE_SYSEMU_SINGLESTEP	0x1e
-#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__ || defined __s390__
+#elif defined __arm64__ || defined __aarch64__ || defined __loongarch__ || defined __s390__ || defined __x86_64__ || defined __i386__
 PTRACE_SYSEMU_SINGLESTEP	0x20
 #else
 PTRACE_SYSEMU_SINGLESTEP

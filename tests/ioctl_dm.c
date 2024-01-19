@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 Mikulas Patocka <mpatocka@redhat.com>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -179,17 +179,16 @@ main(void)
 
 	/* Incorrect operation */
 	ioctl(-1, _IOW(DM_IOCTL, 0xde, int), dm_arg);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xde, %#zx), %p) = "
-	       "-1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xde, %#zx), %p)" RVAL_EBADF,
 	       DM_IOCTL, sizeof(int), dm_arg);
 
 	ioctl(-1, dummy_dm_ioctl1, 0);
-	printf("ioctl(-1, _IOC(_IOC_READ, %#x, 0, %#x), 0) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(_IOC_READ, %#x, 0, %#x), 0)" RVAL_EBADF,
 	       DM_IOCTL, (unsigned int) _IOC_SIZE(dummy_dm_ioctl1));
 
 	ioctl(-1, dummy_dm_ioctl2, dummy_dm_arg);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, %#x, %#x, 0), %#lx) = "
-	       "-1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, %#x, %#x, 0), %#lx)"
+	       RVAL_EBADF,
 	       DM_IOCTL, (unsigned int) _IOC_NR(dummy_dm_ioctl2),
 	       (unsigned long) dummy_dm_arg);
 
@@ -197,12 +196,12 @@ main(void)
 	/* DM_VERSION */
 	/* Incorrect pointer */
 	ioctl(-1, DM_VERSION, dm_arg + 1);
-	printf("ioctl(-1, DM_VERSION, %p) = -1 EBADF (%m)\n", dm_arg + 1);
+	printf("ioctl(-1, DM_VERSION, %p)" RVAL_EBADF, dm_arg + 1);
 
 	/* Incorrect data_size */
 	init_s(dm_arg, 0, 0);
 	ioctl(-1, DM_VERSION, &s);
-	printf("ioctl(-1, DM_VERSION, %p) = -1 EBADF (%m)\n", &s);
+	printf("ioctl(-1, DM_VERSION, %p)" RVAL_EBADF, &s);
 
 	/* Incorrect version */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -211,14 +210,14 @@ main(void)
 	dm_arg->version[2] = 0xbadc0def;
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, [{version=[%u, %u, %u]"
-	       " /* unsupported device mapper ABI version */}]) = "
-	       "-1 EBADF (%m)\n", 0xbadc0ded, 0xbadc0dee, 0xbadc0def);
+	       " /* unsupported device mapper ABI version */}])" RVAL_EBADF,
+	       0xbadc0ded, 0xbadc0dee, 0xbadc0def);
 
 	/* Incorrect data_size */
 	init_s(dm_arg, 14, 64);
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, [{version=[4, 1, 2], data_size=14"
-	       " /* data_size too small */}]) = -1 EBADF (%m)\n");
+	       " /* data_size too small */}])" RVAL_EBADF);
 
 	/* Unterminated name/uuid */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -227,7 +226,7 @@ main(void)
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, [{version=[4, 1, 2], data_size=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"%.127s\"..., uuid=\"%.128s\"..., "
-	       "flags=0}]) = -1 EBADF (%m)\n",
+	       "flags=0}])" RVAL_EBADF,
 	       min_sizeof_dm_ioctl, str129, str129);
 
 	/* Normal call */
@@ -236,7 +235,7 @@ main(void)
 	printf("ioctl(-1, DM_VERSION, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}])"
-	       " = -1 EBADF (%m)\n", min_sizeof_dm_ioctl);
+	       RVAL_EBADF, min_sizeof_dm_ioctl);
 
 	/* Zero dev, name, uuid */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -246,8 +245,8 @@ main(void)
 	dm_arg->uuid[0] = '\0';
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, "
-	       "[{version=[4, 1, 2], data_size=%u, flags=0}]) = "
-	       "-1 EBADF (%m)\n", 0xfacefeed);
+	       "[{version=[4, 1, 2], data_size=%u, flags=0}])" RVAL_EBADF,
+	       0xfacefeed);
 
 	/* Flag */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -263,7 +262,7 @@ main(void)
 	       "DM_NOFLUSH_FLAG|DM_QUERY_INACTIVE_TABLE_FLAG|"
 	       "DM_UEVENT_GENERATED_FLAG|DM_UUID_FLAG|DM_SECURE_DATA_FLAG|"
 	       "DM_DATA_OUT_FLAG|DM_DEFERRED_REMOVE|DM_INTERNAL_SUSPEND_FLAG|"
-	       "DM_IMA_MEASUREMENT_FLAG|0xfff00080}]) = -1 EBADF (%m)\n",
+	       "DM_IMA_MEASUREMENT_FLAG|0xfff00080}])" RVAL_EBADF,
 	       min_sizeof_dm_ioctl);
 
 	/* Normal call */
@@ -271,8 +270,8 @@ main(void)
 	ioctl(-1, DM_VERSION, &s);
 	printf("ioctl(-1, DM_VERSION, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}]) = "
-	       "-1 EBADF (%m)\n", sizeof(s.ioc));
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}])"
+	       RVAL_EBADF, sizeof(s.ioc));
 
 
 	/* DM_REMOVE_ALL */
@@ -282,7 +281,7 @@ main(void)
 		init_s(dm_arg, min_sizeof_dm_ioctl, 0);
 		ioctl(-1, dummy_check_cmds_nodev[i].arg, dm_arg);
 		printf("ioctl(-1, %s, [{version=[4, 1, 2], data_size=%zu%s, "
-		       "flags=0}]) = -1 EBADF (%m)\n",
+		       "flags=0}])" RVAL_EBADF,
 		       dummy_check_cmds_nodev[i].str,
 		       min_sizeof_dm_ioctl,
 		       dummy_check_cmds_nodev[i].has_params ?
@@ -302,7 +301,7 @@ main(void)
 		ioctl(-1, dummy_check_cmds[i].arg, dm_arg);
 		printf("ioctl(-1, %s, [{version=[4, 1, 2], data_size=%zu%s, "
 		       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\"%s, "
-		       "flags=0}]) = -1 EBADF (%m)\n",
+		       "flags=0}])" RVAL_EBADF,
 		       dummy_check_cmds[i].str, min_sizeof_dm_ioctl,
 		       dummy_check_cmds[i].has_params ? ", data_start=0" : "",
 		       dummy_check_cmds[i].has_event_nr ? ", event_nr=0" : "");
@@ -317,7 +316,7 @@ main(void)
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
-	       "flags=DM_SUSPEND_FLAG}]) = -1 EBADF (%m)\n", sizeof(s.ioc));
+	       "flags=DM_SUSPEND_FLAG}])" RVAL_EBADF, sizeof(s.ioc));
 
 	init_s(&s.ioc, sizeof(s.ioc), 0);
 	s.ioc.event_nr = 0xbadc0ded;
@@ -325,7 +324,7 @@ main(void)
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
 	       "[{version=[4, 1, 2], data_size=%zu, dev=makedev(0x12, 0x34), "
 	       "name=\"nnn\", uuid=\"uuu\", event_nr=3134983661, "
-	       "flags=0}]) = -1 EBADF (%m)\n", sizeof(s.ioc));
+	       "flags=0}])" RVAL_EBADF, sizeof(s.ioc));
 
 
 	/* DM_TABLE_LOAD */
@@ -348,7 +347,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n", s.ioc.data_size, s.ioc.data_start);
+	       "])" RVAL_EBADF, s.ioc.data_size, s.ioc.data_start);
 
 	/* No targets */
 	init_s(dm_arg, min_sizeof_dm_ioctl, min_sizeof_dm_ioctl);
@@ -358,7 +357,7 @@ main(void)
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
-	       "target_count=0, flags=0}]) = -1 EBADF (%m)\n",
+	       "target_count=0, flags=0}])" RVAL_EBADF,
 	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
 
 	/* Invalid data_start */
@@ -375,7 +374,7 @@ main(void)
 #else
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n", sizeof(*dm_arg), 0xfffffff8);
+	       "])" RVAL_EBADF, sizeof(*dm_arg), 0xfffffff8);
 
 	/* Inaccessible pointer */
 	init_s(&dm_arg_open1->ioc, offsetof(struct dm_table_open_test, target1),
@@ -392,7 +391,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n", sizeof(*dm_arg_open1),
+	       "])" RVAL_EBADF, sizeof(*dm_arg_open1),
 	       offsetof(struct dm_table_open_test, target1)
 #if VERBOSE
 	       , (char *) dm_arg_open1 +
@@ -540,7 +539,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size, s.ioc.data_start);
 
 	/* Invalid data_start */
@@ -555,7 +554,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
 
 	/* Invalid data_start */
@@ -570,7 +569,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       sizeof(*dm_arg), 0xffffffff);
 
 	/* Inaccessible pointer */
@@ -586,7 +585,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       sizeof(*dm_arg) + sizeof(struct dm_target_msg),
 	       sizeof(*dm_arg)
 #if VERBOSE
@@ -647,7 +646,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size, s.ioc.data_start);
 
 
@@ -666,7 +665,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       sizeof(*unaligned_dm_arg), min_sizeof_dm_ioctl
 #if VERBOSE
 	       , (char *) unaligned_dm_arg + min_sizeof_dm_ioctl
@@ -686,7 +685,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size);
 
 	/* Strange but still valid data_start */
@@ -703,7 +702,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size,
 	       offsetof(struct dm_ioctl, name) + 1);
 
@@ -720,7 +719,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size, s.ioc.data_start);
 
 
@@ -738,7 +737,7 @@ main(void)
 #else
 	       "..."
 #endif /* VERBOSE */
-	       "]) = -1 EBADF (%m)\n",
+	       "])" RVAL_EBADF,
 	       s.ioc.data_size, s.ioc.data_start);
 
 	puts("+++ exited with 0 +++");

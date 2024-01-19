@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -23,8 +23,8 @@ main(void)
 
 	long rc = syscall(__NR_epoll_pwait, -1, ev, 1, -2,
 			  set, (kernel_ulong_t) sizeof(set));
-	printf("epoll_pwait(-1, %p, 1, -2, %p, %u) = %ld %s (%m)\n",
-	       ev, set, (unsigned) sizeof(set), rc, errno2name());
+	printf("epoll_pwait(-1, %p, 1, -2, %p, %u) = %s\n",
+	       ev, set, (unsigned) sizeof(set), sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

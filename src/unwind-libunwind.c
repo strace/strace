@@ -14,7 +14,7 @@
 static unw_addr_space_t libunwind_as;
 
 static void
-init(void)
+init(bool unused_with_srcinfo)
 {
 	mmap_cache_enable();
 
@@ -90,7 +90,8 @@ print_stack_frame(struct tcb *tcp,
 			    entry->binary_filename,
 			    *symbol_name,
 			    function_offset,
-			    true_offset);
+			    true_offset,
+			    NULL, 0);
 
 		return 0;
 	}

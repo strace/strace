@@ -1,7 +1,7 @@
 /*
  * IFLA_LINKINFO netlink attribute decoding check.
  *
- * Copyright (c) 2018-2022 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -897,7 +897,7 @@ main(void)
 		{ 0, "IFLA_BRPORT_UNSPEC" },
 		{ 24, "IFLA_BRPORT_FLUSH" },
 		{ 26, "IFLA_BRPORT_PAD" },
-		{ 40, "0x28 /* IFLA_BRPORT_??? */" },
+		{ 45, "0x2d /* IFLA_BRPORT_??? */" },
 		{ 2989, "0xbad /* IFLA_BRPORT_??? */" },
 	};
 
@@ -940,6 +940,8 @@ main(void)
 		{ ARG_STR(IFLA_BRPORT_MRP_RING_OPEN) },
 		{ ARG_STR(IFLA_BRPORT_MRP_IN_OPEN) },
 		{ ARG_STR(IFLA_BRPORT_LOCKED) },
+		{ ARG_STR(IFLA_BRPORT_MAB) },
+		{ ARG_STR(IFLA_BRPORT_NEIGH_VLAN_SUPPRESS) },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u8_brport_attrs); k++) {
@@ -991,6 +993,9 @@ main(void)
 		{  3, "IFLA_BRPORT_COST" },
 		{ 37, "IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT" },
 		{ 38, "IFLA_BRPORT_MCAST_EHT_HOSTS_CNT" },
+		{ ARG_STR(IFLA_BRPORT_MCAST_N_GROUPS) },
+		{ ARG_STR(IFLA_BRPORT_MCAST_MAX_GROUPS) },
+		{ ARG_STR(IFLA_BRPORT_BACKUP_NHID) },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u32_brport_attrs); k++) {

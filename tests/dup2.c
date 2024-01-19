@@ -1,7 +1,7 @@
 /*
  * Check decoding of dup2 syscall.
  *
- * Copyright (c) 2016-2020 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -24,6 +24,23 @@
 # ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 #  define SKIP_IF_PROC_IS_UNAVAILABLE
 # endif
+
+# ifndef PATH_TRACING
+#  define PATH_TRACING 0
+# endif
+# ifndef TRACE_FDS
+#  define TRACE_FDS 0
+# endif
+# ifndef TRACE_FD_0
+#  define TRACE_FD_0 (!TRACE_FDS && !PATH_TRACING)
+# endif
+# ifndef TRACE_OTHER_FDS
+#  define TRACE_OTHER_FDS (!TRACE_FDS && !PATH_TRACING)
+# endif
+# ifndef TRACE_FD_9
+#  define TRACE_FD_9 (!TRACE_FDS && !PATH_TRACING)
+# endif
+
 
 static const char *errstr;
 
@@ -49,69 +66,95 @@ main(void)
 
 	if (k_dup2(0, 0))
 		perror_msg_and_skip("dup2");
-# ifndef PATH_TRACING
+# if TRACE_FD_0
 	printf("dup2(0" FD0_PATH ", 0" FD0_PATH ") = 0" FD0_PATH "\n");
 # endif
 
 	k_dup2(-1, -2);
-# ifndef PATH_TRACING
+# if !PATH_TRACING && !TRACE_FDS
 	printf("dup2(-1, -2) = %s\n", errstr);
 # endif
 
 	k_dup2(-2, -1);
-# ifndef PATH_TRACING
+# if !PATH_TRACING && !TRACE_FDS
 	printf("dup2(-2, -1) = %s\n", errstr);
 # endif
 
 	k_dup2(-3, 0);
-# ifndef PATH_TRACING
+# if TRACE_FD_0
 	printf("dup2(-3, 0" FD0_PATH ") = %s\n", errstr);
 # endif
 
 	k_dup2(0, -4);
-# ifndef PATH_TRACING
+# if TRACE_FD_0
 	printf("dup2(0" FD0_PATH ", -4) = %s\n", errstr);
 # endif
 
 	k_dup2(-5, 9);
+# if PATH_TRACING || TRACE_FD_9
 	printf("dup2(-5, 9" FD9_PATH ") = %s\n", errstr);
+# endif
 
 	k_dup2(9, -6);
+# if PATH_TRACING || TRACE_FD_9
 	printf("dup2(9" FD9_PATH ", -6) = %s\n", errstr);
+# endif
 
 	k_dup2(9, 9);
+# if PATH_TRACING || TRACE_FD_9
 	printf("dup2(9" FD9_PATH ", 9" FD9_PATH ") = 9" FD9_PATH "\n");
+# endif
 
 	k_dup2(0, fd0);
-# ifndef PATH_TRACING
+# if TRACE_FD_0
 	printf("dup2(0" FD0_PATH ", %d" FD0_PATH ") = %d" FD0_PATH "\n",
 	       fd0, fd0);
 # endif
 
+	k_dup2(fd0, fd9);
+# if PATH_TRACING || TRACE_OTHER_FDS
+	printf("dup2(%d" FD0_PATH ", %d" FD9_PATH ") = %d" FD0_PATH "\n",
+	       fd0, fd9, fd9);
+# endif
+
+	k_dup2(fd0, fd9);
+# if TRACE_OTHER_FDS
+	printf("dup2(%d" FD0_PATH ", %d" FD0_PATH ") = %d" FD0_PATH "\n",
+	       fd0, fd9, fd9);
+# endif
+
 	k_dup2(9, fd9);
-	printf("dup2(9" FD9_PATH ", %d" FD9_PATH ") = %d" FD9_PATH "\n",
+# if PATH_TRACING || TRACE_FD_9 || TRACE_OTHER_FDS
+	printf("dup2(9" FD9_PATH ", %d" FD0_PATH ") = %d" FD9_PATH "\n",
 	       fd9, fd9);
+# endif
 
 	k_dup2(0, fd9);
+# if PATH_TRACING || TRACE_FD_0
 	printf("dup2(0" FD0_PATH ", %d" FD9_PATH ") = %d" FD0_PATH "\n",
 	       fd9, fd9);
+# endif
 
 	k_dup2(9, fd0);
+# if PATH_TRACING || TRACE_FD_9 || TRACE_OTHER_FDS
 	printf("dup2(9" FD9_PATH ", %d" FD0_PATH ") = %d" FD9_PATH "\n",
 	       fd0, fd0);
+# endif
 
 	close(fd0);
 	close(fd9);
 
 	k_dup2(0, fd0);
-# ifndef PATH_TRACING
+# if TRACE_FD_0
 	printf("dup2(0" FD0_PATH ", %d) = %d" FD0_PATH "\n",
 	       fd0, fd0);
 # endif
 
 	k_dup2(9, fd9);
+# if PATH_TRACING || TRACE_FD_9 || TRACE_OTHER_FDS
 	printf("dup2(9" FD9_PATH ", %d) = %d" FD9_PATH "\n",
 	       fd9, fd9);
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

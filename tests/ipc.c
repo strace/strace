@@ -2,7 +2,7 @@
  * Check decoding of ipc syscall.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -46,13 +46,13 @@ ipc_call0(const unsigned short version, const unsigned short call)
 	if (version)
 		printf("%hu<<16|", version);
 	errno = saved_errno;
-	printf("%hu, 0, 0, 0, 0%s) = %d %s (%m)\n", call,
+	printf("%hu, 0, 0, 0, 0%s) = %s\n", call,
 # ifdef __s390__
 	       "",
 # else
 	       ", 0",
 # endif
-	       rc, errno2name());
+	       sprintrc(rc));
 	return rc;
 }
 
@@ -64,7 +64,7 @@ main(void)
 	int rc = ipc_call(0, SEMCTL, 0, 0, 0, (long) efault, 0);
 	if (rc != -1 || EFAULT != errno)
 		perror_msg_and_skip("ipc");
-	printf("semctl(0, 0, IPC_RMID, %p) = -1 EFAULT (%m)\n", efault);
+	printf("semctl(0, 0, IPC_RMID, %p)" RVAL_EFAULT, efault);
 
 	for (unsigned short call = 0; call <= 40; call += 10) {
 		ipc_call0(0, call);
@@ -74,11 +74,11 @@ main(void)
 	rc = ipc_call(42, SEMCTL, 0, 0, 0, (long) efault, 0);
 	int test_version = EFAULT == errno;
 	if (test_version)
-		printf("semctl(0, 0, IPC_RMID, %p) = %d %s (%m)\n",
-		       efault, rc, errno2name());
+		printf("semctl(0, 0, IPC_RMID, %p) = %s\n",
+		       efault, sprintrc(rc));
 	else
-		printf("ipc(42<<16|SEMCTL, 0, 0, 0, %p) = %d %s (%m)\n",
-		       efault, rc, errno2name());
+		printf("ipc(42<<16|SEMCTL, 0, 0, 0, %p) = %s\n",
+		       efault, sprintrc(rc));
 
 	if (test_version) {
 		const int msqid = -2;
@@ -87,8 +87,8 @@ main(void)
 
 		rc = ipc_call(1, MSGRCV,
 			      msqid, msgsz, IPC_NOWAIT, (long) efault, msgtyp);
-		printf("msgrcv(%d, %p, %lu, %ld, IPC_NOWAIT) = %d %s (%m)\n",
-		       msqid, efault, msgsz, msgtyp, rc, errno2name());
+		printf("msgrcv(%d, %p, %lu, %ld, IPC_NOWAIT) = %s\n",
+		       msqid, efault, msgsz, msgtyp, sprintrc(rc));
 	}
 
 	puts("+++ exited with 0 +++");

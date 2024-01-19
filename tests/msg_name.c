@@ -2,7 +2,7 @@
  * Check decoding of struct msghdr.msg_name* arguments of recvmsg syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -115,8 +115,8 @@ test_msg_name(const int send_fd, const int recv_fd)
 	       (int) sizeof(struct sockaddr), (int) msg->msg_namelen, rc);
 
 	rc = send_recv(send_fd, recv_fd, msg, MSG_DONTWAIT);
-	printf("recvmsg(%d, {msg_namelen=%d}, MSG_DONTWAIT) = %d %s (%m)\n",
-	       recv_fd, (int) msg->msg_namelen, rc, errno2name());
+	printf("recvmsg(%d, {msg_namelen=%d}, MSG_DONTWAIT) = %s\n",
+	       recv_fd, (int) msg->msg_namelen, sprintrc(rc));
 
 #if TEST_RECVMSG_BOGUS_ADDR
 	/*
@@ -127,12 +127,12 @@ test_msg_name(const int send_fd, const int recv_fd)
 	 * it doesn't read that inaccessible memory.
 	 */
 	rc = send_recv(send_fd, -1, msg + 1, 0);
-	printf("recvmsg(-1, %p, 0) = %d %s (%m)\n",
-	       msg + 1, rc, errno2name());
+	printf("recvmsg(-1, %p, 0) = %s\n",
+	       msg + 1, sprintrc(rc));
 
 	rc = send_recv(send_fd, -1, 0, 0);
-	printf("recvmsg(-1, NULL, 0) = %d %s (%m)\n",
-	       rc, errno2name());
+	printf("recvmsg(-1, NULL, 0) = %s\n",
+	       sprintrc(rc));
 #endif
 }
 

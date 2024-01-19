@@ -2,6 +2,7 @@
  * Check silent decoding of sendmmsg and recvmmsg syscalls.
  *
  * Copyright (c) 2016-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -33,7 +34,7 @@ main(void)
 		perror_msg_and_skip("sendmmsg");
 	printf("sendmmsg(%d, %p, 1, MSG_DONTWAIT) = %d\n", fds[1], &mh, rc);
 
-	struct timespec t = { .tv_sec = 0, .tv_nsec = 12345678 };
+	kernel_old_timespec_t t = { .tv_sec = 0, .tv_nsec = 12345678 };
 	rc = recv_mmsg(fds[0], &mh, 1, MSG_DONTWAIT, &t);
 	printf("recvmmsg(%d, %p, 1, MSG_DONTWAIT, %p) = %d\n",
 	       fds[0], &mh, &t, rc);

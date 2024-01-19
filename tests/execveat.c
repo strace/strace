@@ -2,7 +2,7 @@
  * This file is part of execveat strace test.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -143,7 +143,7 @@ main(void)
 # else
 	       ", %p /* 5 vars, unterminated */"
 # endif
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv),
@@ -153,7 +153,7 @@ main(void)
 # else
 	       tail_envp,
 # endif
-	       errno2name());
+	       sprintrc(-1));
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
@@ -166,7 +166,7 @@ main(void)
 # else
 	       ", %p /* 2 vars */"
 # endif
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 # if VERBOSE
@@ -174,7 +174,7 @@ main(void)
 # else
 	       tail_envp,
 # endif
-	       errno2name());
+	       sprintrc(-1));
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"]"
@@ -183,7 +183,7 @@ main(void)
 # else
 	       ", %p /* 1 var */"
 # endif
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[2],
 # if VERBOSE
@@ -191,7 +191,7 @@ main(void)
 # else
 	       tail_envp + 1,
 # endif
-	       errno2name());
+	       sprintrc(-1));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(char *, empty);
 	char **const efault = empty + 1;
@@ -204,13 +204,13 @@ main(void)
 # else
 	       ", %p /* 0 vars */"
 # endif
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME,
 # if !VERBOSE
 	       empty,
 # endif
-	       errno2name());
+	       sprintrc(-1));
 
 	char *const str_a = tail_alloc(DEFAULT_STRLEN + 2);
 	fill_memory_ex(str_a, DEFAULT_STRLEN + 1, '0', 10);
@@ -248,8 +248,8 @@ main(void)
 # else
 	printf("], %p /* %u vars */", b, DEFAULT_STRLEN + 1);
 # endif
-	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       errno2name());
+	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
+	       sprintrc(-1));
 
 	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"",
@@ -265,20 +265,20 @@ main(void)
 # else
 	printf("], %p /* %d vars */", b + 1, DEFAULT_STRLEN);
 # endif
-	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       errno2name());
+	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
+	       sprintrc(-1));
 
 	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", NULL, %p"
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
-	       Q_FILENAME, efault, errno2name());
+	       Q_FILENAME, efault, sprintrc(-1));
 
 	syscall(__NR_execveat, -100, FILENAME, efault, NULL, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", %p, NULL"
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
-	       Q_FILENAME, efault, errno2name());
+	       Q_FILENAME, efault, sprintrc(-1));
 
 	tests_with_existing_file();
 

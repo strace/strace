@@ -2,7 +2,7 @@
  * Check decoding of sync_file_range2 syscall.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -27,11 +27,11 @@ main(void)
 	int rc = sync_file_range(fd, offset, nbytes, flags);
 	printf("%s(%d, SYNC_FILE_RANGE_WAIT_BEFORE"
 	       "|SYNC_FILE_RANGE_WRITE|SYNC_FILE_RANGE_WAIT_AFTER"
-	       "|0xfffffff8, %lld, %lld) = %d %s (%m)\n",
+	       "|0xfffffff8, %lld, %lld) = %s\n",
 	       "sync_file_range2", fd,
 	       (long long) offset,
 	       (long long) nbytes,
-	       rc, errno2name());
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -124,5 +124,5 @@ SYS_FUNC(open_by_handle_at)
 	/* flags */
 	tprint_open_modes(tcp->u_arg[2]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }

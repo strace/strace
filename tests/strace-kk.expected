@@ -1,0 +1,2 @@
+chdir f3<stack-fcall-3.c:18> f2<stack-fcall-2.c:15> f1<stack-fcall-1.c:15> f0<stack-fcall-0.c:15> main<stack-fcall.c:25>
+SIGURG f3<stack-fcall-3.c:21> f2<stack-fcall-2.c:15> f1<stack-fcall-1.c:15> f0<stack-fcall-0.c:15> main<stack-fcall.c:25>

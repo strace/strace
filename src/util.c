@@ -4,9 +4,9 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
- *		       Linux for s390 port by D.J. Barrow
- *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2022 The strace developers.
+ *                     Linux for s390 port by D.J. Barrow
+ *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -35,11 +35,11 @@
 
 const struct xlat_data *
 find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
-		 const size_t num_items, const unsigned int flags)
+		const size_t num_items, const unsigned int flags)
 {
 	for (size_t i = 0; i < num_items; i++) {
 		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
-		      : strcasecmp)(items[i].str, s))
+			: strcasecmp)(items[i].str, s))
 			return items + i;
 	}
 
@@ -48,7 +48,7 @@ find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
 
 uint64_t
 find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
-	      uint64_t default_val, uint64_t not_found)
+		uint64_t default_val, uint64_t not_found)
 {
 	if (!arg)
 		return default_val;
@@ -60,7 +60,7 @@ find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
 
 int
 str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
-		 int *width)
+		int *width)
 {
 	static const struct xlat_data units[] = {
 		{ 1000000000U | (0ULL << 32), "s" },
@@ -92,10 +92,10 @@ int
 ts_cmp(const struct timespec *a, const struct timespec *b)
 {
 	if (a->tv_sec < b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
+		|| (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
 		return -1;
 	if (a->tv_sec > b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
+		|| (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
 		return 1;
 	return 0;
 }
@@ -185,8 +185,8 @@ parse_ts(const char *s, struct timespec *t)
 	if (float_len > int_len) {
 		t->tv_sec = float_val / (NS_IN_S / scale);
 		t->tv_nsec = ((uint64_t) ((float_val -
-					   (t->tv_sec * (NS_IN_S / scale)))
-					  * scale)) % NS_IN_S;
+					(t->tv_sec * (NS_IN_S / scale)))
+					* scale)) % NS_IN_S;
 	} else {
 		t->tv_sec = int_val / (NS_IN_S / scale);
 		t->tv_nsec = (int_val % (NS_IN_S / scale)) * scale;
@@ -220,6 +220,30 @@ ilog10(uint64_t val)
 }
 
 void
+print_ticks(uint64_t val, long freq, unsigned int precision)
+{
+	PRINT_VAL_U(val);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
+			&& freq > 0 && val > 0) {
+		tprintf_comment("%" PRIu64 ".%0*" PRIu64 " s",
+				val / freq, precision, val % freq);
+	}
+}
+
+void
+print_ticks_d(int64_t val, long freq, unsigned int precision)
+{
+	PRINT_VAL_D(val);
+	/* freq > 1 to avoid special casing for val ==  */
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
+		&& freq > 1 && val != 0) {
+		tprintf_comment("%s%lld.%0*lld s",
+				val < 0 ? "-" : "", llabs(val / freq),
+				precision, llabs(val % freq));
+	}
+}
+
+void
 print_clock_t(uint64_t val)
 {
 	static long clk_tck;
@@ -236,33 +260,7 @@ print_clock_t(uint64_t val)
 			frac_width = MIN(ilog10(clk_tck), 9);
 	}
 
-	PRINT_VAL_U(val);
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
-	    && clk_tck > 0 && val > 0) {
-		/*
-		 * This dance here is due to the fact that this calculation
-		 * may occasionally hit double precision limitations (52-bit
-		 * mantissa) with large values of val.
-		 */
-		char buf[sizeof(uint64_t) * 3 + sizeof("0.0 s")];
-		size_t offs = ilog10(val / clk_tck);
-		/*
-		 * This check is mostly to appease covscan, which thinks
-		 * that offs can go as high as 31 (it cannot), but since
-		 * there is no proper sanity checks against offs overrunning
-		 * buf down the code, it may as well be here.
-		 */
-		if (offs > (sizeof(buf) - sizeof("0.0 s")))
-			return;
-		int ret = snprintf(buf + offs, sizeof(buf) - offs, "%.*f s",
-				   frac_width,
-				   (double) (val % clk_tck) / clk_tck);
-		if (ret >= 0 && (unsigned) ret < sizeof(buf) - offs) {
-			snprintf(buf, offs + 2, "%" PRIu64, val / clk_tck);
-			buf[offs + 1] = '.';
-			tprints_comment(buf);
-		}
-	}
+	print_ticks(val, clk_tck, frac_width);
 }
 
 #if !defined HAVE_STPCPY
@@ -647,69 +645,121 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 	return true;
 }
 
-static bool
-printdev(struct tcb *tcp, int fd, const char *path)
+struct finfo *
+get_finfo_for_dev(const char *path, struct finfo *finfo)
 {
 	strace_stat_t st;
 
+	finfo->path = path;
+	finfo->type = FINFO_UNSET;
+	finfo->deleted = false;
+
 	if (path[0] != '/')
-		return false;
+		return finfo;
 
 	if (stat_file(path, &st)) {
 		debug_func_perror_msg("stat(\"%s\")", path);
-		return false;
+		return finfo;
 	}
 
 	switch (st.st_mode & S_IFMT) {
 	case S_IFBLK:
+		finfo->type = FINFO_DEV_BLK;
+		break;
 	case S_IFCHR:
+		finfo->type = FINFO_DEV_CHR;
+		break;
+	default:
+		return finfo;
+	}
+
+	finfo->dev.major = major(st.st_rdev);
+	finfo->dev.minor = minor(st.st_rdev);
+
+	return finfo;
+}
+
+static bool
+printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
+{
+	struct finfo finfo_buf;
+	if (!finfo)
+		finfo = get_finfo_for_dev(path, &finfo_buf);
+
+	switch (finfo->type) {
+	case FINFO_DEV_BLK:
+	case FINFO_DEV_CHR:
 		tprint_associated_info_begin();
-		print_quoted_string_ex(path, strlen(path),
+		print_quoted_string_ex(finfo->path, strlen(finfo->path),
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
 		tprint_associated_info_begin();
 		tprintf_dummy("%s %u:%u",
-			S_ISBLK(st.st_mode)? "block" : "char",
-			major(st.st_rdev), minor(st.st_rdev));
+			       (finfo->type == FINFO_DEV_BLK)? "block" : "char",
+			       finfo->dev.major, finfo->dev.minor);
 		tprint_associated_info_end();
 		tprint_associated_info_end();
 		return true;
+	default:
+		break;
 	}
 
 	return false;
 }
 
-pid_t
-pidfd_get_pid(pid_t pid_of_fd, int fd)
+typedef bool (*scan_fdinfo_fn)(const char *value, void *data);
+
+static bool
+scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
+	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
 {
 	int proc_pid = 0;
 	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
 	if (!proc_pid)
-		return -1;
+		return false;
 
 	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
 	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", proc_pid, fd);
 
 	FILE *f = fopen_stream(fdi_path, "r");
 	if (!f)
-		return -1;
+		return false;
 
-	static const char pid_pfx[] = "Pid:\t";
 	char *line = NULL;
 	size_t sz = 0;
-	pid_t pid = -1;
-	while (getline(&line, &sz, f) > 0) {
-		const char *pos = STR_STRIP_PREFIX(line, pid_pfx);
-		if (pos == line)
-			continue;
+	bool result = false;
 
-		pid = string_to_uint_ex(pos, NULL, INT_MAX, "\n");
-		break;
+	while (getline(&line, &sz, f) > 0) {
+		const char *value =
+			str_strip_prefix_len(line, search_pfx, search_pfx_len);
+		if (value != line && fn(value, data)) {
+			result = true;
+			break;
+		}
 	}
 
 	free(line);
 	fclose(f);
 
+	return result;
+}
+
+static bool
+parse_fdinfo_pid(const char *value, void *data)
+{
+	pid_t *pid = data;
+	*pid = string_to_uint_ex(value, NULL, INT_MAX, "\n");
+	return true;
+}
+
+pid_t
+pidfd_get_pid(pid_t pid_of_fd, int fd)
+{
+	static const char pid_pfx[] = "Pid:\t";
+	pid_t pid = -1;
+
+	scan_fdinfo(pid_of_fd, fd, pid_pfx, sizeof(pid_pfx) - 1,
+		    parse_fdinfo_pid, &pid);
 	return pid;
 }
 
@@ -738,6 +788,47 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	return true;
 }
 
+static bool
+print_fdinfo_sigmask(const char *value, void *data)
+{
+#ifdef WORDS_BIGENDIAN
+	unsigned int pos_xor_mask = current_wordsize - 1;
+#else
+	unsigned int pos_xor_mask = 0;
+#endif
+	size_t sigset_size = strlen(value) / 2;
+	uint8_t *sigmask = xmalloc(sigset_size);
+
+	for (size_t i = 0; i < sigset_size; ++i) {
+		uint8_t byte;
+		if (sscanf(value + i * 2, "%02hhx", &byte) != 1) {
+			free(sigmask);
+			return false;
+		}
+		sigmask[(sigset_size - 1 - i) ^ pos_xor_mask] = byte;
+	}
+
+	tprint_associated_info_begin();
+	tprints_string(sprintsigmask_n("signalfd:", sigmask, sigset_size));
+	tprint_associated_info_end();
+
+	free(sigmask);
+	return true;
+}
+
+static bool
+printsignalfd(pid_t pid_of_fd, int fd, const char *path)
+{
+	static const char signalfd_path[] = "anon_inode:[signalfd]";
+	static const char sigmask_pfx[] = "sigmask:\t";
+
+	if (strcmp(path, signalfd_path))
+		return false;
+
+	return scan_fdinfo(pid_of_fd, fd, sigmask_pfx, sizeof(sigmask_pfx) - 1,
+			   print_fdinfo_sigmask, NULL);
+}
+
 static void
 print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 {
@@ -751,31 +842,38 @@ print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 }
 
 void
-printfd_pid(const char* field, struct tcb *tcp, pid_t pid, int fd)
-{
-	char path[PATH_MAX + 1];
+printfd_pid_with_finfo(const char* field, struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo) {
+	char patha[PATH_MAX + 1];
 	bool deleted;
+
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
-	    && getfdpath_pid(pid, fd, path, sizeof(path), &deleted) >= 0) {
+	    && (finfo || (getfdpath_pid(pid, fd, patha, sizeof(patha), &deleted) >= 0))) {
+		const char *path = finfo? finfo->path: patha;
 
 		if(field != NULL) tprints_field_set(field);
 		if(structured_output) tprint_array_begin();
 		PRINT_VAL_D(fd);
 		if(structured_output) tprint_array_next();
+
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
-		    printdev(tcp, fd, path))
+		    printdev(tcp, fd, path, finfo))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
 			goto printed;
-		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set)){
-			print_quoted_string_in_angle_brackets(path, deleted);
+		if (is_number_in_set(DECODE_FD_SIGNALFD, decode_fd_set) &&
+		    printsignalfd(pid, fd, path))
 			goto printed;
-		}
+		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set)) {
+			print_quoted_string_in_angle_brackets(path,
+							      finfo? finfo->deleted: deleted);
+            goto printed;
+        }
 		if(structured_output) tprints_string("<unknown>");
+
 	printed:
 		if(structured_output) tprint_array_end();
 		if(field != NULL) tprint_field_end();
@@ -1159,7 +1257,7 @@ print_quoted_cstring(const char *str, unsigned int size)
  * Print path string specified by address `addr' and length `n'.
  * If path length exceeds `n', append `...' to the output.
  *
- * Returns the result of umovenstr.
+ * Returns the result of umovestr.
  */
 int
 printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
@@ -1206,7 +1304,7 @@ printpath(struct tcb *const tcp, const kernel_ulong_t addr)
  * Append `...' to the output if either the string length exceeds `max_strlen',
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
  *
- * Returns the result of umovenstr if style has QUOTE_0_TERMINATED,
+ * Returns the result of umovestr if style has QUOTE_0_TERMINATED,
  * or the result of umoven otherwise.
  */
 int

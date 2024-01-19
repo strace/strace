@@ -2,7 +2,7 @@
 #
 # Check -tt option.
 #
-# Copyright (c) 2016-2020 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -26,7 +26,7 @@ t_reg=
 while [ "$s" -le "$s1" ]; do
 	t="$(date +%T --date "@$s")"
 	[ -z "$t_reg" ] && t_reg="$t" || t_reg="$t_reg|$t"
-	s=$(($s + 1))
+	s=$((s + 1))
 done
 
 cat > "$EXP" << __EOF__

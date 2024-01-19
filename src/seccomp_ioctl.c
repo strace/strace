@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>.
- * Copyright (c) 2021-2022 The strace developers.
+ * Copyright (c) 2021-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -13,6 +13,7 @@
 
 #include "xlat/seccomp_ioctl_addfd_flags.h"
 #include "xlat/seccomp_ioctl_resp_flags.h"
+#include "xlat/seccomp_ioctl_notif_flags.h"
 
 #define SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR SECCOMP_IOR(2, __u64)
 
@@ -148,6 +149,12 @@ seccomp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SECCOMP_IOCTL_NOTIF_ADDFD:
 		tprint_arg_next();
 		print_struct_seccomp_notif_addfd(tcp, arg);
+
+		return RVAL_IOCTL_DECODED;
+
+	case SECCOMP_IOCTL_NOTIF_SET_FLAGS:
+		tprint_arg_next();
+		printflags64(seccomp_ioctl_notif_flags, arg, "SECCOMP_USER_NOTIF_???");
 
 		return RVAL_IOCTL_DECODED;
 

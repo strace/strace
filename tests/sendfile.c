@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -35,7 +35,7 @@ main(void)
 	assert(syscall(__NR_sendfile, 0, 1, NULL, page_size) == -1);
 	if (EBADF != errno)
 		perror_msg_and_skip("sendfile");
-	printf("sendfile(0, 1, NULL, %u) = -1 EBADF (%m)\n", page_size);
+	printf("sendfile(0, 1, NULL, %u)" RVAL_EBADF, page_size);
 
 	unsigned int file_size = 0;
 	socklen_t optlen = sizeof(file_size);
@@ -59,7 +59,7 @@ main(void)
 	*p_off = 0;
 
 	assert(syscall(__NR_sendfile, 0, 1, efault, page_size) == -1);
-	printf("sendfile(0, 1, %p, %u) = -1 EFAULT (%m)\n", efault, page_size);
+	printf("sendfile(0, 1, %p, %u)" RVAL_EFAULT, efault, page_size);
 
 	assert(syscall(__NR_sendfile, sv[1], reg_in, NULL, alen)
 	       == (long) alen);
@@ -78,7 +78,7 @@ main(void)
 
 	*p_off = (typeof(*p_off)) 0xcafef00dfacefeedULL;
 	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, 1) == -1);
-	printf("sendfile(%d, %d, [%llu], 1) = -1 EINVAL (%m)\n",
+	printf("sendfile(%d, %d, [%llu], 1)" RVAL_EINVAL,
 	       sv[1], reg_in, (unsigned long long) *p_off);
 
 	*p_off = 0xdefaced;

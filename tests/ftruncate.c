@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -25,8 +25,8 @@ main(void)
 	else
 		rc = syscall(__NR_ftruncate, -1L, len);
 
-	printf("ftruncate(-1, %llu) = %ld %s (%m)\n",
-	       (unsigned long long) len, rc, errno2name());
+	printf("ftruncate(-1, %llu) = %s\n",
+	       (unsigned long long) len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

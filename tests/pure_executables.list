@@ -1,6 +1,6 @@
 # Executables without side effects.
 #
-# Copyright (c) 2017-2022 The strace developers.
+# Copyright (c) 2017-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -24,6 +24,10 @@ bpf
 bpf-v
 brk
 btrfs
+cachestat
+cachestat-P
+cachestat-fd
+cachestat-success
 caps
 chdir
 chmod
@@ -51,10 +55,18 @@ dev--decode-fds-socket
 dev-yy
 dup
 dup-P
+dup-trace-fds-0
+dup-trace-fds-0-9
+dup-trace-fds-0-P
+dup-trace-fds-not-9
 dup-y
 dup-yy
 dup2
 dup2-P
+dup2-e-fd-0
+dup2-e-fd-0-9
+dup2-e-fd-0-P
+dup2-e-fd-not-9
 dup2-y
 dup2-yy
 dup3
@@ -93,6 +105,7 @@ fchdir
 fchmod
 fchmod-y
 fchmodat
+fchmodat2
 fchown
 fchown32
 fchownat
@@ -217,7 +230,6 @@ ioctl_hdio-v-Xabbrev
 ioctl_hdio-v-Xraw
 ioctl_hdio-v-Xverbose
 ioctl_inotify
-ioctl_lirc
 ioctl_kd
 ioctl_kd-Xabbrev
 ioctl_kd-Xraw
@@ -225,6 +237,7 @@ ioctl_kd-Xverbose
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
+ioctl_lirc
 ioctl_loop
 ioctl_mtd
 ioctl_nbd
@@ -262,7 +275,15 @@ ioprio
 ioprio-Xabbrev
 ioprio-Xraw
 ioprio-Xverbose
+ip_local_port_range
+ip_local_port_range-Xabbrev
+ip_local_port_range-Xraw
+ip_local_port_range-Xverbose
 ip_mreq
+ip_protocol
+ip_protocol-Xabbrev
+ip_protocol-Xraw
+ip_protocol-Xverbose
 ipc
 ipc_msg
 ipc_msg-Xabbrev
@@ -310,6 +331,13 @@ lseek
 lstat
 lstat64
 madvise
+madvise-Xabbrev
+madvise-Xraw
+madvise-Xverbose
+map_shadow_stack
+map_shadow_stack-Xabbrev
+map_shadow_stack-Xraw
+map_shadow_stack-Xverbose
 maybe_switch_current_tcp
 maybe_switch_current_tcp--quiet-thread-execve
 mbind
@@ -456,6 +484,9 @@ nlattr_smc_diag_msg
 nlattr_tc_stats
 nlattr_tca_stab
 nlattr_tcamsg
+nlattr_tcamsg-Xabbrev
+nlattr_tcamsg-Xraw
+nlattr_tcamsg-Xverbose
 nlattr_tcmsg
 nlattr_unix_diag_msg
 old_mmap
@@ -635,6 +666,9 @@ sched_xetattr
 sched_xetparam
 sched_xetscheduler
 sched_yield
+scm_credentials
+scm_pidfd
+scm_pidfd-success
 seccomp-filter
 seccomp_get_action_avail
 seccomp_get_notif_sizes
@@ -683,6 +717,7 @@ sigaltstack
 siginfo
 signal
 signalfd4
+signalfd4-yy
 sigpending
 sigprocmask
 sigreturn
@@ -693,6 +728,7 @@ so_peercred
 so_peercred-Xabbrev
 so_peercred-Xraw
 so_peercred-Xverbose
+so_peerpidfd
 sock_filter-v
 sock_filter-v-Xabbrev
 sock_filter-v-Xraw

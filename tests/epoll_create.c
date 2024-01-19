@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -19,8 +19,7 @@ main(void)
 	const long int size = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_epoll_create, size);
-	printf("epoll_create(%d) = %ld %s (%m)\n",
-	       (int) size, rc, errno2name());
+	printf("epoll_create(%d) = %s\n", (int) size, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -2,7 +2,7 @@
 #
 # Check -S option.
 #
-# Copyright (c) 2016-2020 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -19,7 +19,7 @@ test_c()
 	sedexpr="$1"; shift
 
 	run_strace -c -w $sortby ../readv > /dev/null
-	sed -r -n -e "$sedexpr" < "$LOG" > "$OUT"
+	sed -E -n -e "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
 		fail_ "$STRACE $args output mismatch"

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -178,6 +178,9 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		break;
 	case 4:
 		fmtstr = "QFMT_VFS_V1";
+		break;
+	case 5:
+		fmtstr = "QFMT_SHMEM";
 		break;
 	default:
 		printf("%#x /* QFMT_VFS_??? */]", *fmtval);

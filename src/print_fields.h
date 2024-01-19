@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2017-2022 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -150,7 +150,7 @@ tprint_null(void)
 {
 	if(structured_output){
 		STRACE_PRINTS(TCP_STATE_VALUE,
-			      STRUCTURED_OUTPUT(NULL_VALUE));
+			STRUCTURED_OUTPUT(NULL_VALUE));
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, "NULL");
 	}
@@ -167,7 +167,7 @@ tprint_newline(void)
 {
 	if(structured_output){
 		STRACE_PRINTS(TCP_STATE_DELIM,
-			      STRUCTURED_OUTPUT(NEWLINE));
+			STRUCTURED_OUTPUT(NEWLINE));
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, "\n");
 	}
@@ -180,7 +180,7 @@ tprint_quoted_string_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(STRING_BEGIN));
+			STRUCTURED_OUTPUT(STRING_BEGIN));
 	}
 }
 
@@ -189,7 +189,7 @@ tprint_quoted_string_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(STRING_END));
+			STRUCTURED_OUTPUT(STRING_END));
 	}
 }
 
@@ -228,7 +228,7 @@ tprint_string_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(STRING_BEGIN));
+			STRUCTURED_OUTPUT(STRING_BEGIN));
 		STRACE_PRINTS( TCP_STATE_DUMMY, "\"");
 	}
 }
@@ -239,7 +239,7 @@ tprint_string_end(void)
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY, "\"");
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(STRING_END));
+			STRUCTURED_OUTPUT(STRING_END));
 	}
 }
 
@@ -278,7 +278,7 @@ tprint_quoted_partial_string_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(PARTIAL_STRING_BEGIN));
+			STRUCTURED_OUTPUT(PARTIAL_STRING_BEGIN));
 	}
 }
 
@@ -287,7 +287,7 @@ tprint_quoted_partial_string_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(PARTIAL_STRING_END));
+			STRUCTURED_OUTPUT(PARTIAL_STRING_END));
 	}
 }
 
@@ -326,7 +326,7 @@ tprint_partial_string_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(PARTIAL_STRING_BEGIN));
+			STRUCTURED_OUTPUT(PARTIAL_STRING_BEGIN));
 		STRACE_PRINTS( TCP_STATE_DUMMY, "\"");
 	}
 }
@@ -337,7 +337,7 @@ tprint_partial_string_end(void)
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY, "\"");
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(PARTIAL_STRING_END));
+			STRUCTURED_OUTPUT(PARTIAL_STRING_END));
 	}
 }
 
@@ -377,7 +377,7 @@ tprint_int_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(INT_BEGIN));
+			STRUCTURED_OUTPUT(INT_BEGIN));
 	} else {
 	}
 }
@@ -387,7 +387,7 @@ tprint_int_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(INT_END));
+			STRUCTURED_OUTPUT(INT_END));
 	} else {
 	}
 }
@@ -422,7 +422,7 @@ tprint_flags_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(FLAGS_BEGIN));
+			STRUCTURED_OUTPUT(FLAGS_BEGIN));
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, "");
 	}
@@ -433,7 +433,7 @@ tprint_flags_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(FLAGS_END));
+			STRUCTURED_OUTPUT(FLAGS_END));
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, "");
 	}
@@ -467,10 +467,10 @@ tprints_field_set(const char* field)
 	if(structured_output){
 		if(get_tcp_state() == TCP_STATE_FIELD)
 			STRACE_PRINTS( TCP_STATE_DELIM,
-				       STRUCTURED_OUTPUT(STRUCT_NEXT));
+				STRUCTURED_OUTPUT(STRUCT_NEXT));
 
 		STRACE_PRINTF( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUTF(FIELD_SET), field);
+			STRUCTURED_OUTPUTF(FIELD_SET), field);
 	}
 }
 
@@ -567,7 +567,7 @@ tprint_struct_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(STRUCT_BEGIN));
+			STRUCTURED_OUTPUT(STRUCT_BEGIN));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "{");
 	}
@@ -578,12 +578,12 @@ tprint_struct_end(void)
 {
 	if(structured_output){
 		if(get_tcp_state() == TCP_STATE_FIELD &&
-		    STRUCTURED_OUTPUTI(STRUCT_NEEDS_ENDING_NEXT))
+			STRUCTURED_OUTPUTI(STRUCT_NEEDS_ENDING_NEXT))
 			STRACE_PRINTS( TCP_STATE_DELIM,
-				       STRUCTURED_OUTPUT(STRUCT_NEXT));
+				STRUCTURED_OUTPUT(STRUCT_NEXT));
 
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(STRUCT_END));
+			STRUCTURED_OUTPUT(STRUCT_END));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "}");
 	}
@@ -612,7 +612,7 @@ tprint_array_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(ARRAY_BEGIN));
+			STRUCTURED_OUTPUT(ARRAY_BEGIN));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "[");
 	}
@@ -624,7 +624,7 @@ tprint_array_next(void)
 	if(structured_output){
 		if(get_tcp_state() != TCP_STATE_DELIM)
 			STRACE_PRINTS( TCP_STATE_DELIM,
-				       STRUCTURED_OUTPUT(ARRAY_NEXT));
+				STRUCTURED_OUTPUT(ARRAY_NEXT));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, ", ");
 	}
@@ -635,7 +635,7 @@ tprint_array_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(ARRAY_END));
+			STRUCTURED_OUTPUT(ARRAY_END));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "]");
 	}
@@ -646,7 +646,7 @@ tprint_array_index_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(ARRAY_INDEX_BEGIN));
+			STRUCTURED_OUTPUT(ARRAY_INDEX_BEGIN));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DELIM, "[");
 	}
@@ -657,7 +657,7 @@ tprint_array_index_equal(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(ARRAY_INDEX_EQUAL));
+			STRUCTURED_OUTPUT(ARRAY_INDEX_EQUAL));
 		STRACE_PRINTS( TCP_STATE_DELIM, "");
 	} else {
 		STRACE_PRINTS( TCP_STATE_DELIM, "]=");
@@ -669,7 +669,18 @@ tprint_array_index_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(ARRAY_INDEX_END));
+			STRUCTURED_OUTPUT(ARRAY_INDEX_END));
+	}
+}
+
+static inline void
+tprints_arg_begin(const char *name)
+{
+	if(structured_output){
+		STRACE_PRINTF( TCP_STATE_DELIM,
+			STRUCTURED_OUTPUTF(CALL_BEGIN) , name);
+	} else {
+		STRACE_PRINTF( TCP_STATE_DUMMY, "%s(", name);
 	}
 }
 
@@ -679,7 +690,7 @@ tprint_arg_next(void)
 	if(structured_output){
 		if(get_tcp_state() != TCP_STATE_DELIM)
 			STRACE_PRINTS( TCP_STATE_DELIM,
-				       STRUCTURED_OUTPUT(ARRAY_NEXT));
+				STRUCTURED_OUTPUT(ARRAY_NEXT));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, ", ");
 	}
@@ -690,7 +701,7 @@ tprint_arg_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(CALL_END));
+			STRUCTURED_OUTPUT(CALL_END));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, ")");
 	}
@@ -720,7 +731,7 @@ tprint_comment_begin(void)
 	if(structured_output){
 		set_tcp_state( TCP_STATE_COMMENT_BEGIN);
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(COMMENT_BEGIN));
+			STRUCTURED_OUTPUT(COMMENT_BEGIN));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, " /* ");
 	}
@@ -731,7 +742,7 @@ tprint_comment_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DUMMY,
-			       STRUCTURED_OUTPUT(COMMENT_END));
+			STRUCTURED_OUTPUT(COMMENT_END));
 		set_tcp_state( TCP_STATE_COMMENT_END);
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, " */");
@@ -743,7 +754,7 @@ tprint_indirect_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(INDIRECT_BEGIN));
+			STRUCTURED_OUTPUT(INDIRECT_BEGIN));
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, "[");
 	}
@@ -754,7 +765,7 @@ tprint_indirect_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(INDIRECT_END));
+			STRUCTURED_OUTPUT(INDIRECT_END));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "]");
 	}
@@ -817,7 +828,7 @@ tprint_shift_begin(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT (SHIFT_BEGIN));
+			STRUCTURED_OUTPUT (SHIFT_BEGIN));
 	}
 }
 
@@ -826,7 +837,7 @@ tprint_shift(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT (SHIFT));
+			STRUCTURED_OUTPUT (SHIFT));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "<<");
 	}
@@ -837,7 +848,7 @@ tprint_shift_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT (SHIFT_END));
+			STRUCTURED_OUTPUT (SHIFT_END));
 	}
 }
 
@@ -846,7 +857,7 @@ tprint_flags_or(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(FLAGS_NEXT));
+			STRUCTURED_OUTPUT(FLAGS_NEXT));
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, "|");
 	}
@@ -873,7 +884,7 @@ tprints_arg_name_begin(const char *name)
 {
 	if(structured_output){
 		STRACE_PRINTF( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUTF(ARG_NAME_BEGIN), name);
+			STRUCTURED_OUTPUTF(ARG_NAME_BEGIN), name);
 	} else {
 		STRACE_PRINTF( TCP_STATE_DUMMY, "%s=", name);
 	}
@@ -884,20 +895,55 @@ tprint_arg_name_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(ARG_NAME_END));
+			STRUCTURED_OUTPUT(ARG_NAME_END));
 	} else {
 	}
 }
 
 static inline void
-tprints_arg_begin(const char *name)
+tprint_sysret_begin(void)
+{
+	if(structured_output) {
+		tprint_struct_begin();
+	} else {
+		tprints_dummy("=");
+	}
+}
+
+static inline void
+tprints_sysret_next(const char *name)
+{
+	if(structured_output) {
+	} else {
+		tprint_space();
+	}
+}
+
+static inline void
+tprints_sysret_string(const char *name, const char *str)
+{
+	if(structured_output) {
+		tprints_sysret_next(name);
+		STRACE_PRINTF("(%s)", str);
+	} else {
+		tprints_field_string(name, str);
+	}
+}
+
+static inline void
+tprint_sysret_pseudo_rval(void)
+{
+	tprints_field_string("return", "?");
+}
+
+static inline void
+tprint_sysret_end(void)
 {
 	if(structured_output){
-		STRACE_PRINTF( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUTF(CALL_BEGIN) , name);
-
+		tprint_struct_end();
+		STRACE_PRINTS( TCP_STATE_DELIM,
+			STRUCTURED_OUTPUT(STRUCT_NEXT));
 	} else {
-		STRACE_PRINTF( TCP_STATE_DUMMY, "%s(", name);
 	}
 }
 
@@ -918,7 +964,7 @@ tprint_argspace_end(void)
 {
 	if(structured_output){
 		STRACE_PRINTS( TCP_STATE_VALUE,
-			       STRUCTURED_OUTPUT(ARRAY_END));
+			STRUCTURED_OUTPUT(ARRAY_END));
 		tprint_field_end();
 	} else {
 		STRACE_PRINTS( TCP_STATE_DUMMY, ")");
@@ -932,7 +978,7 @@ tprint_unfinished(int at_end)
 		if ( at_end){
 			/* we need to close argspace here */
 			STRACE_PRINTS( TCP_STATE_VALUE,
-				       STRUCTURED_OUTPUT(ARRAY_END));
+				STRUCTURED_OUTPUT(ARRAY_END));
 			tprint_field_end();
 			tprints_field_string("return", "unfinished");
 		} else {
@@ -945,31 +991,8 @@ tprint_unfinished(int at_end)
 	}
 }
 
-static inline void
-tprint_syscall_begin(void)
-{
-	if(structured_output){
-		tprint_struct_begin();
-	} else {
-
-	}
-}
-
-
-static inline void
-tprint_syscall_end(void)
-{
-	if(structured_output){
-		tprint_struct_end();
-		STRACE_PRINTS( TCP_STATE_DELIM,
-			       STRUCTURED_OUTPUT(STRUCT_NEXT));
-	} else {
-
-	}
-}
-
-# define PRINT_VAL_D(val_)					\
-	tprintf_int("%lld", sign_extend_unsigned_to_ll(val_))
+# define PRINT_VAL_D(val_)	\
+	STRACE_PRINTF("%lld", sign_extend_unsigned_to_ll(val_))
 
 # define PRINT_VAL_D_FIELD(field_, val_)				\
 	do {								\
@@ -989,7 +1012,7 @@ tprint_syscall_end(void)
 
 # define PRINT_VAL_0X(val_)				\
 	tprintf_int("%#0*llx", (int) sizeof(val_) * 2,	\
-		    zero_extend_signed_to_ull(val_))
+		zero_extend_signed_to_ull(val_))
 
 # define PRINT_VAL_ID(val_)					\
 	do {							\
@@ -1045,8 +1068,8 @@ tprint_syscall_end(void)
 	do {							\
 		tprints_field_name(#field_);			\
 		for (size_t i_ = 0;				\
-		     i_ < ARRAY_SIZE((where_).field_);		\
-		     ++i_) {					\
+			i_ < ARRAY_SIZE((where_).field_);		\
+			++i_) {					\
 			if (i_)					\
 				tprint_array_next();		\
 			else					\
@@ -1069,15 +1092,15 @@ tprint_syscall_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		for (size_t i_ = 0;					\
-		     i_ < ARRAY_SIZE((where_).field_);			\
-		     ++i_) {						\
+			i_ < ARRAY_SIZE((where_).field_);			\
+			++i_) {						\
 			if (i_)						\
 				tprint_array_next();			\
 			else						\
 				tprint_array_begin();			\
 			for (size_t j_ = 0;				\
-			     j_ < ARRAY_SIZE((where_).field_[i_]);	\
-			     ++j_) {					\
+				j_ < ARRAY_SIZE((where_).field_[i_]);	\
+				++j_) {					\
 				if (j_)					\
 					tprint_array_next();		\
 				else					\
@@ -1095,7 +1118,7 @@ tprint_syscall_end(void)
 # define PRINT_FIELD_COOKIE(where_, field_)			\
 	do {							\
 		static_assert(ARRAY_SIZE((where_).field_) == 2,	\
-			      "unexpected array size");		\
+			"unexpected array size");		\
 		PRINT_FIELD_U_ARRAY((where_), field_);		\
 	} while (0)
 
@@ -1103,8 +1126,8 @@ tprint_syscall_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		printflags64((xlat_),					\
-			     zero_extend_signed_to_ull((where_).field_), \
-			     (dflt_));					\
+				zero_extend_signed_to_ull((where_).field_), \
+				(dflt_));					\
 	} while (0)
 
 # define PRINT_FIELD_FLAGS_VERBOSE(where_, field_, xlat_, dflt_)	\
@@ -1112,10 +1135,10 @@ tprint_syscall_end(void)
 		tprints_field_name(#field_);				\
 		tprint_flags_begin();					\
 		printflags_ex(zero_extend_signed_to_ull((where_).field_), \
-			      (dflt_),					\
-			      xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				(dflt_),					\
+				xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
 				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,	\
-			      (xlat_), NULL);				\
+				(xlat_), NULL);				\
 		tprint_flags_end();					\
 	} while (0)
 
@@ -1123,59 +1146,59 @@ tprint_syscall_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		printxval64((xlat_),					\
-			    zero_extend_signed_to_ull((where_).field_),	\
-			    (dflt_));					\
+			zero_extend_signed_to_ull((where_).field_),	\
+			(dflt_));					\
 	} while (0)
 
 # define PRINT_FIELD_XVAL_VERBOSE(where_, field_, xlat_, dflt_)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		printxval_ex((xlat_),					\
-			     zero_extend_signed_to_ull((where_).field_), \
-			     (dflt_),					\
-			     xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
-			     ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE);	\
+				zero_extend_signed_to_ull((where_).field_), \
+				(dflt_),					\
+				xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE);	\
 	} while (0)
 
 # define PRINT_FIELD_XVAL_D(where_, field_, xlat_, dflt_)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		printxval64_d((xlat_),					\
-			      sign_extend_unsigned_to_ll((where_).field_), \
-			      (dflt_));					\
+				sign_extend_unsigned_to_ll((where_).field_), \
+				(dflt_));					\
 	} while (0)
 
 # define PRINT_FIELD_XVAL_U(where_, field_, xlat_, dflt_)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		printxval64_u((xlat_),					\
-			      zero_extend_signed_to_ull((where_).field_), \
-			      (dflt_));					\
+				zero_extend_signed_to_ull((where_).field_), \
+				(dflt_));					\
 	} while (0)
 
 # define PRINT_FIELD_XVAL_U_VERBOSE(where_, field_, xlat_, dflt_)	\
 	do {								\
 		tprints_field_name(#field_);				\
 		printxval_ex((xlat_),					\
-			     zero_extend_signed_to_ull((where_).field_), \
-			     (dflt_),					\
-			     (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
-			      ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE)	\
-			     | XLAT_STYLE_FMT_U);			\
+				zero_extend_signed_to_ull((where_).field_), \
+				(dflt_),					\
+				(xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE)	\
+				| XLAT_STYLE_FMT_U);			\
 	} while (0)
 
 # define PRINT_FIELD_ERR_D(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_err(sign_extend_unsigned_to_ll((where_).field_),	\
-			  true);					\
+			true);					\
 	} while (0)
 
 # define PRINT_FIELD_ERR_U(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_err(zero_extend_signed_to_ull((where_).field_),	\
-			  false);					\
+			false);					\
 	} while (0)
 
 /*
@@ -1194,7 +1217,28 @@ tprint_syscall_end(void)
 		print_uuid((const unsigned char *) ((where_).field_));	\
 	} while (0)
 
-# define PRINT_FIELD_U64(where_, field_)				\
+# define PRINT_FIELD_U64(where_, field_)					\
+	do {									\
+		tprints_field_name(#field_);					\
+		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)	\
+			print_xlat_u(UINT64_MAX);				\
+		else								\
+			PRINT_VAL_U((where_).field_);				\
+	} while (0)
+
+# define PRINT_FIELD_TICKS(where_, field_, freq_, precision_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_ticks((where_).field_, (freq_), (precision_));	\
+	} while (0)
+
+# define PRINT_FIELD_TICKS_D(where_, field_, freq_, precision_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_ticks_d((where_).field_, (freq_), (precision_));	\
+	} while (0)
+
+# define PRINT_FIELD_CLOCK_T(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
 		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX) \
@@ -1213,41 +1257,41 @@ tprint_syscall_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		print_quoted_string((const char *)(where_).field_,	\
-				    (len_), (style_));			\
+				(len_), (style_));			\
 	} while (0)
 
 # define PRINT_FIELD_CSTRING(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_quoted_cstring((const char *) (where_).field_,	\
-				     sizeof((where_).field_) +		\
-				     MUST_BE_ARRAY((where_).field_));	\
+				sizeof((where_).field_) +		\
+				MUST_BE_ARRAY((where_).field_));	\
 	} while (0)
 
 # define PRINT_FIELD_CSTRING_SZ(where_, field_, size_)			\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_quoted_cstring((const char *) (where_).field_,	\
-				     (size_));				\
+				(size_));				\
 	} while (0)
 
 # define PRINT_FIELD_ARRAY(where_, field_, tcp_, print_func_)	\
 	do {							\
 		tprints_field_name(#field_);			\
 		print_local_array((tcp_), (where_).field_,	\
-				  (print_func_));		\
+				(print_func_));		\
 	} while (0)
 
 # define PRINT_FIELD_ARRAY_INDEXED(where_, field_, tcp_, print_func_,	\
-				   ind_xlat_, ind_dflt_)		\
+				ind_xlat_, ind_dflt_)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_local_array_ex((tcp_), (where_).field_,		\
-				     ARRAY_SIZE((where_).field_),	\
-				     sizeof(((where_).field_)[0]),	\
-				     (print_func_),			\
-				     NULL, PAF_PRINT_INDICES | XLAT_STYLE_FMT_U, \
-				     (ind_xlat_), (ind_dflt_));		\
+				ARRAY_SIZE((where_).field_),	\
+				sizeof(((where_).field_)[0]),	\
+				(print_func_),			\
+				NULL, PAF_PRINT_INDICES | XLAT_STYLE_FMT_U, \
+				(ind_xlat_), (ind_dflt_));		\
 	} while (0)
 
 # define PRINT_FIELD_ARRAY_UPTO(where_, field_,			\
@@ -1255,23 +1299,23 @@ tprint_syscall_end(void)
 	do {							\
 		tprints_field_name(#field_);			\
 		print_local_array_upto((tcp_), (where_).field_,	\
-				       (upto_), (print_func_));	\
+				(upto_), (print_func_));	\
 	} while (0)
 
 # define PRINT_FIELD_HEX_ARRAY(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_quoted_string((const char *)(where_).field_,	\
-				    sizeof((where_).field_) +		\
-				    MUST_BE_ARRAY((where_).field_),	\
-				    QUOTE_FORCE_HEX);			\
+				sizeof((where_).field_) +		\
+				MUST_BE_ARRAY((where_).field_),	\
+				QUOTE_FORCE_HEX);			\
 	} while (0)
 
 # define PRINT_FIELD_HEX_ARRAY_UPTO(where_, field_, upto_)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_quoted_string((const char *)(where_).field_,	\
-				    (upto_), QUOTE_FORCE_HEX);		\
+				(upto_), QUOTE_FORCE_HEX);		\
 	} while (0)
 
 # define PRINT_FIELD_INET_ADDR(where_, field_, af_)		\
@@ -1284,15 +1328,15 @@ tprint_syscall_end(void)
 									\
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)	\
 			print_quoted_string((const char *)		\
-					    &(where_).field_,		\
-					    sizeof((where_).field_),	\
-					    QUOTE_FORCE_HEX);		\
+					&(where_).field_,		\
+					sizeof((where_).field_),	\
+					QUOTE_FORCE_HEX);		\
 									\
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)	\
 			break;						\
 									\
 		if (xlat_verbose(xlat_verbosity)			\
-		    == XLAT_STYLE_VERBOSE)				\
+			== XLAT_STYLE_VERBOSE)				\
 			tprint_comment_begin();				\
 									\
 		tprints_arg_begin("htons");				\
@@ -1301,7 +1345,7 @@ tprint_syscall_end(void)
 		tprint_arg_end();					\
 									\
 		if (xlat_verbose(xlat_verbosity)			\
-		    == XLAT_STYLE_VERBOSE)				\
+			== XLAT_STYLE_VERBOSE)				\
 			tprint_comment_end();				\
 	} while (0)
 
@@ -1315,7 +1359,7 @@ tprint_syscall_end(void)
 	do {							\
 		tprints_field_name(#field_);			\
 		print_sockaddr(tcp_, &(where_).field_,		\
-			       sizeof((where_).field_));	\
+			sizeof((where_).field_));	\
 	} while (0)
 
 # define PRINT_FIELD_DEV(where_, field_)	\
@@ -1336,10 +1380,16 @@ tprint_syscall_end(void)
 		printfd((tcp_), (where_).field_);	\
 	} while (0)
 
-# define PRINT_FIELD_CHAR(where_, field_, flags_)	\
-	do {						\
-		tprints_field_name(#field_);		\
-		print_char((where_).field_, (flags_));	\
+# define PRINT_FIELD_DIRFD(where_, field_, tcp_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_dirfd((tcp_), (where_).field_);			\
+	} while (0)
+
+# define PRINT_FIELD_CHAR(where_, field_, flags_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_char((where_).field_, (flags_));			\
 	} while (0)
 
 # define PRINT_FIELD_TGID(where_, field_, tcp_)			\
@@ -1353,21 +1403,21 @@ tprint_syscall_end(void)
 		tprints_field_name(#field_);				\
 		const char *nr_prefix_ = NULL;				\
 		const char *name = syscall_name_arch((where_).field_,	\
-						     (audit_arch_), &nr_prefix_); \
+						(audit_arch_), &nr_prefix_); \
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV	\
-		    || !nr_prefix_)					\
+			|| !nr_prefix_)					\
 			PRINT_VAL_U((where_).field_);			\
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW	\
-		    || !name)						\
+			|| !name)						\
 			break;						\
 		if (!nr_prefix_ ||					\
-		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
+			xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_begin();				\
 		if (nr_prefix_)						\
 			tprints_string(nr_prefix_);			\
 		tprints_string(name);					\
 		if (!nr_prefix_ ||					\
-		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
+			xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_end();				\
 	} while (0)
 
@@ -1380,19 +1430,19 @@ tprint_syscall_end(void)
 # define PRINT_FIELD_MAC_SZ(where_, field_, size_)			\
 	do {								\
 		static_assert(sizeof(((where_).field_)[0]) == 1,	\
-			      "MAC address is not a byte array");	\
+			"MAC address is not a byte array");	\
 		tprints_field_name(#field_);				\
 		print_mac_addr("", (const uint8_t *) ((where_).field_),	\
-			       MIN((size_), ARRAY_SIZE((where_).field_))); \
+			MIN((size_), ARRAY_SIZE((where_).field_))); \
 	} while (0)
 
 # define PRINT_FIELD_HWADDR_SZ(where_, field_, size_, hwtype_)		\
 	do {								\
 		static_assert(sizeof(((where_).field_)[0]) == 1,	\
-			      "hwaddress is not a byte array");		\
+			"hwaddress is not a byte array");		\
 		tprints_field_name(#field_);				\
 		print_hwaddr("", (const uint8_t *) ((where_).field_),	\
-			     (size_), (hwtype_));			\
+			(size_), (hwtype_));			\
 	} while (0)
 
 
@@ -1403,11 +1453,11 @@ tprint_syscall_end(void)
 	} while (0)
 
 # define PRINT_FIELD_OBJ_TCB_PTR(where_, field_,		\
-				 tcp_, print_func_, ...)	\
+				tcp_, print_func_, ...)	\
 	do {							\
 		tprints_field_name(#field_);			\
 		(print_func_)((tcp_), &((where_).field_),	\
-			      ##__VA_ARGS__);			\
+			##__VA_ARGS__);			\
 	} while (0)
 
 # define PRINT_FIELD_OBJ_VAL(where_, field_, print_func_, ...)	\
@@ -1420,19 +1470,19 @@ tprint_syscall_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		(print_func_)(zero_extend_signed_to_ull((where_).field_), \
-			      ##__VA_ARGS__);				\
+			##__VA_ARGS__);				\
 	} while (0)
 
 # define PRINT_FIELD_OBJ_TCB_VAL(where_, field_,			\
-				 tcp_, print_func_, ...)		\
+				tcp_, print_func_, ...)		\
 	do {								\
 		tprints_field_name(#field_);				\
 		(print_func_)((tcp_), (where_).field_, ##__VA_ARGS__);	\
 	} while (0)
 
 
-#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
-			      len_, print_func_, ...)			\
+# define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
+			len_, print_func_, ...)				\
 	do {								\
 		unsigned int start = offsetof(typeof(where_), field_);	\
 		unsigned int end = start + sizeof((where_).field_);	\
@@ -1440,7 +1490,7 @@ tprint_syscall_end(void)
 			print_prefix_;					\
 			if (len_ >= end) {				\
 				print_func_((where_), field_,		\
-					    ##__VA_ARGS__);		\
+					##__VA_ARGS__);		\
 			} else {					\
 				tprints_field_name(#field_);		\
 				print_quoted_string(			\

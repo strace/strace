@@ -2,45 +2,43 @@
  * Check decoding of accept syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-
+#include "scno.h"
 #include <unistd.h>
 
-#include "scno.h"
+#ifndef TEST_SYSCALL_NAME
 
-#if defined __NR_accept
+# if defined __NR_accept || defined __NR_socketcall
 
-# ifndef TEST_SYSCALL_NAME
 #  define TEST_SYSCALL_NAME do_accept
-
-#  ifndef TEST_SYSCALL_STR
-#   define TEST_SYSCALL_STR "accept"
-#  endif
+#  define TEST_SYSCALL_STR "accept"
 
 static int
 do_accept(int sockfd, void *addr, void *addrlen)
 {
+#  ifdef __NR_accept
 	return syscall(__NR_accept, sockfd, addr, addrlen);
+#  else /* __NR_socketcall */
+	const long args[] = { sockfd, (long) addr, (long) addrlen };
+	return syscall(__NR_socketcall, 5, args);
+#  endif
 }
-# endif /* !TEST_SYSCALL_NAME */
 
-#else /* !__NR_accept */
+# endif /* __NR_accept || __NR_socketcall */
 
-# ifndef TEST_SYSCALL_NAME
-#  define TEST_SYSCALL_NAME accept
-# endif
+#endif /* !TEST_SYSCALL_NAME */
 
-#endif /* __NR_accept */
+#ifdef TEST_SYSCALL_NAME
 
-#define TEST_SYSCALL_PREPARE connect_un()
+# define TEST_SYSCALL_PREPARE connect_un()
 static void connect_un(void);
-#include "sockname.c"
+# include "sockname.c"
 
 static void
 connect_un(void)
@@ -90,3 +88,9 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_accept || __NR_socketcall")
+
+#endif

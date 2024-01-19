@@ -2,7 +2,7 @@
  * Check decoding of mlock2 syscall.
  *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -22,7 +22,7 @@ main(void)
 
 	long rc = syscall(__NR_mlock2, addr, len, -1UL);
 	printf("mlock2(%#lx, %lu, MLOCK_ONFAULT|0xfffffffe)"
-	       " = %ld %s (%m)\n", addr, len, rc, errno2name());
+	       " = %s\n", addr, len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

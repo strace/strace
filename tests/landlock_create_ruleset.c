@@ -2,7 +2,7 @@
  * Check decoding of landlock_create_ruleset syscall.
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2021-2022 The strace developers.
+ * Copyright (c) 2021-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -45,8 +45,7 @@
 static const char *errstr;
 
 static long
-sys_landlock_create_ruleset(struct landlock_ruleset_attr *attr,
-			    kernel_ulong_t size, unsigned int flags)
+sys_landlock_create_ruleset(void *attr, kernel_ulong_t size, unsigned int flags)
 
 {
 	static const kernel_ulong_t fill =
@@ -72,7 +71,7 @@ main(void)
 
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct landlock_ruleset_attr, attr);
+	TAIL_ALLOC_OBJECT_VAR_PTR(uint64_t, handled_access_fs);
 	long rc;
 
 	/* All zeroes */
@@ -104,17 +103,18 @@ main(void)
 	       0xbadfacec, sprintrc(rc));
 
 	/* Bogus addr, size, flags */
-	rc = sys_landlock_create_ruleset(attr + 1, bogus_size, 0xbadcaffe);
+	rc = sys_landlock_create_ruleset(handled_access_fs + 1, bogus_size,
+					 0xbadcaffe);
 	printf("landlock_create_ruleset(%p, %llu"
 	       ", 0xbadcaffe /* LANDLOCK_CREATE_RULESET_??? */) = %s"
 	       INJ_FD_STR,
-	       attr + 1, (unsigned long long) bogus_size, errstr);
+	       handled_access_fs + 1, (unsigned long long) bogus_size, errstr);
 
 	/* Size is too small */
 	for (size_t i = 0; i < 8; i++) {
-		rc = sys_landlock_create_ruleset(attr, i, 0);
+		rc = sys_landlock_create_ruleset(handled_access_fs, i, 0);
 		printf("landlock_create_ruleset(%p, %zu, 0) = %s" INJ_FD_STR,
-		       attr, i, errstr);
+		       handled_access_fs, i, errstr);
 	}
 
 	/* Perform syscalls with valid attr ptr */
@@ -123,8 +123,8 @@ main(void)
 		const char *str;
 	} attr_vals[] = {
 		{ ARG_STR(LANDLOCK_ACCESS_FS_EXECUTE) },
-		{ ARG_ULL_STR(LANDLOCK_ACCESS_FS_EXECUTE|LANDLOCK_ACCESS_FS_READ_FILE|LANDLOCK_ACCESS_FS_READ_DIR|LANDLOCK_ACCESS_FS_REMOVE_FILE|LANDLOCK_ACCESS_FS_MAKE_CHAR|LANDLOCK_ACCESS_FS_MAKE_DIR|LANDLOCK_ACCESS_FS_MAKE_SOCK|LANDLOCK_ACCESS_FS_MAKE_FIFO|LANDLOCK_ACCESS_FS_MAKE_BLOCK|LANDLOCK_ACCESS_FS_MAKE_SYM|LANDLOCK_ACCESS_FS_REFER|0xdebeefeddecac000) },
-		{ ARG_ULL_STR(0xdebeefeddecac000)
+		{ ARG_ULL_STR(LANDLOCK_ACCESS_FS_EXECUTE|LANDLOCK_ACCESS_FS_READ_FILE|LANDLOCK_ACCESS_FS_READ_DIR|LANDLOCK_ACCESS_FS_REMOVE_FILE|LANDLOCK_ACCESS_FS_MAKE_CHAR|LANDLOCK_ACCESS_FS_MAKE_DIR|LANDLOCK_ACCESS_FS_MAKE_SOCK|LANDLOCK_ACCESS_FS_MAKE_FIFO|LANDLOCK_ACCESS_FS_MAKE_BLOCK|LANDLOCK_ACCESS_FS_MAKE_SYM|LANDLOCK_ACCESS_FS_REFER|LANDLOCK_ACCESS_FS_TRUNCATE|0xdebeefeddeca8000) },
+		{ ARG_ULL_STR(0xdebeefeddeca8000)
 			" /* LANDLOCK_ACCESS_FS_??? */" },
 	};
 	static const kernel_ulong_t sizes[] = { 8, 12, 16 };
@@ -132,8 +132,9 @@ main(void)
 		for (size_t j = 0; j < ARRAY_SIZE(sizes); j++) {
 			const char *fd_str = FD_PATH;
 
-			attr->handled_access_fs = attr_vals[i].val;
-			rc = sys_landlock_create_ruleset(attr, sizes[j], 0);
+			*handled_access_fs = attr_vals[i].val;
+			rc = sys_landlock_create_ruleset(handled_access_fs,
+							 sizes[j], 0);
 
 #if DECODE_FD
 			/*
@@ -161,7 +162,7 @@ main(void)
 			printf("landlock_create_ruleset({handled_access_fs=%s"
 			       "%s}, %llu, 0) = %s%s" INJ_STR,
 			       attr_vals[i].str,
-			       sizes[j] > sizeof(*attr) ? ", ..." : "",
+			       sizes[j] > sizeof(*handled_access_fs) ? ", ..." : "",
 			       (unsigned long long) sizes[j],
 			       errstr, rc >= 0 ? fd_str : "");
 		}

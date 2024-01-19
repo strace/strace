@@ -1,7 +1,7 @@
 /*
  * Strauss awareness implementation.
  *
- * Copyright (c) 2018-2022 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -57,7 +57,7 @@ static const char *strauss[] = {
 
 const size_t strauss_lines = ARRAY_SIZE(strauss);
 
-enum { MAX_TIP_LINES = 13 };
+enum { MAX_TIP_LINES = 14 };
 
 static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	{ "strace has an extensive manual page",
@@ -128,7 +128,7 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	{ "strace is about as old as the Linux kernel.",
 	  "It has been originally written for SunOS",
 	  "by Paul Kranenburg in 1991.  The support",
-	  "for all OSes except Linux was dropped"
+	  "for all OSes except Linux was dropped",
 	  "in 2012, though, in strace 4.7." },
 	{ "strace is able to decode netlink messages.",
 	  "It does so automatically for I/O performed",
@@ -285,8 +285,8 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	  "will trace all syscalls related to accessing",
 	  "and modifying process's user/group IDs",
 	  "and capability sets.  Other pre-defined",
-	  "syscall classes include %clock, %desc,"
-	  "%file, %ipc, %memory, %net, %process,"
+	  "syscall classes include %clock, %desc,",
+	  "%file, %ipc, %memory, %net, %process,",
 	  "and %signal." },
 	{ "Trying to figure out communication between",
 	  "tracees inside a different PID namespace",
@@ -310,6 +310,23 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	  "to hexadecimal numbers usage." },
 	{ "-Y option (an alias to --decode-pids=comm)",
 	  "shows comm string associated with the PID." },
+	{ "Historically, strace had a mis-feature",
+	  "of interpreting the \" (deleted)\" part",
+	  "of the proc/pid/fd symlinks as a part",
+	  "of the filename.  This peculiar behaviour",
+	  "ended with strace 5.19, which also enables",
+	  "path tracing to trace FDs associated",
+	  "with specific paths even after the paths",
+	  "are unlinked." },
+	{ "It seems that IA-64, POWER and s390 are",
+	  "the only architectures where it is possible",
+	  "for strace to account for syscall time",
+	  "properly by relying on the system time usage",
+	  "reported by the kernel: these are the only",
+	  "architectures that HAVE_VIRT_CPU_ACCOUNTING",
+	  "config option enabled and thusly account",
+	  "the CPU time on syscall entering and exiting",
+	  "instead of approximating it." },
 };
 
 static const char tip_top[] =
@@ -369,9 +386,9 @@ print_totd(void)
 	for (i = 0; (i < MAX_TIP_LINES) && (tips_tricks_tweaks[id][i] ||
 					    (i < (ARRAY_SIZE(tip_right) - 1)));
 	     i++) {
-		fprintf(stderr, "%s%-*.*s%s%s\n",
+		fprintf(stderr, "%s%-*s%s%s\n",
 			tip_left[MIN(i + 1, ARRAY_SIZE(tip_left) - 1)],
-			w, w, tips_tricks_tweaks[id][i] ?: "",
+			w, tips_tricks_tweaks[id][i] ?: "",
 			tip_right[MIN(i + 1, ARRAY_SIZE(tip_right) - 1)],
 			strauss[MIN(3 + i, strauss_lines - 1)]);
 	}

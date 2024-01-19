@@ -2,7 +2,7 @@
  * This file is part of attach-f-p strace test.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -101,7 +101,7 @@ main(void)
 	pid_t pid = getpid();
 	assert(chdir(text_parent) == -1);
 
-	printf("%-5d chdir(\"%s\") = -1 ENOENT (%m)\n"
+	printf("%-5d chdir(\"%s\")" RVAL_ENOENT
 	       "%-5d +++ exited with 0 +++\n", pid, text_parent, pid);
 
 	return 0;

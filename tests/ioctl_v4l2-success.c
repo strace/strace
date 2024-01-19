@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -865,6 +865,36 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0xdeadc0de, "V4L2_INPUT_TYPE_???") },
 	};
 
+	static const struct strval32 input_std[] = {
+		{ V4L2_STD_PAL_I,
+		  XLAT_KNOWN(0x10, "V4L2_STD_PAL_I") },
+		{ V4L2_STD_SECAM_L,
+		  XLAT_KNOWN(0x400000, "V4L2_STD_SECAM_L") },
+		{ V4L2_STD_PAL_B | V4L2_STD_PAL_G,
+		  XLAT_KNOWN(0x5, "V4L2_STD_PAL_B|V4L2_STD_PAL_G") },
+		{ ARG_XLAT_UNKNOWN(0x80000000, "V4L2_STD_???") },
+	};
+
+	static const struct strval32 input_status[] = {
+		{ V4L2_IN_ST_NO_SIGNAL,
+		  XLAT_KNOWN(0x2, "V4L2_IN_ST_NO_SIGNAL") },
+		{ V4L2_IN_ST_NO_STD_LOCK,
+		  XLAT_KNOWN(0x800, "V4L2_IN_ST_NO_STD_LOCK") },
+		{ V4L2_IN_ST_NO_CARRIER | V4L2_IN_ST_NO_ACCESS,
+		  XLAT_KNOWN(0x2040000, "V4L2_IN_ST_NO_CARRIER|V4L2_IN_ST_NO_ACCESS") },
+		{ ARG_XLAT_UNKNOWN(0x80000000, "V4L2_IN_ST_???") },
+	};
+
+	static const struct strval32 input_caps[] = {
+		{ V4L2_IN_CAP_DV_TIMINGS,
+		  XLAT_KNOWN(0x2, "V4L2_IN_CAP_DV_TIMINGS") },
+		{ V4L2_IN_CAP_NATIVE_SIZE,
+		  XLAT_KNOWN(0x8, "V4L2_IN_CAP_NATIVE_SIZE") },
+		{ V4L2_IN_CAP_STD | V4L2_IN_CAP_NATIVE_SIZE,
+		  XLAT_KNOWN(0xc, "V4L2_IN_CAP_STD|V4L2_IN_CAP_NATIVE_SIZE") },
+		{ ARG_XLAT_UNKNOWN(0x80000000, "V4L2_IN_CAP_???") },
+	};
+
 	struct v4l2_input *input = tail_alloc(sizeof(*input));
 
 	ioctl(-1, VIDIOC_ENUMINPUT, 0);
@@ -877,19 +907,34 @@ main(int argc, char **argv)
 
 	for (size_t i = 0; i < ARRAY_SIZE(stdids); i++) {
 		for (size_t j = 0; j < ARRAY_SIZE(input_types); j++) {
-			fill_memory32(input, sizeof(*input));
-			fill_memory_ex(input->name, sizeof(input->name),
-				       i * 47 + 13, 255);
-			input->type = input_types[j].val;
-			input->std = stdids[i].val;
+			for (size_t k = 0; k < ARRAY_SIZE(input_std); k++) {
+				for (size_t l = 0; l < ARRAY_SIZE(input_status); l++) {
+					for (size_t m = 0; m < ARRAY_SIZE(input_caps); m++) {
+						fill_memory32(input, sizeof(*input));
+						fill_memory_ex(input->name, sizeof(input->name),
+							       i * 47 + 13, 255);
+						input->type = input_types[j].val;
+						input->std = stdids[i].val;
+						input->audioset = 0;
+						input->tuner = 0;
+						input->std = input_std[k].val;
+						input->status = input_status[l].val;
+						input->capabilities = input_caps[m].val;
 
-			ioctl(-1, VIDIOC_ENUMINPUT, input);
-			printf("ioctl(-1, %s, {index=2158018784, name=",
-			       XLAT_STR(VIDIOC_ENUMINPUT));
-			print_quoted_cstring((char *) input->name,
-					     sizeof(input->name));
-			printf(", type=%s}) = %ld (INJECTED)\n",
-			       input_types[j].str, inject_retval);
+						ioctl(-1, VIDIOC_ENUMINPUT, input);
+						printf("ioctl(-1, %s, {index=2158018784, name=",
+						       XLAT_STR(VIDIOC_ENUMINPUT));
+						print_quoted_cstring((char *) input->name,
+								     sizeof(input->name));
+						printf(", type=%s", input_types[j].str);
+						printf(", audioset=0, tuner=0");
+						printf(", std=%s", input_std[k].str);
+						printf(", status=%s", input_status[l].str);
+						printf(", capabilities=%s}) = %ld (INJECTED)\n",
+						       input_caps[m].str, inject_retval);
+					}
+				}
+			}
 		}
 	}
 
@@ -1080,7 +1125,7 @@ main(int argc, char **argv)
 	};
 	static const struct strval32 ctrl_flags[] = {
 		{ ARG_STR(0) },
-		{ ARG_XLAT_KNOWN(0x7ff, "V4L2_CTRL_FLAG_DISABLED"
+		{ ARG_XLAT_KNOWN(0xfff, "V4L2_CTRL_FLAG_DISABLED"
 					"|V4L2_CTRL_FLAG_GRABBED"
 					"|V4L2_CTRL_FLAG_READ_ONLY"
 					"|V4L2_CTRL_FLAG_UPDATE"
@@ -1090,15 +1135,17 @@ main(int argc, char **argv)
 					"|V4L2_CTRL_FLAG_VOLATILE"
 					"|V4L2_CTRL_FLAG_HAS_PAYLOAD"
 					"|V4L2_CTRL_FLAG_EXECUTE_ON_WRITE"
-					"|V4L2_CTRL_FLAG_MODIFY_LAYOUT") },
+					"|V4L2_CTRL_FLAG_MODIFY_LAYOUT"
+					"|V4L2_CTRL_FLAG_DYNAMIC_ARRAY") },
 		{ ARG_XLAT_KNOWN(0xbeefface, "V4L2_CTRL_FLAG_GRABBED"
 					     "|V4L2_CTRL_FLAG_READ_ONLY"
 					     "|V4L2_CTRL_FLAG_UPDATE"
 					     "|V4L2_CTRL_FLAG_WRITE_ONLY"
 					     "|V4L2_CTRL_FLAG_VOLATILE"
 					     "|V4L2_CTRL_FLAG_EXECUTE_ON_WRITE"
-					     "|0xbeeff800") },
-		{ ARG_XLAT_UNKNOWN(0xfffff800, "V4L2_CTRL_FLAG_???") },
+					     "|V4L2_CTRL_FLAG_DYNAMIC_ARRAY"
+					     "|0xbeeff000") },
+		{ ARG_XLAT_UNKNOWN(0xfffff000, "V4L2_CTRL_FLAG_???") },
 	};
 	static const size_t qctrl_iters = MAX(MAX(ARRAY_SIZE(cids),
 						  ARRAY_SIZE(ctrl_types)),

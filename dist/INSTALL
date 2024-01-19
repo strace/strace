@@ -99,12 +99,11 @@ For static linking, provide LDFLAGS='-static -pthread'.
 
 2. BUILDING
 
-make
-make V=1
+make -j`nproc`
 
 3. TESTING
 
-make check
+make -j`nproc` check
 
 TESTS='list of tests'
 VALGRIND_FLAGS

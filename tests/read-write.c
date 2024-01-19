@@ -2,7 +2,7 @@
  * Check decoding and dumping of read and write syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -189,7 +189,7 @@ main(void)
 	if (rc != -1)
 		perror_msg_and_fail("write: expected -1 EFAULT"
 				    ", returned %ld", rc);
-	tprintf("write(1, %p, 1) = -1 EFAULT (%m)\n", efault);
+	tprintf("write(1, %p, 1)" RVAL_EFAULT, efault);
 
 	rc = k_write(1, w, w_len);
 	if (rc != (int) w_len)
@@ -207,7 +207,7 @@ main(void)
 	rc = k_read(0, efault, 1);
 	if (rc != -1)
 		perror_msg_and_fail("read: expected -1, returned %ld", rc);
-	tprintf("read(0, %p, 1) = -1 EFAULT (%m)\n", efault);
+	tprintf("read(0, %p, 1)" RVAL_EFAULT, efault);
 
 	rc = k_read(0, r0, r0_len);
 	if (rc != (int) r0_len)

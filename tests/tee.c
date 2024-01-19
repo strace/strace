@@ -2,7 +2,7 @@
  * Check decoding of tee syscall.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -23,10 +23,10 @@ main(void)
 	const unsigned int flags = 15;
 
 	long rc = syscall(__NR_tee, fd_in, fd_out, len, flags);
-	printf("tee(%d, %d, %zu, %s) = %ld %s (%m)\n",
+	printf("tee(%d, %d, %zu, %s) = %s\n",
 	       (int) fd_in, (int) fd_out, len,
 	       "SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT",
-	       rc, errno2name());
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

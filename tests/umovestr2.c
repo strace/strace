@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2015-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -25,7 +25,7 @@ main(void)
 	char *envp[] = { addr, NULL };
 	execve("", argv, envp);
 
-	printf("execve(\"\", [], [\"%0*u\"]) = -1 ENOENT (%m)\n",
+	printf("execve(\"\", [], [\"%0*u\"])" RVAL_ENOENT,
 	       (int) str_len, 0);
 	puts("+++ exited with 0 +++");
 

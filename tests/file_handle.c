@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -189,7 +189,7 @@ main(void)
 	if (EINVAL != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0}, %p"
-	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n",
+	       ", AT_SYMLINK_FOLLOW|0x1)" RVAL_EINVAL,
 	       my_secontext, "name_to_handle_at",
 	       path, path_secontext,
 	       &mount_id);
@@ -199,7 +199,7 @@ main(void)
 	if (EOVERFLOW != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0 => %u}"
-	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
+	       ", %p, AT_SYMLINK_FOLLOW)" RVAL_EOVERFLOW,
 	       my_secontext, "name_to_handle_at",
 	       path, path_secontext,
 	       handle->handle_bytes, &mount_id);
@@ -225,7 +225,7 @@ main(void)
 	print_handle_data(handle->f_handle, handle->handle_bytes);
 	int rc = syscall(__NR_open_by_handle_at, -1, handle,
 		O_RDONLY | O_DIRECTORY);
-	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
+	printf("}, O_RDONLY|O_DIRECTORY) = %s\n", sprintrc(rc));
 
 #ifndef TEST_SECONTEXT
 	static const struct strval dirfds[] = {
@@ -236,10 +236,10 @@ main(void)
 		{ (kernel_ulong_t) 0xdeadf15700000000ULL, "0" },
 		{ (kernel_ulong_t) 0xbadc0ded00001000ULL,
 			"AT_EMPTY_PATH" },
-		{ (kernel_ulong_t) 0xdeadc0deda7a1457ULL,
-			"AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|0xda7a0057" },
-		{ (kernel_ulong_t) 0xdefaced1ffffebffULL,
-			"0xffffebff /* AT_??? */" },
+		{ (kernel_ulong_t) 0xdeadc0deda7a1657ULL,
+			"AT_HANDLE_FID|AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|0xda7a0057" },
+		{ (kernel_ulong_t) 0xdefaced1ffffe9ffULL,
+			"0xffffe9ff /* AT_??? */" },
 	};
 	static const kernel_ulong_t mount_fds[] = {
 		(kernel_ulong_t) 0xdeadca5701234567ULL,

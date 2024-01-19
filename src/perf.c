@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Ben Noordhuis <info@bnoordhuis.nl>
  * Copyright (c) 2013-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015-2022 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -433,6 +433,10 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	STRACE_PERF_CHECK_FIELD(sig_data);
 	tprint_struct_next();
 	PRINT_FIELD_X(*attr, sig_data);
+
+	STRACE_PERF_CHECK_FIELD(config3);
+	tprint_struct_next();
+	PRINT_FIELD_X(*attr, config3);
 
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||

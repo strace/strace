@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -19,7 +19,7 @@
 # define flock64 kernel_flock64
 
 /*
- * sed -rn 's/^#define[[:space:]]+([^[:space:]]+)[[:space:]].*$/# undef \1/p' \
+ * sed -En 's/^#define[[:space:]]+([^[:space:]]+)[[:space:]].*$/# undef \1/p' \
  *	include/uapi/asm-generic/fcntl.h
  */
 # undef O_ACCMODE

@@ -8,7 +8,7 @@
  * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2013 Ali Polatel <alip@exherbo.org>
  * Copyright (c) 2015 Mike Frysinger <vapier@gentoo.org>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -165,6 +165,12 @@
 # endif
 # ifndef PTRACE_GET_RSEQ_CONFIGURATION
 #  define PTRACE_GET_RSEQ_CONFIGURATION	0x420f
+# endif
+# ifndef PTRACE_SET_SYSCALL_USER_DISPATCH_CONFIG
+#  define PTRACE_SET_SYSCALL_USER_DISPATCH_CONFIG	0x4210
+# endif
+# ifndef PTRACE_GET_SYSCALL_USER_DISPATCH_CONFIG
+#  define PTRACE_GET_SYSCALL_USER_DISPATCH_CONFIG	0x4211
 # endif
 
 # if defined HAVE_STRUCT_PTRACE_SYSCALL_INFO

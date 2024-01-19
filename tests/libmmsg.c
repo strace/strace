@@ -2,7 +2,7 @@
  * Wrappers for recvmmsg and sendmmsg syscalls.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -25,7 +25,7 @@
 int
 recv_mmsg(const int fd, struct mmsghdr *const vec,
 	  const unsigned int vlen, const unsigned int flags,
-	  struct timespec *const timeout)
+	  kernel_old_timespec_t *const timeout)
 {
 	int rc = socketcall(__NR_recvmmsg, SC_recvmmsg,
 			    fd, (long) vec, vlen, flags, (long) timeout);

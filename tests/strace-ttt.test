@@ -2,7 +2,7 @@
 #
 # Check -ttt option.
 #
-# Copyright (c) 2016-2020 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -24,7 +24,7 @@ s="$s0"
 t_reg=
 while [ "$s" -le "$s1" ]; do
 	[ -z "$t_reg" ] && t_reg="$s" || t_reg="$t_reg|$s"
-	s=$(($s + 1))
+	s=$((s + 1))
 done
 
 if [ x0 = "x${precision}" ]; then

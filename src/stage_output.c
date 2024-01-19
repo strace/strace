@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017 Intel Corporation
  * Copyright (c) 2019 Paul Chaignon <paul.chaignon@gmail.com>
- * Copyright (c) 2019-2021 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -26,7 +26,7 @@ strace_open_memstream(struct tcb *tcp)
 {
 	FILE *fp = NULL;
 
-#if HAVE_OPEN_MEMSTREAM
+#ifdef HAVE_OPEN_MEMSTREAM
 	tcp->staged_output_data = xmalloc(sizeof(*tcp->staged_output_data));
 	fp = open_memstream(&tcp->staged_output_data->memfptr,
 			    &tcp->staged_output_data->memfloc);
@@ -49,7 +49,7 @@ strace_open_memstream(struct tcb *tcp)
 void
 strace_close_memstream(struct tcb *tcp, bool publish)
 {
-#if HAVE_OPEN_MEMSTREAM
+#ifdef HAVE_OPEN_MEMSTREAM
 	if (!tcp->staged_output_data) {
 		debug_msg("memstream already closed");
 		return;

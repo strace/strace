@@ -2,7 +2,7 @@
 #
 # Common code for per-personality qualification tests
 #
-# Copyright (c) 2018-2022 The strace developers.
+# Copyright (c) 2018-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -29,7 +29,7 @@ aarch64|powerpc64|s390x|sparc64|tile)
 	supported_pers='64 32'
 	;;
 *)
-	supported_pers="$(($SIZEOF_LONG * 8))"
+	supported_pers="$((SIZEOF_LONG * 8))"
 	;;
 esac
 

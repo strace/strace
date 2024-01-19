@@ -3,7 +3,7 @@
 # Check decoding and dumping of readv and writev syscalls.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2016-2021 The strace developers.
+# Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -20,7 +20,7 @@ run_strace_match_diff -a16 -e trace=readv,writev \
 	-eread='!all' -ewrite=none -eread='!0,1,2' -ewrite='!0,1,2'
 
 wfd="$(../print_maxfd)"
-rfd="$(($wfd - 1))"
+rfd="$((wfd - 1))"
 run_strace_match_diff -a16 -e trace=readv,writev \
 	-eread="$rfd" -ewrite="$wfd"
 run_strace_match_diff -a16 -e trace=readv,writev \
@@ -31,7 +31,7 @@ rfds='!!!0'
 i=0
 while [ $i -lt $rfd ]; do
 	rfds="$rfds,$i"
-	i=$(($i + 1))
+	i=$((i + 1))
 done
 
 wfds='!!!0'
@@ -39,7 +39,7 @@ wfds='!!!0'
 i=0
 while [ $i -lt $wfd ]; do
 	wfds="$wfds,$i"
-	i=$(($i + 1))
+	i=$((i + 1))
 done
 
 run_strace_match_diff -a16 -e trace=readv,writev \

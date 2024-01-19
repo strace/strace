@@ -1,7 +1,7 @@
 /*
  * Check decoding of get_mempolicy syscall.
  *
- * Copyright (c) 2016-2022 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -27,8 +27,8 @@ print_nodes(unsigned long maxnode)
 		tail_alloc(sizeof(*nodemask) * NLONGS(maxnode));
 
 	if (syscall(__NR_get_mempolicy, 0, nodemask, maxnode, 0, 0)) {
-		printf("get_mempolicy(NULL, %p, %lu, NULL, 0) = -1 %s (%m)\n",
-		       nodemask, maxnode, errno2name());
+		printf("get_mempolicy(NULL, %p, %lu, NULL, 0) = %s\n",
+		       nodemask, maxnode, sprintrc(-1));
 		return;
 	}
 
@@ -63,10 +63,10 @@ main(void)
 	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeefULL;
 	const unsigned long flags = -1U;
 	rc = syscall(__NR_get_mempolicy, mode, nodemask, maxnode, addr, flags);
-	printf("get_mempolicy(%p, %p, %lu, %#lx, %s|%#lx) = %ld %s (%m)\n",
+	printf("get_mempolicy(%p, %p, %lu, %#lx, %s|%#lx) = %s\n",
 	       mode, nodemask, maxnode, addr,
 	       "MPOL_F_NODE|MPOL_F_ADDR|MPOL_F_MEMS_ALLOWED",
-	       flags & ~7, rc, errno2name());
+	       flags & ~7, sprintrc(rc));
 
 	mode = tail_alloc(sizeof(*mode));
 

@@ -2,7 +2,7 @@
 #
 # Update copyright notices for source files.
 #
-# Copyright (c) 2017-2021 The strace developers.
+# Copyright (c) 2017-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
@@ -115,7 +115,7 @@ process_file()
 	existing_notice_year=$(sed -n \
 		"/${existing_notice_re}/s//\\3/p" "$f")
 	# assume copyright notice is still relevant
-	if [ "$last_commit_year" = "$copyright_year" ]; then
+	if [ "$last_commit_year" -le "$copyright_year" ]; then
 		debug "Does not need update, skipping: $f"
 		return
 	else
@@ -175,10 +175,10 @@ MAX_JOBS="$(getconf _NPROCESSORS_ONLN)"
 while [ -n "${1-}" ]; do
 	case "$1" in
 	"-v")
-		VERBOSE=$(($VERBOSE + 1))
+		VERBOSE=$((VERBOSE + 1))
 		;;
 	"-q")
-		VERBOSE=$(($VERBOSE - 1))
+		VERBOSE=$((VERBOSE - 1))
 		;;
 	"-h")
 		print_help

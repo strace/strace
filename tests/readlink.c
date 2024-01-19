@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015 Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -32,7 +32,7 @@ main(void)
 	(void) unlink(fname);
 
 	long rc = syscall(__NR_readlink, fname, buf, size);
-	printf("readlink(\"%s\", %p, %u) = -1 ENOENT (%m)\n",
+	printf("readlink(\"%s\", %p, %u)" RVAL_ENOENT,
 	       hex_fname, buf, size);
 
 	if (symlink(TARGET, fname))

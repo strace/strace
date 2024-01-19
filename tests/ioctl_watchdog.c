@@ -1,7 +1,7 @@
 /*
  * Check decoding of WDIOC* commands of ioctl syscall.
  *
- * Copyright (c) 2019 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -17,8 +17,6 @@
 #define XLAT_MACROS_ONLY
 #include "xlat/watchdog_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
-
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
 
 int
 main(void)

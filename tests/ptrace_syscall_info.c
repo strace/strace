@@ -2,7 +2,7 @@
  * Check decoding of ptrace PTRACE_GET_SYSCALL_INFO request.
  *
  * Copyright (c) 2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -132,52 +132,48 @@ test_none(void)
 		memset((void *) buf, -1, size);
 
 		long rc = do_ptrace(PTRACE_GET_SYSCALL_INFO, pid, size, buf);
-		if (rc < 0) {
-			printf("ptrace(" XLAT_FMT ", %d, %u, %#lx) = %s\n",
-			       XLAT_ARGS(PTRACE_GET_SYSCALL_INFO), pid,
-			       (unsigned int) size, buf, errstr);
-			return false;
-		}
-		if (rc < (long) expected_none_size)
-			FAIL("signal stop mismatch");
-
 		printf("ptrace(" XLAT_FMT ", %d, %u, ",
 		       XLAT_ARGS(PTRACE_GET_SYSCALL_INFO), pid, size);
-		if (!size) {
+		if (rc < (long) expected_none_size || size == 0)
 			printf("%#lx) = %s\n", buf, errstr);
+
+		if (rc < 0)
+			return false;
+		if (rc < (long) expected_none_size)
+			FAIL("signal stop mismatch");
+		if (size == 0)
 			continue;
-		}
 
 		/* copy to a local structure to avoid unaligned access */
 		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_none_size));
 
+		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_NONE));
 		if (info.op != PTRACE_SYSCALL_INFO_NONE)
 			FAIL("signal stop mismatch");
-		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_NONE));
 
 		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_none;
-		if (!info.arch)
-			FAIL("signal stop mismatch");
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
+		if (!info.arch)
+			FAIL("signal stop mismatch");
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_none;
-		if (!info.instruction_pointer)
-			FAIL("signal stop mismatch");
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
+		if (!info.instruction_pointer)
+			FAIL("signal stop mismatch");
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_none;
-		if (!info.stack_pointer)
-			FAIL("signal stop mismatch");
 		printf(", stack_pointer=%#llx",
 		       (unsigned long long) info.stack_pointer);
+		if (!info.stack_pointer)
+			FAIL("signal stop mismatch");
 
 printed_none:
 		printf("}) = %s\n", errstr);
@@ -195,59 +191,58 @@ test_entry(void)
 		memset((void *) buf, -1, size);
 
 		long rc = do_ptrace(PTRACE_GET_SYSCALL_INFO, pid, size, buf);
-		if (rc < 0)
-			PFAIL("PTRACE_GET_SYSCALL_INFO");
-
-		if (rc < (long) expected_entry_size)
-			FAIL("#%d: entry stop mismatch", ptrace_stop);
-
 		printf("ptrace(" XLAT_FMT ", %d, %u, ",
 		       XLAT_ARGS(PTRACE_GET_SYSCALL_INFO), pid, size);
-		if (!size) {
+		if (rc < (long) expected_entry_size || size == 0)
 			printf("%#lx) = %s\n", buf, errstr);
+
+		if (rc < 0)
+			FAIL("PTRACE_GET_SYSCALL_INFO");
+		if (rc < (long) expected_entry_size)
+			FAIL("#%d: entry stop mismatch", ptrace_stop);
+		if (size == 0)
 			continue;
-		}
 
 		/* copy to a local structure to avoid unaligned access */
 		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_entry_size));
 
+		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_ENTRY));
 		if (info.op != PTRACE_SYSCALL_INFO_ENTRY)
 			FAIL("#%d: entry stop mismatch", ptrace_stop);
-		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_ENTRY));
 
 		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_entry_common;
-		if (!info.arch)
-			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
+		if (!info.arch)
+			FAIL("#%d: entry stop mismatch", ptrace_stop);
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_entry_common;
-		if (!info.instruction_pointer)
-			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
+		if (!info.instruction_pointer)
+			FAIL("#%d: entry stop mismatch", ptrace_stop);
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_entry_common;
-		if (!info.stack_pointer)
-			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf(", stack_pointer=%#llx",
 		       (unsigned long long) info.stack_pointer);
+		if (!info.stack_pointer)
+			FAIL("#%d: entry stop mismatch", ptrace_stop);
 
 		if (size < offsetofend(struct_ptrace_syscall_info, entry.nr))
 			goto printed_entry_common;
-		const unsigned long *exp_args = args[ptrace_stop / 2];
-		if (info.entry.nr != exp_args[0])
-			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf(", entry={nr="
 		       NABBR("%llu") VERB(" /* ") NRAW("__NR_%s") VERB(" */"),
 		       XLAT_SEL((unsigned long long) info.entry.nr,
 				sc_names[ptrace_stop / 2]));
+		const unsigned long *exp_args = args[ptrace_stop / 2];
+		if (info.entry.nr != exp_args[0])
+			FAIL("#%d: entry stop mismatch", ptrace_stop);
 
 		for (unsigned int i = 0; i < ARRAY_SIZE(info.entry.args); ++i) {
 			const unsigned int i_size =
@@ -263,10 +258,10 @@ test_entry(void)
 #else
 # define CAST
 #endif
-			if (CAST info.entry.args[i] != exp_args[i + 1])
-				FAIL("#%d: entry stop mismatch", ptrace_stop);
 			printf("%s%#llx", (i ? ", " : ", args=["),
 			       (unsigned long long) info.entry.args[i]);
+			if (CAST info.entry.args[i] != exp_args[i + 1])
+				FAIL("#%d: entry stop mismatch", ptrace_stop);
 		}
 		printf("]");
 
@@ -287,49 +282,48 @@ test_exit(void)
 		memset((void *) buf, -1, size);
 
 		long rc = do_ptrace(PTRACE_GET_SYSCALL_INFO, pid, size, buf);
-		if (rc < 0)
-			PFAIL("PTRACE_GET_SYSCALL_INFO");
-
-		if (rc < (long) expected_exit_size)
-			FAIL("#%d: exit stop mismatch", ptrace_stop);
-
 		printf("ptrace(" XLAT_FMT ", %d, %u, ",
 		       XLAT_ARGS(PTRACE_GET_SYSCALL_INFO), pid, size);
-		if (!size) {
+		if (rc < (long) expected_exit_size || size == 0)
 			printf("%#lx) = %s\n", buf, errstr);
+
+		if (rc < 0)
+			FAIL("PTRACE_GET_SYSCALL_INFO");
+		if (rc < (long) expected_exit_size)
+			FAIL("#%d: exit stop mismatch", ptrace_stop);
+		if (size == 0)
 			continue;
-		}
 
 		/* copy to a local structure to avoid unaligned access */
 		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_exit_size));
 
+		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_EXIT));
 		if (info.op != PTRACE_SYSCALL_INFO_EXIT)
 			FAIL("#%d: exit stop mismatch", ptrace_stop);
-		printf("{op=" XLAT_FMT, XLAT_ARGS(PTRACE_SYSCALL_INFO_EXIT));
 
 		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_exit_common;
-		if (!info.arch)
-			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
+		if (!info.arch)
+			FAIL("#%d: exit stop mismatch", ptrace_stop);
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_exit_common;
-		if (!info.instruction_pointer)
-			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
+		if (!info.instruction_pointer)
+			FAIL("#%d: exit stop mismatch", ptrace_stop);
 
 		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_exit_common;
-		if (!info.stack_pointer)
-			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		printf(", stack_pointer=%#llx",
 		       (unsigned long long) info.stack_pointer);
+		if (!info.stack_pointer)
+			FAIL("#%d: exit stop mismatch", ptrace_stop);
 
 		const struct {
 			unsigned int is_error;
@@ -342,20 +336,20 @@ test_exit(void)
 
 		if (size < offsetofend(struct_ptrace_syscall_info, exit.rval))
 			goto printed_exit_common;
-		if (info.exit.rval != exp_param->rval)
-			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		if (size >= expected_exit_size && info.exit.is_error) {
 			printf(", exit={rval=" XLAT_FMT_D,
 			       XLAT_SEL(exp_param->rval, exp_param->str));
 		} else {
 			printf(", exit={rval=%lld", (long long) info.exit.rval);
 		}
+		if (info.exit.rval != exp_param->rval)
+			FAIL("#%d: exit stop mismatch", ptrace_stop);
 
 		if (size >= expected_exit_size) {
-			if (info.exit.is_error != exp_param->is_error)
-				FAIL("#%d: exit stop mismatch", ptrace_stop);
 			printf(", is_error=%u",
 			       (unsigned int) info.exit.is_error);
+			if (info.exit.is_error != exp_param->is_error)
+				FAIL("#%d: exit stop mismatch", ptrace_stop);
 		}
 
 		printf("}");

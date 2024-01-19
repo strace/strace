@@ -2,7 +2,7 @@
  * Check decoding of SCSI ioctl commands.
  *
  * Copyright (c) 2017 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -19,34 +19,34 @@
 #  include "xlat/scsi_sg_commands.h"
 # undef XLAT_MACROS_ONLY
 
-# define TEST_NO_ARG(cmd)							\
-	do {									\
-		ioctl(-1, cmd, 0xdeadbeef);					\
-		printf("ioctl(-1, %s) = -1 EBADF (%m)\n", #cmd);		\
+# define TEST_NO_ARG(cmd)						\
+	do {								\
+		ioctl(-1, cmd, 0xdeadbeef);				\
+		printf("ioctl(-1, %s)" RVAL_EBADF, #cmd);		\
 	} while (0)
 
-# define TEST_NULL_ARG(cmd)							\
-	do {									\
-		ioctl(-1, cmd, 0);						\
-		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd);		\
+# define TEST_NULL_ARG(cmd)						\
+	do {								\
+		ioctl(-1, cmd, 0);					\
+		printf("ioctl(-1, %s, NULL)" RVAL_EBADF, #cmd);		\
 	} while (0)
 
-# define TEST_TAKES_INT_BY_VAL(cmd, val)					\
-	do {									\
-		ioctl(-1, cmd, val);						\
-		printf("ioctl(-1, %s, %#x) = -1 EBADF (%m)\n", #cmd, val);	\
+# define TEST_TAKES_INT_BY_VAL(cmd, val)				\
+	do {								\
+		ioctl(-1, cmd, val);					\
+		printf("ioctl(-1, %s, %#x)" RVAL_EBADF, #cmd, val);	\
 	} while (0)
 
-# define TEST_TAKES_INT_BY_PTR(cmd, pint)					\
-	do {									\
-		ioctl(-1, cmd, pint);						\
-		printf("ioctl(-1, %s, [%d]) = -1 EBADF (%m)\n", #cmd, *(pint));	\
+# define TEST_TAKES_INT_BY_PTR(cmd, pint)				\
+	do {								\
+		ioctl(-1, cmd, pint);					\
+		printf("ioctl(-1, %s, [%d])" RVAL_EBADF, #cmd, *(pint));\
 	} while (0)
 
-# define TEST_RETURNS_INT_BY_PTR(cmd, pint)					\
-	do {									\
-		ioctl(-1, cmd, pint);						\
-		printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n", #cmd, pint);	\
+# define TEST_RETURNS_INT_BY_PTR(cmd, pint)				\
+	do {								\
+		ioctl(-1, cmd, pint);					\
+		printf("ioctl(-1, %s, %p)" RVAL_EBADF, #cmd, pint);	\
 	} while (0)
 
 int
@@ -106,27 +106,27 @@ main(void)
 	TEST_RETURNS_INT_BY_PTR(SG_GET_VERSION_NUM, pint);
 
 	ioctl(-1, SG_SCSI_RESET, pint);
-	printf("ioctl(-1, %s, [%#x /* %s_??? */]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%#x /* %s_??? */])" RVAL_EBADF,
 	       "SG_SCSI_RESET", *pint, "SG_SCSI_RESET");
 
 	*pint = 0x100;
 	ioctl(-1, SG_SCSI_RESET, pint);
 	printf("ioctl(-1, %s, [SG_SCSI_RESET_NO_ESCALATE|SG_SCSI_RESET_NOTHING])"
-	       " = -1 EBADF (%m)\n", "SG_SCSI_RESET");
+	       RVAL_EBADF, "SG_SCSI_RESET");
 
 	*pint = 1;
 	ioctl(-1, SG_SCSI_RESET, pint);
-	printf("ioctl(-1, %s, [SG_SCSI_RESET_DEVICE]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [SG_SCSI_RESET_DEVICE])" RVAL_EBADF,
 	       "SG_SCSI_RESET");
 
 	ioctl(-1, 0x22ff, 0);
-	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), 0) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), 0)" RVAL_EBADF,
 	       _IOC_NONE ? "0" : "_IOC_NONE");
 
 	static const unsigned long magic =
 		(unsigned long) 0xdeadbeeffacefeedULL;
 	ioctl(-1, 0x22ff, magic);
-	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), %#lx) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), %#lx)" RVAL_EBADF,
 	       _IOC_NONE ? "0" : "_IOC_NONE", magic);
 
 	puts("+++ exited with 0 +++");

@@ -2,7 +2,7 @@
  * Check decoding of timer_create syscall.
  *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -21,8 +21,8 @@ int
 main(void)
 {
 	syscall(__NR_timer_create, CLOCK_REALTIME, NULL, NULL);
-	printf("timer_create(CLOCK_REALTIME, NULL, NULL) = -1 %s (%m)\n",
-	       errno2name());
+	printf("timer_create(CLOCK_REALTIME, NULL, NULL) = %s\n",
+	       sprintrc(-1));
 
 	int tid[4] = {};
 	struct_sigevent sev = {
@@ -35,11 +35,11 @@ main(void)
 	syscall(__NR_timer_create, CLOCK_REALTIME, &sev, NULL);
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={sival_int=%d, "
 	       "sival_ptr=%p}, sigev_signo=%u, "
-	       "sigev_notify=%#x /* SIGEV_??? */}, NULL) = -1 %s (%m)\n",
+	       "sigev_notify=%#x /* SIGEV_??? */}, NULL) = %s\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr,
 	       sev.sigev_signo, sev.sigev_notify,
-	       errno2name());
+	       sprintrc(-1));
 
 	sev.sigev_notify = SIGEV_NONE;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[0]))

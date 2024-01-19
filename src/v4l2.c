@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Philippe De Muyter <phdm@macqel.be>
  * Copyright (c) 2014 William Manley <will@williammanley.net>
  * Copyright (c) 2011 Peter Zotov <whitequark@whitequark.org>
- * Copyright (c) 2014-2022 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -763,7 +763,10 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+#include "xlat/v4l2_input_capabilities_flags.h"
+#include "xlat/v4l2_input_status_flags.h"
 #include "xlat/v4l2_input_types.h"
+#include "xlat/v4l2_std_ids.h"
 
 static int
 print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -787,6 +790,19 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(i, type, v4l2_input_types,
 				 "V4L2_INPUT_TYPE_???");
+		tprint_struct_next();
+		PRINT_FIELD_X(i, audioset);
+		tprint_struct_next();
+		PRINT_FIELD_U(i, tuner);
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(i, std, v4l2_std_ids, "V4L2_STD_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(i, status, v4l2_input_status_flags,
+				  "V4L2_IN_ST_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(i, capabilities,
+				  v4l2_input_capabilities_flags,
+				  "V4L2_IN_CAP_???");
 	}
 
 	tprint_struct_end();

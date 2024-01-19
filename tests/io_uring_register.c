@@ -2,7 +2,7 @@
  * Check decoding of io_uring_register syscall.
  *
  * Copyright (c) 2019 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2019-2022 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -16,6 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
 /* From tests/bpf.c */
@@ -340,12 +343,12 @@ main(void)
 	probe->ops[0].flags = 0;
 	probe->ops[0].resv2 = 0xbeefface;
 
-	probe->ops[1].op = 46;
+	probe->ops[1].op = 53;
 	probe->ops[1].resv = 0;
 	probe->ops[1].flags = IO_URING_OP_SUPPORTED;
 	probe->ops[1].resv2 = 0xdeadc0de;
 
-	probe->ops[2].op = 47;
+	probe->ops[2].op = 54;
 	probe->ops[2].resv = 0xaf;
 	probe->ops[2].flags = 0xbeef;
 	probe->ops[2].resv2 = 0;
@@ -360,32 +363,32 @@ main(void)
 	       ", ops_len=%hhu, resv2=[0, %#x, 0], ops=["
 	       "{op=" XLAT_FMT_U ", resv=0xde, flags=0, resv2=0xbeefface}, "
 	       "{op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}, "
-	       "{op=47" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
+	       "{op=54" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
 	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
 	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}]}"
 #if RETVAL_INJECTED
 	       " => {last_op=" XLAT_FMT_U ", ops_len=%hhu, resv2=[0, %#x, 0], "
 	       "ops=[{op=" XLAT_FMT_U ", resv=0xde, flags=0, resv2=0xbeefface}"
 	       ", {op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}"
-	       ", {op=47" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
+	       ", {op=54" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
 	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
 	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}, ...]}"
 #endif
 	       ", 4) = %s\n",
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
 	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
-	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_URING_CMD),
+	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_FUTEX_WAITV),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
 #if RETVAL_INJECTED
 	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
-	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_URING_CMD),
+	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_FUTEX_WAITV),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
 #endif
 	       errstr);
 
-	probe->last_op = 47;
+	probe->last_op = 54;
 	probe->resv2[1] = 0;
 	fill_memory_ex(probe->ops, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1),
 		    0x40, 0x80);
@@ -394,7 +397,7 @@ main(void)
 	printf("io_uring_register(%u<%s>, " XLAT_FMT,
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE));
 	for (size_t c = 0; c < 1 + RETVAL_INJECTED; c++) {
-		printf("%s{last_op=47" NRAW(" /* IORING_OP_??? */")
+		printf("%s{last_op=54" NRAW(" /* IORING_OP_??? */")
 		       ", ops_len=%hhu, ops=[",
 		       c ? " => " : ", ", probe->ops_len);
 		for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
@@ -465,9 +468,9 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
 		  "sqe_op=", ARG_STR(IORING_OP_NOP), true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
-		  "sqe_op=", ARG_STR(IORING_OP_URING_CMD), true },
+		  "sqe_op=", ARG_STR(IORING_OP_FUTEX_WAITV), true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
-		  "sqe_op=", 47, " /* IORING_OP_??? */", false },
+		  "sqe_op=", 54, " /* IORING_OP_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
 		  "sqe_op=", 255, " /* IORING_OP_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
@@ -1102,7 +1105,7 @@ main(void)
 			buf_reg->ring_addr = j & 2 ? (uintptr_t) buf_reg : 0;
 			buf_reg->ring_entries = j & 4 ? 3141592653 : 0;
 			buf_reg->bgid = j & 8 ? 42069 : 0;
-			buf_reg->pad = j & 16 ? 31337 : 0;
+			buf_reg->flags = j & 16 ? 31337 : 0;
 			buf_reg->resv[0] = j &  32 ? 0xbadc0deddeadfaceULL : 0;
 			buf_reg->resv[1] = j &  64 ? 0xdecaffedbeefdeadULL : 0;
 			buf_reg->resv[2] = j & 128 ? 0xbadc0dedfacefeedULL : 0;
@@ -1117,10 +1120,10 @@ main(void)
 				printf("%p", buf_reg);
 			else
 				printf("NULL");
-			printf(", ring_entries=%s, bgid=%s%s",
+			printf(", ring_entries=%s, bgid=%s, flags=%s",
 			       j & 4 ? "3141592653" : "0",
 			       j & 8 ? "42069" : "0",
-			       j & 16 ? ", pad=0x7a69" : "");
+			       j & 16 ? "0x7a69" : "0");
 			if (j & 0xe0) {
 				printf(", resv=[%s, %s, %s]",
 				       j &  32 ? "0xbadc0deddeadface" : "0",

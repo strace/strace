@@ -1,7 +1,7 @@
 /*
  * This file is part of ioctl_inotify strace test.
  *
- * Copyright (c) 2018-2019 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -37,7 +37,7 @@ main(void)
 	/* Unknown inotify commands */
 	sys_ioctl(-1, unknown_inotify_cmd, magic);
 	printf("ioctl(-1, _IOC(%s_IOC_READ|_IOC_WRITE, 0x49, %#x, %#x), "
-	       "%#lx) = -1 EBADF (%m)\n",
+	       "%#lx)" RVAL_EBADF,
 	       _IOC_DIR((unsigned int) unknown_inotify_cmd) & _IOC_NONE ?
 	       "_IOC_NONE|" : "",
 	       _IOC_NR((unsigned int) unknown_inotify_cmd),
@@ -45,15 +45,14 @@ main(void)
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, INOTIFY_IOC_SETNEXTWD + 1, magic);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x49, %#x, %#x), %#lx)"
-	       " = -1 EBADF (%m)\n",
+	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x49, %#x, %#x), %#lx)" RVAL_EBADF,
 	       (unsigned int) _IOC_NR(INOTIFY_IOC_SETNEXTWD + 1),
 	       (unsigned int) _IOC_SIZE(INOTIFY_IOC_SETNEXTWD + 1),
 	       (unsigned long) magic);
 
 	/* INOTIFY_IOC_SETNEXTWD */
 	sys_ioctl(-1, INOTIFY_IOC_SETNEXTWD, magic);
-	printf("ioctl(-1, INOTIFY_IOC_SETNEXTWD, %d) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, INOTIFY_IOC_SETNEXTWD, %d)" RVAL_EBADF,
 	       (int) magic);
 
 	puts("+++ exited with 0 +++");

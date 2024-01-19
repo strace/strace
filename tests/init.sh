@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Copyright (c) 2011-2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2011-2022 The strace developers.
+# Copyright (c) 2011-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -38,7 +38,7 @@ sed_slash_escape()
 # in the CONFIG_H variable).
 get_config_str()
 {
-	sed -r -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"([^"]*)".*/\1/p' \
+	sed -E -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"([^"]*)".*/\1/p' \
 		"$CONFIG_H"
 }
 
@@ -50,9 +50,9 @@ get_config_str()
 get_config_option()
 {
 	local opt
-	opt=$(sed -r -n 's/#define[[:space:]]*'"$1"'[[:space:]]*([0-9]+)$/\1/p' \
+	opt=$(sed -E -n 's/#define[[:space:]]*'"$1"'[[:space:]]*([0-9]+)$/\1/p' \
 		"$CONFIG_H")
-	if [ -n "$opt" -a "$opt" -ne 0 ]; then
+	if [ -n "$opt" ] && [ "$opt" -ne 0 ]; then
 		printf "%s" "$2"
 	else
 		printf "%s" "${3-}"
@@ -67,7 +67,7 @@ print_current_personality_designator()
 		if [ 'x32' = "$STRACE_NATIVE_ARCH" ]; then
 			echo x32
 		else
-			echo "$(($SIZEOF_LONG * 8))"
+			echo "$((SIZEOF_LONG * 8))"
 		fi
 	else
 		[ 4 -eq "$SIZEOF_LONG" ] ||
@@ -262,7 +262,7 @@ match_grep()
 			}
 			printf '#%d: %s\n' "$cnt" "$pattern"
 		}
-		cnt=$(($cnt + 1))
+		cnt=$((cnt + 1))
 	done < "$patterns" ||
 		fail_ "Error reading patterns from \"$patterns\""
 	test -z "$failed" || {
@@ -280,9 +280,9 @@ run_strace_match_diff()
 	sed_cmd='p'
 
 	args="$*"
-	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o \
-			   -z "${args##*-etrace=*}" -o \
-			   -z "${args##*--trace=*}" \) ] ||
+	[ -n "$args" ] && [ -z "${args##*-e trace=*}" -o \
+			    -z "${args##*-etrace=*}" -o \
+			    -z "${args##*--trace=*}" ] ||
 		set -- -e trace="$NAME" "$@"
 
 	set -- "$@" END_OF_ARGUMENTS
@@ -323,9 +323,9 @@ run_strace_match_diff()
 run_strace_match_grep()
 {
 	args="$*"
-	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o \
-			   -z "${args##*-etrace=*}" -o \
-			   -z "${args##*--trace=*}" \) ] ||
+	[ -n "$args" ] && [ -z "${args##*-e trace=*}" -o \
+			    -z "${args##*-etrace=*}" -o \
+			    -z "${args##*--trace=*}" ] ||
 		set -- -e trace="$NAME" "$@"
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
@@ -343,7 +343,7 @@ kernel_version_code()
 		v1="${1%%[!0-9]*}" && [ -n "$v1" ] || v1=0
 		v2="${2%%[!0-9]*}" && [ -n "$v2" ] || v2=0
 		v3="${3%%[!0-9]*}" && [ -n "$v3" ] || v3=0
-		echo "$(($v1 * 65536 + $v2 * 256 + $v3))"
+		echo "$((v1 * 65536 + v2 * 256 + v3))"
 	)
 }
 

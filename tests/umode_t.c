@@ -2,7 +2,7 @@
  * Check decoding of umode_t type syscall arguments.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -29,13 +29,13 @@ test_syscall(unsigned short mode)
 			  sample, lmode);
 
 	if (mode <= 07)
-		printf("%s(%s\"%s\", 00%d) = %ld %s (%m)\n",
+		printf("%s(%s\"%s\", 00%d) = %s\n",
 		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
-		       sample, (int) mode, rc, errno2name());
+		       sample, (int) mode, sprintrc(rc));
 	else
-		printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
+		printf("%s(%s\"%s\", %#03ho) = %s\n",
 		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
-		       sample, mode, rc, errno2name());
+		       sample, mode, sprintrc(rc));
 }
 
 int

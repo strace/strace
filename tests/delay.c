@@ -1,7 +1,7 @@
 /*
  * Check delay injection.
  *
- * Copyright (c) 2018-2019 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -18,9 +18,10 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include "scno.h"
+#include "kernel_timeval.h"
 
 static int64_t
-usecs_from_tv(const struct timeval *const tv)
+usecs_from_tv(const kernel_old_timeval_t *const tv)
 {
     return (int64_t) tv->tv_sec * 1000000 + tv->tv_usec;
 }
@@ -48,9 +49,9 @@ check_(const int64_t got, const bool ge, const int64_t orig, const int nproc,
 }
 
 static void
-check_delay(const struct timeval *const tv0,
+check_delay(const kernel_old_timeval_t *const tv0,
 	    const struct timespec *const ts,
-	    const struct timeval *const tv1,
+	    const kernel_old_timeval_t *const tv1,
 	    const int nproc,
 	    const int64_t delay_enter,
 	    const int64_t delay_exit)
@@ -68,7 +69,7 @@ check_delay(const struct timeval *const tv0,
 static void
 run(const int nproc, const int delay_enter, const int delay_exit)
 {
-	struct timeval prev = { 0, 0 }, now;
+	kernel_old_timeval_t prev = { 0, 0 }, now;
 
 	for (int i = 0; i < nproc; ++i, prev = now) {
 		struct timespec ts;

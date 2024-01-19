@@ -1,0 +1,2 @@
+PID execve("../set_ptracer_any", ["../set_ptracer_any", "../set_ptracer_any", "touch", "sample"], 0xHEX /* NUM vars */) = 0
+PID execve("../set_ptracer_any", ["../set_ptracer_any", "touch", "sample"], 0xHEX /* NUM vars */) = 0

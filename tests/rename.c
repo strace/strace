@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -20,8 +20,8 @@ int
 main(void)
 {
 	long rc = syscall(__NR_rename, OLD_FILE, NEW_FILE);
-	printf("rename(\"%s\", \"%s\") = %ld %s (%m)\n",
-	       OLD_FILE, NEW_FILE, rc, errno2name());
+	printf("rename(\"%s\", \"%s\") = %s\n",
+	       OLD_FILE, NEW_FILE, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

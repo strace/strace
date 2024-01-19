@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2015-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -63,11 +63,11 @@ int main(int ac, char **av)
 	pid_t ppid = getpid();
 	logit("finish");
 
-	printf("%-5d chdir(\"%sstart\") = -1 ENOENT (%m)\n"
-	       "%-5d chdir(\"%sparent\") = -1 ENOENT (%m)\n"
-	       "%-5d chdir(\"%schild\") = -1 ENOENT (%m)\n"
-	       "%-5d chdir(\"%sexec\") = -1 ENOENT (%m)\n"
-	       "%-5d chdir(\"%sfinish\") = -1 ENOENT (%m)\n",
+	printf("%-5d chdir(\"%sstart\")" RVAL_ENOENT
+	       "%-5d chdir(\"%sparent\")" RVAL_ENOENT
+	       "%-5d chdir(\"%schild\")" RVAL_ENOENT
+	       "%-5d chdir(\"%sexec\")" RVAL_ENOENT
+	       "%-5d chdir(\"%sfinish\")" RVAL_ENOENT,
 	       ppid, prefix,
 	       ppid, prefix,
 	       pid, prefix,

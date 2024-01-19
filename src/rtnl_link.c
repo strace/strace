@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -211,6 +211,11 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT]	= decode_nla_u32,
 	[IFLA_BRPORT_MCAST_EHT_HOSTS_CNT]	= decode_nla_u32,
 	[IFLA_BRPORT_LOCKED]			= decode_nla_u8,
+	[IFLA_BRPORT_MAB]			= decode_nla_u8,
+	[IFLA_BRPORT_MCAST_N_GROUPS]		= decode_nla_u32,
+	[IFLA_BRPORT_MCAST_MAX_GROUPS]		= decode_nla_u32,
+	[IFLA_BRPORT_NEIGH_VLAN_SUPPRESS]	= decode_nla_u8,
+	[IFLA_BRPORT_BACKUP_NHID]		= decode_nla_u32,
 };
 
 static bool
@@ -1688,6 +1693,9 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_TSO_MAX_SIZE]	= decode_nla_u32,
 	[IFLA_TSO_MAX_SEGS]	= decode_nla_u32,
 	[IFLA_ALLMULTI]		= decode_nla_u32,
+	[IFLA_DEVLINK_PORT]	= decode_nla_u32,
+	[IFLA_GSO_IPV4_MAX_SIZE]	= decode_nla_u32,
+	[IFLA_GRO_IPV4_MAX_SIZE]	= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)

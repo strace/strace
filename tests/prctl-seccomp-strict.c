@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -24,13 +24,13 @@ main(void)
 
 	rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
 	printf("prctl(PR_SET_SECCOMP, %#lx /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"
-	       " = %d %s (%m)\n", -1L, rc, errno2name());
+	       " = %s\n", -1L, sprintrc(rc));
 	fflush(stdout);
 
 	rc = prctl(PR_SET_SECCOMP, 1);
 	if (rc) {
 		printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT)"
-		       " = %d %s (%m)\n", rc, errno2name());
+		       " = %s\n", sprintrc(rc));
 		fflush(stdout);
 		rc = 0;
 	} else {

@@ -1,7 +1,7 @@
 /*
  * Check decoding of ioctl SG_IO v3 commands.
  *
- * Copyright (c) 2017-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2017-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -21,22 +21,22 @@ int
 main(void)
 {
 	ioctl(-1, SG_IO, 0);
-	printf("ioctl(-1, SG_IO, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, SG_IO, NULL)" RVAL_EBADF);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sg_io_hdr, sg_io);
 	fill_memory(sg_io, sizeof(*sg_io));
 
 	const void *const efault = sg_io + 1;
 	ioctl(-1, SG_IO, efault);
-	printf("ioctl(-1, SG_IO, %p) = -1 EBADF (%m)\n", efault);
+	printf("ioctl(-1, SG_IO, %p)" RVAL_EBADF, efault);
 
 	ioctl(-1, SG_IO, sg_io);
-	printf("ioctl(-1, SG_IO, [%u]) = -1 EBADF (%m)\n", sg_io->interface_id);
+	printf("ioctl(-1, SG_IO, [%u])" RVAL_EBADF, sg_io->interface_id);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, piid);
 	*piid = (unsigned char) 'S';
 	ioctl(-1, SG_IO, piid);
-	printf("ioctl(-1, SG_IO, {interface_id='S', %p}) = -1 EBADF (%m)\n", piid + 1);
+	printf("ioctl(-1, SG_IO, {interface_id='S', %p})" RVAL_EBADF, piid + 1);
 
 	sg_io->interface_id = (unsigned char) 'S';
 	sg_io->dxfer_direction = -2;
@@ -69,7 +69,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK|SG_INFO_DIRECT_IO|SG_INFO_MIXED_IO|0xfffffff8"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -112,7 +112,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK|SG_INFO_DIRECT_IO|SG_INFO_MIXED_IO|0xfffffff8"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -171,7 +171,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -221,7 +221,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -273,7 +273,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK|SG_INFO_DIRECT_IO|SG_INFO_MIXED_IO|0xdeadbee8"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -321,7 +321,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK|SG_INFO_DIRECT_IO|SG_INFO_MIXED_IO|0xdeadbee8"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,
@@ -367,7 +367,7 @@ main(void)
 	       ", resid=%d"
 	       ", duration=%u"
 	       ", info=SG_INFO_CHECK|SG_INFO_DIRECT_IO|SG_INFO_MIXED_IO|0xdeadbee8"
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       sg_io->cmd_len,
 	       sg_io->cmdp,
 	       sg_io->mx_sb_len,

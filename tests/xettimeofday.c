@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2020 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -8,6 +8,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_timeval.h"
 
 #ifdef __NR_gettimeofday
 
@@ -21,7 +22,7 @@
 int
 main(void)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timeval, tv);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timeval_t, tv);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct timezone, tz);
 
 	if (syscall(__NR_gettimeofday, tv, NULL))
@@ -56,7 +57,7 @@ main(void)
 	       zero_extend_signed_to_ull(tv->tv_usec),
 	       tz->tz_minuteswest, tz->tz_dsttime, sprintrc(-1));
 
-	tv->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv->tv_sec = (typeof(tv->tv_sec)) 0xcafef00ddeadbeefLL;
 	tv->tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 	assert(syscall(__NR_settimeofday, tv, tz) == -1);
 	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"

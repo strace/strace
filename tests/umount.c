@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2015-2023 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -31,8 +31,7 @@ main(void)
 		perror_msg_and_fail("mkdir: %s", sample);
 
 	long rc = syscall(__NR_oldumount, sample);
-	printf("%s(\"%s\") = %ld %s (%m)\n",
-	       TEST_SYSCALL_STR, sample, rc, errno2name());
+	printf("%s(\"%s\") = %s\n", TEST_SYSCALL_STR, sample, sprintrc(rc));
 
 	if (rmdir(sample))
 		perror_msg_and_fail("rmdir: %s", sample);

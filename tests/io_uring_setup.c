@@ -2,7 +2,7 @@
  * Check decoding of io_uring_setup syscall.
  *
  * Copyright (c) 2019 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2019-2022 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -16,6 +16,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
 #include <sys/stat.h>
@@ -70,9 +73,13 @@ main(void)
 	       "|IORING_SETUP_CLAMP|IORING_SETUP_ATTACH_WQ"
 	       "|IORING_SETUP_R_DISABLED|IORING_SETUP_SUBMIT_ALL"
 	       "|IORING_SETUP_COOP_TASKRUN|IORING_SETUP_TASKRUN_FLAG"
-	       "|IORING_SETUP_SQE128|IORING_SETUP_CQE32|%#x"
+	       "|IORING_SETUP_SQE128|IORING_SETUP_CQE32"
+	       "|IORING_SETUP_SINGLE_ISSUER|IORING_SETUP_DEFER_TASKRUN"
+	       "|IORING_SETUP_NO_MMAP|IORING_SETUP_REGISTERED_FD_ONLY"
+	       "|IORING_SETUP_NO_SQARRAY"
+	       "|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, wq_fd=%d, resv=[",
-	       1, -1U - 0xfff, params->sq_thread_cpu, params->sq_thread_idle,
+	       1, -1U - 0x1ffff, params->sq_thread_cpu, params->sq_thread_idle,
 	       params->wq_fd);
 	for (unsigned int i = 0; i < ARRAY_SIZE(params->resv); ++i)
 		printf("%s%#x", i != 0 ? ", " : "", params->resv[i]);
@@ -110,10 +117,9 @@ main(void)
 			       params->sq_off.array);
 			if (params->sq_off.resv1)
 				printf(", resv1=%#x", params->sq_off.resv1);
-			if (params->sq_off.resv2)
-				printf(", resv1=%#llx",
-				       (unsigned long long)
-						params->sq_off.resv2);
+			printf(", user_addr=%#llx",
+			       (unsigned long long)
+					params->sq_off.user_addr);
 
 			printf("}, cq_off={head=%u, tail=%u, ring_mask=%u"
 			       ", ring_entries=%u, overflow=%u, cqes=%u"
@@ -127,10 +133,9 @@ main(void)
 			       params->cq_off.flags);
 			if (params->cq_off.resv1)
 				printf(", resv1=%#x", params->cq_off.resv1);
-			if (params->cq_off.resv2)
-				printf(", resv2=%#llx",
-				       (unsigned long long)
-						params->cq_off.resv2);
+			printf(", user_addr=%#llx",
+			       (unsigned long long)
+					params->cq_off.user_addr);
 
 			printf("}}) = %ld<anon_inode:[io_uring]>\n", rc);
 		}

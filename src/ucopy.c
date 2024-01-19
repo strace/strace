@@ -6,7 +6,7 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2021 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -432,7 +432,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 			char *nul_addr = memchr(laddr, '\0', r);
 
 			if (nul_addr)
-				return (nul_addr - laddr) + 1;
+				return nread + (nul_addr - laddr) + 1;
 			addr += r;
 			laddr += r;
 			nread += r;

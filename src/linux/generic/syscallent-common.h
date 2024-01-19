@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 The strace developers.
+ * Copyright (c) 2019-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -35,3 +35,6 @@
 [BASE_NR + 448] = { 2,	TD,		SEN(process_mrelease),		"process_mrelease"	},
 [BASE_NR + 449] = { 5,	0,		SEN(futex_waitv),		"futex_waitv"	},
 [BASE_NR + 450] = { 4,	TM,		SEN(set_mempolicy_home_node),	"set_mempolicy_home_node"	},
+[BASE_NR + 451] = { 4,	TD,		SEN(cachestat),			"cachestat"	},
+[BASE_NR + 452] = { 4,	TD|TF,		SEN(fchmodat2),			"fchmodat2"	},
+[BASE_NR + 453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},

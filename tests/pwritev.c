@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -96,27 +96,27 @@ main(void)
 		fputs("pwritev(0, ", stdout);
 		print_iovec(iov + i, n, LEN - i);
 		rc = pwritev(0, iov + i, n, offset + LEN + i);
-		printf(", %u, %lld) = %ld %s (%m)\n",
-		       n, (long long) offset + LEN + i, rc, errno2name());
+		printf(", %u, %lld) = %s\n",
+		       n, (long long) offset + LEN + i, sprintrc(rc));
 	}
 
 	iov->iov_base = iov + LEN * 2;
 	rc = pwritev(0, iov, 1, -1);
-	printf("pwritev(0, [{iov_base=%p, iov_len=%d}], 1, -1) = %ld %s (%m)\n",
-	       iov->iov_base, LEN, rc, errno2name());
+	printf("pwritev(0, [{iov_base=%p, iov_len=%d}], 1, -1) = %s\n",
+	       iov->iov_base, LEN, sprintrc(rc));
 
 	iov += LEN;
 	rc = pwritev(0, iov, 42, -2);
-	printf("pwritev(0, %p, 42, -2) = %ld %s (%m)\n",
-	       iov, rc, errno2name());
+	printf("pwritev(0, %p, 42, -2) = %s\n",
+	       iov, sprintrc(rc));
 
 	rc = pwritev(0, NULL, 1, -3);
-	printf("pwritev(0, NULL, 1, -3) = %ld %s (%m)\n",
-	       rc, errno2name());
+	printf("pwritev(0, NULL, 1, -3) = %s\n",
+	       sprintrc(rc));
 
 	rc = pwritev(0, iov, 0, -4);
-	printf("pwritev(0, [], 0, -4) = %ld %s (%m)\n",
-	       rc, errno2name());
+	printf("pwritev(0, [], 0, -4) = %s\n",
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

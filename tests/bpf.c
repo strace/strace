@@ -2,7 +2,7 @@
  * Check bpf syscall decoding.
  *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2022 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -24,6 +24,7 @@
 
 #include "bpf_attr.h"
 #include "print_fields.h"
+#include "xmalloc.h"
 
 #include "xlat.h"
 #include "xlat/bpf_attach_type.h"
@@ -88,6 +89,10 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_LINK_CREATE);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_UPDATE);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_GET_FD_BY_ID);
+	BPF_ATTR_DATA_FIELD(BPF_ENABLE_STATS);
+	BPF_ATTR_DATA_FIELD(BPF_ITER_CREATE);
+	BPF_ATTR_DATA_FIELD(BPF_LINK_DETACH);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_BIND_MAP);
 	char char_data[256];
 };
 
@@ -110,6 +115,7 @@ struct bpf_check {
 
 static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
+static const char *at_fdcwd_str;
 static const unsigned int sizeof_attr = sizeof(union bpf_attr_data);
 static unsigned int page_size;
 static unsigned long end_of_page;
@@ -272,7 +278,7 @@ init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check, size_t idx)
 	attr->map_ifindex = ifindex_lo();
 }
 
-static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 32,
+static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 33,
 	      "The map_type for tests 1 and 2 below needs to be updated");
 static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	{
@@ -283,7 +289,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 31,
+			.map_type = 32,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
@@ -293,7 +299,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_name = "0123456789abcde",
 		} },
 		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
-		.str = "map_type=BPF_MAP_TYPE_USER_RINGBUF, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_CGRP_STORAGE, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 				   "|BPF_F_NUMA_NODE|BPF_F_RDONLY|BPF_F_WRONLY"
@@ -305,21 +311,21 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 32,
+			.map_type = 33,
 			.key_size = 0xface1e55,
 			.value_size = 0xbadc0ded,
 			.max_entries = 0xbeefcafe,
-			.map_flags = 0xffffe000,
+			.map_flags = 0xffffc000,
 			.inner_map_fd = 2718281828,
 			.numa_node = -1,
 			.map_name = "",
 			.map_ifindex = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
-		.str = "map_type=0x20 /* BPF_MAP_TYPE_??? */"
+		.str = "map_type=0x21 /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
-		       ", map_flags=0xffffe000 /* BPF_F_??? */"
+		       ", map_flags=0xffffc000 /* BPF_F_??? */"
 		       ", inner_map_fd=-1576685468"
 		       ", map_name=\"\", map_ifindex=3141592653",
 
@@ -342,7 +348,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|BPF_F_RDONLY|BPF_F_STACK_BUILD_ID"
 				   "|BPF_F_RDONLY_PROG|BPF_F_CLONE"
 				   "|BPF_F_MMAPABLE|BPF_F_PRESERVE_ELEMS"
-				   "|BPF_F_INNER_MAP|0xc0dee000",
+				   "|BPF_F_INNER_MAP|BPF_F_LINK|0xc0dec000",
 	},
 	{ /* 4 */
 		.data = { .BPF_MAP_CREATE_data = {
@@ -362,7 +368,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|BPF_F_RDONLY|BPF_F_STACK_BUILD_ID"
 				   "|BPF_F_RDONLY_PROG|BPF_F_CLONE"
 				   "|BPF_F_MMAPABLE|BPF_F_PRESERVE_ELEMS"
-				   "|BPF_F_INNER_MAP|0xc0dee000"
+				   "|BPF_F_INNER_MAP|BPF_F_LINK|0xc0dec000"
 		       ", inner_map_fd=-1576685468",
 	},
 	{ /* 5 */
@@ -383,7 +389,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|BPF_F_RDONLY|BPF_F_STACK_BUILD_ID"
 				   "|BPF_F_RDONLY_PROG|BPF_F_CLONE"
 				   "|BPF_F_MMAPABLE|BPF_F_PRESERVE_ELEMS"
-				   "|BPF_F_INNER_MAP|0xc0dee000"
+				   "|BPF_F_INNER_MAP|BPF_F_LINK|0xc0dec000"
 		       ", inner_map_fd=-1576685468"
 		       ", numa_node=4294967295 /* NUMA_NO_NODE */",
 	},
@@ -406,7 +412,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|BPF_F_RDONLY|BPF_F_STACK_BUILD_ID"
 				   "|BPF_F_RDONLY_PROG|BPF_F_CLONE"
 				   "|BPF_F_MMAPABLE|BPF_F_PRESERVE_ELEMS"
-				   "|BPF_F_INNER_MAP|0xc0dee000"
+				   "|BPF_F_INNER_MAP|BPF_F_LINK|0xc0dec000"
 		       ", inner_map_fd=-1576685468"
 		       ", numa_node=4294967295 /* NUMA_NO_NODE */"
 		       ", map_name=\"fedcba987654321\"...",
@@ -430,7 +436,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|BPF_F_RDONLY|BPF_F_STACK_BUILD_ID"
 				   "|BPF_F_RDONLY_PROG|BPF_F_CLONE"
 				   "|BPF_F_MMAPABLE|BPF_F_PRESERVE_ELEMS"
-				   "|BPF_F_INNER_MAP|0xc0dee000"
+				   "|BPF_F_INNER_MAP|BPF_F_LINK|0xc0dec000"
 		       ", inner_map_fd=-1576685468"
 		       ", numa_node=4294967295 /* NUMA_NO_NODE */"
 		       ", map_name=\"0123456789abcde\""
@@ -678,7 +684,7 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check,
 	       license, IFINDEX_LO_STR);
 }
 
-static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 32,
+static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 33,
 	      "The prog_type for tests 1 and 5 below needs to be updated");
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	{
@@ -689,7 +695,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 32,
+			.prog_type = 33,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -700,7 +706,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x20 /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x21 /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -763,7 +769,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 5 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 31,
+			.prog_type = 32,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -775,7 +781,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_SYSCALL"
+		.str = "prog_type=BPF_PROG_TYPE_NETFILTER"
 		       ", insn_cnt=3134983661"
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
@@ -833,6 +839,13 @@ init_BPF_OBJ_PIN_attr(struct bpf_attr_check *check, size_t idx)
 	attr->pathname = (uintptr_t) pathname;
 }
 
+static void
+init_BPF_OBJ_PIN_str(struct bpf_attr_check *check, size_t idx)
+{
+	check->str = xasprintf("pathname=NULL, bpf_fd=-1, file_flags=BPF_F_PATH_FD"
+			       ", path_fd=%s", at_fdcwd_str);
+}
+
 static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 	{
 		.data = { .BPF_OBJ_PIN_data = { .pathname = 0 } },
@@ -862,6 +875,16 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 		.init_fn = init_BPF_OBJ_PIN_attr,
 		.str = "pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1"
 		       ", file_flags=BPF_F_RDONLY|BPF_F_WRONLY"
+	},
+	{
+		.data = { .BPF_OBJ_PIN_data = {
+			.pathname = 0,
+			.bpf_fd = -1,
+			.file_flags = 0x4000,
+			.path_fd = -100
+		} },
+		.size = offsetofend(struct BPF_OBJ_PIN_struct, path_fd),
+		.init_fn = init_BPF_OBJ_PIN_str,
 	}
 };
 
@@ -892,13 +915,13 @@ static const struct bpf_attr_check BPF_PROG_ATTACH_checks[] = {
 			.target_fd = -1,
 			.attach_bpf_fd = -2,
 			.attach_type = 2,
-			.attach_flags = 0xf8,
+			.attach_flags = 0xdfc0,
 			.replace_bpf_fd = -3,
 		} },
 		.size = offsetofend(struct BPF_PROG_ATTACH_struct, replace_bpf_fd),
 		.str = "target_fd=-1, attach_bpf_fd=-2"
 		       ", attach_type=BPF_CGROUP_INET_SOCK_CREATE"
-		       ", attach_flags=0xf8 /* BPF_F_??? */"
+		       ", attach_flags=0xdfc0 /* BPF_F_??? */"
 		       ", replace_bpf_fd=-3"
 	},
 };
@@ -1171,7 +1194,8 @@ print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check,
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE"
+	       "|BPF_F_BEFORE|BPF_F_AFTER|BPF_F_ID|0xbeefcac0"
 #if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828], prog_cnt=4}"
 #else
@@ -1200,7 +1224,8 @@ print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check,
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE"
+	       "|BPF_F_BEFORE|BPF_F_AFTER|BPF_F_ID|0xbeefcac0"
 #if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828, ... /* %p */]"
 	       ", prog_cnt=5}",
@@ -1222,13 +1247,13 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 1 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 43,
+			.attach_type = 55,
 			.query_flags = 1,
 			.attach_flags = 3,
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, attach_flags),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=BPF_LSM_CGROUP"
+		       ", attach_type=BPF_NETKIT_PEER"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE"
 		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
 		       ", prog_ids=NULL, prog_cnt=0}",
@@ -1236,17 +1261,17 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 2 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 44,
+			.attach_type = 56,
 			.query_flags = 0xfffffffe,
-			.attach_flags = 0xfffffff8,
+			.attach_flags = 0xffffdfc0,
 			.prog_ids = 0xffffffffffffffffULL,
 			.prog_cnt = 2718281828,
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=0x2c /* BPF_??? */"
+		       ", attach_type=0x38 /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
-		       ", attach_flags=0xfffffff8 /* BPF_F_??? */"
+		       ", attach_flags=0xffffdfc0 /* BPF_F_??? */"
 		       ", prog_ids="
 		       BIG_ADDR("0xffffffffffffffff", "0xffffffff")
 		       ", prog_cnt=2718281828}",
@@ -1256,7 +1281,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 			.target_fd = 3141592653U,
 			.attach_type = 0xfeedface,
 			.query_flags = 0xdeadf00d,
-			.attach_flags = 0xbeefcafe,
+			.attach_flags = 0xbeef203f,
 			.prog_ids = 0xffffffffffffffffULL,
 			.prog_cnt = 0,
 		} },
@@ -1264,7 +1289,9 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		.str = "query={target_fd=-1153374643"
 		       ", attach_type=0xfeedface /* BPF_??? */"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-		       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
+		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
+		       "|BPF_F_REPLACE|BPF_F_BEFORE|BPF_F_AFTER|BPF_F_ID"
+		       "|BPF_F_LINK|0xbeef0000"
 		       ", prog_ids=" BIG_ADDR_MAYBE("0xffffffffffffffff") "[]"
 		       ", prog_cnt=0}",
 	},
@@ -1825,6 +1852,67 @@ static const struct bpf_attr_check BPF_LINK_GET_FD_BY_ID_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_ENABLE_STATS_checks[] = {
+	{
+		.data = { .BPF_ENABLE_STATS_data = { .type = 0 } },
+		.size = offsetofend(struct BPF_ENABLE_STATS_struct, type),
+		.str = "enable_stats={type=BPF_STATS_RUN_TIME}"
+	},
+	{
+		.data = { .BPF_ENABLE_STATS_data = { .type = 1 } },
+		.size = offsetofend(struct BPF_ENABLE_STATS_struct, type),
+		.str = "enable_stats={type=0x1 /* BPF_STATS_??? */}"
+	}
+};
+
+static const struct bpf_attr_check BPF_ITER_CREATE_checks[] = {
+	{
+		.data = { .BPF_ITER_CREATE_data = {
+			.link_fd = -1,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_ITER_CREATE_struct, flags),
+		.str = "iter_create={link_fd=-1, flags=0}"
+	},
+	{
+		.data = { .BPF_ITER_CREATE_data = {
+			.link_fd = -1,
+			.flags = -1U,
+		} },
+		.size = offsetofend(struct BPF_ITER_CREATE_struct, flags),
+		.str = "iter_create={link_fd=-1, flags=0xffffffff}"
+	}
+};
+
+static const struct bpf_attr_check BPF_LINK_DETACH_checks[] = {
+	{
+		.data = { .BPF_LINK_DETACH_data = { .link_fd = -1 } },
+		.size = offsetofend(struct BPF_LINK_DETACH_struct, link_fd),
+		.str = "link_detach={link_fd=-1}"
+	}
+};
+
+static const struct bpf_attr_check BPF_PROG_BIND_MAP_checks[] = {
+	{
+		.data = { .BPF_PROG_BIND_MAP_data = {
+			.prog_fd = -1,
+			.map_fd = -2,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_PROG_BIND_MAP_struct, flags),
+		.str = "prog_bind_map={prog_fd=-1, map_fd=-2, flags=0}"
+	},
+	{
+		.data = { .BPF_PROG_BIND_MAP_data = {
+			.prog_fd = -1,
+			.map_fd = -2,
+			.flags = -1U,
+		} },
+		.size = offsetofend(struct BPF_PROG_BIND_MAP_struct, flags),
+		.str = "prog_bind_map={prog_fd=-1, map_fd=-2, flags=0xffffffff}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1868,10 +1956,21 @@ main(void)
 		CHK(BPF_LINK_UPDATE),
 		CHK(BPF_LINK_GET_NEXT_ID),
 		CHK(BPF_LINK_GET_FD_BY_ID),
+		CHK(BPF_ENABLE_STATS),
+		CHK(BPF_ITER_CREATE),
+		CHK(BPF_LINK_DETACH),
+		CHK(BPF_PROG_BIND_MAP),
 	};
 
 	page_size = get_page_size();
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
+
+	at_fdcwd_str =
+#ifdef YFLAG
+		xasprintf("AT_FDCWD<%s>", get_fd_path(get_dir_fd(".")));
+#else
+		"AT_FDCWD";
+#endif
 
 	for (size_t i = 0; i < ARRAY_SIZE(checks); i++)
 		test_bpf(checks + i);

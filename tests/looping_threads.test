@@ -2,7 +2,7 @@
 #
 # Check tracing of looping threads.
 #
-# Copyright (c) 2009-2020 The strace developers.
+# Copyright (c) 2009-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -19,8 +19,8 @@ check_prog nproc
 inc="$(nproc)"
 [ "$inc" -ge 1 ] || inc=1
 
-timeout_2="$(($TIMEOUT_DURATION/2))"
-timeout_16="$(($TIMEOUT_DURATION/16))"
+timeout_2="$((TIMEOUT_DURATION/2))"
+timeout_16="$((TIMEOUT_DURATION/16))"
 nproc=1
 
 run_prog "../$NAME" "$timeout_16" "$nproc"
@@ -29,10 +29,10 @@ while :; do
 	run_strace --follow-forks -qq -enone -esignal=none "../$NAME" "$timeout_2" "$nproc"
 
 	s1="$(date +%s)"
-	[ "$(($s1-$s0))" -lt "$timeout_16" ] ||
+	[ "$((s1-s0))" -lt "$timeout_16" ] ||
 		break
 
-	nproc="$(($nproc+$inc))"
+	nproc="$((nproc+inc))"
 done
 
-warn_ "$ME_: nproc=$nproc elapsed=$(($s1-$s0))"
+warn_ "$ME_: nproc=$nproc elapsed=$((s1-s0))"

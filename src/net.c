@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2022 The strace developers.
+ * Copyright (c) 1999-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -734,6 +734,72 @@ print_txrehash(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 }
 
 static void
+print_get_fd(struct tcb *const tcp, const kernel_ulong_t addr,
+	     const unsigned int len)
+{
+	int fd;
+
+	if (len < sizeof(fd)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &fd))
+		return;
+
+	tprint_indirect_begin();
+	printfd(tcp, fd);
+	tprint_indirect_end();
+}
+
+static void
+print_port_range(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const unsigned int len)
+{
+	unsigned int ports;
+
+	if (len != sizeof(ports)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &ports))
+		return;
+
+	tprint_indirect_begin();
+	PRINT_VAL_X(ports);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
+		unsigned short lo = ports & 0xffff;
+		unsigned short hi = ports >> 16;
+
+		if (ports && (!lo || !hi || lo <= hi))
+			tprintf_comment("%.0hu..%.0hu", lo, hi);
+	}
+	tprint_indirect_end();
+}
+
+
+static void
+print_ip_protocol(struct tcb *const tcp, const kernel_ulong_t addr,
+		  const unsigned int len)
+{
+	unsigned int protocol;
+
+	if (len != sizeof(protocol)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &protocol))
+		return;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, protocol, "IPPROTO_???");
+	tprint_indirect_end();
+}
+
+
+static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
 {
@@ -857,6 +923,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_TXREHASH:
 			print_txrehash(tcp, addr, rlen);
 			return;
+		case SO_PEERPIDFD:
+			print_get_fd(tcp, addr, rlen);
+			return;
 
 		/* All known int-like options */
 		case SO_DEBUG:
@@ -902,10 +971,22 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_BUSY_POLL_BUDGET:
 		case SO_RESERVE_MEM:
 		case SO_RCVMARK:
+		case SO_PASSPIDFD:
 			if (rlen >= (int) sizeof(int))
 				printnum_int(tcp, addr, "%d");
 			else
 				printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
+			return;
+		}
+		break;
+
+	case SOL_IP:
+		switch (name) {
+		case IP_LOCAL_PORT_RANGE:
+			print_port_range(tcp, addr, rlen);
+			return;
+		case IP_PROTOCOL:
+			print_ip_protocol(tcp, addr, rlen);
 			return;
 		}
 		break;
@@ -980,7 +1061,7 @@ SYS_FUNC(getsockopt)
 	} else {
 		ulen = get_tcb_priv_ulong(tcp);
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &rlen) < 0) {
+		if (umove(tcp, tcp->u_arg[4], &rlen) < 0) {
 			/* optval */
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
@@ -988,6 +1069,19 @@ SYS_FUNC(getsockopt)
 			/* optlen */
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
+			tprint_indirect_end();
+		} else if (syserror(tcp)) {
+			/* optval */
+			printaddr(tcp->u_arg[3]);
+			tprint_arg_next();
+
+			/* optlen */
+			tprint_indirect_begin();
+			if (ulen != rlen) {
+				PRINT_VAL_D(ulen);
+				tprint_value_changed();
+			}
+			PRINT_VAL_D(rlen);
 			tprint_indirect_end();
 		} else {
 			/* optval */
@@ -1171,6 +1265,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_BUSY_POLL_BUDGET:
 		case SO_RESERVE_MEM:
 		case SO_RCVMARK:
+		case SO_PASSPIDFD:
 			if (len < (int) sizeof(int))
 				printaddr(addr);
 			else
@@ -1188,6 +1283,9 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
+			return;
+		case IP_LOCAL_PORT_RANGE:
+			print_port_range(tcp, addr, len);
 			return;
 		}
 		break;
