@@ -1265,9 +1265,9 @@ printfd_field(const char* field, struct tcb *tcp, int fd)
 }
 
 static inline void
-printfd_with_finfo(struct tcb *tcp, int fd, const struct finfo *finfo)
+printfd_with_finfo(const char* field, struct tcb *tcp, int fd, const struct finfo *finfo)
 {
-	printfd_pid_with_finfo(tcp, tcp->pid, fd, finfo);
+	printfd_pid_with_finfo(field, tcp, tcp->pid, fd, finfo);
 }
 
 /**

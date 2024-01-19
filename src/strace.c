@@ -395,12 +395,8 @@ Startup:\n\
   -p PID, --attach=PID\n\
 		 trace process with process id PID, may be repeated\n\
   -u USERNAME, --user=USERNAME\n\
-<<<<<<< HEAD
-		 run command as USERNAME handling setuid and/or setgid\n\
-=======
                  run command as USERNAME handling setuid and/or setgid\n\
   --argv0=NAME   set PROG argv[0] to NAME\n\
->>>>>>> upstream/master
 \n\
 Tracing:\n\
   -b execve, --detach-on=execve\n\
@@ -983,7 +979,7 @@ printleader(struct tcb *tcp)
 			tprints_dummy(" <");
 			tprint_unfinished(1);
 			tprints_dummy(" ...>");
-			tprint_syscall_end();
+			tprint_sysret_end();
 			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
@@ -993,7 +989,7 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
-	tprint_syscall_begin();
+	tprint_sysret_begin();
 
 	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
 		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
@@ -1074,6 +1070,8 @@ tabto(void)
 {
 	if (current_tcp->curcol < acolumn)
 		tprints_dummy(acolumn_spaces + current_tcp->curcol);
+	else
+		tprints_dummy(" ");
 }
 
 /* Should be only called directly *after successful attach* to a tracee.
@@ -3506,7 +3504,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 				old_pid);
 			tprintf_field_int("superseded-by-execve", "%lu", old_pid);
 			tprints_dummy(" +++");
-			tprint_syscall_end();
+			tprint_sysret_end();
 			tprint_newline();
 			line_ended();
 		}
@@ -3551,7 +3549,7 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 				     WCOREDUMP(status) ? "(core dumped)" : "");
 		/* Warning: we add one space in the case of no core dumped */
 		tprints_dummy("+++");
-		tprint_syscall_end();
+		tprint_sysret_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3571,7 +3569,7 @@ print_exited(struct tcb *tcp, const int pid, int status)
 		tprints_dummy("+++ exited with ");
 		tprintf_field_int("exited", "%d", WEXITSTATUS(status));
 		tprints_dummy(" +++");
-		tprint_syscall_end();
+		tprint_sysret_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3592,13 +3590,13 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 			printsiginfo(tcp, si);
 			tprint_field_end();
 			tprints_dummy(" ---");
-			tprint_syscall_end();
+			tprint_sysret_end();
 			tprint_newline();
 		} else {
 			tprints_dummy("--- stopped by ");
 			tprints_field_string("signal",sprintsigname(sig));
 			tprints_dummy(" ---");
-			tprint_syscall_end();
+			tprint_sysret_end();
 			tprint_newline();
 		}
 		line_ended();
@@ -3651,7 +3649,7 @@ print_event_exit(struct tcb *tcp)
 		tprints_dummy("<");
 		tprint_unfinished(1);
 		tprints_dummy(" ...>");
-		tprint_syscall_end();
+		tprint_sysret_end();
 		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
@@ -3676,6 +3674,8 @@ print_event_exit(struct tcb *tcp)
 	tprint_argspace_end();
 
 	tprint_sysret_begin();
+	tabto();
+	tprints_dummy("=");
 	tprints_sysret_next("retval");
 	tprint_sysret_pseudo_rval();
 	tprint_sysret_end();

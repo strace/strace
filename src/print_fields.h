@@ -906,7 +906,6 @@ tprint_sysret_begin(void)
 	if(structured_output) {
 		tprint_struct_begin();
 	} else {
-		tprints_dummy("=");
 	}
 }
 
@@ -924,7 +923,7 @@ tprints_sysret_string(const char *name, const char *str)
 {
 	if(structured_output) {
 		tprints_sysret_next(name);
-		STRACE_PRINTF("(%s)", str);
+		tprints_field_string(name, str);
 	} else {
 		tprints_field_string(name, str);
 	}
@@ -992,7 +991,7 @@ tprint_unfinished(int at_end)
 }
 
 # define PRINT_VAL_D(val_)	\
-	STRACE_PRINTF("%lld", sign_extend_unsigned_to_ll(val_))
+	STRACE_PRINTF(0, "%lld", sign_extend_unsigned_to_ll(val_))
 
 # define PRINT_VAL_D_FIELD(field_, val_)				\
 	do {								\
@@ -1241,15 +1240,6 @@ tprint_unfinished(int at_end)
 # define PRINT_FIELD_CLOCK_T(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
-		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX) \
-			print_xlat_u(UINT64_MAX);			\
-		else							\
-			PRINT_VAL_U((where_).field_);			\
-	} while (0)
-
-# define PRINT_FIELD_CLOCK_T(where_, field_)	\
-	do {					\
-		tprints_field_name(#field_);	\
 		print_clock_t((where_).field_);	\
 	} while (0)
 
