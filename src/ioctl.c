@@ -78,9 +78,11 @@ ioctl_print_code(const unsigned int code)
 
 	tprints_arg_begin("_IOC");
 
+	tprint_flags_begin();
 	printflags_ex(_IOC_DIR(code), abbrev ? "_IOC_???" : "",
 		      abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV,
 		      ioctl_dirs, NULL);
+	tprint_flags_end();
 	tprint_arg_next();
 
 	PRINT_VAL_X(_IOC_TYPE(code));

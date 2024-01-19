@@ -113,9 +113,9 @@ print_call_cb(void *dummy,
 #endif
 		tprintf_dummy(STACK_ENTRY_SYMBOL_FMT(
 #ifdef USE_DEMANGLE
-					       demangled_name ? demangled_name :
+						      demangled_name ? demangled_name :
 #endif
-					       symbol_name));
+						      symbol_name));
 #ifdef USE_DEMANGLE
 		free(demangled_name);
 #endif

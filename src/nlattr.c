@@ -420,7 +420,9 @@ decode_nla_flags(struct tcb *const tcp,
 			data = opts->process_fn(data);
 		if (opts->fn_str)
 			tprints_arg_begin(opts->fn_str);
+		tprint_flags_begin();
 		printflags_ex(data, opts->dflt, opts->style, opts->xlat, NULL);
+		tprint_flags_end();
 		if (opts->fn_str)
 			tprint_arg_end();
 	}
@@ -509,7 +511,7 @@ decode_nla_ ## name(struct tcb *const tcp,		\
 	if (len < sizeof(num))				\
 		return false;				\
 	if (!umove_or_printaddr(tcp, addr, &num))	\
-          tprintf_string(fmt, num);			\
+		tprintf_string(fmt, num);		\
 	return true;					\
 }
 

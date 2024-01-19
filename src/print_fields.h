@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -12,12 +12,6 @@
 #include <stdarg.h>
 
 # include "static_assert.h"
-
-
-
-
-
-
 
 struct structured_output {
 	const char *structured_output_NULL_VALUE   ;
@@ -127,7 +121,7 @@ enum tcp_state {
 static inline void
 tprints_dummy(const char* s)
 {
-	if(structured_output){
+	if(structured_output) {
 	} else {
 		STRACE_PRINTS(TCP_STATE_DUMMY, s);
 	}
@@ -136,8 +130,7 @@ tprints_dummy(const char* s)
 static inline void
 tprintf_dummy(const char* fmt, ...)
 {
-	if(structured_output){
-
+	if(structured_output) {
 	} else {
 		va_list args;
 		va_start(args, fmt);
@@ -897,6 +890,11 @@ tprint_arg_name_end(void)
 }
 
 static inline void
+tprint_arg_name_end(void)
+{
+}
+
+static inline void
 tprints_arg_begin(const char *name)
 {
 	if(structured_output){
@@ -1117,11 +1115,13 @@ tprint_syscall_end(void)
 # define PRINT_FIELD_FLAGS_VERBOSE(where_, field_, xlat_, dflt_)	\
 	do {								\
 		tprints_field_name(#field_);				\
+		tprint_flags_begin();					\
 		printflags_ex(zero_extend_signed_to_ull((where_).field_), \
 			      (dflt_),					\
 			      xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
-			      ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,	\
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,	\
 			      (xlat_), NULL);				\
+		tprint_flags_end();					\
 	} while (0)
 
 # define PRINT_FIELD_XVAL(where_, field_, xlat_, dflt_)			\

@@ -4,8 +4,8 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
- *		      port by Greg Banks <gbanks@pocketpenguins.com>
- * Copyright (c) 1999-2021 The strace developers.
+ *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ * Copyright (c) 1999-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -66,6 +66,8 @@ print_mmap_flags(kernel_ulong_t flags)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
+	tprint_flags_begin();
+
 	printxvals_ex(flags & MAP_TYPE, "MAP_???", XLAT_STYLE_ABBREV,
 		      mmap_flags, NULL);
 	flags &= ~MAP_TYPE;
@@ -92,6 +94,8 @@ print_mmap_flags(kernel_ulong_t flags)
 		tprints_string("MAP_HUGE_SHIFT");
 		tprint_shift_end();
 	}
+
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();

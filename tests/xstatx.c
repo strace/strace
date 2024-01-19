@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -258,28 +258,44 @@ print_stat(const STRUCT_STAT *st)
 	printf(", stx_attributes=");
 	printflags(statx_attrs, st->stx_attributes, "STATX_ATTR_???");
 
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_nlink);
-	PRINT_FIELD_U32_UID(stx_uid);
-	PRINT_FIELD_U32_UID(stx_gid);
+	if (st->stx_mask & STATX_NLINK) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_nlink);
+	}
+	if (st->stx_mask & STATX_UID)
+		PRINT_FIELD_U32_UID(stx_uid);
+	if (st->stx_mask & STATX_GID)
+		PRINT_FIELD_U32_UID(stx_gid);
 
-	printf(", stx_mode=");
-	print_st_mode(st->stx_mode);
+	if (st->stx_mask & (STATX_TYPE|STATX_MODE)) {
+		printf(", stx_mode=");
+		print_st_mode(st->stx_mode);
+	}
 
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_ino);
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_size);
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_blocks);
+	if (st->stx_mask & STATX_INO) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_ino);
+	}
+	if (st->stx_mask & STATX_SIZE) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_size);
+	}
+	if (st->stx_mask & STATX_BLOCKS) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_blocks);
+	}
 
 	printf(", stx_attributes_mask=");
 	printflags(statx_attrs, st->stx_attributes_mask, "STATX_ATTR_???");
 
-	PRINT_FIELD_TIME(stx_atime);
-	PRINT_FIELD_TIME(stx_btime);
-	PRINT_FIELD_TIME(stx_ctime);
-	PRINT_FIELD_TIME(stx_mtime);
+	if (st->stx_mask & STATX_ATIME)
+		PRINT_FIELD_TIME(stx_atime);
+	if (st->stx_mask & STATX_BTIME)
+		PRINT_FIELD_TIME(stx_btime);
+	if (st->stx_mask & STATX_CTIME)
+		PRINT_FIELD_TIME(stx_ctime);
+	if (st->stx_mask & STATX_MTIME)
+		PRINT_FIELD_TIME(stx_mtime);
 	printf(", ");
 	PRINT_FIELD_U(*st, stx_rdev_major);
 	printf(", ");
@@ -288,6 +304,16 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_U(*st, stx_dev_major);
 	printf(", ");
 	PRINT_FIELD_U(*st, stx_dev_minor);
+	if (st->stx_mask & STATX_MNT_ID) {
+		printf(", ");
+		PRINT_FIELD_X(*st, stx_mnt_id);
+	}
+	if (st->stx_mask & STATX_DIOALIGN) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_dio_mem_align);
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_dio_offset_align);
+	}
 	printf("}");
 }
 
@@ -476,12 +502,12 @@ main(void)
 	TEST_SYSCALL_STATX_FLAGS_STR = old_flags_str;
 
 	SET_MASK_INVOKE(0, "0");
-	SET_MASK_INVOKE(0xffffe000U, "0xffffe000 /* STATX_??? */");
+	SET_MASK_INVOKE(0xffffc000U, "0xffffc000 /* STATX_??? */");
 
 	SET_MASK_INVOKE(0xfffffffbU,
 		"STATX_TYPE|STATX_MODE|STATX_UID|STATX_GID|STATX_ATIME|"
 		"STATX_MTIME|STATX_CTIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|"
-		"STATX_BTIME|STATX_MNT_ID|0xffffe000");
+		"STATX_BTIME|STATX_MNT_ID|STATX_DIOALIGN|0xffffc000");
 
 	SET_MASK_INVOKE(STATX_UID, "STATX_UID");
 

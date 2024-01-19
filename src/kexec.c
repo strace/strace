@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2021 The strace developers.
+ * Copyright (c) 2014-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -76,6 +76,7 @@ SYS_FUNC(kexec_load)
 	/* flags */
 	tprint_flags_begin();
 	kernel_ulong_t n = tcp->u_arg[3];
+	tprint_flags_begin();
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
 	n &= ~(kernel_ulong_t) KEXEC_ARCH_MASK;
 	if (n) {

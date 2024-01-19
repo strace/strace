@@ -1547,6 +1547,73 @@ extern void maybe_load_task_comm(struct tcb *tcp);
 /* Print the contents of /proc/$pid/comm. */
 extern void print_pid_comm(int pid);
 
+static inline int
+printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
+{
+	return printstr_ex(tcp, addr, len, 0);
+}
+
+static inline int
+printstr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
+}
+
+static inline int
+printflags64_in(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
+}
+
+static inline int
+printflags_in(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags64_in(x, flags, dflt);
+}
+
+static inline int
+printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
+{
+	return printxvals(val, dflt, x, NULL);
+}
+
+static inline int
+printxval(const struct xlat *x, const unsigned int val, const char *dflt)
+{
+	return printxvals(val, dflt, x, NULL);
+}
+
+static inline int
+printxval64_u(const struct xlat *x, const uint64_t val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
+}
+
+static inline int
+printxval_u(const struct xlat *x, const unsigned int val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
+}
+
+static inline int
+printxval64_d(const struct xlat *x, const int64_t val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
+}
+
+static inline int
+printxval_d(const struct xlat *x, const int val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
+}
+
+static inline void
+tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
+	   print_obj_by_addr_size_fn print_func)
+{
+	tprint_iov_upto(tcp, len, addr, -1, print_func, NULL);
+}
+
 # if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
 extern bool print_timespec32_data_size(const void *arg, size_t size);
 extern bool print_timespec32_array_data_size(const void *arg,
@@ -1645,7 +1712,6 @@ extern uint8_t get_tcp_state(void);
 extern void set_tcp_state(uint8_t state);
 
 
-
 /*
  * Sign-extend an unsigned integer type to long long.
  */
@@ -1655,95 +1721,6 @@ extern void set_tcp_state(uint8_t state);
 	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
-
-
-# include "print_fields.h"
-
-
-
-static inline int
-printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
-{
-	return printstr_ex(tcp, addr, len, 0);
-}
-
-static inline int
-printstr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
-}
-
-/* flags printer without structured output delimiters */
-static inline int
-printflags64_in(const struct xlat *x, uint64_t flags, const char *dflt)
-{
-	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
-}
-
-static inline int
-printflags_in(const struct xlat *x, unsigned int flags, const char *dflt)
-{
-	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
-}
-
-/* flags printer with structured output delimiters */
-static inline int
-printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
-{
-	tprint_flags_begin();
-	int r = printflags64_in(x, flags, dflt);
-	tprint_flags_end();
-	return r;
-}
-
-static inline int
-printflags(const struct xlat *x, unsigned int flags, const char *dflt)
-{
-	return printflags64(x, flags, dflt);
-}
-
-static inline int
-printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
-{
-	return printxvals(val, dflt, x, NULL);
-}
-
-static inline int
-printxval(const struct xlat *x, const unsigned int val, const char *dflt)
-{
-	return printxvals(val, dflt, x, NULL);
-}
-
-static inline int
-printxval64_u(const struct xlat *x, const uint64_t val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
-}
-
-static inline int
-printxval_u(const struct xlat *x, const unsigned int val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
-}
-
-static inline int
-printxval64_d(const struct xlat *x, const int64_t val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
-}
-
-static inline int
-printxval_d(const struct xlat *x, const int val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
-}
-
-static inline void
-tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
-	   print_obj_by_addr_size_fn print_func)
-{
-	tprint_iov_upto(tcp, len, addr, -1, print_func, NULL);
-}
 
 
 /*
@@ -2089,6 +2066,23 @@ ilog2_32(uint32_t val)
 # endif
 
 # undef ILOG2_ITER_
+
+# include "print_fields.h"
+
+static inline int
+printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	tprint_flags_begin();
+	int r = printflags64_in(x, flags, dflt);
+	tprint_flags_end();
+	return r;
+}
+
+static inline int
+printflags(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags64(x, flags, dflt);
+}
 
 /*
  * When u64 is interpreted by the kernel as an address, there is a difference

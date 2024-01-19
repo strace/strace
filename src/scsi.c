@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2007 Vladimir Nadvornik <nadvornik@suse.cz>
  * Copyright (c) 2007-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2007-2021 The strace developers.
+ * Copyright (c) 2007-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -107,6 +107,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &val)) {
 			tprint_indirect_begin();
+			tprint_flags_begin();
 			if (val & SG_SCSI_RESET_NO_ESCALATE) {
 				printxval(sg_scsi_reset,
 					  SG_SCSI_RESET_NO_ESCALATE, 0);
@@ -115,6 +116,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			printxval(sg_scsi_reset,
 				  val & ~SG_SCSI_RESET_NO_ESCALATE,
 				  "SG_SCSI_RESET_???");
+			tprint_flags_end();
 			tprint_indirect_end();
 
 		}

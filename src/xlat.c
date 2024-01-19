@@ -231,7 +231,7 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
-                          tprints_string(str);
+				tprints_string(str);
 			}
 
 			goto printxvals_ex_end;

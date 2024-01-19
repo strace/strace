@@ -2,6 +2,7 @@
  * Support for decoding of VT ioctl commands.
  *
  * Copyright (c) 2019-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2019-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -261,8 +262,8 @@ print_scrmap_array_member(struct tcb *tcp, void *elem_buf,
 
 	if ((val & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE)
 		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		 ? tprintf_comment : tprintf_string)("UNI_DIRECT_BASE+%#hx",
-						     val & UNI_DIRECT_MASK);
+			? tprintf_comment : tprintf_string)("UNI_DIRECT_BASE+%#hx",
+							    val & UNI_DIRECT_MASK);
 
 	return true;
 }

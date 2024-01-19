@@ -407,19 +407,19 @@ printaddr64(const uint64_t addr)
 		PRINT_VAL_X(addr);
 }
 
-#define DEF_PRINTNUM(name, type)					\
-	bool								\
-	printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr, \
-			  const char *const fmt)			\
-	{								\
-		type num;						\
-		if (umove_or_printaddr(tcp, addr, &num))		\
-			return false;					\
-		tprint_indirect_begin();				\
-		tprintf_string(fmt, num);				\
-		tprint_indirect_end();					\
-		return true;						\
-	}
+#define DEF_PRINTNUM(name, type) \
+bool									\
+printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
+		  const char *const fmt)				\
+{									\
+	type num;							\
+	if (umove_or_printaddr(tcp, addr, &num))			\
+		return false;						\
+	tprint_indirect_begin();					\
+	tprintf_string(fmt, num);					\
+	tprint_indirect_end();						\
+	return true;							\
+}
 
 #define DEF_PRINTNUM_ADDR(name, type)					\
 	bool								\
@@ -434,21 +434,21 @@ printaddr64(const uint64_t addr)
 		return true;						\
 	}
 
-#define DEF_PRINTPAIR(name, type)					\
-	bool								\
-	printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr, \
-			   const char *const fmt)			\
-	{								\
-		type pair[2];						\
-		if (umove_or_printaddr(tcp, addr, &pair))		\
-			return false;					\
-		tprint_array_begin();					\
-		tprintf_string(fmt, pair[0]);				\
-		tprint_array_next();					\
-		tprintf_string(fmt, pair[1]);				\
-		tprint_array_end();					\
-		return true;						\
-	}
+#define DEF_PRINTPAIR(name, type) \
+bool									\
+printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
+		   const char *const fmt)				\
+{									\
+	type pair[2];							\
+	if (umove_or_printaddr(tcp, addr, &pair))			\
+		return false;						\
+	tprint_array_begin();						\
+	tprintf_string(fmt, pair[0]);					\
+	tprint_array_next();						\
+	tprintf_string(fmt, pair[1]);					\
+	tprint_array_end();						\
+	return true;							\
+}
 
 DEF_PRINTNUM(int, int)
 	DEF_PRINTNUM_ADDR(int, unsigned int)
@@ -1374,7 +1374,8 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 			data_size -= iov_len;
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
-			tprintf_string(" * %" PRI_klu " bytes in buffer %d\n", iov_len, i);
+			tprintf_string(" * %" PRI_klu " bytes in buffer %d\n",
+				       iov_len, i);
 			dumpstr(tcp, iov_iov_base(i), iov_len);
 		}
 	}
@@ -1755,12 +1756,13 @@ print_array_ex(struct tcb *const tcp,
 			tprint_array_index_equal();
 		}
 
-		break_needed =
+		bool break_needed =
 			!print_func(tcp, elem_buf, elem_size, opaque_data);
-		if (flags & PAF_PRINT_INDICES) {
+
+		if (flags & PAF_PRINT_INDICES)
 			tprint_array_index_end();
-		}
-		if(break_needed){
+
+		if (break_needed) {
 			cur = end_addr;
 			break;
 		}

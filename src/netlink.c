@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -181,10 +181,10 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 	tprint_flags_begin();
 	tprint_shift_begin();
 	printxval(xlat, subsys_id, dflt);
-
 	tprint_shift();
 	PRINT_VAL_U(8);
 	tprint_shift_end();
+
 	tprint_flags_or();
 	if (subsys_id < ARRAY_SIZE(nf_nlmsg_types))
 		printxval(nf_nlmsg_types[subsys_id].xlat,
@@ -451,8 +451,10 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type,
 	} else if (family < ARRAY_SIZE(nlmsg_flags) && nlmsg_flags[family])
 		table = nlmsg_flags[family](type);
 
+	tprint_flags_begin();
 	printflags_ex(flags, "NLM_F_???", XLAT_STYLE_DEFAULT,
 		      netlink_flags, table, NULL);
+	tprint_flags_end();
 }
 
 static void

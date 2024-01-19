@@ -362,7 +362,7 @@ SYS_FUNC(sigaction)
 		int signo = tcp->u_arg[0];
 #if defined SPARC || defined SPARC64
 		if (signo < 0) {
-			tprints("-");
+			tprints_string("-");
 			signo = -signo;
 		}
 #endif

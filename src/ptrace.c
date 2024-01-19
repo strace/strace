@@ -7,8 +7,8 @@
  *		       Linux for s390 port by D.J. Barrow
  *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
- *		      port by Greg Banks <gbanks@pocketpenguins.com>
- * Copyright (c) 1999-2021 The strace developers.
+ *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ * Copyright (c) 1999-2022 The strace developers.
  *
  * All rights reserved.
  *

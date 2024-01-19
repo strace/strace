@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Ben Noordhuis <info@bnoordhuis.nl>
  * Copyright (c) 2013-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -167,7 +167,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 			tprint_flags_or();
 		}
 		printxval(perf_hw_id, attr->config & PERF_HW_EVENT_MASK,
-			  "PERF_COUNT_HW_???");
+			   "PERF_COUNT_HW_???");
 		tprint_flags_end();
 		break;
 	case PERF_TYPE_SOFTWARE:
@@ -218,6 +218,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_shift();
 		PRINT_VAL_U(16);
 		tprint_shift_end();
+
 		tprint_flags_or();
 		tprint_shift_begin();
 		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
@@ -225,6 +226,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_shift();
 		PRINT_VAL_U(8);
 		tprint_shift_end();
+
 		tprint_flags_or();
 		printxval(perf_hw_cache_id, attr->config & 0xFF,
 			  "PERF_COUNT_HW_CACHE_???");

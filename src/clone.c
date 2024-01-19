@@ -174,8 +174,10 @@ SYS_FUNC(clone3)
 
 		tprint_struct_begin();
 		tprints_field_name("flags");
+		tprint_flags_begin();
 		printflags_ex(arg.flags, "CLONE_???", XLAT_STYLE_DEFAULT,
 			      clone_flags, clone3_flags, NULL);
+		tprint_flags_end();
 
 		if (arg.flags & CLONE_PIDFD) {
 			tprint_struct_next();

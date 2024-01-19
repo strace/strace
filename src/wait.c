@@ -7,7 +7,7 @@
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2009-2013 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2021 The strace developers.
+ * Copyright (c) 2014-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -32,6 +32,7 @@ printstatus(int status)
 	 * are no wait status constructors it will have to do.
 	 */
 	tprint_indirect_begin();
+	tprint_flags_begin();
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
 		tprintf_string("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
@@ -57,6 +58,7 @@ printstatus(int status)
 #endif
 	else {
 		PRINT_VAL_X(status);
+		tprint_flags_end();
 		tprint_indirect_end();
 		return 0;
 	}
@@ -77,6 +79,7 @@ printstatus(int status)
 			PRINT_VAL_X(status);
 		}
 	}
+	tprint_flags_end();
 	tprint_indirect_end();
 
 	return exited;

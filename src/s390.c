@@ -510,7 +510,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "machine structure");
 
-	tprints("/* machine */ ");
+	tprints_string("/* machine */ ");
 	tprint_struct_begin();
 	if (!abbrev(tcp)) {
 		if (hdr->infmflg1) { /* Reserved */
@@ -620,7 +620,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 
 	*mt = !!(hdr->infpflg1 & 0x80);
 
-	tprints("/* partition */ ");
+	tprints_string("/* partition */ ");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infpflg1);
 	if (!abbrev(tcp) && hdr->infpflg1)
@@ -786,12 +786,12 @@ print_funcs(const uint8_t funcs[8])
 			continue;
 
 		if (cont) {
-			tprints(", ");
+			tprints_string(", ");
 		} else {
 			tprint_comment_begin();
 			cont = true;
 		}
-		tprintf("%u: %s", i, func_descs[i]);
+		tprintf_string("%u: %s", i, func_descs[i]);
 	}
 
 	if (cont)
@@ -806,7 +806,7 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "hypervisor %d structure", num);
 
-	tprintf("/* hypervisor %d */ ", num);
+	tprintf_string("/* hypervisor %d */ ", num);
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infyflg1);
 	if (!abbrev(tcp) && hdr->infyflg1)
@@ -922,7 +922,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 {
 	CHECK_SIZE(hdr, size, "guest %d structure", num);
 
-	tprintf("/* guest %d */ ", num);
+	tprintf_string("/* guest %d */ ", num);
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infgflg1);
 	if (!abbrev(tcp) && hdr->infgflg1)
@@ -1132,7 +1132,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	tprint_struct_begin();
 
 	/* Header */
-	tprints("/* header */ ");
+	tprints_string("/* header */ ");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infhflg1);
 
@@ -1349,7 +1349,7 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 	/* Since it is 64-bit even on 31-bit s390... */
 	if (sizeof(addr) > current_klongsize &&
 	    addr >= (1ULL << (current_klongsize * 8))) {
-		tprintf("%#" PRIx64, addr);
+		tprintf_string("%#" PRIx64, addr);
 
 		return;
 	}

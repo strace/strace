@@ -1,7 +1,7 @@
 /*
  * IFLA_VFINFO_LIST netlink attribute decoding check.
  *
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -351,7 +351,7 @@ main(void)
 		{ ARG_STR(0) NRAW(" /* ETH_P_??? */") },
 		{ ARG_XLAT_KNOWN(0x8, "ETH_P_PPP_MP") },
 		{ ARG_XLAT_KNOWN(0x800, "ETH_P_IP") },
-		{ ARG_STR(0xe) NRAW(" /* ETH_P_??? */") },
+		{ ARG_STR(0xf) NRAW(" /* ETH_P_??? */") },
 		{ ARG_STR(0xfb) NRAW(" /* ETH_P_??? */") },
 		{ ARG_XLAT_KNOWN(0xfbfb, "ETH_P_AF_IUCV") },
 		{ ARG_STR(0xffff) NRAW(" /* ETH_P_??? */") },

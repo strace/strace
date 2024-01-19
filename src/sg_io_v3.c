@@ -168,7 +168,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprint_struct_begin();
 	tprints_field_name("interface_id");
-	tprints("'S'");
+	tprints_string("'S'");
 	tprint_struct_next();
 	tprint_more_data_follows();
 	tprint_struct_end();

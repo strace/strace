@@ -425,8 +425,8 @@ print_err(int64_t err, bool negated)
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
-	 ? tprintf_string : tprintf_comment)("%s%s",
-					     negated ? "-" : "", str);
+		? tprintf_string : tprintf_comment)("%s%s",
+						    negated ? "-" : "", str);
 }
 
 static void
