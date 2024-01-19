@@ -890,11 +890,6 @@ tprint_arg_name_end(void)
 }
 
 static inline void
-tprint_arg_name_end(void)
-{
-}
-
-static inline void
 tprints_arg_begin(const char *name)
 {
 	if(structured_output){

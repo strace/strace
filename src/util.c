@@ -1712,7 +1712,6 @@ print_array_ex(struct tcb *const tcp,
 	kernel_ulong_t idx = 0;
 	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;
 	bool truncated = false;
-	bool break_needed = false;
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
