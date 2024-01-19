@@ -10,10 +10,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_map_shadow_stack
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -70,9 +68,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_map_shadow_stack")
-
-#endif
