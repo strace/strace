@@ -904,7 +904,6 @@ static inline void
 tprint_sysret_begin(void)
 {
 	if(structured_output) {
-		tprint_struct_begin();
 	} else {
 	}
 }
@@ -942,6 +941,15 @@ tprint_sysret_end(void)
 		tprint_struct_end();
 		STRACE_PRINTS( TCP_STATE_DELIM,
 			STRUCTURED_OUTPUT(STRUCT_NEXT));
+	} else {
+	}
+}
+
+static inline void
+tprint_syscall_begin(void)
+{
+	if(structured_output){
+		tprint_struct_begin();
 	} else {
 	}
 }
@@ -991,7 +999,7 @@ tprint_unfinished(int at_end)
 }
 
 # define PRINT_VAL_D(val_)	\
-	STRACE_PRINTF(0, "%lld", sign_extend_unsigned_to_ll(val_))
+	tprintf_int("%lld", sign_extend_unsigned_to_ll(val_))
 
 # define PRINT_VAL_D_FIELD(field_, val_)				\
 	do {								\
