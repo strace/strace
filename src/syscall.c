@@ -169,7 +169,7 @@ const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 
 const char *const personality_names[] = PERSONALITY_NAMES;
 static_assert(ARRAY_SIZE(personality_names) == SUPPORTED_PERSONALITIES,
-		"ARRAY_SIZE(personality_names) != SUPPORTED_PERSONALITIES");
+	      "ARRAY_SIZE(personality_names) != SUPPORTED_PERSONALITIES");
 
 #if SUPPORTED_PERSONALITIES > 1
 
@@ -205,7 +205,7 @@ set_personality(unsigned int personality)
 
 	if (personality >= SUPPORTED_PERSONALITIES)
 		error_msg_and_die("Requested switch to unsupported personality "
-				"%u", personality);
+				  "%u", personality);
 
 	nsyscalls = nsyscall_vec[personality];
 	sysent = sysent_vec[personality];
@@ -256,7 +256,7 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	if (!is_number_in_set(QUIET_PERSONALITY, quiet_set)) {
 		printleader(tcp);
 		tprintf_string("[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, personality_names[personality]);
+			       tcp->pid, personality_names[personality]);
 		line_ended();
 	}
 
@@ -298,7 +298,7 @@ decode_socket_subcall(struct tcb *tcp)
 
 	for (unsigned int i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
-			? ((uint32_t *) (void *) buf)[i] : buf[i];
+				? ((uint32_t *) (void *) buf)[i] : buf[i];
 }
 #endif /* SYS_socket_subcall */
 
@@ -323,12 +323,12 @@ decode_ipc_subcall(struct tcb *tcp)
 	}
 
 	switch (call) {
-	case  1: case  2: case	3: case	 4:
-	case 11: case 12: case 13: case 14:
-	case 21: case 22: case 23: case 24:
-		break;
-	default:
-		return;
+		case  1: case  2: case  3: case  4:
+		case 11: case 12: case 13: case 14:
+		case 21: case 22: case 23: case 24:
+			break;
+		default:
+			return;
 	}
 
 	tcp->scno = SYS_ipc_subcall + call;
@@ -342,7 +342,7 @@ decode_ipc_subcall(struct tcb *tcp)
 #endif /* SYS_ipc_subcall */
 
 #ifdef SYS_syscall_subcall
-/* The implementation is architecture specific.	 */
+/* The implementation is architecture specific.  */
 static void decode_syscall_subcall(struct tcb *);
 #endif /* SYS_syscall_subcall */
 
@@ -475,7 +475,7 @@ static struct inject_opts *
 tcb_inject_opts(struct tcb *tcp)
 {
 	return (scno_in_range(tcp->scno) && tcp->inject_vec[current_personality])
-		? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
+	       ? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
 }
 
 
@@ -606,18 +606,18 @@ syscall_entering_decode(struct tcb *tcp)
 	if (tcp_sysent(tcp)->sen == SEN_syscall)
 		decode_syscall_subcall(tcp);
 #endif
-#if defined SYS_ipc_subcall			\
-	|| defined SYS_socket_subcall
+#if defined SYS_ipc_subcall	\
+ || defined SYS_socket_subcall
 	switch (tcp_sysent(tcp)->sen) {
 # ifdef SYS_ipc_subcall
-	case SEN_ipc:
-		decode_ipc_subcall(tcp);
-		break;
+		case SEN_ipc:
+			decode_ipc_subcall(tcp);
+			break;
 # endif
 # ifdef SYS_socket_subcall
-	case SEN_socketcall:
-		decode_socket_subcall(tcp);
-		break;
+		case SEN_socketcall:
+			decode_socket_subcall(tcp);
+			break;
 # endif
 	}
 #endif
@@ -636,18 +636,18 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		tcp->qual_flg &= ~QUAL_INJECT;
 
 		switch (tcp_sysent(tcp)->sen) {
-		case SEN_execve:
-		case SEN_execveat:
-		case SEN_execv:
-			/*
-			 * First exec* syscall makes the log visible.
-			 */
-			tcp->flags &= ~TCB_HIDE_LOG;
-			/*
-			 * Check whether this exec* syscall succeeds.
-			 */
-			tcp->flags |= TCB_CHECK_EXEC_SYSCALL;
-			break;
+			case SEN_execve:
+			case SEN_execveat:
+			case SEN_execv:
+				/*
+				 * First exec* syscall makes the log visible.
+				 */
+				tcp->flags &= ~TCB_HIDE_LOG;
+				/*
+				 * Check whether this exec* syscall succeeds.
+				 */
+				tcp->flags |= TCB_CHECK_EXEC_SYSCALL;
+				break;
 		}
 	}
 
@@ -834,13 +834,13 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			? tcp->s_prev_ent : tcp->s_ent;
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
+		/* There was an error in one of prior ptrace ops.  */
 		bool status_filtering =
 			!is_complete_set(status_set, NUMBER_OF_STATUSES);
 		bool publish = status_filtering
-				? is_number_in_set(STATUS_UNAVAILABLE, status_set)
-				: true;
+			       ? is_number_in_set(STATUS_UNAVAILABLE, status_set)
+			       : true;
 
-		/* There was error in one of prior ptrace ops */
 		if (cflag && publish)
 			count_syscall(tcp, ts);
 		if (cflag != CFLAG_ONLY_STATS) {
@@ -880,9 +880,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = syserror(tcp)
-			&& is_number_in_set(STATUS_FAILED, status_set);
+			       && is_number_in_set(STATUS_FAILED, status_set);
 		publish |= !syserror(tcp)
-			&& is_number_in_set(STATUS_SUCCESSFUL, status_set);
+			   && is_number_in_set(STATUS_SUCCESSFUL, status_set);
 		if (cflag != CFLAG_ONLY_STATS)
 			strace_close_memstream(tcp, publish);
 		if (!publish) {
@@ -917,22 +917,22 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
 		switch (tcp->u_error) {
-			/* Blocked signals do not interrupt any syscalls.
-			 * In this case syscalls don't return ERESTARTfoo codes.
-			 *
-			 * Deadly signals set to SIG_DFL interrupt syscalls
-			 * and kill the process regardless of which of the codes below
-			 * is returned by the interrupted syscall.
-			 * In some cases, kernel forces a kernel-generated deadly
-			 * signal to be unblocked and set to SIG_DFL (and thus cause
-			 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
-			 * or SIGILL. (The alternative is to leave process spinning
-			 * forever on the faulty instruction - not useful).
-			 *
-			 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
-			 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
-			 * but kernel will always restart them.
-			 */
+		/* Blocked signals do not interrupt any syscalls.
+		 * In this case syscalls don't return ERESTARTfoo codes.
+		 *
+		 * Deadly signals set to SIG_DFL interrupt syscalls
+		 * and kill the process regardless of which of the codes below
+		 * is returned by the interrupted syscall.
+		 * In some cases, kernel forces a kernel-generated deadly
+		 * signal to be unblocked and set to SIG_DFL (and thus cause
+		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
+		 * or SIGILL. (The alternative is to leave process spinning
+		 * forever on the faulty instruction - not useful).
+		 *
+		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
+		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
+		 * but kernel will always restart them.
+		 */
 		case ERESTARTSYS:
 			/* Most common type of signal-interrupted syscall exit code.
 			 * The system call will be restarted with the same arguments
@@ -1077,11 +1077,11 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 
 		print_injected_note(tcp);
 	}
-
-	/*if ((sys_res & RVAL_STR) && tcp->auxstr)
+/*
+	if ((sys_res & RVAL_STR) && tcp->auxstr)
 		tprints_sysret_string("retstr", tcp->auxstr);
-	print_injected_note(tcp);*/
-
+	print_injected_note(tcp);
+*/
 	if (Tflag) {
 		tprints_sysret_next("time");
 		tprint_associated_info_begin();
@@ -1127,13 +1127,13 @@ bool
 is_erestart(struct tcb *tcp)
 {
 	switch (tcp->u_error) {
-	case ERESTARTSYS:
-	case ERESTARTNOINTR:
-	case ERESTARTNOHAND:
-	case ERESTART_RESTARTBLOCK:
-		return true;
-	default:
-		return false;
+		case ERESTARTSYS:
+		case ERESTARTNOINTR:
+		case ERESTARTNOHAND:
+		case ERESTART_RESTARTBLOCK:
+			return true;
+		default:
+			return false;
 	}
 }
 
@@ -1158,7 +1158,7 @@ static bool
 ptrace_syscall_info_is_valid(void)
 {
 	return ptrace_get_syscall_info_supported &&
-		ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
+	       ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
 }
 
 #define XLAT_MACROS_ONLY
@@ -1577,8 +1577,8 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	get_error(tcp,
 		  (!(tcp_sysent(tcp)->sys_flags & SYSCALL_NEVER_FAILS)
-		   || syscall_tampered(tcp))
-		  && !syscall_tampered_nofail(tcp));
+			|| syscall_tampered(tcp))
+                  && !syscall_tampered_nofail(tcp));
 
 	return 1;
 }

@@ -99,7 +99,6 @@ printwaitn(struct tcb *const tcp,
 
 		if(structured_output)
 			tprint_arg_next();
-
 		/* status */
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);

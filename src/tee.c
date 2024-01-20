@@ -8,7 +8,7 @@
 #include "defs.h"
 #include <linux/tee.h>
 
-/* Not in UAPI.	 */
+/* Not in UAPI.  */
 struct tee_ioctl_shm_register_fd_data {
 	int64_t fd;
 	uint64_t size;
@@ -31,17 +31,17 @@ struct tee_ioctl_shm_register_fd_data {
 
 #define TEE_IOCTL_PARAM_SIZE(x) (sizeof(struct tee_ioctl_param) * (x))
 
-#define TEE_FETCH_BUF_DATA(buf_, arg_, params_)				\
-	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_),		\
-			   &arg_, offsetof(typeof(arg_), num_params),	\
+#define TEE_FETCH_BUF_DATA(buf_, arg_, params_) \
+	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_), \
+			   &arg_, offsetof(typeof(arg_), num_params), \
 			   params_)
 
 /* session id is printed as 0x%x in libteec */
-#define PRINT_FIELD_SESSION(where_, field_)	\
+#define PRINT_FIELD_SESSION(where_, field_) \
 	PRINT_FIELD_X(where_, field_)
 
 static void
-	tee_print_buf(struct tee_ioctl_buf_data *buf)
+tee_print_buf(struct tee_ioctl_buf_data *buf)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(*buf, buf_len);

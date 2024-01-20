@@ -39,10 +39,10 @@ SYS_FUNC(statx)
 		tprint_arg_next();
 
 		/* flags */
-		tprint_flags_begin();
 		unsigned int flags = tcp->u_arg[2];
+		tprint_flags_begin();
 		printflags_in(at_statx_sync_types, flags & AT_STATX_SYNC_TYPE,
-			   NULL);
+			      NULL);
 		flags &= ~AT_STATX_SYNC_TYPE;
 		if (flags) {
 			tprint_flags_or();

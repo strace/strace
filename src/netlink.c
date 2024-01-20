@@ -624,7 +624,7 @@ decode_payload(struct tcb *const tcp,
 	 * netlink payload decoding.
 	 */
 	if ((nlmsghdr->nlmsg_type >= NLMSG_MIN_TYPE
-	     || nlmsghdr->nlmsg_type == NLMSG_DONE)
+	    || nlmsghdr->nlmsg_type == NLMSG_DONE)
 	    && (unsigned int) family < ARRAY_SIZE(netlink_decoders)
 	    && netlink_decoders[family]
 	    && netlink_decoders[family](tcp, nlmsghdr, addr, len)) {
@@ -660,7 +660,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprint_array_next();
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
-			       nlmsg_len - NLMSG_HDRLEN);
+						     nlmsg_len - NLMSG_HDRLEN);
 		tprint_array_end();
 	}
 }

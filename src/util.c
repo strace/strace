@@ -35,11 +35,11 @@
 
 const struct xlat_data *
 find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
-		const size_t num_items, const unsigned int flags)
+		 const size_t num_items, const unsigned int flags)
 {
 	for (size_t i = 0; i < num_items; i++) {
 		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
-			: strcasecmp)(items[i].str, s))
+						 : strcasecmp)(items[i].str, s))
 			return items + i;
 	}
 
@@ -48,25 +48,25 @@ find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
 
 uint64_t
 find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
-		uint64_t default_val, uint64_t not_found)
+	       uint64_t default_val, uint64_t not_found)
 {
 	if (!arg)
 		return default_val;
 
 	const struct xlat_data *res = find_xlat_val_ex(strs, arg, strs_size, 0);
 
-	return	res ? res->val : not_found;
+	return  res ? res->val : not_found;
 }
 
 int
 str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
-		int *width)
+		 int *width)
 {
 	static const struct xlat_data units[] = {
 		{ 1000000000U | (0ULL << 32), "s" },
 		{ 1000000U    | (3ULL << 32), "ms" },
-		{ 1000U	      | (6ULL << 32), "us" },
-		{ 1U	      | (9ULL << 32), "ns" },
+		{ 1000U       | (6ULL << 32), "us" },
+		{ 1U          | (9ULL << 32), "ns" },
 	};
 
 	if (!arg)
@@ -92,10 +92,10 @@ int
 ts_cmp(const struct timespec *a, const struct timespec *b)
 {
 	if (a->tv_sec < b->tv_sec
-		|| (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
 		return -1;
 	if (a->tv_sec > b->tv_sec
-		|| (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
 		return 1;
 	return 0;
 }
@@ -185,8 +185,8 @@ parse_ts(const char *s, struct timespec *t)
 	if (float_len > int_len) {
 		t->tv_sec = float_val / (NS_IN_S / scale);
 		t->tv_nsec = ((uint64_t) ((float_val -
-					(t->tv_sec * (NS_IN_S / scale)))
-					* scale)) % NS_IN_S;
+					   (t->tv_sec * (NS_IN_S / scale)))
+					  * scale)) % NS_IN_S;
 	} else {
 		t->tv_sec = int_val / (NS_IN_S / scale);
 		t->tv_nsec = (int_val % (NS_IN_S / scale)) * scale;
@@ -202,7 +202,7 @@ parse_ts(const char *s, struct timespec *t)
 			(ret_) += (pow_);	\
 		}				\
 	} while (0)				\
-		/* End of ILOG10_ITER_ */
+	/* End of ILOG10_ITER_ */
 
 /* Returns 0 for 0. */
 static int
@@ -211,10 +211,10 @@ ilog10(uint64_t val)
 	int ret = 0;
 
 	ILOG10_ITER_(val, 10000000000000000ULL, ret, 16);
-	ILOG10_ITER_(val, 100000000,		ret, 8);
-	ILOG10_ITER_(val, 10000,		ret, 4);
-	ILOG10_ITER_(val, 100,			ret, 2);
-	ILOG10_ITER_(val, 10,			ret, 1);
+	ILOG10_ITER_(val, 100000000,            ret, 8);
+	ILOG10_ITER_(val, 10000,                ret, 4);
+	ILOG10_ITER_(val, 100,                  ret, 2);
+	ILOG10_ITER_(val, 10,                   ret, 1);
 
 	return ret;
 }
@@ -224,7 +224,7 @@ print_ticks(uint64_t val, long freq, unsigned int precision)
 {
 	PRINT_VAL_U(val);
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
-			&& freq > 0 && val > 0) {
+	    && freq > 0 && val > 0) {
 		tprintf_comment("%" PRIu64 ".%0*" PRIu64 " s",
 				val / freq, precision, val % freq);
 	}
@@ -236,7 +236,7 @@ print_ticks_d(int64_t val, long freq, unsigned int precision)
 	PRINT_VAL_D(val);
 	/* freq > 1 to avoid special casing for val ==  */
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
-		&& freq > 1 && val != 0) {
+	    && freq > 1 && val != 0) {
 		tprintf_comment("%s%lld.%0*lld s",
 				val < 0 ? "-" : "", llabs(val / freq),
 				precision, llabs(val % freq));
@@ -344,19 +344,19 @@ getllval(struct tcb *tcp, unsigned long long *val, unsigned int arg_no)
 		arg_no++;
 	}
 #else /* SIZEOF_KERNEL_LONG_T == 4 */
-# if defined __ARM_EABI__			\
-	|| defined LINUX_MIPSO32		\
-	|| defined POWERPC			\
-	|| defined XTENSA
+# if defined __ARM_EABI__	\
+  || defined LINUX_MIPSO32	\
+  || defined POWERPC		\
+  || defined XTENSA
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
 # elif defined SH
 	/*
 	 * The SH4 ABI does allow long longs in odd-numbered registers, but
 	 * does not allow them to be split between registers and memory - and
-	 * there are only four argument registers for normal functions.	 As a
+	 * there are only four argument registers for normal functions.  As a
 	 * result, pread, for example, takes an extra padding argument before
-	 * the offset.	This was changed late in the 2.4 series (around 2.4.20).
+	 * the offset.  This was changed late in the 2.4 series (around 2.4.20).
 	 */
 	if (arg_no == 3)
 		arg_no++;
@@ -419,18 +419,18 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	return true;							\
 }
 
-#define DEF_PRINTNUM_ADDR(name, type)					\
-	bool								\
-	printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr) \
-	{								\
-		type num;						\
-		if (umove_or_printaddr(tcp, addr, &num))		\
-			return false;					\
-		tprint_indirect_begin();				\
-		printaddr64(num);					\
-		tprint_indirect_end();					\
-		return true;						\
-	}
+#define DEF_PRINTNUM_ADDR(name, type) \
+bool									\
+printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
+{									\
+	type num;							\
+	if (umove_or_printaddr(tcp, addr, &num))			\
+		return false;						\
+	tprint_indirect_begin();					\
+	printaddr64(num);						\
+	tprint_indirect_end();						\
+	return true;							\
+}
 
 #define DEF_PRINTPAIR(name, type) \
 bool									\
@@ -449,15 +449,15 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 }
 
 DEF_PRINTNUM(int, int)
-	DEF_PRINTNUM_ADDR(int, unsigned int)
-	DEF_PRINTPAIR(int, int)
-	DEF_PRINTNUM(short, short)
-	DEF_PRINTNUM(int64, uint64_t)
-	DEF_PRINTNUM_ADDR(int64, uint64_t)
-	DEF_PRINTPAIR(int64, uint64_t)
+DEF_PRINTNUM_ADDR(int, unsigned int)
+DEF_PRINTPAIR(int, int)
+DEF_PRINTNUM(short, short)
+DEF_PRINTNUM(int64, uint64_t)
+DEF_PRINTNUM_ADDR(int64, uint64_t)
+DEF_PRINTPAIR(int64, uint64_t)
 
-	bool
-	printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
+bool
+printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	int fd;
 	if (umove_or_printaddr(tcp, addr, &fd))
@@ -845,7 +845,6 @@ void
 printfd_pid_with_finfo(const char* field, struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo) {
 	char patha[PATH_MAX + 1];
 	bool deleted;
-
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && (finfo || (getfdpath_pid(pid, fd, patha, sizeof(patha), &deleted) >= 0))) {
 		const char *path = finfo? finfo->path: patha;
@@ -982,9 +981,9 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 	int usehex, c, eol;
 	bool printable;
 	enum xflag_opts xstyle = style & QUOTE_OVERWRITE_HEXSTR
-		? ((style & QUOTE_HEXSTR_MASK)
-		   >> QUOTE_HEXSTR_SHIFT)
-		: xflag;
+					? ((style & QUOTE_HEXSTR_MASK)
+					   >> QUOTE_HEXSTR_SHIFT)
+					: xflag;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -1132,7 +1131,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 		}
 	}
 
-string_ended:
+ string_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 	if (style & QUOTE_EMIT_COMMENT)
@@ -1149,7 +1148,7 @@ string_ended:
 
 	return 1;
 
-asciz_ended:
+ asciz_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 	if (style & QUOTE_EMIT_COMMENT)
@@ -1366,9 +1365,9 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	 * or we were requested to print more than -s NUM chars)...
 	 */
 	ellipsis = string_quote(str, outstr, size, style, NULL)
-		&& len
-		&& ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
-		    || len > max_strlen);
+		   && len
+		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
+		       || len > max_strlen);
 
 	if (ellipsis){
 		tprints_quoted_partial_string(outstr);
@@ -1399,7 +1398,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 
 	if (!str) {
 		error_func_msg("memory exhausted when tried to allocate"
-			       " %u bytes", len);
+                               " %u bytes", len);
 		prefix_fun();
 		tprint_unavailable();
 		return true;
@@ -1436,12 +1435,12 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		struct { uint64_t base; uint64_t len; } *iov64;
 	} iovu;
 # define iov iovu.iov64
-# define sizeof_iov							\
+# define sizeof_iov \
 	(current_wordsize == 4 ? (unsigned int) sizeof(*iovu.iov32)	\
-	 : (unsigned int) sizeof(*iovu.iov64))
-# define iov_iov_base(i)						\
+			       : (unsigned int) sizeof(*iovu.iov64))
+# define iov_iov_base(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
-# define iov_iov_len(i)							\
+# define iov_iov_len(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
@@ -1498,7 +1497,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		/** Width of formatted dump in characters.  */
 		DUMPSTR_WIDTH_CHARS = DUMPSTR_WIDTH_BYTES +
-		sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
+			sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
 
 		DUMPSTR_GROUP_MASK = DUMPSTR_GROUP_BYTES - 1,
 		DUMPSTR_BYTES_MASK = DUMPSTR_WIDTH_BYTES - 1,
@@ -1623,8 +1622,8 @@ tfetch_mem64(struct tcb *const tcp, const uint64_t addr,
 	     const unsigned int len, void *const our_addr)
 {
 	return addr && verbose(tcp) &&
-		(entering(tcp) || !syserror(tcp)) &&
-		!umoven(tcp, addr, len, our_addr);
+	       (entering(tcp) || !syserror(tcp)) &&
+	       !umoven(tcp, addr, len, our_addr);
 }
 
 bool
@@ -1632,7 +1631,7 @@ tfetch_mem64_ignore_syserror(struct tcb *const tcp, const uint64_t addr,
 			     const unsigned int len, void *const our_addr)
 {
 	return addr && verbose(tcp) &&
-		!umoven(tcp, addr, len, our_addr);
+	       !umoven(tcp, addr, len, our_addr);
 }
 
 int
@@ -1663,7 +1662,7 @@ umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
 {
 	union {
 		uint64_t val;
-		uint8_t	 bytes[sizeof(uint64_t)];
+		uint8_t  bytes[sizeof(uint64_t)];
 	} data = { .val = 0 };
 	const size_t offs = is_bigendian ? sizeof(data) - len : 0;
 
@@ -1805,7 +1804,7 @@ print_array_ex(struct tcb *const tcp,
 
 	const kernel_ulong_t abbrev_end =
 		(abbrev(tcp) && max_strlen < nmemb) ?
-		start_addr + elem_size * max_strlen : end_addr;
+			start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
 	kernel_ulong_t idx = 0;
 	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;

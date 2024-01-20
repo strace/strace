@@ -321,7 +321,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	static const struct xlat *xlat_tables[] = {
 		/* KT_LATIN */
-		[KT_FN]	   = kd_key_fn_keys,
+		[KT_FN]    = kd_key_fn_keys,
 		[KT_SPEC]  = kd_key_spec_keys,
 		[KT_PAD]   = kd_key_pad_keys,
 		[KT_DEAD]  = kd_key_dead_keys,
@@ -375,7 +375,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 
 	tprint_struct_next();
 	if (umove(tcp, arg + offsetof(struct kbentry, kb_value),
-		  &val.kb_value)) {
+			 &val.kb_value)) {
 		tprints_field_name("kb_value");
 		tprint_unavailable();
 		goto out;
@@ -457,7 +457,7 @@ kd_kbd_str_entry(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	if (print_quoted_string((char *) val.kb_string,
 				MIN(max_strlen,
-				    (unsigned int) ret ?: sizeof(val.kb_string)),
+				   (unsigned int) ret ?: sizeof(val.kb_string)),
 				QUOTE_OMIT_TRAILING_0))
 		tprint_more_data_follows();
 
@@ -830,7 +830,7 @@ kd_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PIO_CMAP:
 		return kd_cmap(tcp, arg, code == GIO_CMAP);
 
-		/* no arguments */
+	/* no arguments */
 	case KDENABIO:
 	case KDDISABIO:
 	case KDMAPDISP:

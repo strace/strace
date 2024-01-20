@@ -98,7 +98,7 @@ print_mmap_flags(kernel_ulong_t flags)
 	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprint_comment_end();
+                tprint_comment_end();
 	tprint_flags_end();
 }
 

@@ -450,6 +450,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 		}
 	}
 	va_end(args);
+
 	if (n) {
 		if (flags) {
 			tprint_flags_or();

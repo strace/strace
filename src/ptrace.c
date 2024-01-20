@@ -279,8 +279,8 @@ decode_ptrace_entering(struct tcb *const tcp)
 		case COMPAT_PTRACE_SETHBPREGS:
 			printxvals_ex(request, "COMPAT_PTRACE_???",
 				      xlat_verbose(xlat_verbosity)
-				      == XLAT_STYLE_RAW ? XLAT_STYLE_RAW
-				      : XLAT_STYLE_VERBOSE,
+					== XLAT_STYLE_RAW ? XLAT_STYLE_RAW
+							  : XLAT_STYLE_VERBOSE,
 				      compat_ptrace_cmds, NULL);
 			tprint_arg_next();
 			printpid(tcp, pid, PT_TGID);
@@ -507,5 +507,5 @@ decode_ptrace_exiting(struct tcb *const tcp)
 SYS_FUNC(ptrace)
 {
 	return entering(tcp) ? decode_ptrace_entering(tcp)
-		: decode_ptrace_exiting(tcp);
+			     : decode_ptrace_exiting(tcp);
 }

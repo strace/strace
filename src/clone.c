@@ -100,7 +100,6 @@ SYS_FUNC(clone)
 			printsignal(sig);
 		}
 		tprint_arg_name_end();
-
 		/*
 		 * TODO on syscall entry:
 		 * We can clear CLONE_PTRACE here since it is an ancient hack
@@ -225,9 +224,9 @@ SYS_FUNC(clone3)
 
 				tprint_struct_next();
 				PRINT_FIELD_OBJ_TCB_VAL(arg, set_tid, tcp,
-							print_array, arg.set_tid_size,
-							&buf, sizeof(buf), tfetch_mem,
-							print_int_array_member, 0);
+					print_array, arg.set_tid_size,
+					&buf, sizeof(buf), tfetch_mem,
+					print_int_array_member, 0);
 			}
 			tprint_struct_next();
 			PRINT_FIELD_U(arg, set_tid_size);
@@ -284,9 +283,9 @@ SYS_FUNC(clone3)
 	if (size > fetch_size) {
 		/*
 		 * TODO: it is possible to also store the tail on entering
-		 *	 and then compare against it on exiting in order
-		 *	 to avoid double-printing, but it would also require yet
-		 *	 another complication of print_nonzero_bytes interface.
+		 *       and then compare against it on exiting in order
+		 *       to avoid double-printing, but it would also require yet
+		 *       another complication of print_nonzero_bytes interface.
 		 */
 		if (print_nonzero_bytes(tcp, prefix_fun, addr, fetch_size,
 					MIN(size, get_pagesize()),

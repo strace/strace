@@ -324,7 +324,7 @@ struct tcb {
 	struct unwind_queue_t *unwind_queue;
 # endif
 
-        uint8_t  structured_state;
+	uint8_t structured_state;
 
 # define PROC_COMM_LEN 16
 	char comm[PROC_COMM_LEN];
@@ -1255,13 +1255,13 @@ printfd_pid(const char* field, struct tcb *tcp, pid_t pid, int fd)
 static inline void
 printfd(struct tcb *tcp, int fd)
 {
-  printfd_pid(NULL, tcp, tcp->pid, fd);
+	printfd_pid(NULL, tcp, tcp->pid, fd);
 }
 
 static inline void
 printfd_field(const char* field, struct tcb *tcp, int fd)
 {
-  printfd_pid(field, tcp, tcp->pid, fd);
+	printfd_pid(field, tcp, tcp->pid, fd);
 }
 
 static inline void
@@ -1305,9 +1305,8 @@ extern void printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd);
 
 /** Prints a PID specified in the tracee's PID namespace */
 extern void printpid(struct tcb *, int pid, enum pid_type type);
-extern void printpid_field(const char *s,
-                           struct tcb *,
-                           int pid, enum pid_type type); /* pidns.c */
+extern void printpid_field(const char *s, struct tcb *,
+		int pid, enum pid_type type); /* pidns.c */
 
 /**
  * Prints pid as a TGID if positive, and PGID if negative
@@ -1756,18 +1755,6 @@ extern struct structured_output* structured_output ;
 extern uint8_t get_tcp_state(void);
 extern void set_tcp_state(uint8_t state);
 
-
-/*
- * Sign-extend an unsigned integer type to long long.
- */
-# define sign_extend_unsigned_to_ll(v) \
-	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
-	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
-	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
-	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
-	 (long long) (v))
-
-
 /*
  * Staging output for status qualifier.
  */
@@ -1924,6 +1911,16 @@ truncate_kulong_to_current_klongsize(const kernel_ulong_t v)
 	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
+
+/*
+ * Sign-extend an unsigned integer type to long long.
+ */
+# define sign_extend_unsigned_to_ll(v) \
+	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
+	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
+	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
+	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
+	 (long long) (v))
 
 /*
  * Computes the popcount of a vector of 32-bit values.

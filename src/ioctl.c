@@ -29,10 +29,10 @@
  * So, let's redefine _IOC_SIZE in a way that is more suitable for us.
  */
 # undef _IOC_SIZE
-# define _IOC_SIZE(nr)					\
-	((_IOC_DIR(nr) & (_IOC_WRITE | _IOC_READ))	\
-	 ? (((nr) >> _IOC_SIZESHIFT) & _IOC_XSIZEMASK)	\
-	 : (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK))	\
+# define _IOC_SIZE(nr)						\
+	((_IOC_DIR(nr) & (_IOC_WRITE | _IOC_READ))		\
+		? (((nr) >> _IOC_SIZESHIFT) & _IOC_XSIZEMASK)	\
+		: (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK))	\
 	/* end of _IOC_SIZE definition */
 #endif
 
@@ -50,7 +50,7 @@ ioctl_lookup(const unsigned int code)
 	struct_ioctlent *iop;
 
 	iop = bsearch((const void *) (const uintptr_t) code, ioctlent,
-		      nioctlents, sizeof(ioctlent[0]), compare);
+			nioctlents, sizeof(ioctlent[0]), compare);
 	while (iop > ioctlent) {
 		iop--;
 		if (iop->code != code) {
@@ -107,7 +107,7 @@ evdev_decode_number(const unsigned int code)
 			printxval_ex(evdev_abs, nr - 0xc0,
 				     abbrev ? "ABS_???" : "",
 				     abbrev ? XLAT_STYLE_DEFAULT
-				     : XLAT_STYLE_ABBREV);
+					    : XLAT_STYLE_ABBREV);
 			tprint_arg_end();
 			return 1;
 		}
@@ -124,7 +124,7 @@ evdev_decode_number(const unsigned int code)
 			printxval_ex(evdev_ev, nr - 0x20,
 				     abbrev ? "EV_???" : "",
 				     abbrev ? XLAT_STYLE_DEFAULT
-				     : XLAT_STYLE_ABBREV);
+					    : XLAT_STYLE_ABBREV);
 		tprint_arg_next();
 		PRINT_VAL_U(_IOC_SIZE(code));
 		tprint_arg_end();
@@ -329,28 +329,28 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
  *              - the file descriptor is not valid (e.g. -1).
  *
  * @return There are two flags of the return value important for the purposes of
- *	   processing by SYS_FUNC(ioctl):
- *	    - RVAL_IOCTL_DECODED: indicates that ioctl decoder code
- *				  has printed arg parameter;
- *	    - RVAL_DECODED: indicates that decoding is done.
- *	   As a result, the following behaviour is expected:
- *	    - on entering:
- *	      - 0: decoding should be continued on exiting;
- *	      - RVAL_IOCTL_DECODED: decoding on exiting is not needed
- *				    and decoder has printed arg value;
- *	      - RVAL_DECODED: decoding on exiting is not needed
- *			      and generic handler should print arg value.
- *	    - on exiting:
- *	      - 0: generic handler should print arg value;
- *	      - RVAL_IOCTL_DECODED: decoder has printed arg value.
+ *         processing by SYS_FUNC(ioctl):
+ *          - RVAL_IOCTL_DECODED: indicates that ioctl decoder code
+ *                                has printed arg parameter;
+ *          - RVAL_DECODED: indicates that decoding is done.
+ *         As a result, the following behaviour is expected:
+ *          - on entering:
+ *            - 0: decoding should be continued on exiting;
+ *            - RVAL_IOCTL_DECODED: decoding on exiting is not needed
+ *                                  and decoder has printed arg value;
+ *            - RVAL_DECODED: decoding on exiting is not needed
+ *                            and generic handler should print arg value.
+ *          - on exiting:
+ *            - 0: generic handler should print arg value;
+ *            - RVAL_IOCTL_DECODED: decoder has printed arg value.
  *
- *	   Note that it makes no sense to return just RVAL_DECODED on exiting,
- *	   but, of course, it is not prohibited (for example, it may be useful
- *	   in cases where the return path is common on entering and on exiting
- *	   the syscall).
+ *         Note that it makes no sense to return just RVAL_DECODED on exiting,
+ *         but, of course, it is not prohibited (for example, it may be useful
+ *         in cases where the return path is common on entering and on exiting
+ *         the syscall).
  *
- *	   SYS_FUNC(ioctl) converts RVAL_IOCTL_DECODED flag to RVAL_DECODED,
- *	   and passes all other bits of ioctl_decode return value unchanged.
+ *         SYS_FUNC(ioctl) converts RVAL_IOCTL_DECODED flag to RVAL_DECODED,
+ *         and passes all other bits of ioctl_decode return value unchanged.
  */
 static int
 ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
