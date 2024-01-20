@@ -4,8 +4,8 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
- *		       Linux for s390 port by D.J. Barrow
- *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ *                     Linux for s390 port by D.J. Barrow
+ *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
  * Copyright (c) 1999-2022 The strace developers.
@@ -160,15 +160,15 @@ decode_regset(struct tcb *const tcp, const strace_iovec *iov,
 	      const unsigned int nt)
 {
 	switch (nt) {
-	case NT_PRSTATUS:
-		decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
-		break;
-	case NT_FPREGSET:
-		decode_fpregset(tcp, iov->iov_base, iov->iov_len);
-		break;
-	default:
-		printaddr(iov->iov_base);
-		break;
+		case NT_PRSTATUS:
+			decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
+			break;
+		case NT_FPREGSET:
+			decode_fpregset(tcp, iov->iov_base, iov->iov_len);
+			break;
+		default:
+			printaddr(iov->iov_base);
+			break;
 	}
 }
 
