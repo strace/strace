@@ -136,7 +136,7 @@ libstrace_a_SOURCES =	\
 	fstatfs.c \
 	fstatfs64.c \
 	futex.c		\
-	futex_waitv.c		\
+	futex2.c	\
 	gcc_compat.h	\
 	gen/gen_hdio.c	\
 	gen/generated.h	\
