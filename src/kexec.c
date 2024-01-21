@@ -74,7 +74,6 @@ SYS_FUNC(kexec_load)
 	tprint_arg_next();
 
 	/* flags */
-	tprint_flags_begin();
 	kernel_ulong_t n = tcp->u_arg[3];
 	tprint_flags_begin();
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");

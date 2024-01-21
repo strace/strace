@@ -2114,10 +2114,7 @@ ilog2_32(uint32_t val)
 static inline int
 printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
 {
-	tprint_flags_begin();
-	int r = printflags64_in(x, flags, dflt);
-	tprint_flags_end();
-	return r;
+	return printflags64_in(x, flags, dflt);
 }
 
 static inline int

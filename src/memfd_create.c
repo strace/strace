@@ -37,8 +37,6 @@ SYS_FUNC(memfd_create)
 	const unsigned int hugetlb_value = flags & mask;
 	flags &= ~mask;
 
-	tprint_flags_begin();
-
 	if (flags || !hugetlb_value)
 		printflags_ex(flags, "MFD_???", XLAT_STYLE_ABBREV,
 			      memfd_create_flags, NULL);
@@ -56,7 +54,6 @@ SYS_FUNC(memfd_create)
 		tprints_string("MFD_HUGE_SHIFT");
 		tprint_shift_end();
 	}
-	tprint_flags_end();
 
 	tprint_flags_end();
 
