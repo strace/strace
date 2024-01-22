@@ -428,7 +428,6 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 			print_xlat_val(flags, style);
 	}
 
-	tprint_flags_begin();
 	va_start(args, xlat);
 	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
 		for (size_t idx = 0; (flags || !n) && idx < xlat->size; ++idx) {
@@ -470,7 +469,6 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 				PRINT_VAL_U(0);
 		}
 	}
-	tprint_flags_end();
 
 	return n;
 }

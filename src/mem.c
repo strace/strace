@@ -56,7 +56,6 @@ SYS_FUNC(brk)
 static void
 print_mmap_flags(kernel_ulong_t flags)
 {
-	tprint_flags_begin();
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		PRINT_VAL_X(flags);
 
@@ -99,7 +98,6 @@ print_mmap_flags(kernel_ulong_t flags)
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
                 tprint_comment_end();
-	tprint_flags_end();
 }
 
 static void
@@ -120,7 +118,9 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 	tprint_arg_next();
 
 	/* prot */
+	tprint_flags_begin();
 	printflags64(mmap_prot, prot, "PROT_???");
+	tprint_flags_end();
 	tprint_arg_next();
 
 	/* flags */
