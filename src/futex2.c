@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 The strace developers.
+ * Copyright (c) 2021-2024 The strace developers.
  * Copyright (c) 2021 André Almeida <andrealmeid@collabora.com>
  * All rights reserved.
  *
@@ -9,6 +9,38 @@
 #include "defs.h"
 #include <linux/futex.h>
 #include "xlat/futex_waiter_flags.h"
+#include "xlat/futex2_sizes.h"
+#include "xlat/futex2_flags.h"
+
+static void
+print_futex2_flags(unsigned int flags)
+{
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		PRINT_VAL_X(flags);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprint_comment_begin();
+
+	tprint_flags_begin();
+
+	printxvals_ex(flags & FUTEX2_SIZE_MASK, NULL, XLAT_STYLE_ABBREV,
+		      futex2_sizes, NULL);
+	flags &= ~FUTEX2_SIZE_MASK;
+
+	if (flags) {
+		tprint_flags_or();
+		printflags_ex(flags, NULL, XLAT_STYLE_ABBREV,
+			      futex2_flags, NULL);
+	}
+
+	tprint_flags_end();
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+                tprint_comment_end();
+}
 
 struct print_waiter_data {
 	unsigned int count;
@@ -72,6 +104,31 @@ SYS_FUNC(futex_waitv)
 	print_timespec64(tcp, timeout);
 	tprint_arg_next();
 	printxval(clocknames, clockid, "CLOCK_???");
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(futex_wake)
+{
+	const kernel_ulong_t uaddr = tcp->u_arg[0];
+	const kernel_ulong_t mask = tcp->u_arg[1];
+	const int nr = tcp->u_arg[2];
+	const unsigned int flags = tcp->u_arg[3];
+
+	/* uaddr */
+	printaddr(uaddr);
+	tprint_arg_next();
+
+	/* mask */
+	printxval64(futexbitset, mask, NULL);
+	tprint_arg_next();
+
+	/* nr */
+	PRINT_VAL_D(nr);
+	tprint_arg_next();
+
+	/* flags */
+	print_futex2_flags(flags);
 
 	return RVAL_DECODED;
 }
