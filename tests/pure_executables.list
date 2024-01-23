@@ -138,6 +138,10 @@ ftruncate
 ftruncate64
 futex
 futex_waitv
+futex_wake
+futex_wake-Xabbrev
+futex_wake-Xraw
+futex_wake-Xverbose
 futimesat
 get_mempolicy
 getcpu

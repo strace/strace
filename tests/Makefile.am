@@ -54,6 +54,7 @@ libtests_a_SOURCES = \
 	errno2name.c \
 	error_msg.c \
 	fill_memory.c \
+	futex2_flags.h \
 	get_page_size.c \
 	get_sigset_size.c \
 	hexdump_strdup.c \
