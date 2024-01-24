@@ -39,3 +39,4 @@
 [BASE_NR + 452] = { 4,	TD|TF,		SEN(fchmodat2),			"fchmodat2"	},
 [BASE_NR + 453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},
 [BASE_NR + 454] = { 4,	0,		SEN(futex_wake),		"futex_wake"	},
+[BASE_NR + 455] = { 6,	0,		SEN(futex_wait),		"futex_wait"	},

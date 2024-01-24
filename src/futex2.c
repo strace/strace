@@ -132,3 +132,38 @@ SYS_FUNC(futex_wake)
 
 	return RVAL_DECODED;
 }
+
+SYS_FUNC(futex_wait)
+{
+	const kernel_ulong_t uaddr = tcp->u_arg[0];
+	const kernel_ulong_t val = tcp->u_arg[1];
+	const kernel_ulong_t mask = tcp->u_arg[2];
+	const unsigned int flags = tcp->u_arg[3];
+	const kernel_ulong_t timeout = tcp->u_arg[4];
+	const unsigned int clockid = tcp->u_arg[5];
+
+	/* uaddr */
+	printaddr(uaddr);
+	tprint_arg_next();
+
+	/* val */
+	PRINT_VAL_U(val);
+	tprint_arg_next();
+
+	/* mask */
+	printxval64(futexbitset, mask, NULL);
+	tprint_arg_next();
+
+	/* flags */
+	print_futex2_flags(flags);
+	tprint_arg_next();
+
+	/* timeout */
+	print_timespec64(tcp, timeout);
+	tprint_arg_next();
+
+	/* clockid */
+	printxval(clocknames, clockid, "CLOCK_???");
+
+	return RVAL_DECODED;
+}

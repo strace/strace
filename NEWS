@@ -3,7 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented -kk/--stack-traces=source option for libdw-based stack tracing.
-  * Implemented decoding of futex_wake syscall.
+  * Implemented decoding of futex_wake and futex_wait syscalls.
   * Updated lists of BPF_*, BTRFS_*, IORING_*, KVM_*, LANDLOCK_*, PR_*,
     and TCP_* constants.
   * Updated lists of ioctl commands from Linux 6.7.
