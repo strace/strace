@@ -3092,7 +3092,7 @@ init(int argc, char *argv[])
 	 * -p PID1,PID2: yes (there are already more than one pid)
 	 */
 	print_pid_pfx = outfname && !output_separately &&
-		((followfork && !output_separately) || nprocs > 1);
+		(followfork || nprocs > 1);
 }
 
 static struct tcb *
