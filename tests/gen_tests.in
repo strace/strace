@@ -211,6 +211,10 @@ fsync	-a10
 fsync-y -y -e trace=fsync
 ftruncate	-a24
 ftruncate64	-a36
+futex_wait
+futex_wait-Xabbrev	--trace=futex_wait -Xabbrev
+futex_wait-Xraw		--trace=futex_wait -Xraw
+futex_wait-Xverbose	--trace=futex_wait -Xverbose
 futex_waitv	-s256
 futex_wake
 futex_wake-Xabbrev	--trace=futex_wake -Xabbrev
