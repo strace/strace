@@ -40,3 +40,4 @@
 [BASE_NR + 453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},
 [BASE_NR + 454] = { 4,	0,		SEN(futex_wake),		"futex_wake"	},
 [BASE_NR + 455] = { 6,	0,		SEN(futex_wait),		"futex_wait"	},
+[BASE_NR + 456] = { 4,	0,		SEN(futex_requeue),		"futex_requeue"	},

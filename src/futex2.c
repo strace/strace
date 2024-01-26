@@ -167,3 +167,28 @@ SYS_FUNC(futex_wait)
 
 	return RVAL_DECODED;
 }
+
+SYS_FUNC(futex_requeue)
+{
+	const kernel_ulong_t waiters = tcp->u_arg[0];
+	const unsigned int flags = tcp->u_arg[1];
+	const int nr_wake = tcp->u_arg[2];
+	const int nr_requeue = tcp->u_arg[3];
+
+	/* waiters */
+	print_waiter_array(tcp, waiters, 2);
+	tprint_arg_next();
+
+	/* flags */
+	PRINT_VAL_X(flags);
+	tprint_arg_next();
+
+	/* nr_wake */
+	PRINT_VAL_D(nr_wake);
+	tprint_arg_next();
+
+	/* nr_requeue */
+	PRINT_VAL_D(nr_requeue);
+
+	return RVAL_DECODED;
+}
