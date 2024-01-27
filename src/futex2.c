@@ -8,7 +8,6 @@
 
 #include "defs.h"
 #include <linux/futex.h>
-#include "xlat/futex_waiter_flags.h"
 #include "xlat/futex2_sizes.h"
 #include "xlat/futex2_flags.h"
 
@@ -65,7 +64,7 @@ print_waiter(struct tcb * const tcp, void * const elem_buf,
 	PRINT_FIELD_ADDR64(*waiter, uaddr);
 
 	tprint_struct_next();
-	PRINT_FIELD_FLAGS(*waiter, flags, futex_waiter_flags, "FUTEX_???");
+	PRINT_FIELD_OBJ_VAL(*waiter, flags, print_futex2_flags);
 
 	if (waiter->__reserved) {
 		tprint_struct_next();
