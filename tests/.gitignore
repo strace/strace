@@ -192,6 +192,10 @@ fsync-y
 ftruncate
 ftruncate64
 futex
+futex_requeue
+futex_requeue-Xabbrev
+futex_requeue-Xraw
+futex_requeue-Xverbose
 futex_wait
 futex_wait-Xabbrev
 futex_wait-Xraw
