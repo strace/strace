@@ -11,7 +11,7 @@ Copyright (c) 1993 Ulrich Pegelow <pegelow@moorea.uni-muenster.de>
 Copyright (c) 1995, 1996 Michael Elizabeth Chastain <mec@duracef.shout.net>
 Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
 Copyright (c) 1998-2001 Wichert Akkerman <wakkerma@deephackmode.org>
-Copyright (c) 2001-2023 The strace developers.
+Copyright (c) 2001-2024 The strace developers.
 All rights reserved.
 
 strace is free software; you can redistribute it and/or modify it

@@ -1,6 +1,6 @@
 # Executables without side effects.
 #
-# Copyright (c) 2017-2023 The strace developers.
+# Copyright (c) 2017-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -137,7 +137,19 @@ fsync
 ftruncate
 ftruncate64
 futex
+futex_requeue
+futex_requeue-Xabbrev
+futex_requeue-Xraw
+futex_requeue-Xverbose
+futex_wait
+futex_wait-Xabbrev
+futex_wait-Xraw
+futex_wait-Xverbose
 futex_waitv
+futex_wake
+futex_wake-Xabbrev
+futex_wake-Xraw
+futex_wake-Xverbose
 futimesat
 get_mempolicy
 getcpu

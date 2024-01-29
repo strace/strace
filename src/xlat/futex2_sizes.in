@@ -1,0 +1,6 @@
+#unconditional
+#value_indexed
+FUTEX2_SIZE_U8		0
+FUTEX2_SIZE_U16		1
+FUTEX2_SIZE_U32		2
+FUTEX2_SIZE_U64		3

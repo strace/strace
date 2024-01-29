@@ -4,7 +4,7 @@
 # Copyright (c) 2006-2016 Dmitry V. Levin <ldv@strace.io>
 # Copyright (c) 2008-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
-# Copyright (c) 2002-2023 The strace developers.
+# Copyright (c) 2002-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
@@ -136,7 +136,7 @@ libstrace_a_SOURCES =	\
 	fstatfs.c \
 	fstatfs64.c \
 	futex.c		\
-	futex_waitv.c		\
+	futex2.c	\
 	gcc_compat.h	\
 	gen/gen_hdio.c	\
 	gen/generated.h	\

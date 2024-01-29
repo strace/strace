@@ -1,6 +1,6 @@
 # Input for gen_tests.sh
 #
-# Copyright (c) 2017-2023 The strace developers.
+# Copyright (c) 2017-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -211,7 +211,19 @@ fsync	-a10
 fsync-y -y -e trace=fsync
 ftruncate	-a24
 ftruncate64	-a36
+futex_requeue
+futex_requeue-Xabbrev	--trace=futex_requeue -Xabbrev
+futex_requeue-Xraw		--trace=futex_requeue -Xraw
+futex_requeue-Xverbose	--trace=futex_requeue -Xverbose
+futex_wait
+futex_wait-Xabbrev	--trace=futex_wait -Xabbrev
+futex_wait-Xraw		--trace=futex_wait -Xraw
+futex_wait-Xverbose	--trace=futex_wait -Xverbose
 futex_waitv	-s256
+futex_wake
+futex_wake-Xabbrev	--trace=futex_wake -Xabbrev
+futex_wake-Xraw		--trace=futex_wake -Xraw -a34
+futex_wake-Xverbose	--trace=futex_wake -Xverbose
 futimesat	-a28
 get_mempolicy	-s3 -a38
 getcpu	-a25

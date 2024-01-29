@@ -1,7 +1,7 @@
 /*
  * Check decoding of futex_waitv syscall.
  *
- * Copyright (c) 2015-2022 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2015-2024 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -65,8 +65,8 @@ main(void)
 	printf("futex_waitv([{val=%#llx, uaddr=NULL, flags=%s|%#x"
 	       ", __reserved=%#x}], 1, 0, NULL, CLOCK_MONOTONIC) = %s\n",
 	       (unsigned long long) waiter->val,
-	       "FUTEX_32|FUTEX_PRIVATE_FLAG",
-	       waiter->flags & ~(FUTEX_32|FUTEX_PRIVATE_FLAG),
+	       "FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_PRIVATE",
+	       waiter->flags & ~(FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_PRIVATE),
 	       waiter->__reserved, errstr);
 
 	waiter->val = 0xdeadbeeffacefeedULL;
@@ -74,31 +74,31 @@ main(void)
 	waiter->flags = 0;
 	waiter->__reserved = 0;
 	k_futex_waitv(waiter, 1, 0, 0, 2);
-	printf("futex_waitv([{val=%#llx, uaddr=%#llx, flags=0}], 1, 0, NULL"
-	       ", CLOCK_PROCESS_CPUTIME_ID) = %s\n",
+	printf("futex_waitv([{val=%#llx, uaddr=%#llx, flags=FUTEX2_SIZE_U8}]"
+	       ", 1, 0, NULL, CLOCK_PROCESS_CPUTIME_ID) = %s\n",
 	       (unsigned long long) waiter->val,
 	       (unsigned long long) waiter->uaddr,
 	       errstr);
 
 	waiter->val = 0;
 	waiter->uaddr = (uintptr_t) futex;
-	waiter->flags = FUTEX_PRIVATE_FLAG;
+	waiter->flags = FUTEX2_PRIVATE;
 	k_futex_waitv(waiter, 1, 0, 0, 0);
 	printf("futex_waitv([{val=0, uaddr=%p, flags=%s}], 1, 0, NULL"
 	       ", CLOCK_REALTIME) = %s\n",
-	       futex, "FUTEX_PRIVATE_FLAG", errstr);
+	       futex, "FUTEX2_SIZE_U8|FUTEX2_PRIVATE", errstr);
 
-	waiter->flags = FUTEX_32;
+	waiter->flags = FUTEX2_SIZE_U32;
 	k_futex_waitv(waiter, 2, 0, 0, 1);
 	printf("futex_waitv([{val=0, uaddr=%p, flags=%s}, ... /* %p */], 2, 0, NULL"
 	       ", CLOCK_MONOTONIC) = %s\n",
-	       futex, "FUTEX_32", waiter + 1, errstr);
+	       futex, "FUTEX2_SIZE_U32", waiter + 1, errstr);
 
-	waiter->flags = FUTEX_32|FUTEX_PRIVATE_FLAG;
+	waiter->flags = FUTEX2_SIZE_U32|FUTEX2_PRIVATE;
 	k_futex_waitv(waiter, 1, 0, ts, 1);
 	printf("futex_waitv([{val=0, uaddr=%p, flags=%s}], 1, 0"
 	       ", {tv_sec=1, tv_nsec=2}, CLOCK_MONOTONIC) = %s\n",
-	       futex, "FUTEX_32|FUTEX_PRIVATE_FLAG", errstr);
+	       futex, "FUTEX2_SIZE_U32|FUTEX2_PRIVATE", errstr);
 
 	unsigned int nr = FUTEX_WAITV_MAX + 1;
 	uint32_t * const futexes = tail_alloc(nr * sizeof(*futexes));
@@ -107,7 +107,7 @@ main(void)
 		futexes[i] = i;
 		waiters[i].val = i;
 		waiters[i].uaddr = (uintptr_t) &futexes[i];
-		waiters[i].flags = FUTEX_32|FUTEX_PRIVATE_FLAG;
+		waiters[i].flags = FUTEX2_SIZE_U32|FUTEX2_PRIVATE;
 		waiters[i].__reserved = 0;
 	}
 	k_futex_waitv(waiters, nr, 0, ts, 1);
@@ -115,7 +115,7 @@ main(void)
 	for (unsigned int i = 0; i < FUTEX_WAITV_MAX; ++i) {
 		printf("%s{val=%#x, uaddr=%p, flags=%s}",
 		       i ? ", " : "",
-		       i, &futexes[i], "FUTEX_32|FUTEX_PRIVATE_FLAG");
+		       i, &futexes[i], "FUTEX2_SIZE_U32|FUTEX2_PRIVATE");
 	}
 	printf(", ...], %u, 0, {tv_sec=1, tv_nsec=2}, CLOCK_MONOTONIC) = %s\n",
 	       nr, errstr);
@@ -126,7 +126,7 @@ main(void)
 	for (unsigned int i = 0; i < FUTEX_WAITV_MAX; ++i) {
 		printf("%s{val=%#x, uaddr=%p, flags=%s}",
 		       i ? ", " : "",
-		       i + 1, &futexes[i + 1], "FUTEX_32|FUTEX_PRIVATE_FLAG");
+		       i + 1, &futexes[i + 1], "FUTEX2_SIZE_U32|FUTEX2_PRIVATE");
 	}
 	printf("], %u, 0, {tv_sec=1, tv_nsec=2}, CLOCK_MONOTONIC) = %s\n",
 	       nr, errstr);

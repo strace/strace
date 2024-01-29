@@ -146,6 +146,10 @@ main(void)
 		register_struct->ioctls &= ~(1ull<<_UFFDIO_WAKE|
 					    1ull<<_UFFDIO_COPY|
 					    1ull<<_UFFDIO_ZEROPAGE);
+		if (register_struct->ioctls & (1ull<<_UFFDIO_POISON)) {
+			printf("|1<<_UFFDIO_POISON");
+			register_struct->ioctls &= ~(1ull<<_UFFDIO_POISON);
+		}
 		if (register_struct->ioctls)
 			printf("|%#" PRIx64, (uint64_t)register_struct->ioctls);
 	}
