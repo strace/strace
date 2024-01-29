@@ -26,14 +26,14 @@ jobs:
 
       - id: ShellCheck
         name: Differential ShellCheck
-        uses: redhat-plumbers-in-action/differential-shellcheck@v4
+        uses: redhat-plumbers-in-action/differential-shellcheck@v5
         with:
           severity: warning
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - if: ${{ always() }}
         name: Upload artifact with ShellCheck defects in SARIF format
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Differential ShellCheck SARIF
           path: ${{ steps.ShellCheck.outputs.sarif }}
