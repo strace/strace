@@ -1526,7 +1526,7 @@ main(int argc, char *argv[])
 	       ")" RETVAL, XLAT_ARGS(KDFONTOP));
 
 	cfo->op = 0xbeefface;
-	cfo->flags = 0x5a1ecafe;;
+	cfo->flags = 0x5a1ecafe;
 	cfo->data = (unsigned char *) cfo;
 	sys_ioctl(-1, KDFONTOP, (uintptr_t) cfo);
 	printf("ioctl(-1, " XLAT_FMT ", {op=0xbeefface"
