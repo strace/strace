@@ -74,7 +74,7 @@ main(void)
 
 	/* COUNTER_ADD_WATCH_IOCTL */
 	static const struct {
-		struct counter_watch val;;
+		struct counter_watch val;
 		const char *str;
 	} watches[] = {
 		{ { { 0 } },
