@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of BPF_* constants.
+  * Updated lists of BPF_* and KEXEC_* constants.
 
 Noteworthy changes in release 6.7 (2024-01-29)
 ==============================================
