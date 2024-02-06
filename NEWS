@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of BPF_*, KEXEC_*, KVM_*, PERF_*, SOL_*, and STATX_*
+  * Updated lists of BPF_*, KEXEC_*, KVM_*, PERF_*, SOL_*, STATX_*, and UFFD_*
     constants.
 
 Noteworthy changes in release 6.7 (2024-01-29)
