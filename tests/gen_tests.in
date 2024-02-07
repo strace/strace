@@ -8,6 +8,7 @@
 _newselect
 _newselect-P	 -e trace=_newselect -P /dev/full 9>>/dev/full
 accept	-a22
+accept@json	-e trace=accept
 accept4	-a37
 access	-a30 --trace-path=access_sample
 access--secontext	-a30 --secontext --trace-path=access_sample -e trace=access

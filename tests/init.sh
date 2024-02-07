@@ -135,6 +135,11 @@ run_strace()
 {
 	> "$LOG" || fail_ "failed to write $LOG"
 	args="$*"
+
+	if [[ $ME_ =~ *_json ]]; then
+		args="-Bjson $args"
+	fi
+
 	$STRACE -o "$LOG" "$@" ||
 		dump_log_and_fail_with "$STRACE $args failed with code $?"
 }
