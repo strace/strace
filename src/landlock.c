@@ -13,16 +13,17 @@
 #include "xlat/landlock_create_ruleset_flags.h"
 #include "xlat/landlock_rule_types.h"
 #include "xlat/landlock_ruleset_access_fs.h"
+#include "xlat/landlock_ruleset_access_net.h"
 
 static void
 print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 			    const kernel_ulong_t size)
 {
-	struct landlock_ruleset_attr attr;
+	struct landlock_ruleset_attr attr = { 0 };
 	const size_t min_attr_size =
 		offsetofend(typeof(attr), handled_access_fs);
 	const size_t max_attr_size =
-		offsetofend(typeof(attr), handled_access_fs);
+		offsetofend(typeof(attr), handled_access_net);
 
 	if (size < min_attr_size) {
 		printaddr(addr);
@@ -35,6 +36,13 @@ print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(attr, handled_access_fs, landlock_ruleset_access_fs,
 			  "LANDLOCK_ACCESS_FS_???");
+
+	if (size > min_attr_size) {
+		tprint_arg_next();
+		PRINT_FIELD_FLAGS(attr, handled_access_net,
+				  landlock_ruleset_access_net,
+				  "LANDLOCK_ACCESS_NET_???");
+	}
 
 	if (size > max_attr_size) {
 		tprint_arg_next();
