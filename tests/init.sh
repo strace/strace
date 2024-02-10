@@ -280,6 +280,13 @@ match_grep()
 # Usage: run_strace_match_diff [args to run_strace]
 run_strace_match_diff()
 {
+	case $ME_ in
+		*@json*)
+			if ! type -p python; then
+				skip_ "Cannot validate JSON output without python"
+			fi ;;
+	esac
+
 	local sed_cmd prog_args
 	prog_args="../$NAME"
 	sed_cmd='p'
@@ -319,8 +326,16 @@ run_strace_match_diff()
 
 	run_prog > /dev/null
 	args="$prog_args"
-	run_strace "$@" $args > "$EXP"
-	sed -n "$sed_cmd" < "$LOG" > "$OUT"
+
+	case $ME_ in
+		*@json*)
+			run_strace "$@" $args | python -m json.tool > "$EXP";
+			sed -n "$sed_cmd" < "$LOG" | python -m json.tool > "$OUT" ;;
+		*)
+			run_strace "$@" $args > "$EXP"
+			sed -n "$sed_cmd" < "$LOG" > "$OUT" ;;
+	esac
+
 	match_diff "$OUT" "$EXP"
 }
 
