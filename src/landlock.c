@@ -90,6 +90,22 @@ print_landlock_path_beneath_attr(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_end();
 }
 
+static void
+print_landlock_net_port_attr(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct landlock_net_port_attr attr;
+
+	if (umove_or_printaddr(tcp, addr, &attr))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(attr, allowed_access, landlock_ruleset_access_net,
+			  "LANDLOCK_ACCESS_NET_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, port);
+	tprint_struct_end();
+}
+
 SYS_FUNC(landlock_add_rule)
 {
 	unsigned int rule_type = tcp->u_arg[1];
@@ -106,6 +122,10 @@ SYS_FUNC(landlock_add_rule)
 	switch (rule_type) {
 	case LANDLOCK_RULE_PATH_BENEATH:
 		print_landlock_path_beneath_attr(tcp, tcp->u_arg[2]);
+		break;
+
+	case LANDLOCK_RULE_NET_PORT:
+		print_landlock_net_port_attr(tcp, tcp->u_arg[2]);
 		break;
 
 	default:
