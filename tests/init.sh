@@ -282,7 +282,7 @@ run_strace_match_diff()
 {
 	case $ME_ in
 		*@json*)
-			if ! type -p python; then
+			if ! python --version; then
 				skip_ "Cannot validate JSON output without python"
 			fi ;;
 	esac
