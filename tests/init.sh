@@ -136,11 +136,12 @@ run_strace()
 	> "$LOG" || fail_ "failed to write $LOG"
 	args="$*"
 
+	STRUCTURE=
 	case $ME_ in *@json*)
-		args="-B json $args" ;;
+		STRUCTURE="-B json" ;;
 	esac
 
-	$STRACE -o "$LOG" $args ||
+	$STRACE -o "$LOG" $STRUCTURE "$@" ||
 		dump_log_and_fail_with "$STRACE $args failed with code $?"
 }
 
