@@ -64,7 +64,8 @@ main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct landlock_path_beneath_attr, attr);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct landlock_path_beneath_attr, attr_path);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct landlock_net_port_attr, attr_port);
 
 	/* All zeroes */
 	sys_landlock_add_rule(0, 0, NULL, 0);
@@ -72,39 +73,45 @@ main(void)
 	       ", NULL, 0) = %s\n", errstr);
 
 	/* Bogus values */
-	sys_landlock_add_rule(0xdeadc0de, 0xfacebeef, attr + 1, 1);
+	sys_landlock_add_rule(0xdeadc0de, 0xfacebeef, attr_path + 1, 1);
 	printf("landlock_add_rule(-559038242"
 	       ", 0xfacebeef /* LANDLOCK_RULE_??? */, %p, 0x1) = %s\n",
-	       attr + 1, errstr);
+	       attr_path + 1, errstr);
 
-	sys_landlock_add_rule(1729, 3, attr + 1, 0xffffffff);
+	sys_landlock_add_rule(1729, 3, attr_path + 1, 0xffffffff);
 	printf("landlock_add_rule(1729, 0x3 /* LANDLOCK_RULE_??? */, %p"
 	       ", 0xffffffff) = %s\n",
-	       attr + 1, errstr);
+	       attr_path + 1, errstr);
 
 	/* Invalid pointer */
 	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_PATH_BENEATH,
-			      attr + 1, 0);
+			      attr_path + 1, 0);
 	printf("landlock_add_rule(" RULESET_FD_STR
 	       ", LANDLOCK_RULE_PATH_BENEATH, %p, 0) = %s\n",
-	       attr + 1, errstr);
+	       attr_path + 1, errstr);
 
 	/* Short read */
 	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_NET_PORT,
-			      (char *) attr + 4, 0);
+			      (char *) attr_port + 4, 0);
 	printf("landlock_add_rule(" RULESET_FD_STR
 	       ", LANDLOCK_RULE_NET_PORT, %p, 0) = %s\n",
-	       (char *) attr + 4, errstr);
+	       (char *) attr_port + 4, errstr);
 
 	/* Valid attr ptr */
 	static const struct {
 		uint64_t val;
 		const char *str;
-	} attr_vals[] = {
+	} fs_vals[] = {
 		{ ARG_STR(LANDLOCK_ACCESS_FS_EXECUTE) },
 		{ ARG_ULL_STR(LANDLOCK_ACCESS_FS_EXECUTE|LANDLOCK_ACCESS_FS_READ_FILE|LANDLOCK_ACCESS_FS_READ_DIR|LANDLOCK_ACCESS_FS_REMOVE_FILE|LANDLOCK_ACCESS_FS_MAKE_CHAR|LANDLOCK_ACCESS_FS_MAKE_DIR|LANDLOCK_ACCESS_FS_MAKE_SOCK|LANDLOCK_ACCESS_FS_MAKE_FIFO|LANDLOCK_ACCESS_FS_MAKE_BLOCK|LANDLOCK_ACCESS_FS_MAKE_SYM|LANDLOCK_ACCESS_FS_REFER|LANDLOCK_ACCESS_FS_TRUNCATE|0xdebeefeddeca8000) },
 		{ ARG_ULL_STR(0xdebeefeddeca8000)
 			" /* LANDLOCK_ACCESS_FS_??? */" },
+	}, net_vals[] = {
+		{ ARG_STR(LANDLOCK_ACCESS_NET_BIND_TCP) },
+		{ ARG_STR(LANDLOCK_ACCESS_NET_CONNECT_TCP) },
+		{ ARG_ULL_STR(LANDLOCK_ACCESS_NET_BIND_TCP|LANDLOCK_ACCESS_NET_CONNECT_TCP|0xfffffffffffffffc) },
+		{ ARG_ULL_STR(0xfffffffffffffffc)
+			" /* LANDLOCK_ACCESS_NET_??? */" },
 	};
 	static const struct {
 		int val;
@@ -114,17 +121,33 @@ main(void)
 		{ ARG_STR(11630) },
 		{ PARENT_FD, PARENT_FD_STR },
 	};
-	for (size_t i = 0; i < ARRAY_SIZE(attr_vals); i++) {
+	static const unsigned long long port_vals[] = {
+		0, 0xffff, 0xfacefeeddeadbeefULL
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(fs_vals); i++) {
 		for (size_t j = 0; j < ARRAY_SIZE(parent_fd_vals); j++) {
-			attr->allowed_access = attr_vals[i].val;
-			attr->parent_fd = parent_fd_vals[j].val;
+			attr_path->allowed_access = fs_vals[i].val;
+			attr_path->parent_fd = parent_fd_vals[j].val;
 			sys_landlock_add_rule(RULESET_FD,
 					      LANDLOCK_RULE_PATH_BENEATH,
-					      attr, 0);
+					      attr_path, 0);
 			printf("landlock_add_rule(" RULESET_FD_STR
 			       ", LANDLOCK_RULE_PATH_BENEATH"
 			       ", {allowed_access=%s, parent_fd=%s}, 0) = %s\n",
-			       attr_vals[i].str, parent_fd_vals[j].str, errstr);
+			       fs_vals[i].str, parent_fd_vals[j].str, errstr);
+		}
+	}
+	for (size_t i = 0; i < ARRAY_SIZE(net_vals); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(port_vals); j++) {
+			attr_port->allowed_access = net_vals[i].val;
+			attr_port->port = (uint64_t) port_vals[j];
+			sys_landlock_add_rule(RULESET_FD,
+					      LANDLOCK_RULE_NET_PORT,
+					      attr_port, 0);
+			printf("landlock_add_rule(" RULESET_FD_STR
+			       ", LANDLOCK_RULE_NET_PORT"
+			       ", {allowed_access=%s, port=%llu}, 0) = %s\n",
+			       net_vals[i].str, port_vals[j], errstr);
 		}
 	}
 

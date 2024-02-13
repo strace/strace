@@ -180,11 +180,15 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 			const unsigned int len,
 			const void *const opaque_data)
 {
-	struct smcd_diag_dmbinfo dinfo;
+	struct smcd_diag_dmbinfo dinfo = { 0 };
+	const unsigned int min_size =
+		offsetofend(struct smcd_diag_dmbinfo, peer_token);
+	const unsigned int max_size =
+		offsetofend(struct smcd_diag_dmbinfo, my_gid_ext);
 
-	if (len < sizeof(dinfo))
+	if (len < min_size)
 		return false;
-	if (umove_or_printaddr(tcp, addr, &dinfo))
+	if (umoven_or_printaddr(tcp, addr, MIN(len, max_size), &dinfo))
 		return true;
 
 	tprint_struct_begin();
@@ -197,10 +201,17 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 	PRINT_FIELD_X(dinfo, token);
 	tprint_struct_next();
 	PRINT_FIELD_X(dinfo, peer_token);
+	if (len > min_size) {
+		tprint_struct_next();
+		PRINT_FIELD_X(dinfo, peer_gid_ext);
+		tprint_struct_next();
+		PRINT_FIELD_X(dinfo, my_gid_ext);
+	}
 	tprint_struct_end();
 
 	return true;
 }
+
 static bool
 decode_smc_diag_fallback(struct tcb *const tcp,
 			 const kernel_ulong_t addr,

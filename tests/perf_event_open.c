@@ -431,7 +431,8 @@ end:
 	"PERF_SAMPLE_BRANCH_NO_CYCLES|" \
 	"PERF_SAMPLE_BRANCH_TYPE_SAVE|" \
 	"PERF_SAMPLE_BRANCH_HW_INDEX|" \
-	"PERF_SAMPLE_BRANCH_PRIV_SAVE"
+	"PERF_SAMPLE_BRANCH_PRIV_SAVE|" \
+	"PERF_SAMPLE_BRANCH_COUNTERS"
 
 int
 main(void)
@@ -571,11 +572,11 @@ main(void)
 	static const struct u64_val_str branch_sample_types[] = {
 		{ ARG_STR(0) },
 		{ 0x80, "PERF_SAMPLE_BRANCH_ABORT_TX" },
-		{ 0x7ffff, BRANCH_TYPE_ALL },
-		{ ARG_ULL_STR(0xdeadcaffeee80000)
+		{ 0xfffff, BRANCH_TYPE_ALL },
+		{ ARG_ULL_STR(0xdeadcaffeee00000)
 			" /* PERF_SAMPLE_BRANCH_??? */" },
 		{ 0xffffffffffffffffULL,
-			BRANCH_TYPE_ALL "|0xfffffffffff80000" }
+			BRANCH_TYPE_ALL "|0xfffffffffff00000" }
 	};
 	static const struct s32_val_str clockids[] = {
 		{ 11, "CLOCK_TAI" },

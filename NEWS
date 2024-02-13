@@ -2,6 +2,11 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Updated decoding of landlock_create_ruleset and landlock_add_rule syscalls.
+  * Updated decoding of SMC_DIAG_DMBINFO netlink attribute.
+  * Updated decoding of UBI_IOCATT ioctl command.
+  * Updated lists of BPF_*, KEXEC_*, KVM_*, PERF_*, SOL_*, STATX_*, UFFD_*,
+    and V4L2_* constants.
 
 Noteworthy changes in release 6.7 (2024-01-29)
 ==============================================

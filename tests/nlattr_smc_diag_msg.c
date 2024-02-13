@@ -230,6 +230,10 @@ int main(void)
 			   PRINT_FIELD_X(dinfo, token);
 			   printf(", ");
 			   PRINT_FIELD_X(dinfo, peer_token);
+			   printf(", ");
+			   PRINT_FIELD_X(dinfo, peer_gid_ext);
+			   printf(", ");
+			   PRINT_FIELD_X(dinfo, my_gid_ext);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

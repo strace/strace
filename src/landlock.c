@@ -13,16 +13,17 @@
 #include "xlat/landlock_create_ruleset_flags.h"
 #include "xlat/landlock_rule_types.h"
 #include "xlat/landlock_ruleset_access_fs.h"
+#include "xlat/landlock_ruleset_access_net.h"
 
 static void
 print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 			    const kernel_ulong_t size)
 {
-	struct landlock_ruleset_attr attr;
+	struct landlock_ruleset_attr attr = { 0 };
 	const size_t min_attr_size =
 		offsetofend(typeof(attr), handled_access_fs);
 	const size_t max_attr_size =
-		offsetofend(typeof(attr), handled_access_fs);
+		offsetofend(typeof(attr), handled_access_net);
 
 	if (size < min_attr_size) {
 		printaddr(addr);
@@ -35,6 +36,13 @@ print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(attr, handled_access_fs, landlock_ruleset_access_fs,
 			  "LANDLOCK_ACCESS_FS_???");
+
+	if (size > min_attr_size) {
+		tprint_arg_next();
+		PRINT_FIELD_FLAGS(attr, handled_access_net,
+				  landlock_ruleset_access_net,
+				  "LANDLOCK_ACCESS_NET_???");
+	}
 
 	if (size > max_attr_size) {
 		tprint_arg_next();
@@ -82,6 +90,22 @@ print_landlock_path_beneath_attr(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_end();
 }
 
+static void
+print_landlock_net_port_attr(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct landlock_net_port_attr attr;
+
+	if (umove_or_printaddr(tcp, addr, &attr))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(attr, allowed_access, landlock_ruleset_access_net,
+			  "LANDLOCK_ACCESS_NET_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, port);
+	tprint_struct_end();
+}
+
 SYS_FUNC(landlock_add_rule)
 {
 	unsigned int rule_type = tcp->u_arg[1];
@@ -98,6 +122,10 @@ SYS_FUNC(landlock_add_rule)
 	switch (rule_type) {
 	case LANDLOCK_RULE_PATH_BENEATH:
 		print_landlock_path_beneath_attr(tcp, tcp->u_arg[2]);
+		break;
+
+	case LANDLOCK_RULE_NET_PORT:
+		print_landlock_net_port_attr(tcp, tcp->u_arg[2]);
 		break;
 
 	default:

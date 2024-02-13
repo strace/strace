@@ -649,7 +649,7 @@ print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check,
 	       ", insns=" INSNS_FMT ", license=\"%s\", log_level=2718281828"
 	       ", log_size=%u, log_buf=%p"
 	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
-	       ", prog_flags=0x20 /* BPF_F_??? */"
+	       ", prog_flags=0x100 /* BPF_F_??? */"
 	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=3203399405",
 	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG, license,
 	       log_buf_size, get_log_buf_tail());
@@ -678,7 +678,9 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check,
 	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=BPF_F_STRICT_ALIGNMENT|BPF_F_ANY_ALIGNMENT"
 	       "|BPF_F_TEST_RND_HI32|BPF_F_TEST_STATE_FREQ|BPF_F_SLEEPABLE"
-	       "|0x20, prog_name=\"0123456789abcde\"..., prog_ifindex=%s"
+	       "|BPF_F_XDP_HAS_FRAGS|BPF_F_XDP_DEV_BOUND_ONLY"
+	       "|BPF_F_TEST_REG_INVARIANTS|0x100"
+	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s"
 	       ", expected_attach_type=BPF_CGROUP_INET6_BIND",
 	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
 	       license, IFINDEX_LO_STR);
@@ -743,7 +745,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.log_level = 2718281828U,
 			.log_size = log_buf_size,
 			.kern_version = 0xcafef00d,
-			.prog_flags = 32,
+			.prog_flags = 0x100,
 			.prog_name = "0123456789abcdef",
 			.prog_ifindex = 0xbeeffeed,
 		} },
@@ -758,7 +760,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.log_level = 2718281828U,
 			.log_size = 4,
 			.kern_version = 0xcafef00d,
-			.prog_flags = 0x3f,
+			.prog_flags = 0x1ff,
 			.prog_name = "0123456789abcdef",
 			.expected_attach_type = 9,
 		} },

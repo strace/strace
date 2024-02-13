@@ -41,6 +41,10 @@ SOL_NFC		280
 SOL_KCM		281
 SOL_TLS		282
 SOL_XDP		283
+SOL_MPTCP	284
+SOL_MCTP	285
+SOL_SMC		286
+SOL_VSOCK	287
 #if defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__
 SOL_SOCKET	0xffff
 #endif
