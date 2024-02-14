@@ -327,14 +327,15 @@ run_strace_match_diff()
 
 	run_prog > /dev/null
 	args="$prog_args"
+	run_strace "$@" $args > "$EXP"
+	sed -n "$sed_cmd" < "$LOG" > "$OUT"
 
 	case $ME_ in
 		*@json*)
-			run_strace "$@" $args | python -m json.tool > "$EXP";
-			sed -n "$sed_cmd" < "$LOG" | python -m json.tool > "$OUT" ;;
-		*)
-			run_strace "$@" $args > "$EXP"
-			sed -n "$sed_cmd" < "$LOG" > "$OUT" ;;
+			cp "$EXP" "$EXP.raw"
+			cp "$OUT" "$OUT.raw"
+			python -m json.tool "$EXP.raw" "$EXP";
+			python -m json.tool "$OUT.raw" "$OUT" ;;
 	esac
 
 	match_diff "$OUT" "$EXP"
