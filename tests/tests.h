@@ -464,7 +464,7 @@ f8ill_ptr_to_kulong(const void *const ptr)
 
 /* Sign-extend an unsigned integer type to long long. */
 # define sign_extend_unsigned_to_ll(v) \
-	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
+	(sizeof(v) == sizeof(char) ? (long long) (signed char) (v) : \
 	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
 	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
