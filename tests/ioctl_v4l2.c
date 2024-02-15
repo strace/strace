@@ -793,6 +793,42 @@ main(void)
 	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_DQBUF), p_v4l2_buffer->type);
 
+#ifdef KERNEL_V4L2_HAVE_TIME32
+	/* VIDIOC_QUERYBUF_TIME32 */
+	ioctl(-1, VIDIOC_QUERYBUF_TIME32, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_QUERYBUF_TIME32));
+
+	kernel_v4l2_buffer_time32_t *const p_v4l2_buffer_time32 =
+		page_end - sizeof(*p_v4l2_buffer_time32);
+	ioctl(-1, VIDIOC_QUERYBUF_TIME32, p_v4l2_buffer_time32);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       ", index=%u})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_QUERYBUF_TIME32),
+	       p_v4l2_buffer_time32->type, p_v4l2_buffer_time32->index);
+
+	/* VIDIOC_QBUF_TIME32 */
+	ioctl(-1, VIDIOC_QBUF_TIME32, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_QBUF_TIME32));
+
+	ioctl(-1, VIDIOC_QBUF_TIME32, p_v4l2_buffer_time32);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       ", index=%u})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_QBUF_TIME32),
+	       p_v4l2_buffer_time32->type, p_v4l2_buffer_time32->index);
+
+	/* VIDIOC_DQBUF_TIME32 */
+	ioctl(-1, VIDIOC_DQBUF_TIME32, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_DQBUF_TIME32));
+
+	ioctl(-1, VIDIOC_DQBUF_TIME32, p_v4l2_buffer_time32);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_DQBUF_TIME32), p_v4l2_buffer_time32->type);
+#endif
+
 	/* VIDIOC_G_FBUF */
 	ioctl(-1, VIDIOC_G_FBUF, 0);
 	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,

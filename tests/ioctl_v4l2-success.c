@@ -272,6 +272,138 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 	}
 }
 
+#ifdef KERNEL_V4L2_HAVE_TIME32
+static void
+test_v4l2_buffer_time32(long inject_retval) {
+	static const struct strval32 buf_cmds[] = {
+		{ ARG_STR(VIDIOC_QUERYBUF_TIME32) },
+		{ ARG_STR(VIDIOC_QBUF_TIME32) },
+		{ ARG_STR(VIDIOC_DQBUF_TIME32) },
+	};
+
+	kernel_v4l2_buffer_time32_t *buf = tail_alloc(sizeof(*buf));
+
+	for (size_t i = 0; i < ARRAY_SIZE(buf_cmds); i++) {
+		ioctl(-1, buf_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, buf_cmds[i].val, (char *) buf + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       (char *) buf + 1, inject_retval);
+
+		fill_memory(buf, sizeof(*buf));
+		buf->index     = 0xdeadc0de;
+		buf->type      = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		buf->bytesused = 0xdecaffee;
+		buf->flags     = 0x1ff; /* TODO: update */
+		buf->field     = V4L2_FIELD_TOP;
+
+		buf->timestamp.tv_sec  = 0x1e55c0de;
+		buf->timestamp.tv_usec = 999999;
+
+		buf->timecode.type = V4L2_TC_TYPE_24FPS;
+		buf->timecode.flags = 0xbeefdeaf;
+
+		buf->memory    = V4L2_MEMORY_MMAP;
+		buf->m.offset  = 0xfacefeed;
+		buf->length    = 0xcafebed5;
+		buf->reserved  = 0xdeefaced;
+
+		ioctl(-1, buf_cmds[i].val, buf);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0x1, "V4L2_BUF_TYPE_VIDEO_CAPTURE")
+		       ", index=3735929054, memory="
+		       XLAT_KNOWN(0x1, "V4L2_MEMORY_MMAP")
+		       ", m.offset=0xfacefeed, length=3405692629"
+		       ", bytesused=3737845742, flags=" RAW("0x1ff")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0x1ff, "V4L2_BUF_FLAG_MAPPED"
+		       "|V4L2_BUF_FLAG_QUEUED|V4L2_BUF_FLAG_DONE"
+		       "|V4L2_BUF_FLAG_KEYFRAME|V4L2_BUF_FLAG_PFRAME"
+		       "|V4L2_BUF_FLAG_BFRAME|V4L2_BUF_FLAG_ERROR"
+		       "|V4L2_BUF_FLAG_IN_REQUEST|V4L2_BUF_FLAG_TIMECODE") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
+#endif
+		       "%s, ...}) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32
+			? ", timestamp={tv_sec=508936414, tv_usec=999999}" : "",
+		       inject_retval);
+
+		buf->type      = V4L2_BUF_TYPE_VBI_CAPTURE;
+		buf->flags     = 0x268040;
+		buf->field     = 0xb;
+		buf->memory    = V4L2_MEMORY_USERPTR;
+		buf->m.userptr = (long) 0xdefaced0dec0ded1LL;
+
+		ioctl(-1, buf_cmds[i].val, buf);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0x4, "V4L2_BUF_TYPE_VBI_CAPTURE")
+		       ", index=3735929054, memory="
+		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
+		       ", m.userptr=%p, length=3405692629"
+		       ", bytesused=3737845742, flags=" RAW("0x268040")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0x200040, "V4L2_BUF_FLAG_ERROR|0x200000") "|"
+		       XLAT_UNKNOWN(0x8000, "V4L2_BUF_FLAG_TIMESTAMP_???") "|"
+		       XLAT_UNKNOWN(0x60000, "V4L2_BUF_FLAG_TSTAMP_SRC_???")
+#endif
+		       "%s, ...}) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
+		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32
+			? ", timestamp={tv_sec=508936414, tv_usec=999999}" : "",
+		       inject_retval);
+
+		buf->type      = 0x9;
+		buf->flags     = 0;
+
+		ioctl(-1, buf_cmds[i].val, buf);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0x9, "V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE")
+		       ", index=3735929054, memory="
+		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
+		       ", m.userptr=%p, length=3405692629"
+		       ", bytesused=3737845742, flags=" RAW("0")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
+#endif
+		       "%s, ...}) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
+		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32
+			? ", timestamp={tv_sec=508936414, tv_usec=999999}" : "",
+		       inject_retval);
+
+		buf->type      = 0xa;
+		buf->memory    = V4L2_MEMORY_OVERLAY;
+		buf->flags     = 0x2000;
+
+		ioctl(-1, buf_cmds[i].val, buf);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0xa, "V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE")
+		       ", index=3735929054, memory="
+		       XLAT_KNOWN(0x3, "V4L2_MEMORY_OVERLAY")
+		       ", length=3405692629, bytesused=3737845742"
+		       ", flags=" RAW("0x2000")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0x2000, "V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC")
+		       "|" XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
+#endif
+		       "%s, ...}) = %ld (INJECTED)\n",
+		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
+		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32
+			? ", timestamp={tv_sec=508936414, tv_usec=999999}" : "",
+		       inject_retval);
+	}
+}
+#endif
+
 int
 main(int argc, char **argv)
 {
@@ -523,6 +655,10 @@ main(int argc, char **argv)
 		}
 	}
 
+#ifdef KERNEL_V4L2_HAVE_TIME32
+	/* VIDIOC_QUERYBUF_TIME32, VIDIOC_QBUF_TIME32, VIDIOC_DQBUF_TIME32 */
+	test_v4l2_buffer_time32(inject_retval);
+#endif
 
 	/* VIDIOC_QUERYBUF, VIDIOC_QBUF, VIDIOC_DQBUF */
 	static const struct strval32 buf_cmds[] = {
