@@ -2253,7 +2253,7 @@ init(int argc, char *argv[])
 	bool sortby_set = false;
 	bool opt_kill_on_exit = false;
 #ifdef ENABLE_STACKTRACE
-	int stack_trace_frame_limit = DEFAULT_STACK_TRACE_FRAME_LIMIT;
+	int stack_trace_frame_limit = 0;
 #endif
 
 	/*
@@ -2945,9 +2945,16 @@ init(int argc, char *argv[])
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_mode)
+	if (stack_trace_mode) {
+		if (stack_trace_frame_limit == 0)
+			stack_trace_frame_limit =
+				DEFAULT_STACK_TRACE_FRAME_LIMIT;
 		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO,
 			    stack_trace_frame_limit);
+	} else if (stack_trace_frame_limit != 0) {
+		error_msg("--stack-trace-frame-limit has no effect "
+			  "without -k/--stack-traces");
+	}
 #endif
 
 	/* See if they want to run as another user. */
