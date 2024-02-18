@@ -355,6 +355,7 @@ libstrace_a_SOURCES =	\
 	statfs.h	\
 	statfs64.c \
 	static_assert.h	\
+	statmount.c	\
 	statx.c		\
 	statx.h		\
 	strauss.c	\
