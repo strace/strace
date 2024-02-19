@@ -1038,6 +1038,8 @@ stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 statfs	-a17
 statfs64	-a23
+statmount	-a28
+statmount-success -a28 --trace=statmount --inject=statmount:retval=42
 status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
 status-failed	-a10 -e trace=chdir -Z
 status-failed-long	-a10 -e trace=chdir --failed-only
