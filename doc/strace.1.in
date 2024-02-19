@@ -1014,12 +1014,12 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stacktrace\-frames\-limit = \fIlimit\fR
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print no more than this amount of stack trace frames
-.if '@ENABLE_STACKTRACE_FALSE@'#' when backtracing a system call.
-.if '@ENABLE_STACKTRACE_FALSE@'#' Use this option with
+.if '@ENABLE_STACKTRACE_FALSE@'#' when backtracing a system call (the default is 256).
+.if '@ENABLE_STACKTRACE_FALSE@'#' Use this option with the
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
 .if '@ENABLE_STACKTRACE_FALSE@'#' (or
 .if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-k )
-.if '@ENABLE_STACKTRACE_FALSE@'#' options.
+.if '@ENABLE_STACKTRACE_FALSE@'#' option.
 .TP
 .BI "\-o " filename
 .TQ
