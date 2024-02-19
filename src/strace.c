@@ -43,6 +43,7 @@
 #include "delay.h"
 #include "wait.h"
 #include "secontext.h"
+#include "print_fields.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -203,6 +204,92 @@ static volatile int interrupted, restart_failed;
 
 static sigset_t timer_set;
 static void timer_sighandler(int);
+
+struct structured_output* structured_output = NULL ;
+
+struct structured_output ocaml_structured_output ;
+struct structured_output json_structured_output ;
+
+static void init_structured_outputs(void)
+{
+	struct structured_output *s;
+
+	s = &ocaml_structured_output ;
+	s->structured_output_NULL_VALUE	    =	  "NULL";
+	s->structured_output_NEWLINE	  =	 "\n";
+	s->structured_output_STRING_BEGIN =  "STRING ";
+	s->structured_output_STRING_END	    = "" ;
+	s->structured_output_PARTIAL_STRING_BEGIN =  "PARTIAL_STRING " ;
+	s->structured_output_PARTIAL_STRING_END	  =  "" ;
+	s->structured_output_ARRAY_BEGIN    = "ARRAY [" ;
+	s->structured_output_ARRAY_NEXT	 =    "; " ;
+	s->structured_output_ARRAY_END =      "]" ;
+	s->structured_output_FIELD_SET =      "\"%s\", " ;
+	s->structured_output_STRUCT_BEGIN =   "STRUCT [" ;
+	s->structured_output_STRUCT_NEXT =    "; " ;
+	s->structured_output_STRUCT_END =     "]" ;
+	s->structured_output_INT_BEGIN =      "INT (" ;
+	s->structured_output_INT_END =	      "L)" ;
+	s->structured_output_FLAGS_BEGIN =     "FLAGS [" ;
+	s->structured_output_FLAGS_NEXT =     "; " ;
+	s->structured_output_FLAGS_END =      "]" ;
+	s->structured_output_CALL_BEGIN =     "CALL ( \"%s\", [" ;
+	s->structured_output_CALL_ARG_NEXT =   ", " ;
+	s->structured_output_CALL_END =	       "])" ;
+	s->structured_output_COMMENT_BEGIN =   "(* " ;
+	s->structured_output_COMMENT_END =     " *)" ;
+	s->structured_output_ARG_NAME_BEGIN =  "ARG (\"%s\", " ;
+	s->structured_output_ARG_NAME_END =    ")" ;
+	s->structured_output_INDIRECT_BEGIN =  "INDIRECT [" ;
+	s->structured_output_INDIRECT_END =    "]" ;
+	s->structured_output_SHIFT_BEGIN =    "SHIFT (" ;
+	s->structured_output_SHIFT =    "," ;
+	s->structured_output_SHIFT_END =    ")" ;
+	s->structured_output_ARRAY_INDEX_BEGIN = "INDEX (" ;
+	s->structured_output_ARRAY_INDEX_EQUAL = "," ;
+	s->structured_output_ARRAY_INDEX_END   = ")" ;
+	s->structured_output_STRUCT_NEEDS_ENDING_NEXT = 1;
+	s->structured_output_ACCEPTS_COMMENTS = 1;
+	s->structured_output_ESCAPES_WITH_U_XXXX = 0;
+
+	s = &json_structured_output ;
+	s->structured_output_NULL_VALUE =     "null" ;
+	s->structured_output_NEWLINE	  =    "\n" ;
+	s->structured_output_STRING_BEGIN  =   "" ;
+	s->structured_output_STRING_END	   =   "" ;
+	s->structured_output_PARTIAL_STRING_BEGIN  =   "{ \"partial\": " ;
+	s->structured_output_PARTIAL_STRING_END	  =    "}" ;
+	s->structured_output_ARRAY_BEGIN =     "[" ;
+	s->structured_output_ARRAY_NEXT	  =    ", " ;
+	s->structured_output_ARRAY_END	   =   "]" ;
+	s->structured_output_FIELD_SET	  =    "\"%s\": " ;
+	s->structured_output_STRUCT_BEGIN  =   "{" ;
+	s->structured_output_STRUCT_NEXT   =   ", " ;
+	s->structured_output_STRUCT_END	   =   "}" ;
+	s->structured_output_INT_BEGIN	   =   "\"" ;
+	s->structured_output_INT_END	  =    "\"" ;
+	s->structured_output_FLAGS_BEGIN   =   "{ \"flags\": [" ;
+	s->structured_output_FLAGS_NEXT	   =   ", " ;
+	s->structured_output_FLAGS_END	   =   "]}" ;
+	s->structured_output_CALL_BEGIN	    =  "{ \"call\": \"%s\", \"args\": [" ;
+	s->structured_output_CALL_ARG_NEXT  =	", " ;
+	s->structured_output_CALL_END	   =	"]}" ;
+	s->structured_output_COMMENT_BEGIN  =	"/* " ;
+	s->structured_output_COMMENT_END    =	" */" ;
+	s->structured_output_ARG_NAME_BEGIN  =	"{ \"arg\": \"%s\", \"value\": " ;
+	s->structured_output_ARG_NAME_END   =	"}" ;
+	s->structured_output_INDIRECT_BEGIN =	"{ \"indirect\": [" ;
+	s->structured_output_INDIRECT_END  =	"]}" ;
+	s->structured_output_SHIFT_BEGIN =      "{ \"shift\": " ;
+	s->structured_output_SHIFT =            ", \"by\": " ;
+	s->structured_output_SHIFT_END =        "}" ;
+	s->structured_output_ARRAY_INDEX_BEGIN = "[" ;
+	s->structured_output_ARRAY_INDEX_EQUAL = ", " ;
+	s->structured_output_ARRAY_INDEX_END   = "]" ;
+	s->structured_output_STRUCT_NEEDS_ENDING_NEXT = 0;
+	s->structured_output_ACCEPTS_COMMENTS = 0;
+	s->structured_output_ESCAPES_WITH_U_XXXX = 1;
+}
 
 #ifndef HAVE_STRERROR
 
@@ -415,6 +502,8 @@ Output format:\n\
                  send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
                  open the file provided in the -o option in append mode\n\
+  -B, --structured-output\n\
+                 output in a structured format, possibly binary\n\
   --output-separately\n\
                  output into separate files (by appending pid to file names)\n\
   -q, --quiet=attach,personality\n\
@@ -598,7 +687,7 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
 		tprint_space();
-		tprintf_string("<Cannot restart pid %d with ptrace(%s): %s>",
+		tprintf_dummy("<Cannot restart pid %d with ptrace(%s): %s>",
 			       tcp->pid, ptrace_op_str(op), strerror(err));
 		tprint_newline();
 		line_ended();
@@ -723,26 +812,55 @@ outf_perror(const struct tcb * const tcp)
 		perror_msg("%s", outfname);
 }
 
-ATTRIBUTE_FORMAT((printf, 1, 0))
-static void
-tvprintf(const char *const fmt, va_list args)
+uint8_t get_tcp_state(void){
+	return current_tcp->structured_state;
+}
+
+void set_tcp_state(uint8_t state){
+	if(state == TCP_STATE_COMMENT_BEGIN){
+		if(structured_output &&
+		    !structured_output->structured_output_ACCEPTS_COMMENTS){
+			current_tcp->structured_state =
+				state|TCP_STATE_COMMENTED_OUT;
+		} else {
+			current_tcp->structured_state =
+				state|TCP_STATE_COMMENTED;
+		}
+	} else
+		if(state == TCP_STATE_COMMENT_END){
+			current_tcp->structured_state = state &
+				~(TCP_STATE_COMMENTED|TCP_STATE_COMMENTED_OUT);
+		} else
+			if(current_tcp->structured_state
+			    & (TCP_STATE_COMMENTED|TCP_STATE_COMMENTED_OUT)){
+				/* do not modify state when commented */
+			} else
+				current_tcp->structured_state = state;
+}
+
+ATTRIBUTE_FORMAT((printf, 2, 0))
+void
+tvprintf(uint8_t state, const char *const fmt, va_list args)
 {
 	if (current_tcp) {
-		int n = vfprintf(current_tcp->outf, fmt, args);
-		if (n < 0) {
-			/* very unlikely due to vfprintf buffering */
-			outf_perror(current_tcp);
-		} else
-			current_tcp->curcol += n;
+		if(!(current_tcp->structured_state & TCP_STATE_COMMENTED_OUT)){
+			int n = vfprintf(current_tcp->outf, fmt, args);
+			if (n < 0) {
+				/* very unlikely due to vfprintf buffering */
+				outf_perror(current_tcp);
+			} else
+				current_tcp->curcol += n;
+		}
+		if(state) set_tcp_state(state);
 	}
 }
 
 void
-tprintf_string(const char *fmt, ...)
+tprintf_nodelim(uint8_t state, const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	tvprintf(fmt, args);
+	tvprintf(state, fmt, args);
 	va_end(args);
 }
 
@@ -751,16 +869,19 @@ tprintf_string(const char *fmt, ...)
 #endif
 
 void
-tprints_string(const char *str)
+tprints_nodelim(uint8_t state, const char *str)
 {
 	if (current_tcp) {
-		int n = fputs_unlocked(str, current_tcp->outf);
-		if (n >= 0) {
-			current_tcp->curcol += strlen(str);
-			return;
+		if(!(current_tcp->structured_state & TCP_STATE_COMMENTED_OUT)){
+			int n = fputs_unlocked(str, current_tcp->outf);
+			if (n >= 0) {
+				current_tcp->curcol += strlen(str);
+			} else {
+				/* very unlikely due to fputs_unlocked buffering */
+				outf_perror(current_tcp);
+			}
 		}
-		/* very unlikely due to fputs_unlocked buffering */
-		outf_perror(current_tcp);
+		if(state) set_tcp_state(state);
 	}
 }
 
@@ -769,7 +890,7 @@ tprints_comment(const char *const str)
 {
 	if (str && *str) {
 		tprint_comment_begin();
-		tprints_string(str);
+		tprints_nodelim(TCP_STATE_DUMMY, str);
 		tprint_comment_end();
 	}
 }
@@ -783,7 +904,7 @@ tprintf_comment(const char *fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	tprint_comment_begin();
-	tvprintf(fmt, args);
+	tvprintf(TCP_STATE_DUMMY, fmt, args);
 	tprint_comment_end();
 	va_end(args);
 }
@@ -800,6 +921,7 @@ line_ended(void)
 {
 	if (current_tcp) {
 		current_tcp->curcol = 0;
+		current_tcp->structured_state = TCP_STATE_DELIM;
 		flush_tcp_output(current_tcp);
 	}
 	if (printing_tcp) {
@@ -824,8 +946,10 @@ print_comm_str(const char *str, const size_t len)
 	if (!len)
 		return;
 	tprint_associated_info_begin();
+	tprints_field_set("pidstr");
 	print_quoted_string_ex(str, len,
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+	tprint_field_end();
 	tprint_associated_info_end();
 }
 
@@ -850,8 +974,11 @@ printleader(struct tcb *tcp)
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
 			set_current_tcp(printing_tcp);
-			tprint_space();
-			tprints_string("<unfinished ...>");
+
+			tprints_dummy(" <");
+			tprint_unfinished(1);
+			tprints_dummy(" ...>");
+			tprint_sysret_end();
 			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
@@ -861,18 +988,20 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
+	tprint_syscall_begin();
 	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
 		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
 			     ? strlen(tcp->comm) : 0;
 
 		if (print_pid_pfx) {
 			if (len)
-				tprintf_string("%u", tcp->pid);
+				tprintf_field_int("pid", "%u", tcp->pid);
 			else
-				tprintf_string("%-5u", tcp->pid);
+				tprintf_field_int("pid", "%-5u", tcp->pid);
 		} else {
 			tprint_attribute_begin();
-			tprintf_string("pid %5u", tcp->pid);
+			tprints_dummy("pid ");
+			tprintf_field_int("pid", "%5u", tcp->pid);
 		}
 
 		print_comm_str(tcp->comm, len);
@@ -896,11 +1025,13 @@ printleader(struct tcb *tcp)
 			strftime(str, sizeof(str), tflag_format, tm);
 		else
 			xsprintf(str, "%lld", (long long) local);
-		if (tflag_width)
-			tprintf_string("%s.%0*ld ", str, tflag_width,
-				       (long) ts.tv_nsec / tflag_scale);
-		else
-			tprintf_string("%s ", str);
+		tprints_field_string("time_str", str);
+		if (tflag_width){
+			tprints_dummy(".");
+			tprintf_field_int("time", "%0*ld", tflag_width,
+					  (long) ts.tv_nsec / tflag_scale);
+		}
+		tprint_space();
 	}
 
 	if (rflag) {
@@ -915,13 +1046,14 @@ printleader(struct tcb *tcp)
 		ts_sub(&dts, &ts, &ots);
 		ots = ts;
 
-		tprintf_string("%s%6ld",
-			       tflag_format ? "(+" : "", (long) dts.tv_sec);
+		tprints_dummy(tflag_format ? "(+" : "");
+		tprintf_field_int("time_sec", "%6ld", (long) dts.tv_sec);
 		if (rflag_width) {
-			tprintf_string(".%0*ld", rflag_width,
-				       (long) dts.tv_nsec / rflag_scale);
+			tprints_dummy(".");
+			tprintf_field_int("time_nsec", "%0*ld",
+					  rflag_width, (long) dts.tv_nsec / rflag_scale);
 		}
-		tprints_string(tflag_format ? ") " : " ");
+		tprints_dummy(tflag_format ? ") " : " ");
 	}
 
 	if (nflag)
@@ -935,7 +1067,9 @@ void
 tabto(void)
 {
 	if (current_tcp->curcol < acolumn)
-		tprints_string(acolumn_spaces + current_tcp->curcol);
+		tprints_dummy(acolumn_spaces + current_tcp->curcol);
+	else
+		tprints_dummy(" ");
 }
 
 /* Should be only called directly *after successful attach* to a tracee.
@@ -2296,7 +2430,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:B:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2333,6 +2467,7 @@ init(int argc, char *argv[])
 		{ "columns",		required_argument, 0, 'a' },
 		{ "output-append-mode",	no_argument,	   0, 'A' },
 		{ "detach-on",		required_argument, 0, 'b' },
+		{ "structured-output",	required_argument, 0, 'B' },
 		{ "summary-only",	no_argument,	   0, 'c' },
 		{ "summary",		no_argument,	   0, 'C' },
 		{ "debug",		no_argument,	   0, 'd' },
@@ -2418,6 +2553,19 @@ init(int argc, char *argv[])
 				error_msg_and_die("Syscall '%s' for -b isn't supported",
 					optarg);
 			detach_on_execve = 1;
+			break;
+		case 'B': /* <=> structured output */
+			init_structured_outputs();
+			if(optarg == NULL)
+				error_msg_and_die("Structured-output required: use either 'json' or 'ocaml'");
+			if (!strcmp(optarg, "ocaml")){
+				structured_output = &ocaml_structured_output ;
+			} else
+				if (!strcmp(optarg, "json")){
+					structured_output = &json_structured_output ;
+				} else {
+					error_msg_and_die("Unknown structured format '%s', use either 'json' or 'ocaml'", optarg);
+				}
 			break;
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
@@ -3323,6 +3471,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		 * Another case is demonstrated by
 		 * tests/maybe_switch_current_tcp.c
 		 */
+		/* Fabrice: TODO somehting ? */
 		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
@@ -3349,8 +3498,11 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	if (cflag != CFLAG_ONLY_STATS) {
 		if (!is_number_in_set(QUIET_THREAD_EXECVE, quiet_set)) {
 			printleader(tcp);
-			tprintf_string("+++ superseded by execve in pid %lu +++",
-				       old_pid);
+			tprintf_dummy("+++ superseded by execve in pid ",
+				old_pid);
+			tprintf_field_int("superseded-by-execve", "%lu", old_pid);
+			tprints_dummy(" +++");
+			tprint_sysret_end();
 			tprint_newline();
 			line_ended();
 		}
@@ -3388,9 +3540,14 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
-		tprintf_string("+++ killed by %s %s+++",
-			       sprintsigname(WTERMSIG(status)),
-			       WCOREDUMP(status) ? "(core dumped) " : "");
+		tprints_dummy("+++ killed by ");
+		tprints_field_string("killed", sprintsigname(WTERMSIG(status)));
+		tprint_space();
+		tprints_field_string("with-core",
+				     WCOREDUMP(status) ? "(core dumped)" : "");
+		/* Warning: we add one space in the case of no core dumped */
+		tprints_dummy("+++");
+		tprint_sysret_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3407,7 +3564,10 @@ print_exited(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS &&
 	    !is_number_in_set(QUIET_EXIT, quiet_set)) {
 		printleader(tcp);
-		tprintf_string("+++ exited with %d +++", WEXITSTATUS(status));
+		tprints_dummy("+++ exited with ");
+		tprintf_field_int("exited", "%d", WEXITSTATUS(status));
+		tprints_dummy(" +++");
+		tprint_sysret_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3421,12 +3581,22 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	    && is_number_in_set(sig, signal_set)) {
 		printleader(tcp);
 		if (si) {
-			tprintf_string("--- %s ", sprintsigname(sig));
+			tprints_dummy("--- ");
+			tprints_field_string("signal", sprintsigname(sig));
+			tprint_space();
+			tprints_field_set("siginfo");
 			printsiginfo(tcp, si);
-			tprints_string(" ---");
-		} else
-			tprintf_string("--- stopped by %s ---", sprintsigname(sig));
-		tprint_newline();
+			tprint_field_end();
+			tprints_dummy(" ---");
+			tprint_sysret_end();
+			tprint_newline();
+		} else {
+			tprints_dummy("--- stopped by ");
+			tprints_field_string("signal",sprintsigname(sig));
+			tprints_dummy(" ---");
+			tprint_sysret_end();
+			tprint_newline();
+		}
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
@@ -3474,7 +3644,10 @@ print_event_exit(struct tcb *tcp)
 	    && printing_tcp->curcol != 0 && !printing_tcp->staged_output_data) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
-		tprints_string("<unfinished ...>");
+		tprints_dummy("<");
+		tprint_unfinished(1);
+		tprints_dummy(" ...>");
+		tprint_sysret_end();
 		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
@@ -3489,12 +3662,16 @@ print_event_exit(struct tcb *tcp)
 		 * on exiting syscall which is not going to happen.
 		 */
 		tprint_space();
-		tprints_string("<unfinished ...>");
+		tprints_dummy("<");
+		tprint_unfinished(0);
+		tprints_dummy(" ...>");
 	}
 
-	tprints_string(") ");
-	tabto();
+	printing_tcp = tcp;
+	tprint_argspace_end();
 	tprint_sysret_begin();
+	tabto();
+	tprints_dummy("=");
 	tprints_sysret_next("retval");
 	tprint_sysret_pseudo_rval();
 	tprint_sysret_end();

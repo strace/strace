@@ -86,11 +86,14 @@ print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 		return;
 	}
 
+	tprint_flags_begin();
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		PRINT_VAL_X(mode_arg);
 
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW){
+		tprint_flags_end();
 		return;
+	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();

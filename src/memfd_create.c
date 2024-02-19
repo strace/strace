@@ -21,6 +21,7 @@ SYS_FUNC(memfd_create)
 		    QUOTE_0_TERMINATED);
 	tprint_arg_next();
 
+	tprint_flags_begin();
 	unsigned int flags = tcp->u_arg[1];
 
 	if (!flags || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
@@ -35,8 +36,6 @@ SYS_FUNC(memfd_create)
 	const unsigned int mask = MFD_HUGE_MASK << MFD_HUGE_SHIFT;
 	const unsigned int hugetlb_value = flags & mask;
 	flags &= ~mask;
-
-	tprint_flags_begin();
 
 	if (flags || !hugetlb_value)
 		printflags_ex(flags, "MFD_???", XLAT_STYLE_ABBREV,

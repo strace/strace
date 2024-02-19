@@ -118,7 +118,9 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 	tprint_arg_next();
 
 	/* prot */
+	tprint_flags_begin();
 	printflags64(mmap_prot, prot, "PROT_???");
+	tprint_flags_end();
 	tprint_arg_next();
 
 	/* flags */

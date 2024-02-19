@@ -463,7 +463,7 @@ SYS_FUNC(ioctl)
 				  &deleted) >= 0) {
 			finfo = get_finfo_for_dev(path, &finfoa);
 			finfo->deleted = deleted;
-			printfd_with_finfo(tcp, tcp->u_arg[0], finfo);
+			printfd_with_finfo(NULL, tcp, tcp->u_arg[0], finfo);
 		} else
 			printfd(tcp, tcp->u_arg[0]);
 

@@ -61,7 +61,7 @@ print_v4l2_rect(const MPERS_PTR_ARG(struct v4l2_rect *) const arg)
 #define PRINT_FIELD_FRACT(where_, field_)			\
 	do {							\
 		tprints_field_name(#field_);			\
-		tprintf_string("%u/%u",				\
+		STRACE_PRINTF( TCP_STATE_DUMMY, "%u/%u",	\
 			      (where_).field_.numerator,	\
 			      (where_).field_.denominator);	\
 	} while (0)

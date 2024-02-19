@@ -49,11 +49,19 @@ print_dirfd(struct tcb *tcp, int fd)
 		if ((size_t) n >= sizeof(buf))
 			goto done;
 
-		tprint_associated_info_begin();
+		if(structured_output){
+			tprint_comment_begin();
+		} else {
+			tprint_associated_info_begin();
+		}
 		print_quoted_string_ex(buf, n,
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
-		tprint_associated_info_end();
+		if(structured_output){
+			tprint_comment_end();
+		} else {
+			tprint_associated_info_end();
+		}
 done:		;
 	} else {
 		printfd(tcp, fd);

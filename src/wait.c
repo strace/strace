@@ -92,10 +92,13 @@ printwaitn(struct tcb *const tcp,
 	if (entering(tcp)) {
 		/* pid */
 		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
+		if(!structured_output)
+			tprint_arg_next();
 	} else {
 		int status;
 
+		if(structured_output)
+			tprint_arg_next();
 		/* status */
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);

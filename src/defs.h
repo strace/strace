@@ -324,6 +324,8 @@ struct tcb {
 	struct unwind_queue_t *unwind_queue;
 # endif
 
+	uint8_t structured_state;
+
 # define PROC_COMM_LEN 16
 	char comm[PROC_COMM_LEN];
 };
@@ -1242,25 +1244,31 @@ extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracer).
  */
-extern void printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd,
-				   const struct finfo *finfo);
+extern void printfd_pid_with_finfo(const char* field, struct tcb *tcp,
+		pid_t pid, int fd, const struct finfo *finfo);
 
 static inline void
-printfd_pid(struct tcb *tcp, pid_t pid, int fd)
+printfd_pid(const char* field, struct tcb *tcp, pid_t pid, int fd)
 {
-	printfd_pid_with_finfo(tcp, pid, fd, NULL);
+	printfd_pid_with_finfo(field, tcp, pid, fd, NULL);
 }
 
 static inline void
 printfd(struct tcb *tcp, int fd)
 {
-	printfd_pid(tcp, tcp->pid, fd);
+	printfd_pid(NULL, tcp, tcp->pid, fd);
 }
 
 static inline void
-printfd_with_finfo(struct tcb *tcp, int fd, const struct finfo *finfo)
+printfd_field(const char* field, struct tcb *tcp, int fd)
 {
-	printfd_pid_with_finfo(tcp, tcp->pid, fd, finfo);
+	printfd_pid(field, tcp, tcp->pid, fd);
+}
+
+static inline void
+printfd_with_finfo(const char* field, struct tcb *tcp, int fd, const struct finfo *finfo)
+{
+	printfd_pid_with_finfo(field, tcp, tcp->pid, fd, finfo);
 }
 
 /**
@@ -1298,6 +1306,8 @@ extern void printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd);
 
 /** Prints a PID specified in the tracee's PID namespace */
 extern void printpid(struct tcb *, int pid, enum pid_type type);
+extern void printpid_field(const char *s, struct tcb *,
+		int pid, enum pid_type type); /* pidns.c */
 
 /**
  * Prints pid as a TGID if positive, and PGID if negative
@@ -1732,10 +1742,19 @@ extern struct tcb *printing_tcp;
 extern void printleader(struct tcb *);
 extern void line_ended(void);
 extern void tabto(void);
-extern void tprintf_string(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
-extern void tprints_string(const char *str);
+extern void tprintf_nodelim(uint8_t state, const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 2, 3));
+extern void tprints_nodelim(uint8_t state, const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
+
+#include <stdarg.h>
+
+extern void tvprintf(uint8_t state, const char *const fmt, va_list args) ATTRIBUTE_FORMAT((printf, 2, 0));
+
+/* defined in strace.c */
+extern struct structured_output* structured_output ;
+extern uint8_t get_tcp_state(void);
+extern void set_tcp_state(uint8_t state);
 
 /*
  * Staging output for status qualifier.
@@ -2096,10 +2115,7 @@ ilog2_32(uint32_t val)
 static inline int
 printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
 {
-	tprint_flags_begin();
-	int r = printflags64_in(x, flags, dflt);
-	tprint_flags_end();
-	return r;
+	return printflags64_in(x, flags, dflt);
 }
 
 static inline int

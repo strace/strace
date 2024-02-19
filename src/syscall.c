@@ -433,17 +433,22 @@ static void
 print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 {
 	const char *u_error_str = err_name(u_error);
+	tprint_sysret_begin();
 
+	tprintf_dummy("=");
 	tprints_sysret_next("retval");
-	PRINT_VAL_D(ret);
+	tprintf_field_int("return", "%" PRI_kld, ret);
+	tprint_space();
 
-	if (u_error_str) {
-		tprints_sysret_next("error");
-		tprints_string(u_error_str);
+	if (u_error_str){
+		tprints_sysret_string("error", u_error_str);
+		tprints_dummy(" (");
 		tprints_sysret_string("strerror", strerror(u_error));
+		tprints_dummy(")");
 	} else {
-		tprints_sysret_next("strerror");
-		tprintf_string("(errno %lu)", u_error);
+		tprints_dummy("(errno ");
+		tprintf_field_int("errno", "%lu", u_error);
+		tprints_dummy(")");
 	}
 }
 
@@ -589,7 +594,7 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
-		tprints_arg_begin(tcp_sysent(tcp)->sys_name);
+		tprints_argspace_begin(tcp_sysent(tcp)->sys_name);
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -673,7 +678,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		strace_open_memstream(tcp);
 
 	printleader(tcp);
-	tprints_arg_begin(tcp_sysent(tcp)->sys_name);
+	tprints_argspace_begin(tcp_sysent(tcp)->sys_name);
 	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
@@ -760,7 +765,13 @@ print_syscall_resume(struct tcb *tcp)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		if( structured_output ){
+			tprints_field_string("resumed", tcp_sysent(tcp)->sys_name);
+			tprints_field_set("args");
+			tprint_array_begin();
+		} else {
+			tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		}
 	}
 	printing_tcp = tcp;
 }
@@ -768,24 +779,43 @@ print_syscall_resume(struct tcb *tcp)
 static void
 print_injected_note(struct tcb *tcp)
 {
-	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp))
+	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp)) {
+		tprints_sysret_next("injected_note");
+		tprints_dummy("(");
 		tprints_sysret_string("inject", "INJECTED: args, retval");
-	else if (syscall_tampered_poked(tcp))
+		tprints_dummy(")");
+	} else if (syscall_tampered_poked(tcp)) {
+		tprints_sysret_next("injected_note");
+		tprints_dummy("(");
 		tprints_sysret_string("inject", "INJECTED: args");
-	else if (syscall_tampered(tcp))
+		tprints_dummy(")");
+	} else if (syscall_tampered(tcp)) {
+		tprints_sysret_next("injected_note");
+		tprints_dummy("(");
 		tprints_sysret_string("inject", "INJECTED");
-	if (syscall_tampered_delayed(tcp))
+		tprints_dummy(")");
+	}
+
+	if (syscall_tampered_delayed(tcp)) {
+		tprints_sysret_next("injected_note");
+		tprints_dummy("(");
 		tprints_sysret_string("delay", "DELAYED");
+		tprints_dummy(")");
+	}
 }
 
 static void
 print_erestart(const char *err_short, const char *err_long)
 {
+	tprints_dummy("=");
 	tprints_sysret_next("retval");
 	tprint_sysret_pseudo_rval();
 	tprints_sysret_next("error");
 	tprints_string(err_short);
+	tprints_sysret_next("strerror");
+	tprints_dummy("(");
 	tprints_sysret_string("strerror", err_long);
+	tprints_dummy(")");
 }
 
 int
@@ -810,17 +840,22 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		bool publish = status_filtering
 			       ? is_number_in_set(STATUS_UNAVAILABLE, status_set)
 			       : true;
+
 		if (cflag && publish)
 			count_syscall(tcp, ts);
 		if (cflag != CFLAG_ONLY_STATS) {
+			tprint_argspace_end();
 			tprint_arg_end();
 			tprint_space();
 			tabto();
 			tprint_sysret_begin();
+			tprints_dummy("=");
 			tprints_sysret_next("retval");
 			tprint_sysret_pseudo_rval();
 			tprints_sysret_next("return");
-			tprints_string("<unavailable>");
+			tprints_dummy("<");
+			tprints_field_string("return", "unavailable");
+			tprints_dummy(">");
 			tprint_sysret_end();
 			tprint_newline();
 			if (status_filtering)
@@ -866,8 +901,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			return 0;
 	}
 
-	tprint_arg_end();
-	tprint_space();
+	tprint_argspace_end();
 	tabto();
 	tprint_sysret_begin();
 
@@ -875,9 +909,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		if (tcp->u_error) {
 			print_err_ret(tcp->u_rval, tcp->u_error);
 		} else {
+			tprints_dummy("=");
 			tprints_sysret_next("retval");
-			PRINT_VAL_X(tcp->u_rval);
+			tprintf_field_int("return", "%#" PRI_klx, tcp->u_rval);
 		}
+
+		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
 		switch (tcp->u_error) {
 		/* Blocked signals do not interrupt any syscalls.
@@ -937,8 +974,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 			break;
 		}
+
+		print_injected_note(tcp);
 	} else {
-		tprints_sysret_next("retval");
 		if (sys_res & RVAL_NONE)
 			tprint_sysret_pseudo_rval();
 		else {
@@ -946,31 +984,46 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			case RVAL_HEX:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
+					tprints_dummy("= ");
 					PRINT_VAL_X((unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					PRINT_VAL_X(tcp->u_rval);
+					tprints_dummy("=");
+					tprints_sysret_next("retval");
+					tprintf_field_int("return",
+							  "%#" PRI_klx, tcp->u_rval);
 				}
 				break;
 			case RVAL_OCTAL: {
 				unsigned long long mode =
 					zero_extend_signed_to_ull(tcp->u_rval);
+				tprints_dummy("=");
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval))
 					mode = (unsigned int) mode;
 #endif
+				tprints_field_set("return");
+				tprints_sysret_next("retval");
 				print_numeric_ll_umode_t(mode);
+				tprint_field_end();
 				break;
 			}
 			case RVAL_UDECIMAL:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
-					PRINT_VAL_U((unsigned int) tcp->u_rval);
+					tprints_dummy("=");
+					tprints_sysret_next("retval");
+					tprintf_field_int("return",
+							  "%u",
+							  (unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					PRINT_VAL_U(tcp->u_rval);
+					tprints_dummy("=");
+					tprints_sysret_next("retval");
+					tprintf_field_int("return",
+							  "%" PRI_klu, tcp->u_rval);
 				}
 				break;
 			case RVAL_FD:
@@ -980,9 +1033,14 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				 */
 				if ((current_klongsize < sizeof(tcp->u_rval)) ||
 				    ((kernel_ulong_t) tcp->u_rval <= INT_MAX)) {
-					printfd(tcp, tcp->u_rval);
+					tprints_dummy("=");
+					tprints_sysret_next("retval");
+					printfd_field("return", tcp, tcp->u_rval);
 				} else {
-					PRINT_VAL_D(tcp->u_rval);
+					tprints_dummy("=");
+					tprints_sysret_next("retval");
+					tprintf_field_int("return",
+							  "%" PRI_kld, tcp->u_rval);
 				}
 				break;
 			case RVAL_TID:
@@ -995,8 +1053,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				};
 #undef _
 
-				printpid(tcp, tcp->u_rval,
-					 types[(sys_res & RVAL_MASK) - RVAL_TID]);
+				tprints_dummy("=");
+				tprints_sysret_next("retval");
+				printpid_field(
+					"return",
+					tcp, tcp->u_rval,
+					types[(sys_res & RVAL_MASK) - RVAL_TID]);
 				break;
 			}
 			default:
@@ -1005,18 +1067,31 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				break;
 			}
 		}
+		if ((sys_res & RVAL_STR) && tcp->auxstr){
+			if( structured_output ){
+				tprints_field_string("retstr", tcp->auxstr);
+			} else {
+				tprintf_dummy(" (%s)", tcp->auxstr);
+			}
+		}
+
+		print_injected_note(tcp);
 	}
+/*
 	if ((sys_res & RVAL_STR) && tcp->auxstr)
 		tprints_sysret_string("retstr", tcp->auxstr);
 	print_injected_note(tcp);
+*/
 	if (Tflag) {
 		tprints_sysret_next("time");
 		tprint_associated_info_begin();
 		ts_sub(ts, ts, &tcp->etime);
-		PRINT_VAL_D(ts->tv_sec);
+		tprintf_field_int("secs", "%ld", (long) ts->tv_sec);
 		if (Tflag_width) {
-			tprintf_string(".%0*ld", Tflag_width,
-				       (long) ts->tv_nsec / Tflag_scale);
+			tprints_dummy(".");
+			tprintf_field_int("nsecs", "%0*ld",
+					  Tflag_width,
+					  (long) ts->tv_nsec / Tflag_scale);
 		}
 		tprint_associated_info_end();
 	}

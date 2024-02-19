@@ -66,7 +66,7 @@ decode_oflag(uint64_t val)
 		val &= ~xlats[i].mask;
 	}
 
-	printflags64_in(term_oflags, val, NULL);
+	printflags64(term_oflags, val, NULL);
 	tprint_flags_end();
 }
 
@@ -90,7 +90,7 @@ decode_cflag(uint64_t val)
 	tprint_flags_or();
 
 	val &= ~(CBAUD | CIBAUD | CSIZE);
-	printflags64_in(term_cflags, val, NULL);
+	printflags64(term_cflags, val, NULL);
 	tprint_flags_end();
 }
 

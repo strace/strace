@@ -694,7 +694,7 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
 		tprint_associated_info_begin();
-		tprintf_string("%s %u:%u",
+		tprintf_dummy("%s %u:%u",
 			       (finfo->type == FINFO_DEV_BLK)? "block" : "char",
 			       finfo->dev.major, finfo->dev.minor);
 		tprint_associated_info_end();
@@ -774,7 +774,7 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);
 	if (pid > 0) {
 		tprint_associated_info_begin();
-		tprints_string("pid:");
+		tprints_dummy("pid:");
 		/*
 		 * The pid translation is not needed because
 		 * the pid is in strace's namespace.
@@ -838,19 +838,22 @@ print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 	tprint_associated_info_end();
 
 	if (deleted)
-		tprints_string("(deleted)");
+		tprints_dummy("(deleted)");
 }
 
 void
-printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo)
-{
-	PRINT_VAL_D(fd);
-
+printfd_pid_with_finfo(const char* field, struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo) {
 	char patha[PATH_MAX + 1];
 	bool deleted;
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && (finfo || (getfdpath_pid(pid, fd, patha, sizeof(patha), &deleted) >= 0))) {
 		const char *path = finfo? finfo->path: patha;
+
+		if(field != NULL) tprints_field_set(field);
+		if(structured_output) tprint_array_begin();
+		PRINT_VAL_D(fd);
+		if(structured_output) tprint_array_next();
+
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
@@ -863,10 +866,23 @@ printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *f
 		if (is_number_in_set(DECODE_FD_SIGNALFD, decode_fd_set) &&
 		    printsignalfd(pid, fd, path))
 			goto printed;
-		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set)) {
 			print_quoted_string_in_angle_brackets(path,
 							      finfo? finfo->deleted: deleted);
-printed:	;
+            goto printed;
+        }
+		if(structured_output) tprints_string("<unknown>");
+
+	printed:
+		if(structured_output) tprint_array_end();
+		if(field != NULL) tprint_field_end();
+		;
+	} else {
+		if(field != NULL){
+			PRINT_VAL_D_FIELD(field, fd);
+		} else {
+			PRINT_VAL_D(fd);
+		}
 	}
 
 	selinux_printfdcon(pid, fd);
@@ -876,7 +892,7 @@ void
 printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 {
 	int strace_pid = translate_pid(tcp, pid, PT_TGID, NULL);
-	printfd_pid(tcp, strace_pid, fd);
+	printfd_pid(NULL, tcp, strace_pid, fd);
 }
 
 const char *
@@ -1013,9 +1029,24 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			/* Check for NUL-terminated string. */
 			if (c == eol)
 				goto asciz_ended;
-			*s++ = '\\';
-			*s++ = 'x';
-			s = sprint_byte_hex(s, c);
+			if(structured_output){
+				if ( structured_output->
+				     structured_output_ESCAPES_WITH_U_XXXX){
+					*s++ = '\\';
+					*s++ = 'u';
+					*s++ = '0';
+					*s++ = '0';
+					s = sprint_byte_hex(s, c);
+				} else {
+					*s++ = '\\';
+					*s++ = 'x';
+					s = sprint_byte_hex(s, c);
+				}
+			} else {
+				*s++ = '\\';
+				*s++ = 'x';
+				s = sprint_byte_hex(s, c);
+			}
 		}
 
 		goto string_ended;
@@ -1034,10 +1065,6 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = '\\';
 			*s++ = c;
 			break;
-		case '\f':
-			*s++ = '\\';
-			*s++ = 'f';
-			break;
 		case '\n':
 			*s++ = '\\';
 			*s++ = 'n';
@@ -1050,10 +1077,20 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = '\\';
 			*s++ = 't';
 			break;
+		case '\f':
+			if(! structured_output){
+				*s++ = '\\';
+				*s++ = 'f';
+				break;
+			}
+			__attribute__ ((fallthrough));
 		case '\v':
-			*s++ = '\\';
-			*s++ = 'v';
-			break;
+			if(!structured_output){
+				*s++ = '\\';
+				*s++ = 'v';
+				break;
+			}
+			__attribute__ ((fallthrough));
 		default:
 			printable = is_print(c);
 
@@ -1063,19 +1100,33 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			if (printable) {
 				*s++ = c;
 			} else {
-				if (xstyle == HEXSTR_NON_ASCII_CHARS) {
-					/* Print he\x */
-					*s++ = '\\';
-					*s++ = 'x';
-					s = sprint_byte_hex(s, c);
-				} else {
-					/* Print \octal */
-					*s++ = '\\';
-					s = sprint_byte_oct(s, c,
-							i + 1 < size
-							&& ustr[i + 1] >= '0'
-							&& ustr[i + 1] <= '7');
-				}
+				if(structured_output){
+					if ( structured_output->
+					     structured_output_ESCAPES_WITH_U_XXXX){
+						*s++ = '\\';
+						*s++ = 'u';
+						*s++ = '0';
+						*s++ = '0';
+						s = sprint_byte_hex(s, c);
+					} else {
+						*s++ = '\\';
+						*s++ = 'x';
+						s = sprint_byte_hex(s, c);
+					}
+				} else
+					if ( xstyle == HEXSTR_NON_ASCII_CHARS) {
+						/* Print he\x */
+						*s++ = '\\';
+						*s++ = 'x';
+						s = sprint_byte_hex(s, c);
+					} else {
+						/* Print \octal */
+						*s++ = '\\';
+						s = sprint_byte_oct(s, c,
+								    i + 1 < size
+								    && ustr[i + 1] >= '0'
+								    && ustr[i + 1] <= '7');
+					}
 			}
 		}
 	}
@@ -1127,12 +1178,16 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  */
 int
 print_quoted_string_ex(const char *str, unsigned int size,
-		       const unsigned int style, const char *escape_chars)
+		       unsigned int style, const char *escape_chars)
 {
 	char *buf;
 	char *outstr;
 	unsigned int alloc_size;
 	int rc;
+
+	if(structured_output &&
+	    (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
+		style = style & ~QUOTE_OMIT_LEADING_TRAILING_QUOTES;
 
 	if (size && style & QUOTE_0_TERMINATED)
 		--size;
@@ -1161,7 +1216,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	}
 
 	rc = string_quote(str, outstr, size, style, escape_chars);
-	tprints_string(outstr);
+	tprints_quoted_string(outstr);
 
 	if (((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 	     == (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0)) && rc) {
@@ -1314,9 +1369,12 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 		       || len > max_strlen);
 
-	tprints_string(outstr);
-	if (ellipsis)
+	if (ellipsis){
+		tprints_quoted_partial_string(outstr);
 		tprint_more_data_follows();
+	} else {
+		tprints_quoted_string(outstr);
+	}
 
 	return rc;
 }

@@ -160,6 +160,9 @@ print_inet_addr(const int af,
 		break;
 	case AF_INET6:
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
+			if (structured_output && var_name)
+				tprints_field_name(var_name);
+
 			if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
 				if (var_name)
 					tprints_field_name(var_name);

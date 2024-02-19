@@ -135,7 +135,13 @@ run_strace()
 {
 	> "$LOG" || fail_ "failed to write $LOG"
 	args="$*"
-	$STRACE -o "$LOG" "$@" ||
+
+	STRUCTURE=
+	case $ME_ in *@json*)
+		STRUCTURE="-B json" ;;
+	esac
+
+	$STRACE -o "$LOG" $STRUCTURE "$@" ||
 		dump_log_and_fail_with "$STRACE $args failed with code $?"
 }
 
@@ -275,6 +281,13 @@ match_grep()
 # Usage: run_strace_match_diff [args to run_strace]
 run_strace_match_diff()
 {
+	case $ME_ in
+		*@json*)
+			if ! python --version; then
+				skip_ "Cannot validate JSON output without python"
+			fi ;;
+	esac
+
 	local sed_cmd prog_args
 	prog_args="../$NAME"
 	sed_cmd='p'
@@ -316,6 +329,15 @@ run_strace_match_diff()
 	args="$prog_args"
 	run_strace "$@" $args > "$EXP"
 	sed -n "$sed_cmd" < "$LOG" > "$OUT"
+
+	case $ME_ in
+		*@json*)
+			cp "$EXP" "$EXP.raw"
+			cp "$OUT" "$OUT.raw"
+			python -m json.tool "$EXP.raw" "$EXP";
+			python -m json.tool "$OUT.raw" "$OUT" ;;
+	esac
+
 	match_diff "$OUT" "$EXP"
 }
 

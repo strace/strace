@@ -227,7 +227,7 @@ print_context(char *secontext, char *expected)
 	ssize_t exp_len = parse_secontext(expected, &exp_str);
 
 	if (ctx_len != exp_len || strncmp(ctx_str, exp_str, ctx_len)) {
-		tprints_string("!!");
+		tprints_dummy("!!");
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 
@@ -246,9 +246,9 @@ selinux_printfdcon(pid_t pid, int fd)
 		return;
 
 	tprint_space();
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, exp);
-	tprint_attribute_end();
+	tprint_array_end();
 }
 
 void
@@ -261,9 +261,9 @@ selinux_printfilecon(struct tcb *tcp, const char *path)
 		return;
 
 	tprint_space();
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, exp);
-	tprint_attribute_end();
+	tprint_array_end();
 }
 
 void
@@ -274,8 +274,8 @@ selinux_printpidcon(struct tcb *tcp)
 	if (selinux_getpidcon(tcp, &ctx) < 0)
 		return;
 
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, NULL);
-	tprint_attribute_end();
+	tprint_array_end();
 	tprint_space();
 }

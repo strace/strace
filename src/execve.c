@@ -66,7 +66,7 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 
 static void
 printargc(struct tcb *const tcp, kernel_ulong_t addr)
-{
+{ /* Fabrice: TODO */
 	printaddr(addr);
 
 	if (!addr || !verbose(tcp))

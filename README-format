@@ -1,0 +1,91 @@
+Formats of output
+=================
+
+strace can output data in 3 different format:
+
+* In legacy "raw" format
+* In JSON structured format
+* In OCaml structured format
+
+This page explains the two structured formats.
+
+Limitations
+-----------
+
+Given the extend of modifications, we don't aim at covering all the
+features of strace, but only the most commonly used, and keep full
+textual backward compatibility. Consequently, structured formats may
+be broken in some cases, feel free to submit an issue in such cases.
+
+Choosing a structured format
+----------------------------
+
+To select a structured format, use the argument `-B FORMAT` or
+`--structured-output FORMAT`, where `FORMAT` is the name of the
+structured format.
+
+For now, `FORMAT` can take the following values:
+
+* `json` for JSON format
+* `ocaml` for OCaml format
+
+JSON Format definition
+----------------------
+
+The format can be checked by putting it in a contest "[... null]", as
+an array of syscalls. All ints are stored in strings to avoid
+overflows and specific notations.
+
+NULL:           null
+STRING:         standard JSON string
+PARTIAL_STRING: { "partial: standard JSON string }
+ARRAY:          [ ... ]
+INDIRECT:       { "indirect": [ ... ] }
+STRUCT:         { ... }
+INT:            standard JSON string containing an integer in whatever notation
+FLAGS:          { "flags": [ ... ] }
+CALL:           { "call": "<syscall>", "args": [ ... ] }
+ARG_NAMED :     { "arg": "<arg name>", "value": ... }
+SHIFT:          { "shift": value, "by": value }
+INDEX:		[ value, value ]
+
+OCaml Format definition
+-----------------------
+
+This format can be used as input for the OCaml compiler. It is quite
+easy to parse in general.
+
+terminals:= token_string | token_integer64L | comment
+
+struct := "[" [ token_string "," value ';' ]* "]"
+array := "[" [ value ";" ]* "]"
+value :=
+| "NULL"
+| "STRING" token_string
+| "PARTIAL_STRING" token_string
+| "ARRAY" array
+| "INDIRECT" array
+| "INT" token_integer64L
+| "STRUCT" struct
+| "FLAGS" array
+| "CALL" "(" token_string "," array ")"
+| "SHIFT" "(" value "," value ")"
+| "INDEX" "(" value "," value ")"
+
+comment := "(*" ... "*)"
+
+Values can be typechecked by the OCaml compiler using the following ADT:
+
+type t =
+| NULL
+| PARTIAL_STRING of string
+| STRING of string
+| INT of int64
+| INDIRECT of t list
+| ARRAY of t list
+| FLAGS of t list
+| STRUCT of ( string * t ) list
+| CALL of string * t list
+| ARG of string * t
+| SHIFT of t * t
+| INDEX of t * t

@@ -17,6 +17,7 @@ SYS_FUNC(personality)
 
 	if (entering(tcp)) {
 		pers = tcp->u_arg[0];
+		tprint_flags_begin();
 		if (0xffffffff == pers) {
 			PRINT_VAL_X(0xffffffff);
 		} else {
@@ -29,6 +30,7 @@ SYS_FUNC(personality)
 			}
 			tprint_flags_end();
 		}
+		tprint_flags_end();
 		return 0;
 	}
 
