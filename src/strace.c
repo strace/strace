@@ -400,9 +400,6 @@ Output format:\n\
 "\
   -k, --stack-traces[=symbol]\n\
                  obtain stack trace between each syscall\n\
-  --stacktrace-frames-limit=limit\n\
-                 obtain no more than this amount of frames\n\
-                 when backtracing a syscall (default %d)\n\
 "
 #ifdef USE_LIBDW
 "\
@@ -410,6 +407,11 @@ Output format:\n\
                  obtain stack trace and source info between each syscall\n\
 "
 #endif
+"\
+  --stack-traces-frame-limit=limit\n\
+                 obtain no more than this amount of frames\n\
+                 when backtracing a syscall (default %d)\n\
+"
 #endif
 "\
   -n, --syscall-number\n\
@@ -2359,7 +2361,7 @@ init(int argc, char *argv[])
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "kill-on-exit",	no_argument,	   0, GETOPT_KILL_ON_EXIT },
 		{ "stack-traces" ,	optional_argument, 0, GETOPT_STACK },
-		{ "stacktrace-frames-limit", required_argument, 0, GETOPT_STACKTRACE_FRAMES_LIMIT },
+		{ "stack-traces-frame-limit", required_argument, 0, GETOPT_STACKTRACE_FRAMES_LIMIT },
 		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
@@ -2551,7 +2553,7 @@ init(int argc, char *argv[])
 			stacktrace_frames_limit = i;
 #else
 			error_msg_and_die("Stack traces "
-					  "(--stacktrace-frames-limit "
+					  "(--stack-traces-frame-limit "
 					  "option) are not supported "
 					  "by this build of strace");
 #endif
@@ -2950,7 +2952,7 @@ init(int argc, char *argv[])
 		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO,
 			    stacktrace_frames_limit);
 	} else if (stacktrace_frames_limit != 0) {
-		error_msg("--stacktrace-frames-limit has no effect "
+		error_msg("--stack-traces-frame-limit has no effect "
 			  "without -k/--stack-traces");
 	}
 #endif

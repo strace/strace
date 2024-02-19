@@ -57,7 +57,7 @@ strace \- trace system calls and signals
 .OP \-U columns
 .OP \-X format
 .OP \-\-seccomp\-bpf
-.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-\-stacktrace\-frames\-limit\fR=\fIlimit\fR
+.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-\-stack\-traces\-frame\-limit\fR=\fIlimit\fR
 .OP \-\-syscall\-limit=\fIlimit\fR
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
 .OP \-\-tips\fR[=\fIformat\fR]
@@ -1012,7 +1012,7 @@ Print the syscall number.
 .if '@USE_LIBDW_FALSE@'#' processes after each system call. This option expects the target program is compiled
 .if '@USE_LIBDW_FALSE@'#' with appropriate debug options: "\-g" (gcc), or "\-g \-gdwarf-aranges" (clang).
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
-.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stacktrace\-frames\-limit = \fIlimit\fR
+.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stack-traces\-frame\-limit = \fIlimit\fR
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print no more than this amount of stack trace frames
 .if '@ENABLE_STACKTRACE_FALSE@'#' when backtracing a system call (the default is 256).
 .if '@ENABLE_STACKTRACE_FALSE@'#' Use this option with the

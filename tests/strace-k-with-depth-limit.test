@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check strace -k --stacktrace-frames-limit for attached tracees.
+# Check strace -k --stack-traces-frame-limit for attached tracees.
 #
 # Copyright (c) 2020-2024 The strace developers.
 # All rights reserved.
@@ -9,6 +9,6 @@
 
 KOPT_SHORT=-k
 KOPT_LONG=--stack-traces
-KOPT_EXTRA="--stacktrace-frames-limit 3"
+KOPT_EXTRA="--stack-traces-frame-limit 3"
 
 . "${srcdir=.}"/strace-k.test
