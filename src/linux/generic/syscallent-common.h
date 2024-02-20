@@ -42,3 +42,4 @@
 [BASE_NR + 455] = { 6,	0,		SEN(futex_wait),		"futex_wait"	},
 [BASE_NR + 456] = { 4,	0,		SEN(futex_requeue),		"futex_requeue"	},
 [BASE_NR + 457] = { 4,	0,		SEN(statmount),			"statmount"	},
+[BASE_NR + 458] = { 4,	0,		SEN(listmount),			"listmount"	},

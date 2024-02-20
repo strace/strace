@@ -193,6 +193,7 @@ libstrace_a_SOURCES =	\
 	lirc_ioctl.c	\
 	list.h		\
 	listen.c	\
+	listmount.c	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
