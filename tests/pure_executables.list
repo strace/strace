@@ -337,6 +337,8 @@ lchown
 lchown32
 link
 linkat
+listmount
+listmount-success
 llseek
 lookup_dcookie
 lseek
