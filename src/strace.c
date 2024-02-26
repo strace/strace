@@ -1085,6 +1085,9 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 		char name[PATH_MAX];
 		xsprintf(name, "%s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
+
+		if (structured_output)
+			fprintf(tcp->outf, "%s\n", structured_output->structured_output_ARRAY_BEGIN);
 	}
 
 #ifdef ENABLE_STACKTRACE
@@ -1264,6 +1267,8 @@ droptcb(struct tcb *tcp)
 		if (output_separately) {
 			if (tcp->curcol != 0 && publish)
 				fprintf(tcp->outf, " <detached ...>\n");
+			if (structured_output)
+				fprintf(tcp->outf, "%s\n", structured_output->structured_output_ARRAY_END);
 			fclose(tcp->outf);
 		} else {
 			if (printing_tcp == tcp && tcp->curcol != 0 && publish)
@@ -3241,6 +3246,10 @@ init(int argc, char *argv[])
 	 */
 	print_pid_pfx = outfname && !output_separately &&
 		((followfork && !output_separately) || nprocs > 1);
+
+	// If using structured output, wrap the output in ARRAY tags
+	if (structured_output && !output_separately)
+		fprintf(shared_log, "%s\n", structured_output->structured_output_ARRAY_BEGIN);
 }
 
 static struct tcb *
@@ -3567,7 +3576,7 @@ print_exited(struct tcb *tcp, const int pid, int status)
 		tprints_dummy("+++ exited with ");
 		tprintf_field_int("exited", "%d", WEXITSTATUS(status));
 		tprints_dummy(" +++");
-		tprint_sysret_end();
+		tprint_sysret_final();
 		tprint_newline();
 		line_ended();
 	}
@@ -4322,6 +4331,11 @@ terminate(void)
 	int sig = interrupted;
 
 	cleanup(sig);
+
+	// Close the array if using structured output
+	if (structured_output && !output_separately)
+		fprintf(shared_log, "%s\n", structured_output->structured_output_ARRAY_END);
+
 	if (cflag)
 		call_summary(shared_log);
 	fflush(NULL);

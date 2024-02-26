@@ -945,6 +945,20 @@ tprint_sysret_end(void)
 	}
 }
 
+/// This function differs from sysret_end in the fact that STRUCT_NEXT is
+/// omitted, as there will be no further content.
+static inline void
+tprint_sysret_final(void)
+{
+	if(structured_output){
+		tprint_struct_end();
+		/* TODO check if this does not break OCaml compatibility
+		STRACE_PRINTS( TCP_STATE_DELIM,
+			STRUCTURED_OUTPUT(STRUCT_NEXT)); */
+	} else {
+	}
+}
+
 static inline void
 tprint_syscall_begin(void)
 {
