@@ -808,7 +808,12 @@ tprint_more_data_follows(void)
 static inline void
 tprint_value_changed(void)
 {
-	STRACE_PRINTS( TCP_STATE_DELIM, " => ");
+	if(structured_output){
+		STRACE_PRINTS( TCP_STATE_DELIM,
+				STRUCTURED_OUTPUT (STRUCT_NEXT));
+	} else {
+		STRACE_PRINTS( TCP_STATE_DUMMY, " => ");
+	}
 }
 
 static inline void
