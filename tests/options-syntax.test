@@ -417,12 +417,18 @@ fi
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
 
+check_h "invalid --stack-trace-frame-limit argument: '1073741824'" --stack-trace-frame-limit 1073741824
+check_h "invalid --stack-trace-frame-limit argument: '0'" --stack-trace-frame-limit=0
 if [ -z "$compiled_with_stacktrace" ]; then
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=symbol
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=source
+	check_e "Stack traces (--stack-trace-frame-limit option) are not supported by this build of strace" \
+		--stack-trace-frame-limit=1
 else
+	check_e "--stack-trace-frame-limit has no effect without -k/--stack-traces
+$STRACE_EXE: $umsg" -u :nosuchuser: --stack-trace-frame-limit=1 true
 	if [ -n "$compiled_with_libunwind" ]; then
 		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" -kk
 		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" --stack-traces=source

@@ -57,7 +57,8 @@ strace \- trace system calls and signals
 .OP \-U columns
 .OP \-X format
 .OP \-\-seccomp\-bpf
-.OP \-\-syscall\-limit limit
+.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-\-stack\-trace\-frame\-limit\fR=\fIlimit\fR
+.OP \-\-syscall\-limit=\fIlimit\fR
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
 .OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
@@ -81,7 +82,7 @@ strace \- trace system calls and signals
 .OP \-S sortby
 .OP \-U columns
 .OP \-\-seccomp\-bpf
-.OP \-\-syscall\-limit limit
+.OP \-\-syscall\-limit=\fIlimit\fR
 .OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
@@ -1000,16 +1001,25 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ
-.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces [= symbol ]
+.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stack\-traces [= symbol ]
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
 .if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
 .if '@USE_LIBDW_FALSE@'#' .TP
 .if '@USE_LIBDW_FALSE@'#' .B \-kk
 .if '@USE_LIBDW_FALSE@'#' .TQ
-.if '@USE_LIBDW_FALSE@'#' .B \-\-stack\-traces [= source ]
+.if '@USE_LIBDW_FALSE@'#' .BR \-\-stack\-traces = source
 .if '@USE_LIBDW_FALSE@'#' Print the execution stack trace and source code information of the traced
 .if '@USE_LIBDW_FALSE@'#' processes after each system call. This option expects the target program is compiled
 .if '@USE_LIBDW_FALSE@'#' with appropriate debug options: "\-g" (gcc), or "\-g \-gdwarf-aranges" (clang).
+.if '@ENABLE_STACKTRACE_FALSE@'#' .TP
+.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stack\-trace\-frame\-limit = \fIlimit\fR
+.if '@ENABLE_STACKTRACE_FALSE@'#' Print no more than this amount of stack trace frames
+.if '@ENABLE_STACKTRACE_FALSE@'#' when backtracing a system call (the default is 256).
+.if '@ENABLE_STACKTRACE_FALSE@'#' Use this option with the
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
+.if '@ENABLE_STACKTRACE_FALSE@'#' (or
+.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-k )
+.if '@ENABLE_STACKTRACE_FALSE@'#' option.
 .TP
 .BI "\-o " filename
 .TQ

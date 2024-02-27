@@ -501,7 +501,7 @@ trie_test_LDADD = $(LDADD) $(CODE_COVERAGE_LIBS)
 include gen_tests.am
 
 if ENABLE_STACKTRACE
-STACKTRACE_TESTS = strace-k.test strace-k-p.test
+STACKTRACE_TESTS = strace-k.test strace-k-p.test strace-k-with-depth-limit.test
 if USE_LIBDW
 STACKTRACE_TESTS += strace-kk.test strace-kk-p.test
 endif
@@ -708,6 +708,7 @@ check_SCRIPTS = \
 	scno_tampering.sh \
 	strace-k-demangle.test \
 	strace-k-p.test \
+	strace-k-with-depth-limit.test \
 	strace-k.test \
 	strace-kk-p.test \
 	strace-kk.test \
@@ -766,6 +767,7 @@ check_DATA = \
 	strace-ff.expected \
 	strace-k-demangle.expected \
 	strace-k-p.expected \
+	strace-k-with-depth-limit.expected \
 	strace-k.expected \
 	strace-kk-p.expected \
 	strace-kk.expected \

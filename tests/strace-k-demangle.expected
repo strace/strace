@@ -1,2 +1,2 @@
-^chdir .*(__kernel_vsyscall )?(__)?chdir ns::f3\(int\) ns::f2\(int\) ns::f1\(int\) ns::f0\(int\) main
-^SIGURG .*(__kernel_vsyscall )?(__)?kill ns::f3\(int\) ns::f2\(int\) ns::f1\(int\) ns::f0\(int\) main
+^chdir (__kernel_vsyscall )?(__)?chdir ns::f3\(int\) ns::f2\(int\) ns::f1\(int\) ns::f0\(int\) main
+^SIGURG (__kernel_vsyscall )?(__)?kill ns::f3\(int\) ns::f2\(int\) ns::f1\(int\) ns::f0\(int\) main

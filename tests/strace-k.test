@@ -14,6 +14,7 @@
 : "${ATTACH_MODE=0}"
 : "${KOPT_SHORT=-k}"
 : "${KOPT_LONG=--stack-traces}"
+: "${KOPT_EXTRA=}"
 
 # strace -k is implemented using /proc/$pid/maps
 [ -f /proc/self/maps ] ||
@@ -45,9 +46,9 @@ if [ "x${ATTACH_MODE}" = "x1" ]; then
 			fail_ 'set_ptracer_any failed'
 	done
 
-	run_strace --trace=chdir ${KOPT_LONG} --attach="$tracee_pid"
+	run_strace --trace=chdir ${KOPT_LONG} ${KOPT_EXTRA} --attach="$tracee_pid"
 else
-	run_strace -e chdir ${KOPT_SHORT} $args
+	run_strace -e chdir ${KOPT_SHORT} ${KOPT_EXTRA} $args
 fi
 
 expected="$srcdir/$NAME.expected"
@@ -68,6 +69,11 @@ awk_script_common='
 	} else {
 		out = ""
 	}
+}
+
+/^ > too many stack frames/ {
+	out = out " _too_many_stack_frames_"
+	stop = 1
 }
 
 '

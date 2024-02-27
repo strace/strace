@@ -72,6 +72,10 @@ extern char *stpcpy(char *dst, const char *src);
 # ifndef DEFAULT_ACOLUMN
 #  define DEFAULT_ACOLUMN	40	/* default alignment column for results */
 # endif
+# ifndef DEFAULT_STACK_TRACE_FRAME_LIMIT
+/* Default limit for the amount of frames obtained during syscall backtrace.  */
+#  define DEFAULT_STACK_TRACE_FRAME_LIMIT 256
+# endif
 /*
  * Maximum number of args to a syscall.
  *
@@ -1566,7 +1570,7 @@ extern void print_ticks_d(int64_t val, long freq, unsigned int precision);
 extern void print_clock_t(uint64_t val);
 
 # ifdef ENABLE_STACKTRACE
-extern void unwind_init(bool);
+extern void unwind_init(bool, int);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
 extern void unwind_tcb_print(struct tcb *);

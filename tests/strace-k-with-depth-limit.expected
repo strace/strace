@@ -1,0 +1,2 @@
+^chdir ((__)?chdir f3 f2|__kernel_vsyscall (__)?chdir f3) _too_many_stack_frames_
+^SIGURG ((__)?chdir f3 f2|__kernel_vsyscall (__)?chdir f3) _too_many_stack_frames_
