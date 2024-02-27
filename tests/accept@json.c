@@ -81,19 +81,12 @@ main(void)
 	if (listen(lfd, 16))
 		perror_msg_and_skip("listen");
 
-#ifdef STRUCTURE_JSON
+	puts("[");
 	test_sockname_syscall_json(lfd);
-#else
-	test_sockname_syscall(lfd);
-#endif
 
 	(void) unlink(TEST_SOCKET);
 
-#ifdef STRUCTURE_JSON
-	puts("{\"exited\": \"0\"},");
-#else
-	puts("+++ exited with 0 +++");
-#endif
+	puts("{\"exited\": \"0\"}]");
 	return 0;
 }
 

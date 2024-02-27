@@ -65,13 +65,16 @@ test_sockname_syscall_json(const int fd)
 	char *my_secontext = SECONTEXT_PID_MY();
 	char *fd_secontext = SECONTEXT_FD(fd);
 
+	static char se_buf[4096];
+	if (my_secontext[0] != '\0')
+		snprintf(se_buf, sizeof(se_buf), "\"secontext\": \"%s\", ", my_secontext);
+
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	int rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, (void *) addr,
 				   plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("{"
-			"\"secontext\": \"%s\", "
+	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
 				"\"%d%s%s\", "
@@ -79,9 +82,10 @@ test_sockname_syscall_json(const int fd)
 					"\"sa_family\": \"AF_UNIX\", "
 					"\"sun_path\": \"%s\"%s"
 				"}, "
-				"[%d => %d]%s], "
-			"\"return\": %d}, \n",
-	       my_secontext,
+				"{\"indirect\": [\"%d\", \"%d\"]}%s], "
+			"\"return\": \"%d\""
+			"},\n",
+	       se_buf,
 	       TEST_SYSCALL_STR,
 	       fd,
 	       fd_secontext,
@@ -99,35 +103,87 @@ test_sockname_syscall_json(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s%s(%d%s%s, {sa_family=AF_UNIX, sun_path=\"%s\"%s}"
-	       ", [%d]%s) = %d\n",
-	       my_secontext,
-	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
-	       addr->sun_path, SECONTEXT_FILE(addr->sun_path),
-	       (int) *plen, SUFFIX_STR, rc);
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"{"
+					"\"sa_family\": \"AF_UNIX\", "
+					"\"sun_path\": \"%s\"%s"
+				"}, "
+				"{\"indirect\": [\"%d\"]}%s], "
+			"\"return\": \"%d\""
+			"},\n",
+	       se_buf,
+	       TEST_SYSCALL_STR,
+	       fd,
+	       fd_secontext,
+	       PREFIX_S_STR,
+	       addr->sun_path,
+	       SECONTEXT_FILE(addr->sun_path),
+	       (int) *plen,
+	       SUFFIX_STR,
+	       rc);
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr, 0 SUFFIX_ARGS);
-	printf("%s%s(%d%s%s, %p, NULL%s) = %s\n",
-	       my_secontext,
-	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR,
-	       addr, SUFFIX_STR, sprintrc(rc));
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"\"%p\", "
+				"null%s], "
+			"\"return\": \"%d\","
+			"\"error\": \"%s\","
+			"\"strerror\": \"%m\""
+			"},\n",
+	       se_buf,
+	       TEST_SYSCALL_STR,
+	       fd,
+	       fd_secontext,
+	       PREFIX_F_STR,
+	       addr,
+	       SUFFIX_STR,
+	       rc,
+	       errno2name());
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, 0, 0 SUFFIX_ARGS);
-	printf("%s%s(%d%s%s, NULL, NULL%s) = %s\n",
-	       my_secontext,
-	       TEST_SYSCALL_STR, fd, fd_secontext,
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"null, "
+				"null%s], "
+			"\"return\": \"%d\""
+			//",\"error\": \"%s\","         // For some reason this is not output
+			//"\"strerror\": \"%m\""       // TODO find out why and enable it
+			"},\n",
+	       se_buf,
+	       TEST_SYSCALL_STR,
+	       fd,
+	       fd_secontext,
 	       rc == -1 ? PREFIX_F_STR : PREFIX_S_STR,
-	       SUFFIX_STR, sprintrc(rc));
+	       SUFFIX_STR,
+	       rc);
+	       //errno2name());
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen + 1 SUFFIX_ARGS);
-	printf("%s%s(%d%s%s, %p, %p%s) = %s\n",
-	       my_secontext,
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"\"%p\", "
+				"\"%p\"%s], "
+			"\"return\": \"%d\","
+			"\"error\": \"%s\","
+			"\"strerror\": \"%m\""
+			"},\n",
+	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR, addr,
-	       plen + 1, SUFFIX_STR, sprintrc(rc));
+	       plen + 1, SUFFIX_STR, rc, errno2name());
 
 	const size_t offsetof_sun_path = offsetof(struct sockaddr_un, sun_path);
 	*plen = offsetof_sun_path;
@@ -138,8 +194,17 @@ test_sockname_syscall_json(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s%s(%d%s%s, {sa_family=AF_UNIX}, [%d => %d]%s) = %d\n",
-	       my_secontext,
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"{"
+					"\"sa_family\": \"AF_UNIX\""
+				"}, "
+				"{ \"indirect\": [\"%d\", \"%d\"]}%s], "
+			"\"return\": \"%d\""
+			"},\n",
+	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
 	       (int) offsetof_sun_path, (int) *plen, SUFFIX_STR, rc);
 
@@ -152,9 +217,19 @@ test_sockname_syscall_json(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s%s(%d%s%s, {sa_family=AF_UNIX, sun_path=\"%.*s\"%s}"
-	       ", [%d => %d]%s) = %d\n",
-	       my_secontext,
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"{"
+					"\"sa_family\": \"AF_UNIX\", "
+					"\"sun_path\": \"%.*s\"%s"
+				"}, "
+				"{\"indirect\": [\"%d\", \"%d\"]}"
+				"%s], "
+			"\"return\": \"%d\""
+			"},\n",
+	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
 	       (int) (sizeof(struct sockaddr) - offsetof_sun_path),
 	       addr->sun_path, SECONTEXT_FILE(addr->sun_path),
@@ -163,10 +238,19 @@ test_sockname_syscall_json(const int fd)
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen SUFFIX_ARGS);
-	printf("%s%s(%d%s%s, %p, [%d]%s) = %s\n",
-	       my_secontext,
+	printf("{ %s"
+			"\"cmd\": \"%s\", "
+			"\"args\": ["
+				"\"%d%s%s\", "
+				"\"%p\", "
+				"{\"indirect\": [\"%d\"]}%s], "
+			"\"return\": \"%d\","
+			"\"error\": \"%s\","
+			"\"strerror\": \"%m\""
+			"},\n",
+	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR, addr,
-	       *plen, SUFFIX_STR, sprintrc(rc));
+	       *plen, SUFFIX_STR, rc, errno2name());
 }
 #else
 static void
