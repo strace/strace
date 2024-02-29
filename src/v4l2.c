@@ -11,6 +11,7 @@
 #include "defs.h"
 
 #include DEF_MPERS_TYPE(kernel_v4l2_buffer_t)
+#include DEF_MPERS_TYPE(kernel_v4l2_buffer_time32_t)
 #include DEF_MPERS_TYPE(kernel_v4l2_event_t)
 #include DEF_MPERS_TYPE(kernel_v4l2_timeval_t)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
@@ -544,6 +545,52 @@ print_v4l2_timeval(const MPERS_PTR_ARG(kernel_v4l2_timeval_t *) const arg)
 		print_v4l2_timeval(&((where_).field_));	\
 	} while (0)
 
+static void
+print_v4l2_buffer_contents(struct tcb *const tcp, const unsigned int code,
+			   const kernel_v4l2_buffer_t *b)
+{
+	if (entering(tcp)) {
+		PRINT_FIELD_XVAL(*b, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		if (code != VIDIOC_DQBUF) {
+			tprint_struct_next();
+			PRINT_FIELD_U(*b, index);
+		}
+
+		/* The rest of the buffer hasn't been filled in yet */
+		return;
+	}
+
+	if (code == VIDIOC_DQBUF) {
+		tprint_struct_next();
+		PRINT_FIELD_U(*b, index);
+	}
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*b, memory, v4l2_memories,
+			 "V4L2_MEMORY_???");
+
+	if (b->memory == V4L2_MEMORY_MMAP) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*b, m.offset);
+	} else if (b->memory == V4L2_MEMORY_USERPTR) {
+		tprint_struct_next();
+		PRINT_FIELD_PTR(*b, m.userptr);
+	}
+
+	tprint_struct_next();
+	PRINT_FIELD_U(*b, length);
+	tprint_struct_next();
+	PRINT_FIELD_U(*b, bytesused);
+	tprint_struct_next();
+	PRINT_FIELD_V4L2_BUFFER_FLAGS(*b, flags);
+	if (code == VIDIOC_DQBUF) {
+		tprint_struct_next();
+		PRINT_FIELD_V4L2_TIMEVAL(*b, timestamp);
+	}
+	tprint_struct_next();
+	tprint_more_data_follows();
+}
+
 static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		  const kernel_ulong_t arg)
@@ -556,51 +603,82 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 			return RVAL_IOCTL_DECODED;
 
 		tprint_struct_begin();
-		PRINT_FIELD_XVAL(b, type, v4l2_buf_types,
-				 "V4L2_BUF_TYPE_???");
-		if (code != VIDIOC_DQBUF) {
-			tprint_struct_next();
-			PRINT_FIELD_U(b, index);
-		}
+
+		print_v4l2_buffer_contents(tcp, code, &b);
 
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &b)) {
-		if (code == VIDIOC_DQBUF) {
-			tprint_struct_next();
-			PRINT_FIELD_U(b, index);
-		}
-		tprint_struct_next();
-		PRINT_FIELD_XVAL(b, memory, v4l2_memories,
-				 "V4L2_MEMORY_???");
-
-		if (b.memory == V4L2_MEMORY_MMAP) {
-			tprint_struct_next();
-			PRINT_FIELD_X(b, m.offset);
-		} else if (b.memory == V4L2_MEMORY_USERPTR) {
-			tprint_struct_next();
-			PRINT_FIELD_PTR(b, m.userptr);
-		}
-
-		tprint_struct_next();
-		PRINT_FIELD_U(b, length);
-		tprint_struct_next();
-		PRINT_FIELD_U(b, bytesused);
-		tprint_struct_next();
-		PRINT_FIELD_V4L2_BUFFER_FLAGS(b, flags);
-		if (code == VIDIOC_DQBUF) {
-			tprint_struct_next();
-			PRINT_FIELD_V4L2_TIMEVAL(b, timestamp);
-		}
-		tprint_struct_next();
-		tprint_more_data_follows();
+		print_v4l2_buffer_contents(tcp, code, &b);
 	}
 
 	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
+
+#ifdef KERNEL_V4L2_HAVE_TIME32
+static void
+print_v4l2_buffer_time32_contents(struct tcb *const tcp, const unsigned int code,
+				  const kernel_v4l2_buffer_time32_t *b32)
+{
+	/* "Upsample" to full 64-bit buffer to reuse the same printing function. */
+	kernel_v4l2_buffer_t b = {
+		.index = b32->index,
+		.type = b32->type,
+		.bytesused = b32->bytesused,
+		.flags = b32->flags,
+		.field = b32->field,
+		.timestamp = {
+			.tv_sec = sign_extend_unsigned_to_ll(b32->timestamp.tv_sec),
+			.tv_usec = zero_extend_signed_to_ull(b32->timestamp.tv_usec),
+		},
+		.sequence = b32->sequence,
+		.memory = b32->memory,
+		.length = b32->length,
+		.reserved2 = b32->reserved2,
+		.request_fd = b32->request_fd,
+	};
+
+	static_assert(sizeof(b.timecode) == sizeof(b32->timecode),
+		     "sizeof(b.timecode) != sizeof(b32->timecode)");
+	memcpy(&b.timecode, &b32->timecode, sizeof(b.timecode));
+
+	static_assert(sizeof(b.m) == sizeof(b32->m),
+		     "sizeof(b.m) != sizeof(b32->m)");
+	memcpy(&b.m, &b32->m, sizeof(b.m));
+
+	print_v4l2_buffer_contents(tcp, code, &b);
+}
+
+static int
+print_v4l2_buffer_time32(struct tcb *const tcp, const unsigned int code,
+			 const kernel_ulong_t arg)
+{
+	kernel_v4l2_buffer_time32_t b32;
+
+	if (entering(tcp)) {
+		tprint_arg_next();
+		if (umove_or_printaddr(tcp, arg, &b32))
+			return RVAL_IOCTL_DECODED;
+
+		tprint_struct_begin();
+
+		print_v4l2_buffer_time32_contents(tcp, code, &b32);
+
+		return 0;
+	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &b32)) {
+		print_v4l2_buffer_time32_contents(tcp, code, &b32);
+	}
+
+	tprint_struct_end();
+
+	return RVAL_IOCTL_DECODED;
+}
+#endif
 
 static int
 print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -1454,6 +1532,15 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_QBUF: /* RW */
 	case VIDIOC_DQBUF: /* RW */
 		return print_v4l2_buffer(tcp, code, arg);
+
+#ifdef KERNEL_V4L2_HAVE_TIME32
+	case VIDIOC_QUERYBUF_TIME32: /* RW */
+		return print_v4l2_buffer_time32(tcp, VIDIOC_QUERYBUF, arg);
+	case VIDIOC_QBUF_TIME32: /* RW */
+		return print_v4l2_buffer_time32(tcp, VIDIOC_QBUF, arg);
+	case VIDIOC_DQBUF_TIME32: /* RW */
+		return print_v4l2_buffer_time32(tcp, VIDIOC_DQBUF, arg);
+#endif
 
 	case VIDIOC_G_FBUF: /* R */
 		if (entering(tcp))
