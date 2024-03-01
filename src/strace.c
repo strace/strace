@@ -870,7 +870,7 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
-	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
+	if (print_pid_pfx || ((followfork || nprocs > 1) && !outfname)) {
 		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
 			     ? strlen(tcp->comm) : 0;
 
