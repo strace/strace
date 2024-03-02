@@ -1348,7 +1348,12 @@ process_opt_p_list(char *opt)
 		 * pidof uses space as delim, pgrep uses newline. :(
 		 */
 		int pid;
-		char *delim = opt + strcspn(opt, "\n\t ,");
+		size_t adv = strcspn(opt, "\n\t ,");
+		if (adv == 0) {
+			opt++;
+			continue;
+		}
+		char *delim = opt + adv;
 		char c = *delim;
 
 		*delim = '\0';

@@ -437,6 +437,14 @@ $STRACE_EXE: $umsg" -u :nosuchuser: --stack-trace-frame-limit=1 true
 	fi
 fi
 
+check_zero -p "$$  $$" -V
+check_zero -p "$$   $$" -V
+check_zero -p "$$    $$" -V
+check_zero -p "$$,,$$" -V
+check_zero -p "$$, ,$$" -V
+check_zero -p "$$, , ,$$" -V
+check_zero -p "$$, ,, ,$$" -V
+
 args='-p 2147483647'
 $STRACE $args 2> "$LOG" &&
 	dump_log_and_fail_with \
