@@ -9,6 +9,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of UBI_IOCATT ioctl command.
   * Updated lists of BPF_*, KEXEC_*, KVM_*, PERF_*, SOL_*, STATX_*, UFFD_*,
     and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 6.8.
 
 Noteworthy changes in release 6.7 (2024-01-29)
 ==============================================
