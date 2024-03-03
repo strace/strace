@@ -86,7 +86,7 @@ main(void)
 
 	(void) unlink(TEST_SOCKET);
 
-	puts("{\"exited\": \"0\"}]");
+	puts("{\"exited\": 0}]");
 	return 0;
 }
 

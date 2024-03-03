@@ -77,13 +77,13 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"{"
 					"\"sa_family\": \"AF_UNIX\", "
 					"\"sun_path\": \"%s\"%s"
 				"}, "
-				"{\"indirect\": [\"%d\", \"%d\"]}%s], "
-			"\"return\": \"%d\""
+				"{\"indirect\": [%d, %d]}%s], "
+			"\"return\": %d"
 			"},\n",
 	       se_buf,
 	       TEST_SYSCALL_STR,
@@ -106,13 +106,13 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"{"
 					"\"sa_family\": \"AF_UNIX\", "
 					"\"sun_path\": \"%s\"%s"
 				"}, "
-				"{\"indirect\": [\"%d\"]}%s], "
-			"\"return\": \"%d\""
+				"{\"indirect\": [%d]}%s], "
+			"\"return\": %d"
 			"},\n",
 	       se_buf,
 	       TEST_SYSCALL_STR,
@@ -130,10 +130,10 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"\"%p\", "
 				"null%s], "
-			"\"return\": \"%d\","
+			"\"return\": %d,"
 			"\"error\": \"%s\","
 			"\"strerror\": \"%m\""
 			"},\n",
@@ -152,10 +152,10 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"null, "
 				"null%s], "
-			"\"return\": \"%d\""
+			"\"return\": %d"
 			//",\"error\": \"%s\","         // For some reason this is not output
 			//"\"strerror\": \"%m\""       // TODO find out why and enable it
 			"},\n",
@@ -174,10 +174,10 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"\"%p\", "
 				"\"%p\"%s], "
-			"\"return\": \"%d\","
+			"\"return\": %d,"
 			"\"error\": \"%s\","
 			"\"strerror\": \"%m\""
 			"},\n",
@@ -197,12 +197,12 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"{"
 					"\"sa_family\": \"AF_UNIX\""
 				"}, "
-				"{ \"indirect\": [\"%d\", \"%d\"]}%s], "
-			"\"return\": \"%d\""
+				"{ \"indirect\": [%d, %d]}%s], "
+			"\"return\": %d"
 			"},\n",
 	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
@@ -220,14 +220,14 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"{"
 					"\"sa_family\": \"AF_UNIX\", "
 					"\"sun_path\": \"%.*s\"%s"
 				"}, "
-				"{\"indirect\": [\"%d\", \"%d\"]}"
+				"{\"indirect\": [%d, %d]}"
 				"%s], "
-			"\"return\": \"%d\""
+			"\"return\": %d"
 			"},\n",
 	       se_buf,
 	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
@@ -241,10 +241,10 @@ test_sockname_syscall_json(const int fd)
 	printf("{ %s"
 			"\"cmd\": \"%s\", "
 			"\"args\": ["
-				"\"%d%s%s\", "
+				"%d%s%s, "
 				"\"%p\", "
-				"{\"indirect\": [\"%d\"]}%s], "
-			"\"return\": \"%d\","
+				"{\"indirect\": [%d]}%s], "
+			"\"return\": %d,"
 			"\"error\": \"%s\","
 			"\"strerror\": \"%m\""
 			"},\n",
