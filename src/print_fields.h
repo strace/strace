@@ -29,6 +29,8 @@ struct structured_output {
 	const char *structured_output_STRUCT_END     ;
 	const char *structured_output_INT_BEGIN	     ;
 	const char *structured_output_INT_END	     ;
+	const char *structured_output_HEX_BEGIN	   ;
+	const char *structured_output_HEX_END	     ;
 	const char *structured_output_FLAGS_BEGIN    ;
 	const char *structured_output_FLAGS_NEXT     ;
 	const char *structured_output_FLAGS_END	     ;
@@ -417,6 +419,53 @@ tprintf_int(const char *fmt, ...)
 	va_end(args);
 }
 
+// PRINT AN HEX VALUE
+
+static inline void
+tprint_hex_begin(void)
+{
+	if(structured_output){
+		STRACE_PRINTS( TCP_STATE_DUMMY,
+			STRUCTURED_OUTPUT(HEX_BEGIN));
+	} else {
+	}
+}
+
+static inline void
+tprint_hex_end(void)
+{
+	if(structured_output){
+		STRACE_PRINTS( TCP_STATE_DUMMY,
+			STRUCTURED_OUTPUT(HEX_END));
+	} else {
+	}
+}
+
+static inline void
+tprints_hex(const char *str)
+{
+	tprint_hex_begin();
+	STRACE_PRINTS( TCP_STATE_VALUE, str);
+	tprint_hex_end();
+}
+
+static inline void
+tprintv_hex(const char *fmt, va_list args)
+{
+	tprint_hex_begin();
+	STRACE_PRINTV( TCP_STATE_VALUE, fmt, args);
+	tprint_hex_end();
+}
+
+static inline void
+tprintf_hex(const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	tprintv_hex( fmt, args);
+	va_end(args);
+}
+
 static inline void
 tprint_flags_begin(void)
 {
@@ -475,7 +524,6 @@ tprints_field_set(const char* field)
 }
 
 
-
 static inline void
 tprintf_field_int(const char* field, const char* fmt, ...)
 {
@@ -492,6 +540,25 @@ tprints_field_int(const char* field, const char* s)
 {
 	tprints_field_set(field);
 	tprints_int(s);
+	tprint_field_end();
+}
+
+static inline void
+tprintf_field_hex(const char* field, const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	tprints_field_set(field);
+	tprintv_hex( fmt, args);
+	tprint_field_end();
+	va_end(args);
+}
+
+static inline void
+tprints_field_hex(const char* field, const char* s)
+{
+	tprints_field_set(field);
+	tprints_hex(s);
 	tprint_field_end();
 }
 
@@ -1031,7 +1098,7 @@ tprint_unfinished(int at_end)
 	tprintf_int("%llu", zero_extend_signed_to_ull(val_))
 
 # define PRINT_VAL_X(val_)					\
-	tprintf_int("%#llx", zero_extend_signed_to_ull(val_))
+	tprintf_hex("%#llx", zero_extend_signed_to_ull(val_))
 
 # define PRINT_VAL_03O(val_)					\
 	tprintf_int("%#03llo", zero_extend_signed_to_ull(val_))

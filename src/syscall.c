@@ -991,7 +991,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				{
 					tprints_dummy("=");
 					tprints_sysret_next("retval");
-					tprintf_field_int("return",
+					tprintf_field_hex("return",
 							  "%#" PRI_klx, tcp->u_rval);
 				}
 				break;

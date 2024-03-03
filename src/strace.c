@@ -230,6 +230,8 @@ static void init_structured_outputs(void)
 	s->structured_output_STRUCT_END =     "]" ;
 	s->structured_output_INT_BEGIN =      "INT (" ;
 	s->structured_output_INT_END =	      "L)" ;
+	s->structured_output_HEX_BEGIN =      "INT (" ;
+	s->structured_output_HEX_END =	      "L)" ;
 	s->structured_output_FLAGS_BEGIN =     "FLAGS [" ;
 	s->structured_output_FLAGS_NEXT =     "; " ;
 	s->structured_output_FLAGS_END =      "]" ;
@@ -266,8 +268,10 @@ static void init_structured_outputs(void)
 	s->structured_output_STRUCT_BEGIN  =   "{" ;
 	s->structured_output_STRUCT_NEXT   =   ", " ;
 	s->structured_output_STRUCT_END	   =   "}" ;
-	s->structured_output_INT_BEGIN	   =   "\"" ;
-	s->structured_output_INT_END	  =    "\"" ;
+	s->structured_output_INT_BEGIN	   =   "" ;
+	s->structured_output_INT_END	  =    "" ;
+	s->structured_output_HEX_BEGIN =      "\"" ;
+	s->structured_output_HEX_END =	      "\"" ;
 	s->structured_output_FLAGS_BEGIN   =   "{ \"flags\": [" ;
 	s->structured_output_FLAGS_NEXT	   =   ", " ;
 	s->structured_output_FLAGS_END	   =   "]}" ;
