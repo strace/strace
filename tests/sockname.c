@@ -55,6 +55,9 @@
 #endif
 
 #ifdef STRUCTURE_JSON
+
+#define SYSCALL_FIELD_NAME "syscall"
+
 static void
 test_sockname_syscall_json(const int fd)
 {
@@ -75,7 +78,7 @@ test_sockname_syscall_json(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"{"
@@ -104,7 +107,7 @@ test_sockname_syscall_json(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"{"
@@ -128,7 +131,7 @@ test_sockname_syscall_json(const int fd)
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr, 0 SUFFIX_ARGS);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"\"%p\", "
@@ -150,7 +153,7 @@ test_sockname_syscall_json(const int fd)
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, 0, 0 SUFFIX_ARGS);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"null, "
@@ -172,7 +175,7 @@ test_sockname_syscall_json(const int fd)
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen + 1 SUFFIX_ARGS);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"\"%p\", "
@@ -195,7 +198,7 @@ test_sockname_syscall_json(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"{"
@@ -218,7 +221,7 @@ test_sockname_syscall_json(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"{"
@@ -239,7 +242,7 @@ test_sockname_syscall_json(const int fd)
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen SUFFIX_ARGS);
 	printf("{ %s"
-			"\"cmd\": \"%s\", "
+			"\"" SYSCALL_FIELD_NAME "\": \"%s\", "
 			"\"args\": ["
 				"%d%s%s, "
 				"\"%p\", "

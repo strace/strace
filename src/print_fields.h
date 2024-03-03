@@ -13,6 +13,8 @@
 
 # include "static_assert.h"
 
+#define SYSCALL_FIELD_NAME "syscall"
+
 struct structured_output {
 	const char *structured_output_NULL_VALUE   ;
 	const char *structured_output_NEWLINE	   ;
@@ -1044,7 +1046,7 @@ static inline void
 tprints_argspace_begin(const char *name)
 {
 	if(structured_output){
-		tprints_field_string("cmd", name);
+		tprints_field_string(SYSCALL_FIELD_NAME, name);
 		tprints_field_set("args");
 		tprint_array_begin();
 	} else {
