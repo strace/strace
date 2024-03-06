@@ -633,6 +633,7 @@ readv
 reboot
 recv-MSG_TRUNC
 recvfrom
+recvfrom@json
 recvfrom-MSG_TRUNC
 recvmmsg-timeout
 recvmsg

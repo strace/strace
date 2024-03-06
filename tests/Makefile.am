@@ -473,6 +473,7 @@ truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 
 accept@json_CPPFLAGS = $(AM_CPPFLAGS) -DSTRUCTURE_JSON
+recvfrom@json_CPPFLAGS = $(AM_CPPFLAGS) -DSTRUCTURE_JSON
 
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
