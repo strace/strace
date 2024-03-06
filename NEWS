@@ -6,8 +6,8 @@ Noteworthy changes in release ?.? (????-??-??)
     Old option is retained for backwards compatibility.
   * Implemented --stack-trace-frame-limit=N option for configuring the limit
     of the number of printed backtrace frames.
-  * Implemented decoding of statmount, listmount, and lsm_get_self_attr
-    syscalls.
+  * Implemented decoding of statmount, listmount, lsm_get_self_attr, and
+    lsm_set_self_attr syscalls.
   * Implemented decoding of setsockopt(TCP_AO_ADD_KEY).
   * Updated decoding of landlock_create_ruleset and landlock_add_rule syscalls.
   * Updated decoding of SMC_DIAG_DMBINFO netlink attribute.

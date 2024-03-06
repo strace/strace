@@ -176,3 +176,27 @@ SYS_FUNC(lsm_get_self_attr)
 
 	return 0;
 }
+
+SYS_FUNC(lsm_set_self_attr)
+{
+	const unsigned int attr = tcp->u_arg[0];
+	const kernel_ulong_t p_ctx = tcp->u_arg[1];
+	const uint32_t size = tcp->u_arg[2];
+	const uint32_t flags = tcp->u_arg[3];
+
+	struct lsm_ctx ctx;
+
+	printxval(lsm_attrs, attr, "LSM_ATTR_???");
+	tprint_arg_next();
+
+	if (fetch_lsm_ctx_header(tcp, &ctx, p_ctx, size, false))
+		decode_lsm_ctx(tcp, &ctx, p_ctx, size);
+
+	tprint_arg_next();
+	PRINT_VAL_U(size);
+
+	tprint_arg_next();
+	PRINT_VAL_X(flags);
+
+	return RVAL_DECODED;
+}
