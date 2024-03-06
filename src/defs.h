@@ -682,11 +682,14 @@ struct finfo {
 	bool deleted;
 	struct {
 		unsigned int major, minor;
+
+		/* Use only when major == 5, minor == 2 (/dev/ptmx) */
+		int tty_index;
 	} dev;
 };
 
 extern struct finfo *
-get_finfo_for_dev(const char *path, struct finfo *finfo);
+get_finfo_for_dev(pid_t pid, int fd, const char *path, struct finfo *finfo);
 
 extern int
 term_ioctl_decode_command_number(struct tcb *tcp,

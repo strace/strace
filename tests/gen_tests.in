@@ -82,6 +82,7 @@ dev--decode-fds-dev	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P 
 dev--decode-fds-none	-a9 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=none
 dev--decode-fds-path	-a19 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=path
 dev--decode-fds-socket	-a9 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=socket
+dev-pty-yy -a30 -e trace=close -P "/dev/ptmx" -yy
 dev-yy	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -yy
 dup	-a7 9>>/dev/full
 dup-P	-a7 --trace=dup -P /dev/full 9>>/dev/full

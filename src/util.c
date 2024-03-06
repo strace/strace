@@ -682,8 +682,25 @@ scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
 	return result;
 }
 
+static bool
+is_ptmx(const struct finfo *finfo)
+{
+	return finfo->type == FINFO_DEV_CHR
+		&& finfo->dev.major == 5
+		&& finfo->dev.minor == 2;
+}
+
+static bool
+set_tty_index(const char *value, void *data)
+{
+	struct finfo *finfo = data;
+
+	finfo->dev.tty_index = string_to_uint_ex(value, NULL, INT_MAX, "\n");
+	return true;
+}
+
 struct finfo *
-get_finfo_for_dev(const char *path, struct finfo *finfo)
+get_finfo_for_dev(pid_t pid, int fd, const char *path, struct finfo *finfo)
 {
 	strace_stat_t st;
 
@@ -713,6 +730,14 @@ get_finfo_for_dev(const char *path, struct finfo *finfo)
 	finfo->dev.major = major(st.st_rdev);
 	finfo->dev.minor = minor(st.st_rdev);
 
+	if (is_ptmx(finfo)) {
+		static const char prefix[] = "tty-index:\t";
+
+		finfo->dev.tty_index = -1;
+		scan_fdinfo(pid, fd, prefix, sizeof(prefix) - 1,
+			    set_tty_index, finfo);
+	}
+
 	return finfo;
 }
 
@@ -721,7 +746,7 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 {
 	struct finfo finfo_buf;
 	if (!finfo)
-		finfo = get_finfo_for_dev(path, &finfo_buf);
+		finfo = get_finfo_for_dev(tcp->pid, fd, path, &finfo_buf);
 
 	switch (finfo->type) {
 	case FINFO_DEV_BLK:
@@ -734,6 +759,8 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 		tprintf_string("%s %u:%u",
 			       (finfo->type == FINFO_DEV_BLK)? "block" : "char",
 			       finfo->dev.major, finfo->dev.minor);
+		if (is_ptmx(finfo) && finfo->dev.tty_index >= 0)
+			tprintf_string(" @/dev/pts/%d", finfo->dev.tty_index);
 		tprint_associated_info_end();
 		tprint_associated_info_end();
 		return true;
