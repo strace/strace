@@ -1168,3 +1168,4 @@ xetpriority
 xetpriority--pidns-translation
 xettimeofday
 zeroargc
+*@json
