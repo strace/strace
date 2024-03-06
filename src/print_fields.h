@@ -1103,7 +1103,7 @@ tprint_unfinished(int at_end)
 	tprintf_hex("%#llx", zero_extend_signed_to_ull(val_))
 
 # define PRINT_VAL_03O(val_)					\
-	tprintf_int("%#03llo", zero_extend_signed_to_ull(val_))
+	tprintf_hex("%#03llo", zero_extend_signed_to_ull(val_))
 
 # define PRINT_VAL_0X(val_)				\
 	tprintf_int("%#0*llx", (int) sizeof(val_) * 2,	\
