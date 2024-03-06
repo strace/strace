@@ -502,6 +502,7 @@ oldselect
 oldselect-efault
 oldstat
 open
+open@json
 open_tree
 open_tree-P
 openat

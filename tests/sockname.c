@@ -56,8 +56,6 @@
 
 #ifdef STRUCTURE_JSON
 
-#define SYSCALL_FIELD_NAME "syscall"
-
 static void
 test_sockname_syscall_json(const int fd)
 {

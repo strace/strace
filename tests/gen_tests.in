@@ -688,6 +688,7 @@ oldselect-efault	-a13 -e trace=select
 oldselect-efault-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
+open@json	-e trace=open -P $NAME.sample
 open--secontext		-a30 -P open.sample --secontext --trace=open
 open--secontext_full	-a30 -P open.sample --secontext=full --trace=open
 open--secontext_full_mismatch	-a30 -P open.sample --secontext=full,mismatch --trace=open
