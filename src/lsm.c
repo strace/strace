@@ -12,14 +12,17 @@
 #include "xlat/lsm_ids.h"
 
 static int
-print_args_size_flags(struct tcb *const tcp,
-		      const kernel_ulong_t p_size, const uint32_t flags)
+print_args_size_flags(struct tcb *const tcp, const kernel_ulong_t p_size,
+		      const uint32_t flags, const bool raw_flags)
 {
 	tprint_arg_next();
 	printnum_int(tcp, p_size, "%u");
 
 	tprint_arg_next();
-	printflags(lsm_flags, flags, "LSM_FLAG_???");
+	if (raw_flags)
+		PRINT_VAL_X(flags);
+	else
+		printflags(lsm_flags, flags, "LSM_FLAG_???");
 
 	return RVAL_DECODED;
 }
@@ -137,7 +140,7 @@ SYS_FUNC(lsm_get_self_attr)
 		if (!tfetch_obj(tcp, p_size, &size) ||
 		    (single && !tfetch_obj(tcp, p_ctx, &ctx))) {
 			printaddr(p_ctx);
-			return print_args_size_flags(tcp, p_size, flags);
+			return print_args_size_flags(tcp, p_size, flags, false);
 		}
 		set_tcb_priv_ulong(tcp, size);
 
@@ -154,7 +157,7 @@ SYS_FUNC(lsm_get_self_attr)
 		if (!single)
 			printaddr(p_ctx);
 
-		return print_args_size_flags(tcp, p_size, flags);
+		return print_args_size_flags(tcp, p_size, flags, false);
 	}
 
 	if (single)
@@ -199,4 +202,58 @@ SYS_FUNC(lsm_set_self_attr)
 	PRINT_VAL_X(flags);
 
 	return RVAL_DECODED;
+}
+
+static bool
+print_lsm_id_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	const uint64_t *p_id = elem_buf;
+	printxval64(lsm_ids, *p_id, "LSM_ID_???");
+
+	return true;
+}
+
+SYS_FUNC(lsm_list_modules)
+{
+	const kernel_ulong_t p_ids = tcp->u_arg[0];
+	const kernel_ulong_t p_size = tcp->u_arg[1];
+	const uint32_t flags = tcp->u_arg[2];
+	uint32_t size;
+
+	if (entering(tcp)) {
+		if (!tfetch_obj(tcp, p_size, &size)) {
+			printaddr(p_ids);
+			return print_args_size_flags(tcp, p_size, flags, true);
+		}
+
+		set_tcb_priv_ulong(tcp, size);
+
+		return 0;
+	}
+
+	if (!tfetch_obj_ignore_syserror(tcp, p_size, &size)) {
+		printaddr(p_ids);
+		return print_args_size_flags(tcp, p_size, flags, true);
+	}
+
+	const uint32_t saved_size = get_tcb_priv_ulong(tcp);
+	uint64_t elem;
+
+	print_array(tcp, p_ids, (kernel_ulong_t) tcp->u_rval, &elem,
+		    sizeof(elem), tfetch_mem, print_lsm_id_array_member, 0);
+
+	tprint_arg_next();
+	tprint_indirect_begin();
+	PRINT_VAL_U(saved_size);
+	if (saved_size != size) {
+		tprint_value_changed();
+		PRINT_VAL_U(size);
+	}
+	tprint_indirect_end();
+
+	tprint_arg_next();
+	PRINT_VAL_X(flags);
+
+	return 0;
 }
