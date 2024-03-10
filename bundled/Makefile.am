@@ -110,6 +110,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
 	linux/include/uapi/linux/stat.h \
+	linux/include/uapi/linux/stddef.h \
 	linux/include/uapi/linux/tcp.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/tls.h \
