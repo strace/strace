@@ -798,6 +798,7 @@ sysctl
 sysinfo
 syslog
 tampering-notes
+tcp_ao
 tee
 tgkill
 time

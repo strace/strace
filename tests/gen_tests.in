@@ -1111,6 +1111,7 @@ sync_file_range2
 sysctl	-a16 --trace=_sysctl
 sysinfo	-a14
 syslog	-a35
+tcp_ao	-e trace=getsockopt,setsockopt
 tee
 tgkill	-a15 --signal='!cont'
 tgkill--pidns-translation       test_pidns -a15 --signal='!cont' -e trace=tgkill

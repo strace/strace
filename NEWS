@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented --stack-trace-frame-limit=N option for configuring the limit
     of the number of printed backtrace frames.
   * Implemented decoding of statmount and listmount syscalls.
+  * Implemented decoding of setsockopt(TCP_AO_ADD_KEY).
   * Updated decoding of landlock_create_ruleset and landlock_add_rule syscalls.
   * Updated decoding of SMC_DIAG_DMBINFO netlink attribute.
   * Updated decoding of UBI_IOCATT ioctl command.

@@ -1113,6 +1113,7 @@ sysinfo
 syslog
 syslog-success
 tampering-notes
+tcp_ao
 tee
 tgkill
 tgkill--pidns-translation
