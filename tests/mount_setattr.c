@@ -94,76 +94,80 @@ main(void)
 	       ~valid_flags.val, MOUNT_ATTR_SIZE_VER0, rcstr);
 #endif
 
-	static const struct strval64 valid_attr =
-		{ ARG_STR(MOUNT_ATTR_RDONLY|MOUNT_ATTR_NOSUID|MOUNT_ATTR_NODEV|MOUNT_ATTR_NOEXEC|MOUNT_ATTR_NOATIME|MOUNT_ATTR_STRICTATIME|MOUNT_ATTR_NODIRATIME|MOUNT_ATTR_IDMAP|MOUNT_ATTR_NOSYMFOLLOW) };
+	static const struct strval64 valid_attrs[] = {
+		{ ARG_STR(MOUNT_ATTR_RDONLY|MOUNT_ATTR_NOSUID|MOUNT_ATTR_NODEV|MOUNT_ATTR_NOEXEC|MOUNT_ATTR_NOATIME|MOUNT_ATTR_STRICTATIME|MOUNT_ATTR_NODIRATIME|MOUNT_ATTR_IDMAP|MOUNT_ATTR_NOSYMFOLLOW) },
+		{ ARG_STR(MOUNT_ATTR_RDONLY|MOUNT_ATTR_NOSUID|MOUNT_ATTR_NODEV|MOUNT_ATTR_NOEXEC|MOUNT_ATTR__ATIME|MOUNT_ATTR_NODIRATIME|MOUNT_ATTR_IDMAP|MOUNT_ATTR_NOSYMFOLLOW) }
+	};
 
 	for (unsigned int j = 0; j < 4; ++j) {
-		struct mount_attr *const a = j > 1 ? attr_big : attr;
-		const size_t size = j ? sizeof(*a) + 8 : sizeof(*a);
+		for (unsigned int i = 0; i < ARRAY_SIZE(valid_attrs); ++i) {
+			struct mount_attr *const a = j > 1 ? attr_big : attr;
+			const size_t size = j ? sizeof(*a) + 8 : sizeof(*a);
 
-		if (j == 3)
-			memset(attr_big + 1, 0, 8);
-		else
-			fill_memory(attr_big + 1, 8);
+			if (j == 3)
+				memset(attr_big + 1, 0, 8);
+			else
+				fill_memory(attr_big + 1, 8);
 
-		a->attr_set = 0xffffffff00000000ULL;
-		a->attr_clr = 0;
-		a->propagation = MS_UNBINDABLE;
-		a->userns_fd = dfd;
+			a->attr_set = 0xffffffff00000000ULL;
+			a->attr_clr = 0;
+			a->propagation = MS_UNBINDABLE;
+			a->userns_fd = dfd;
 
-		k_mount_setattr(-1, path, 0, a, size);
-		printf("mount_setattr(-1, \"%s\", 0"
-		       ", {attr_set=0xffffffff00000000 /* MOUNT_ATTR_??? */"
-		       ", attr_clr=0, propagation=%s, userns_fd=%u",
-		       path, "MS_UNBINDABLE", dfd);
-		if (j == 1)
-			printf(", ???");
-		if (j == 2) {
-			printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
-			       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
-			       sizeof(*a), sizeof(*a) + 7);
+			k_mount_setattr(-1, path, 0, a, size);
+			printf("mount_setattr(-1, \"%s\", 0"
+			       ", {attr_set=0xffffffff00000000 /* MOUNT_ATTR_??? */"
+			       ", attr_clr=0, propagation=%s, userns_fd=%u",
+			       path, "MS_UNBINDABLE", dfd);
+			if (j == 1)
+				printf(", ???");
+			if (j == 2) {
+				printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
+				       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
+				       sizeof(*a), sizeof(*a) + 7);
+			}
+			printf("}, %zu) = %s\n", size, rcstr);
+
+			a->attr_set = valid_attrs[i].val;
+			a->attr_clr = ~valid_attrs[i].val;
+			a->propagation = MS_PRIVATE | MS_SHARED;
+			a->userns_fd = dfd;
+
+			k_mount_setattr(-1, path, 0, a, size);
+			printf("mount_setattr(-1, \"%s\", 0"
+			       ", {attr_set=%s, attr_clr=%#llx /* MOUNT_ATTR_??? */"
+			       ", propagation=%#x /* MS_??? */, userns_fd=%d<%s>",
+			       path, valid_attrs[i].str, (unsigned long long) a->attr_clr,
+			       MS_PRIVATE | MS_SHARED, dfd, path);
+			if (j == 1)
+				printf(", ???");
+			if (j == 2) {
+				printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
+				       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
+				       sizeof(*a), sizeof(*a) + 7);
+			}
+			printf("}, %zu) = %s\n", size, rcstr);
+
+			a->attr_set = MOUNT_ATTR_NOSUID;
+			a->attr_clr = MOUNT_ATTR_NODEV;
+			a->propagation = MS_SLAVE;
+			a->userns_fd = 0xdefaced00000000ULL | dfd;
+
+			k_mount_setattr(dfd, empty, AT_EMPTY_PATH, a, size);
+			printf("mount_setattr(%d<%s>, \"\", %s, {attr_set=%s, attr_clr=%s"
+			       ", propagation=%s, userns_fd=%llu",
+			       dfd, path, "AT_EMPTY_PATH",
+			       "MOUNT_ATTR_NOSUID", "MOUNT_ATTR_NODEV", "MS_SLAVE",
+			       (unsigned long long) a->userns_fd);
+			if (j == 1)
+				printf(", ???");
+			if (j == 2) {
+				printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
+				       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
+				       sizeof(*a), sizeof(*a) + 7);
+			}
+			printf("}, %zu) = %s\n", size, rcstr);
 		}
-		printf("}, %zu) = %s\n", size, rcstr);
-
-		a->attr_set = valid_attr.val;
-		a->attr_clr = ~valid_attr.val;
-		a->propagation = MS_PRIVATE | MS_SHARED;
-		a->userns_fd = dfd;
-
-		k_mount_setattr(-1, path, 0, a, size);
-		printf("mount_setattr(-1, \"%s\", 0"
-		       ", {attr_set=%s, attr_clr=%#llx /* MOUNT_ATTR_??? */"
-		       ", propagation=%#x /* MS_??? */, userns_fd=%d<%s>",
-		       path, valid_attr.str, (unsigned long long) a->attr_clr,
-		       MS_PRIVATE | MS_SHARED, dfd, path);
-		if (j == 1)
-			printf(", ???");
-		if (j == 2) {
-			printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
-			       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
-			       sizeof(*a), sizeof(*a) + 7);
-		}
-		printf("}, %zu) = %s\n", size, rcstr);
-
-		a->attr_set = MOUNT_ATTR_NOSUID;
-		a->attr_clr = MOUNT_ATTR_NODEV;
-		a->propagation = MS_SLAVE;
-		a->userns_fd = 0xdefaced00000000ULL | dfd;
-
-		k_mount_setattr(dfd, empty, AT_EMPTY_PATH, a, size);
-		printf("mount_setattr(%d<%s>, \"\", %s, {attr_set=%s, attr_clr=%s"
-		       ", propagation=%s, userns_fd=%llu",
-		       dfd, path, "AT_EMPTY_PATH",
-		       "MOUNT_ATTR_NOSUID", "MOUNT_ATTR_NODEV", "MS_SLAVE",
-		       (unsigned long long) a->userns_fd);
-		if (j == 1)
-			printf(", ???");
-		if (j == 2) {
-			printf(", /* bytes %zu..%zu */ \"\\x80\\x81"
-			       "\\x82\\x83\\x84\\x85\\x86\\x87\"",
-			       sizeof(*a), sizeof(*a) + 7);
-		}
-		printf("}, %zu) = %s\n", size, rcstr);
 	}
 
 	puts("+++ exited with 0 +++");

@@ -7,6 +7,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of landlock_create_ruleset and landlock_add_rule syscalls.
   * Updated decoding of SMC_DIAG_DMBINFO netlink attribute.
   * Updated decoding of UBI_IOCATT ioctl command.
+  * Enhanced decoding of mount attributes of fsmount and mount_setattr syscalls.
   * Updated lists of BPF_*, KEXEC_*, KVM_*, PERF_*, SOL_*, STATX_*, UFFD_*,
     and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 6.8.
