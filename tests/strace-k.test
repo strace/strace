@@ -13,7 +13,7 @@
 
 : "${ATTACH_MODE=0}"
 : "${KOPT_SHORT=-k}"
-: "${KOPT_LONG=--stack-traces}"
+: "${KOPT_LONG=--stack-trace}"
 : "${KOPT_EXTRA=}"
 
 # strace -k is implemented using /proc/$pid/maps
@@ -103,7 +103,7 @@ awk_script_source='
 
 '
 
-if [ "${KOPT_LONG}" = "--stack-traces" ]; then
+if [ "${KOPT_LONG}" = "--stack-trace" ]; then
     awk_script="${awk_script_common}${awk_script_symbol}"
 else
     awk_script="${awk_script_common}${awk_script_source}"

@@ -89,15 +89,15 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	  "    strace -E REMOVE_VAR -E VAR=new_val" },
 #ifdef ENABLE_STACKTRACE
 	{ "You can print a stack trace for each traced",
-	  "call by specifying -k/--stack-traces option.",
+	  "call by specifying -k/--stack-trace option.",
 # ifdef USE_DEMANGLE
 	  "It can even demangle symbol names.",
 # endif
 	  },
 #else
 	{ "We wish we could tell you that you can",
-	  "specify -k/--stack-traces option to print",
-	  "stack traces for each traced system call,",
+	  "specify -k/--stack-trace option to print",
+	  "stack trace for each traced system call,",
 	  "but, unfortunately, you can't: this strace",
 	  "binary is built without stack tracing",
 	  "support." },

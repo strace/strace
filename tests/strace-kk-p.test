@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check strace --stack-traces=source for attached tracees.
+# Check strace --stack-trace=source for attached tracees.
 #
 # Copyright (c) 2020-2023 The strace developers.
 # All rights reserved.
@@ -9,7 +9,7 @@
 
 ATTACH_MODE=1
 KOPT_SHORT=-kk
-KOPT_LONG=--stack-traces=source
+KOPT_LONG=--stack-trace=source
 test_prog=../stack-fcall-attach
 
 . "${srcdir=.}"/strace-k.test

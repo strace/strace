@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 KOPT_SHORT=-k
-KOPT_LONG=--stack-traces
+KOPT_LONG=--stack-trace
 KOPT_EXTRA="--stack-trace-frame-limit 3"
 
 . "${srcdir=.}"/strace-k.test

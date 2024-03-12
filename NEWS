@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Renamed --stack-traces to --stack-trace for consistency.
+    Old option is retained for backwards compatibility.
   * Implemented --stack-trace-frame-limit=N option for configuring the limit
     of the number of printed backtrace frames.
   * Implemented decoding of statmount and listmount syscalls.
