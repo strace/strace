@@ -15,6 +15,17 @@ log_sfx()
 	printf "%.128s" "$*" | tr -c '0-9A-Za-z-=,' '_'
 }
 
+check_zero()
+{
+	local sfx
+	sfx="$(log_sfx "$*")"
+
+	$STRACE "$@" 2> "$LOG.$sfx" > /dev/null || {
+		cat "$LOG.$sfx" >&2
+		fail_ "strace $* failed to handle the error properly"
+	}
+}
+
 check_exit_status_and_stderr()
 {
 	local sfx
