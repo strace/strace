@@ -645,6 +645,43 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 	return true;
 }
 
+typedef bool (*scan_fdinfo_fn)(const char *value, void *data);
+
+static bool
+scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
+	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
+{
+	int proc_pid = 0;
+	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
+	if (!proc_pid)
+		return false;
+
+	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
+	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", proc_pid, fd);
+
+	FILE *f = fopen_stream(fdi_path, "r");
+	if (!f)
+		return false;
+
+	char *line = NULL;
+	size_t sz = 0;
+	bool result = false;
+
+	while (getline(&line, &sz, f) > 0) {
+		const char *value =
+			str_strip_prefix_len(line, search_pfx, search_pfx_len);
+		if (value != line && fn(value, data)) {
+			result = true;
+			break;
+		}
+	}
+
+	free(line);
+	fclose(f);
+
+	return result;
+}
+
 struct finfo *
 get_finfo_for_dev(const char *path, struct finfo *finfo)
 {
@@ -705,43 +742,6 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 	}
 
 	return false;
-}
-
-typedef bool (*scan_fdinfo_fn)(const char *value, void *data);
-
-static bool
-scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
-	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
-{
-	int proc_pid = 0;
-	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
-	if (!proc_pid)
-		return false;
-
-	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
-	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", proc_pid, fd);
-
-	FILE *f = fopen_stream(fdi_path, "r");
-	if (!f)
-		return false;
-
-	char *line = NULL;
-	size_t sz = 0;
-	bool result = false;
-
-	while (getline(&line, &sz, f) > 0) {
-		const char *value =
-			str_strip_prefix_len(line, search_pfx, search_pfx_len);
-		if (value != line && fn(value, data)) {
-			result = true;
-			break;
-		}
-	}
-
-	free(line);
-	fclose(f);
-
-	return result;
 }
 
 static bool
