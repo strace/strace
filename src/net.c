@@ -16,9 +16,6 @@
 #include <sys/uio.h>
 #include <sys/un.h>
 #include <netinet/in.h>
-#ifdef HAVE_NETINET_TCP_H
-# include <netinet/tcp.h>
-#endif
 #ifdef HAVE_NETINET_UDP_H
 # include <netinet/udp.h>
 #endif
@@ -45,6 +42,7 @@
 #endif
 #include <linux/if_packet.h>
 #include <linux/icmp.h>
+#include <linux/tcp.h>
 #include <linux/vm_sockets.h>
 
 #include "xlat/socktypes.h"
@@ -879,6 +877,51 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	tprint_bitset_end();
 }
 
+#include "xlat/tcp_ao_keyf_flags.h"
+
+static void
+print_tcp_ao_add_key(struct tcb *const tcp, const kernel_ulong_t addr, int len)
+{
+	struct tcp_ao_add key = {};
+
+	if (len > (int) sizeof(key))
+		len = sizeof(key);
+	else if (len <= 0) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umoven_or_printaddr(tcp, addr, len, &key))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_SOCKADDR(key, addr, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_U(key, prefix);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(key, alg_name);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(key, ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_U_CAST(key, set_current, unsigned);
+	tprint_struct_next();
+	PRINT_FIELD_U_CAST(key, set_rnext, unsigned);
+	tprint_struct_next();
+	PRINT_FIELD_U(key, sndid);
+	tprint_struct_next();
+	PRINT_FIELD_U(key, rcvid);
+	tprint_struct_next();
+	PRINT_FIELD_U(key, maclen);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(key, keyflags, tcp_ao_keyf_flags, "TCP_AO_KEYF_???");
+	tprint_struct_next();
+	PRINT_FIELD_HEX_ARRAY_UPTO(key, key,
+		key.keylen > sizeof(key.key) ? sizeof(key.key) : key.keylen);
+	tprint_struct_next();
+	PRINT_FIELD_U(key, keylen);
+	tprint_struct_end();
+}
+
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
@@ -1332,6 +1375,14 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		else
 			printnum_int(tcp, addr, "%d");
 		return;
+
+	case SOL_TCP:
+		switch (name) {
+		case TCP_AO_ADD_KEY:
+			print_tcp_ao_add_key(tcp, addr, len);
+			return;
+		}
+		break;
 	}
 
 	/* default arg printing */

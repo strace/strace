@@ -500,6 +500,8 @@ link
 link-P
 linkat
 list_sigaction_signum
+listmount
+listmount-success
 llseek
 localtime
 lookup_dcookie
@@ -1060,6 +1062,8 @@ stat
 stat64
 statfs
 statfs64
+statmount
+statmount-success
 status-all
 status-detached-threads
 status-failed
@@ -1109,6 +1113,7 @@ sysinfo
 syslog
 syslog-success
 tampering-notes
+tcp_ao
 tee
 tgkill
 tgkill--pidns-translation

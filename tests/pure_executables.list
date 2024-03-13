@@ -337,6 +337,8 @@ lchown
 lchown32
 link
 linkat
+listmount
+listmount-success
 llseek
 lookup_dcookie
 lseek
@@ -763,6 +765,8 @@ stat
 stat64
 statfs
 statfs64
+statmount
+statmount-success
 status-all
 status-failed
 status-failed-long
@@ -794,6 +798,7 @@ sysctl
 sysinfo
 syslog
 tampering-notes
+tcp_ao
 tee
 tgkill
 time

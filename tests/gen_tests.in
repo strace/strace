@@ -519,6 +519,8 @@ linkat--secontext	--secontext -e trace=linkat
 linkat--secontext_full	--secontext=full -e trace=linkat
 linkat--secontext_full_mismatch	--secontext=full,mismatch -e trace=linkat
 linkat--secontext_mismatch	--secontext=mismatch -e trace=linkat
+listmount	-a26
+listmount-success -a26 --trace=listmount --inject=listmount:retval=42
 lookup_dcookie	-a27
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
@@ -1038,6 +1040,8 @@ stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 statfs	-a17
 statfs64	-a23
+statmount	-a28
+statmount-success -a28 --trace=statmount --inject=statmount:retval=42
 status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
 status-failed	-a10 -e trace=chdir -Z
 status-failed-long	-a10 -e trace=chdir --failed-only
@@ -1107,6 +1111,7 @@ sync_file_range2
 sysctl	-a16 --trace=_sysctl
 sysinfo	-a14
 syslog	-a35
+tcp_ao	-e trace=getsockopt,setsockopt
 tee
 tgkill	-a15 --signal='!cont'
 tgkill--pidns-translation       test_pidns -a15 --signal='!cont' -e trace=tgkill

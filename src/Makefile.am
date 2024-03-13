@@ -193,6 +193,7 @@ libstrace_a_SOURCES =	\
 	lirc_ioctl.c	\
 	list.h		\
 	listen.c	\
+	listmount.c	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
@@ -355,6 +356,7 @@ libstrace_a_SOURCES =	\
 	statfs.h	\
 	statfs64.c \
 	static_assert.h	\
+	statmount.c	\
 	statx.c		\
 	statx.h		\
 	strauss.c	\
