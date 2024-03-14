@@ -104,7 +104,7 @@ main(void)
 # if defined PRINT_PIDFD
 	       "%ld<pid:%d>\n", pid, pid_str, rc, pid
 # elif defined PRINT_PATHS
-	       "%ld<anon_inode:[pidfd]>\n", pid, pid_str, rc
+	       "%ld<%s>\n", pid, pid_str, rc, get_fd_path(rc)
 # else
 	       "%s\n", pid, pid_str, errstr
 # endif
