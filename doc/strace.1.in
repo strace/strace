@@ -1001,13 +1001,13 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ
-.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stack\-traces [= symbol ]
+.if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-\-stack\-trace [= symbol ]
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
 .if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
 .if '@USE_LIBDW_FALSE@'#' .TP
 .if '@USE_LIBDW_FALSE@'#' .B \-kk
 .if '@USE_LIBDW_FALSE@'#' .TQ
-.if '@USE_LIBDW_FALSE@'#' .BR \-\-stack\-traces = source
+.if '@USE_LIBDW_FALSE@'#' .BR \-\-stack\-trace = source
 .if '@USE_LIBDW_FALSE@'#' Print the execution stack trace and source code information of the traced
 .if '@USE_LIBDW_FALSE@'#' processes after each system call. This option expects the target program is compiled
 .if '@USE_LIBDW_FALSE@'#' with appropriate debug options: "\-g" (gcc), or "\-g \-gdwarf-aranges" (clang).
@@ -1016,7 +1016,7 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print no more than this amount of stack trace frames
 .if '@ENABLE_STACKTRACE_FALSE@'#' when backtracing a system call (the default is 256).
 .if '@ENABLE_STACKTRACE_FALSE@'#' Use this option with the
-.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-trace
 .if '@ENABLE_STACKTRACE_FALSE@'#' (or
 .if '@ENABLE_STACKTRACE_FALSE@'#' .BR \-k )
 .if '@ENABLE_STACKTRACE_FALSE@'#' option.
@@ -2014,7 +2014,7 @@ systems was removed.
 Also, in 2012
 .B strace
 gained support for path tracing and file descriptor path decoding.
-In 2014, support for stack traces printing was added.
+In 2014, support for stack trace printing was added.
 In 2016, syscall fault injection was implemented.
 .PP
 For the additional information, please refer to the

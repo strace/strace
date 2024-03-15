@@ -97,6 +97,7 @@ dev--decode-fds-dev
 dev--decode-fds-none
 dev--decode-fds-path
 dev--decode-fds-socket
+dev-pty-yy
 dev-yy
 dup
 dup-P
