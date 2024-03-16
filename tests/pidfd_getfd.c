@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "xmalloc.h"
 
 #include <assert.h>
 #include <signal.h>
@@ -18,14 +19,14 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#ifndef PIDFD_PATH
-# define PIDFD_PATH ""
-#endif
 #ifndef FD0_PATH
 # define FD0_PATH ""
 #endif
-#ifndef PRINT_PIDFD
-# define PRINT_PIDFD 0
+#ifndef PRINT_PIDFD_PATH
+# define PRINT_PIDFD_PATH 0
+#endif
+#ifndef PRINT_PIDFD_PID
+# define PRINT_PIDFD_PID 0
 #endif
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
@@ -77,15 +78,17 @@ main(void)
 	close(dupfd);
 
 	int pidfd = syscall(__NR_pidfd_open, pid, 0);
-#if PRINT_PIDFD
-	char pidfd_str[sizeof("<pid:>") + 3 * sizeof(int)];
-	snprintf(pidfd_str, sizeof(pidfd_str), "<pid:%d>", pid);
-#else
-	const char *pidfd_str = PIDFD_PATH;
+	const char *pidfd_str = "";
+	if (pidfd >= 0) {
+#if PRINT_PIDFD_PID
+		pidfd_str = xasprintf("<pid:%d>", pid);
+#elif PRINT_PIDFD_PATH
+		pidfd_str = xasprintf("<%s>", get_fd_path(pidfd));
 #endif
+	}
 	rc = k_pidfd_getfd(pidfd, dupfd, 0);
 	printf("pidfd_getfd(%d%s, %d%s, 0) = %s%s\n",
-	       pidfd, pidfd >= 0 ? pidfd_str : "",
+	       pidfd, pidfd_str,
 	       dupfd, pidfd >= 0 ? FD0_PATH : "",
 	       errstr, rc >= 0 ? FD0_PATH : "");
 

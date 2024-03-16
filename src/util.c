@@ -793,9 +793,11 @@ pidfd_get_pid(pid_t pid_of_fd, int fd)
 static bool
 printpidfd(pid_t pid_of_fd, int fd, const char *path)
 {
+	static const char pidfs_prefix[] = "pidfd:";
 	static const char pidfd_path[] = "anon_inode:[pidfd]";
 
-	if (strcmp(path, pidfd_path))
+	if (STR_STRIP_PREFIX(path, pidfs_prefix) == path
+	    && strcmp(path, pidfd_path) != 0)
 		return false;
 
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);

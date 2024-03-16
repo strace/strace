@@ -33,7 +33,7 @@ print_pidfd(const struct cmsghdr *c)
 				    expected_len, data_len);
 
 	memcpy(&pidfd, cmsg_data, sizeof(pidfd));
-	printf("%d<anon_inode:[pidfd]>", pidfd);
+	printf("%d<%s>", pidfd, get_fd_path(pidfd));
 }
 
 int
