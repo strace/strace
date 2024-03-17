@@ -343,6 +343,8 @@ listmount-success
 llseek
 lookup_dcookie
 lseek
+lsm_get_self_attr
+lsm_get_self_attr-success
 lstat
 lstat64
 madvise
