@@ -510,6 +510,8 @@ looping_threads
 lseek
 lsm_get_self_attr
 lsm_get_self_attr-success
+lsm_list_modules
+lsm_list_modules-success
 lsm_set_self_attr
 lstat
 lstat64

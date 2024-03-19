@@ -525,6 +525,8 @@ listmount-success -a26 --trace=listmount --inject=listmount:retval=42
 lookup_dcookie	-a27
 lsm_get_self_attr	-a49 -s2
 lsm_get_self_attr-success	-a49 -s2 --trace=lsm_get_self_attr --inject=lsm_get_self_attr:retval=96
+lsm_list_modules	-a32
+lsm_list_modules-success	-a32 --trace=lsm_list_modules --inject=lsm_list_modules:retval=15
 lsm_set_self_attr	-a46
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
