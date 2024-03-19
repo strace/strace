@@ -41,7 +41,7 @@ btrfs	+ioctl.test
 cachestat	-a29 -y 9>>/dev/full
 cachestat-P	-y --trace-path=/dev/full --trace=cachestat 9>>/dev/full
 cachestat-fd	-y --trace-fds=9 --trace=cachestat 9>>/dev/full
-cachestat-success -a29 --trace=cachestat --inject=cachestat:retval=42 9>>/dev/full
+cachestat-success --inject=cachestat:retval=42 -a29 --trace=cachestat 9>>/dev/full
 chdir	-a10
 chmod	-a28
 chmod--secontext	-a28 -e secontext=!full,mismatch -e trace=chmod
@@ -521,12 +521,12 @@ linkat--secontext_full	--secontext=full -e trace=linkat
 linkat--secontext_full_mismatch	--secontext=full,mismatch -e trace=linkat
 linkat--secontext_mismatch	--secontext=mismatch -e trace=linkat
 listmount	-a26
-listmount-success -a26 --trace=listmount --inject=listmount:retval=42
+listmount-success --inject=listmount:retval=42 -a26 --trace=listmount
 lookup_dcookie	-a27
 lsm_get_self_attr	-a49 -s2
-lsm_get_self_attr-success	-a49 -s2 --trace=lsm_get_self_attr --inject=lsm_get_self_attr:retval=96
+lsm_get_self_attr-success	--inject=lsm_get_self_attr:retval=96 -a49 -s2 --trace=lsm_get_self_attr
 lsm_list_modules	-a32
-lsm_list_modules-success	-a32 --trace=lsm_list_modules --inject=lsm_list_modules:retval=15
+lsm_list_modules-success	--inject=lsm_list_modules:retval=15 -a32 --trace=lsm_list_modules
 lsm_set_self_attr	-a46
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
@@ -1047,7 +1047,7 @@ stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 statfs	-a17
 statfs64	-a23
 statmount	-a28
-statmount-success -a28 --trace=statmount --inject=statmount:retval=42
+statmount-success --inject=statmount:retval=42 -a28 --trace=statmount
 status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
 status-failed	-a10 -e trace=chdir -Z
 status-failed-long	-a10 -e trace=chdir --failed-only
