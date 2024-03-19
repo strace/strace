@@ -271,9 +271,9 @@ usage(void)
 {
 #ifdef ENABLE_STACKTRACE
 # ifdef USE_LIBDW
-# define K_OPT "kk"
+#  define K_OPT "kk"
 # else
-# define K_OPT "k"
+#  define K_OPT "k"
 # endif
 #else
 # define K_OPT ""
@@ -401,12 +401,12 @@ Output format:\n\
   -k, --stack-trace[=symbol]\n\
                  obtain stack trace between each syscall\n\
 "
-#ifdef USE_LIBDW
+# ifdef USE_LIBDW
 "\
   -kk, --stack-trace=source\n\
                  obtain stack trace and source info between each syscall\n\
 "
-#endif
+# endif
 "\
   --stack-trace-frame-limit=limit\n\
                  obtain no more than this amount of frames\n\
