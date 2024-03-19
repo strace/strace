@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012 Mike Frysinger <vapier@gentoo.org>
- * Copyright (c) 2012-2021 The strace developers.
+ * Copyright (c) 2012-2024 The strace developers.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */

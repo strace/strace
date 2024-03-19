@@ -1,7 +1,7 @@
 /*
  * Check decoding of SCM_PIDFD control messages.
  *
- * Copyright (c) 2023 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2023-2024 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
