@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2021-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -127,19 +128,19 @@ typedef struct {
 # undef VIDIOC_PREPARE_BUF
 # define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
 
-#ifdef KERNEL_V4L2_HAVE_TIME32
-# undef VIDIOC_QUERYBUF_TIME32
-# define VIDIOC_QUERYBUF_TIME32	_IOWR('V',   9, kernel_v4l2_buffer_time32_t)
+# ifdef KERNEL_V4L2_HAVE_TIME32
+#  undef VIDIOC_QUERYBUF_TIME32
+#  define VIDIOC_QUERYBUF_TIME32	_IOWR('V',   9, kernel_v4l2_buffer_time32_t)
 
-# undef VIDIOC_QBUF_TIME32
-# define VIDIOC_QBUF_TIME32		_IOWR('V',  15, kernel_v4l2_buffer_time32_t)
+#  undef VIDIOC_QBUF_TIME32
+#  define VIDIOC_QBUF_TIME32		_IOWR('V',  15, kernel_v4l2_buffer_time32_t)
 
-# undef VIDIOC_DQBUF_TIME32
-# define VIDIOC_DQBUF_TIME32		_IOWR('V',  17, kernel_v4l2_buffer_time32_t)
+#  undef VIDIOC_DQBUF_TIME32
+#  define VIDIOC_DQBUF_TIME32		_IOWR('V',  17, kernel_v4l2_buffer_time32_t)
 
-# undef VIDIOC_PREPARE_BUF_TIME32
-# define VIDIOC_PREPARE_BUF_TIME32	_IOWR('V',  93, kernel_v4l2_buffer_time32_t)
-#endif
+#  undef VIDIOC_PREPARE_BUF_TIME32
+#  define VIDIOC_PREPARE_BUF_TIME32	_IOWR('V',  93, kernel_v4l2_buffer_time32_t)
+# endif
 
 /*
  * Constants based on struct v4l2_event are unreliable

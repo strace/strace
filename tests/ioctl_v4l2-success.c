@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 The strace developers.
+ * Copyright (c) 2018-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -319,7 +319,7 @@ test_v4l2_buffer_time32(long inject_retval) {
 		       XLAT_KNOWN(0x1, "V4L2_MEMORY_MMAP")
 		       ", m.offset=0xfacefeed, length=3405692629"
 		       ", bytesused=3737845742, flags=" RAW("0x1ff")
-#if !XLAT_RAW
+# if !XLAT_RAW
 		       XLAT_KNOWN(0x1ff, "V4L2_BUF_FLAG_MAPPED"
 		       "|V4L2_BUF_FLAG_QUEUED|V4L2_BUF_FLAG_DONE"
 		       "|V4L2_BUF_FLAG_KEYFRAME|V4L2_BUF_FLAG_PFRAME"
@@ -327,7 +327,7 @@ test_v4l2_buffer_time32(long inject_retval) {
 		       "|V4L2_BUF_FLAG_IN_REQUEST|V4L2_BUF_FLAG_TIMECODE") "|"
 		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
 		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
-#endif
+# endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32
@@ -347,11 +347,11 @@ test_v4l2_buffer_time32(long inject_retval) {
 		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
 		       ", m.userptr=%p, length=3405692629"
 		       ", bytesused=3737845742, flags=" RAW("0x268040")
-#if !XLAT_RAW
+# if !XLAT_RAW
 		       XLAT_KNOWN(0x200040, "V4L2_BUF_FLAG_ERROR|0x200000") "|"
 		       XLAT_UNKNOWN(0x8000, "V4L2_BUF_FLAG_TIMESTAMP_???") "|"
 		       XLAT_UNKNOWN(0x60000, "V4L2_BUF_FLAG_TSTAMP_SRC_???")
-#endif
+# endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
@@ -369,10 +369,10 @@ test_v4l2_buffer_time32(long inject_retval) {
 		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
 		       ", m.userptr=%p, length=3405692629"
 		       ", bytesused=3737845742, flags=" RAW("0")
-#if !XLAT_RAW
+# if !XLAT_RAW
 		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
 		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
-#endif
+# endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
@@ -391,10 +391,10 @@ test_v4l2_buffer_time32(long inject_retval) {
 		       XLAT_KNOWN(0x3, "V4L2_MEMORY_OVERLAY")
 		       ", length=3405692629, bytesused=3737845742"
 		       ", flags=" RAW("0x2000")
-#if !XLAT_RAW
+# if !XLAT_RAW
 		       XLAT_KNOWN(0x2000, "V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC")
 		       "|" XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
-#endif
+# endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       buf_cmds[i].val == VIDIOC_DQBUF_TIME32

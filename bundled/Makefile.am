@@ -1,6 +1,6 @@
 # Automake input for bundled.
 #
-# Copyright (c) 2018-2023 The strace developers.
+# Copyright (c) 2018-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
@@ -64,6 +64,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/lirc.h \
 	linux/include/uapi/linux/loop.h \
+	linux/include/uapi/linux/lsm.h \
 	linux/include/uapi/linux/mctp.h \
 	linux/include/uapi/linux/memfd.h \
 	linux/include/uapi/linux/mmtimer.h \
@@ -110,6 +111,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
 	linux/include/uapi/linux/stat.h \
+	linux/include/uapi/linux/stddef.h \
 	linux/include/uapi/linux/tcp.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/tls.h \

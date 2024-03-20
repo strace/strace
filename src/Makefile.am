@@ -197,6 +197,7 @@ libstrace_a_SOURCES =	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
+	lsm.c		\
 	macros.h	\
 	map_shadow_stack.c \
 	mem.c		\

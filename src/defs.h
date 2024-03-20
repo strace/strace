@@ -738,6 +738,9 @@ tfetch_mem_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
 {
 	return tfetch_mem64_ignore_syserror(tcp, addr, len, laddr);
 }
+# define tfetch_obj_ignore_syserror(pid, addr, objp)			\
+	tfetch_mem_ignore_syserror((pid), (addr),			\
+				   sizeof(*(objp)), (void *) (objp))
 
 /**
  * @return 0 on success, -1 on error (and print addr).

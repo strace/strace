@@ -11,7 +11,7 @@
 #include "xlat/statmount_sb_flags.h"
 #include "xlat/statmount_mnt_propagation.h"
 
-# define PRINT_FIELD_CSTRING_OFFSET(where_, field_, str_buf_, str_size_)	\
+#define PRINT_FIELD_CSTRING_OFFSET(where_, field_, str_buf_, str_size_)	\
 	do {									\
 		tprints_field_name(#field_);					\
 		if ((where_).field_< (str_size_))				\

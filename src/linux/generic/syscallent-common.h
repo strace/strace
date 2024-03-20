@@ -43,3 +43,6 @@
 [BASE_NR + 456] = { 4,	0,		SEN(futex_requeue),		"futex_requeue"	},
 [BASE_NR + 457] = { 4,	0,		SEN(statmount),			"statmount"	},
 [BASE_NR + 458] = { 4,	0,		SEN(listmount),			"listmount"	},
+[BASE_NR + 459] = { 4,	0,		SEN(lsm_get_self_attr),		"lsm_get_self_attr"	},
+[BASE_NR + 460] = { 4,	0,		SEN(lsm_set_self_attr),		"lsm_set_self_attr"	},
+[BASE_NR + 461] = { 3,	0,		SEN(lsm_list_modules),		"lsm_list_modules"	},
