@@ -146,6 +146,18 @@ main(void)
 		register_struct->ioctls &= ~(1ull<<_UFFDIO_WAKE|
 					    1ull<<_UFFDIO_COPY|
 					    1ull<<_UFFDIO_ZEROPAGE);
+		if (register_struct->ioctls & (1ull<<_UFFDIO_MOVE)) {
+			printf("|1<<_UFFDIO_MOVE");
+			register_struct->ioctls &= ~(1ull<<_UFFDIO_MOVE);
+		}
+		if (register_struct->ioctls & (1ull<<_UFFDIO_WRITEPROTECT)) {
+			printf("|1<<_UFFDIO_WRITEPROTECT");
+			register_struct->ioctls &= ~(1ull<<_UFFDIO_WRITEPROTECT);
+		}
+		if (register_struct->ioctls & (1ull<<_UFFDIO_CONTINUE)) {
+			printf("|1<<_UFFDIO_CONTINUE");
+			register_struct->ioctls &= ~(1ull<<_UFFDIO_CONTINUE);
+		}
 		if (register_struct->ioctls & (1ull<<_UFFDIO_POISON)) {
 			printf("|1<<_UFFDIO_POISON");
 			register_struct->ioctls &= ~(1ull<<_UFFDIO_POISON);
