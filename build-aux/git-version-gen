@@ -160,7 +160,7 @@ elif test "`git log -1 --pretty=format:x . 2>&1`" = x \
           || git describe --abbrev=4 HEAD 2>/dev/null` \
     && v=`printf '%s\n' "$v" | sed "$tag_sed_script"` \
     && case $v in
-         $prefix[0-9]*) ;;
+         "$prefix"[0-9]*) ;;
          *) (exit 1) ;;
        esac
 then
