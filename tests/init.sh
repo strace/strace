@@ -575,9 +575,10 @@ esac
 STRACE_EXE=
 if [ -n "$NAME" ]; then
 	TESTDIR="$NAME.dir"
-	rm -rf -- "$TESTDIR"
-	mkdir -- "$TESTDIR"
-	cd "$TESTDIR"
+	rm -rf -- "$TESTDIR" &&
+	mkdir -- "$TESTDIR" &&
+	cd "$TESTDIR" ||
+	framework_failure_ "Cannot setup $TESTDIR"
 
 	case "$srcdir" in
 		/*) ;;
