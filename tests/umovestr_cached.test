@@ -36,6 +36,6 @@ run_strace -qq -esignal=none -eprocess_vm_readv -z \
 count="$(cat count)"
 case "$count" in
 	0) skip_ "$STRACE $args made no process_vm_readv syscall invocations" ;;
-	$expected_count) ;;
+	"$expected_count") ;;
 	*) fail_ "$STRACE $args made $count != $expected_count process_vm_readv syscall invocations" ;;
 esac
