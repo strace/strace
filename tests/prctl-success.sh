@@ -60,7 +60,7 @@ for i in $(echo "$PRCTL_INJECT_RETVALS"); do
 	fi
 
 	run_strace -a80 "$@" -e trace="${PRCTL_SYSCALL}" \
-		-e inject="${PRCTL_SYSCALL}":"${inj_str}":when="${PRCTL_INJECT_START}+" \
+		-e "inject=${PRCTL_SYSCALL}:${inj_str}:when=${PRCTL_INJECT_START}+" \
 		"../$NAME" "${PRCTL_INJECT_START}" "${ret_val}" > "$EXP.$i"
 	sed '0,/^'"${PRCTL_MARKER_RE}"'  *= '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
 	match_diff "$OUT.$i" "$EXP.$i"
