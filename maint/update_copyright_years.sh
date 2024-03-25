@@ -157,7 +157,7 @@ process_file()
 			-v COMMENT_MARKER_RE="$r_quoted" \
 			-v COPYRIGHT_NOTICE="$copyright_notice" \
 			-v COPYRIGHT_MARKER="$COPYRIGHT_MARKER" \
-			-f $(dirname "$0")/update_copyright_years.awk \
+			-f "$(dirname "$0")/update_copyright_years.awk" \
 			"$f" > "$f.out" && {
 				cat "$f.out" > "$f"
 				log "Added copyright notice to $f (start year $start_note)"
