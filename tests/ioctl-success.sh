@@ -24,7 +24,7 @@
 }
 
 run_strace -a50 "$@" -e trace=ioctl \
-	-e inject=ioctl:retval="${IOCTL_INJECT_RETVAL}":when="${IOCTL_INJECT_START}+" \
+	-e "inject=ioctl:retval=${IOCTL_INJECT_RETVAL}:when=${IOCTL_INJECT_START}+" \
 	"../$NAME" "${IOCTL_INJECT_START}" "${IOCTL_INJECT_RETVAL}" > "$EXP"
 grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

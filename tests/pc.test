@@ -31,7 +31,7 @@ addr="$(echo "$ip" |sed -E 's/^0+//')" && addr=${addr%?} &&
 
 cat > "$EXP" << __EOF__
 \\[[[:xdigit:]]{$len}\\] munmap\\(0x[[:xdigit:]]+, 0\\) += -1 .*
-\\[pid +$pid\\] \\[$ip\\] --- SIGSEGV \\{si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=0x$addr[[:xdigit:]]\\} ---
+\\[pid +$pid\\] \\[$ip\\] --- SIGSEGV \\{si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=0x${addr}[[:xdigit:]]\\} ---
 \\[pid +$pid\\] \\[\\?{$len}\\] \\+\\+\\+ killed by SIGSEGV( \\(core dumped\\))? \\+\\+\\+
 \\[\\?{$len}\\] \\+\\+\\+ exited with 0 \\+\\+\\+
 __EOF__
