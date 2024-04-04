@@ -663,7 +663,7 @@ main(void)
 	const uint64_t *arg_tags = tail_memdup(tags, sizeof(tags));
 
 	struct io_uring_rsrc_register *bogus_rsrc_reg = tail_alloc(24);
-	struct io_uring_rsrc_register *rsrc_reg = tail_alloc(sizeof(*rsrc_reg));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_rsrc_register, rsrc_reg);
 	struct io_uring_rsrc_register *big_rsrc_reg =
 		tail_alloc(sizeof(*big_rsrc_reg) + 8);
 
@@ -766,7 +766,7 @@ main(void)
 	};
 
 	struct io_uring_rsrc_update2 *bogus_rsrc_upd = tail_alloc(24);
-	struct io_uring_rsrc_update2 *rsrc_upd = tail_alloc(sizeof(*rsrc_upd));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_rsrc_update2, rsrc_upd);
 	struct io_uring_rsrc_update2 *big_rsrc_upd =
 		tail_alloc(sizeof(*big_rsrc_upd) + 8);
 
@@ -1082,7 +1082,7 @@ main(void)
 		{ 22, "IORING_REGISTER_PBUF_RING" },
 		{ 23, "IORING_UNREGISTER_PBUF_RING" },
 	};
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_buf_reg, buf_reg);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_buf_reg, buf_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_reg_ops); i++) {
 		sys_io_uring_register(fd_null, buf_reg_ops[i].op, 0,
@@ -1149,8 +1149,8 @@ main(void)
 	} sync_cancel_reg_ops[] = {
 		{ 24, "IORING_REGISTER_SYNC_CANCEL" },
 	};
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_sync_cancel_reg,
-				  sync_cancel_reg);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sync_cancel_reg,
+				    sync_cancel_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(sync_cancel_reg_ops); i++) {
 		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op, 0,

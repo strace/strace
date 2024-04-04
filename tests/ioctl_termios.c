@@ -848,10 +848,10 @@ main(void)
 {
 	int ret;
 
-	struct termio *tio = tail_alloc(sizeof(*tio));
-	struct termios *tios1 = tail_alloc(sizeof(*tios1));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct termio, tio);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct termios, tios1);
 #ifdef HAVE_STRUCT_TERMIOS2
-	struct termios2 *tios2 = tail_alloc(sizeof(*tios2));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct termios2, tios2);
 #endif
 
 	struct {

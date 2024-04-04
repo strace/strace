@@ -1195,8 +1195,7 @@ main(void)
 
 	char *pkey1 = tail_memdup(pkey_str1, sizeof(pkey_str1) - 1);
 	char *pkey2 = tail_memdup(pkey_str2, sizeof(pkey_str2) - 1);
-	struct keyctl_pkey_params *pkey_params =
-		tail_alloc(sizeof(*pkey_params));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct keyctl_pkey_params, pkey_params);
 
 	for (size_t i = 0; i < ARRAY_SIZE(pkey_ops); ++i) {
 		do_keyctl(pkey_ops[i].op, pkey_ops[i].str,

@@ -95,15 +95,15 @@ main(void)
 	kernel_old_timeval_t *const tv = tail_memdup(&tv_in, sizeof(tv_in));
 	const uintptr_t a_tv = (uintptr_t) tv;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_rs);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_ulong_t, l_rs);
 	fd_set *const rs = (void *) l_rs;
 	const uintptr_t a_rs = (uintptr_t) rs;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_ws);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_ulong_t, l_ws);
 	fd_set *const ws = (void *) l_ws;
 	const uintptr_t a_ws = (uintptr_t) ws;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_es);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_ulong_t, l_es);
 	fd_set *const es = (void *) l_es;
 	const uintptr_t a_es = (uintptr_t) es;
 
