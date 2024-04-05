@@ -45,7 +45,7 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, u64_ptr);
 	uint64_t *const u64_efault = u64_ptr + 1;
-	uint32_t *const u32_arr = tail_alloc(sizeof(uint32_t) * 4);
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint32_t, u32_arr, 4);
 	uint32_t *const u32_efault = u32_arr + 4;
 	char *const str_ptr = tail_memdup(str, sizeof(str));
 	char *const str_efault = str_ptr + sizeof(str);

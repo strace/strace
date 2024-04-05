@@ -53,7 +53,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	kernel_old_timeval_t *const tv = tail_alloc(sizeof(*tv) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(kernel_old_timeval_t, tv, 2);
 
 	(void) close(0);
 

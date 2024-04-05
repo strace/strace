@@ -501,6 +501,8 @@ main(void)
 	struct io_uring_restriction *restrictions =
 			tail_alloc(sizeof(*restrictions)
 				   * ARRAY_SIZE(restrictions_data));
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct io_uring_restriction, restrictions,
+				    ARRAY_SIZE(restrictions_data));
 	char *restrictions_end = (char *) (restrictions
 					   + ARRAY_SIZE(restrictions_data));
 
@@ -992,8 +994,8 @@ main(void)
 	static const size_t ringfd_count = DEFAULT_STRLEN + 1;
 	static const uint32_t ringfd_off[] =
 		{ -1U, 0, 1, 2, 161803398, 3141592653, -2U };
-	TAIL_ALLOC_OBJECT_VAR_ARR(struct io_uring_rsrc_update, ringfds,
-				  ringfd_count);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct io_uring_rsrc_update, ringfds,
+				    ringfd_count);
 
 	fill_memory(ringfds, sizeof(*ringfds) * ringfd_count);
 	for (size_t i = 0; i < ringfd_count; i++) {

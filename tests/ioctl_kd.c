@@ -622,7 +622,7 @@ static void
 check_unimap(unsigned int c, const char *s)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct unimapdesc, umd);
-	struct unipair *ups = tail_alloc(33 * sizeof(*ups));
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct unipair, ups, 33);
 
 	fill_memory16(ups, 33 * sizeof(*ups));
 	ups[0].unicode = 0;
@@ -695,7 +695,7 @@ check_unimap(unsigned int c, const char *s)
 static void
 check_uniscrnmap(unsigned int c, const char *s)
 {
-	uint16_t *map = tail_alloc(256 * sizeof(*map));
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint16_t, map, 256);
 	for (unsigned int i = 0; i < 256; i++)
 		map[i] = 0xeff1 + 32 * (i % 112) - i / 8;
 

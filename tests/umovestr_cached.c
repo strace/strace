@@ -20,7 +20,7 @@ main(void)
 	char *const buf = tail_alloc(DEFAULT_STRLEN);
 	fill_memory_ex(buf, DEFAULT_STRLEN, 'a', 'z' - 'a' + 1);
 
-	struct iovec *const io = tail_alloc(sizeof(*io) * DEFAULT_STRLEN);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct iovec, io, DEFAULT_STRLEN);
 	for (unsigned int i = 0; i < DEFAULT_STRLEN; ++i) {
 		io[i].iov_base = buf + DEFAULT_STRLEN - i;
 		io[i].iov_len = i;

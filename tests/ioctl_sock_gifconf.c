@@ -105,7 +105,7 @@ gifconf_ioctl(const int fd, struct ifconf *const ifc, const bool ifc_valid)
 int
 main(int argc, char *argv[])
 {
-	struct ifreq *const ifr = tail_alloc(2 * sizeof(*ifr));
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct ifreq, ifr, 2);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct ifconf, ifc);
 	const int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)

@@ -20,7 +20,7 @@
 int
 main(void)
 {
-	struct sock_filter *const filter = tail_alloc(sizeof(*filter) * N);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct sock_filter, filter, N);
 	const void *const efault = tail_alloc(1);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sock_fprog, prog);
 	long rc;

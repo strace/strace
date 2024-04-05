@@ -315,7 +315,7 @@ main(int argc, char *argv[])
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, pidfd);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, child_tid);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, parent_tid);
-	int *const tids = tail_alloc(sizeof(*tids) * MAX_SET_TID_SIZE);
+	TAIL_ALLOC_OBJECT_CONST_ARR(int, tids, MAX_SET_TID_SIZE);
 	long rc;
 
 #if defined HAVE_STRUCT_USER_DESC

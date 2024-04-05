@@ -88,7 +88,7 @@ main(void)
 	pidns_print_leader();
 	printf("ioctl(-1, BLKBSZSET, [%d])" RVAL_EBADF, *val_int);
 
-	uint64_t *pair_int64 = tail_alloc(sizeof(*pair_int64) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint64_t, pair_int64, 2);
 	pair_int64[0] = 0xdeadbeefbadc0dedULL;
 	pair_int64[1] = 0xfacefeedcafef00dULL;
 

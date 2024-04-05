@@ -23,8 +23,7 @@
 static void
 print_nodes(unsigned long maxnode)
 {
-	unsigned long *const nodemask =
-		tail_alloc(sizeof(*nodemask) * NLONGS(maxnode));
+	TAIL_ALLOC_OBJECT_CONST_ARR(unsigned long, nodemask, NLONGS(maxnode));
 
 	if (syscall(__NR_get_mempolicy, 0, nodemask, maxnode, 0, 0)) {
 		printf("get_mempolicy(NULL, %p, %lu, NULL, 0) = %s\n",

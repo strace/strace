@@ -101,8 +101,8 @@ main(void)
 	       futex, "FUTEX2_SIZE_U32|FUTEX2_PRIVATE", errstr);
 
 	unsigned int nr = FUTEX_WAITV_MAX + 1;
-	uint32_t * const futexes = tail_alloc(nr * sizeof(*futexes));
-	struct futex_waitv * const waiters = tail_alloc(nr * sizeof(*waiters));
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint32_t, futexes, nr);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct futex_waitv, waiters, nr);
 	for (unsigned int i = 0; i < nr; ++i) {
 		futexes[i] = i;
 		waiters[i].val = i;

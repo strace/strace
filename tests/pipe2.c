@@ -18,7 +18,7 @@
 int
 main(void)
 {
-	int *const fds = tail_alloc(sizeof(*fds) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(int, fds, 2);
 	int *const efault = fds + 1;
 	long rc;
 
