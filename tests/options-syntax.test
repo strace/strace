@@ -342,14 +342,26 @@ diff -u -- "$EXP" "$LOG" > /dev/null || {
 		"zeroargc $STRACE $args output mismatch"
 }
 
+check_uid_gid_syntax()
+{
+	check_e "Invalid UID:GID pair 'uid:gid'" -u uid:gid true
+	check_e "Invalid UID:GID pair '4294967295:4294967294'" \
+		-u 4294967295:4294967294 true
+	check_e "Invalid UID:GID pair '4294967294:4294967295'" \
+		-u 4294967294:4294967295 true
+	run_strace --user="$(id -u):$(id -g)" -qq -enone /bin/true
+}
+
 uid="${UID:-`id -u`}"
 if [ "$uid" -ge 0 ]; then
 	if [ "$uid" -eq 0 ]; then
+		check_uid_gid_syntax
 		umsg="Cannot find user '!no such user!'"
 	else
 		if [ "$(fakeroot ../block_reset_run 15 id -u 2>&1)" = 0 ]; then
 			saved_STRACE=$STRACE
 			STRACE="fakeroot -- $STRACE"
+			check_uid_gid_syntax
 			umsg="Cannot find user '!no such user!'"
 			check_e "$umsg" -u '!no such user!' true
 			STRACE=$saved_STRACE
