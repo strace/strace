@@ -144,6 +144,7 @@ static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
 static bool detach_on_execve;
+static bool always_show_pid;
 
 static int exit_code;
 static int strace_child;
@@ -469,6 +470,8 @@ Output format:\n\
                  print PIDs in strace's namespace, too\n\
   -Y, --decode-pids=comm\n\
                  print command names associated with PIDs\n\
+  --always-show-pid\n\
+                 show PID prefix also for the process started by strace\n\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
@@ -2362,6 +2365,7 @@ init(int argc, char *argv[])
 		GETOPT_TIPS,
 		GETOPT_ARGV0,
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
+		GETOPT_ALWAYS_SHOW_PID,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
@@ -2427,6 +2431,7 @@ init(int argc, char *argv[])
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
+		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
@@ -2721,6 +2726,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_ARGV0:
 			argv0 = optarg;
+			break;
+		case GETOPT_ALWAYS_SHOW_PID:
+			always_show_pid = true;
 			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
@@ -3173,9 +3181,11 @@ init(int argc, char *argv[])
 	 * -ff: no (every pid has its own file); or
 	 * -f: yes (there can be more pids in the future); or
 	 * -p PID1,PID2: yes (there are already more than one pid)
+	 * --always-show-pid: yes
 	 */
-	print_pid_pfx = outfname && !output_separately &&
-		(followfork || nprocs > 1);
+	print_pid_pfx = (outfname && !output_separately &&
+			 (followfork || nprocs > 1)) ||
+			always_show_pid;
 }
 
 static struct tcb *

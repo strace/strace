@@ -1307,6 +1307,11 @@ Print command names for PIDs.
 .if '@ENABLE_SECONTEXT_FALSE@'#' .BR !full,mismatch
 .if '@ENABLE_SECONTEXT_FALSE@'#' which prints only the type instead of full context
 .if '@ENABLE_SECONTEXT_FALSE@'#' and doesn't check for context mismatches.
+.TP
+.B \-\-always\-show\-pid
+Show PID prefix also for the process started by strace.
+Implied when \-f and \-o are both specified.
+.RE
 .SS Statistics
 .TP 12
 .B \-c

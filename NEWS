@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented --always-show-pid option.
   * The --user|-u option has learned to recognize numeric UID:GID pair, allowing
     e.g. statically-built strace to be used without invoking nss plugins.
   * Updated decoding of pidfd_send_signal syscall.
