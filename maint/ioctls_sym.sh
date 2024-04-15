@@ -260,8 +260,12 @@ process_file()
 			echo 'struct omap3isp_stat_data_time32 {uint32_t dummy32[4]; uint16_t dummy16[3]; };'
 			;;
 		*linux/platform_data/cros_ec_chardev.h)
-			echo '#define DECLARE_FLEX_ARRAY(TYPE, NAME) __DECLARE_FLEX_ARRAY(TYPE, NAME)'
-			echo 'struct cros_ec_command {uint32_t dummy32[5]; uint8_t dummy8[0]; };'
+			cat <<-'__EOF__'
+				#include <linux/const.h>
+				#define BIT(nr) (UL(1) << (nr))
+				#define DECLARE_FLEX_ARRAY(TYPE, NAME) __DECLARE_FLEX_ARRAY(TYPE, NAME)
+				struct cros_ec_command {uint32_t dummy32[5]; uint8_t dummy8[0]; };
+				__EOF__
 			;;
 		*linux/sonet.h)
 			echo '#include <linux/atmioc.h>'
