@@ -30,6 +30,14 @@ jobs:
       run: ci/install-dependencies.sh
     - name: build check
       run: ci/run-build-and-tests.sh
+    - name: upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        plugin: gcov
+        token: ${{ secrets.CODECOV_TOKEN }}
+        use_legacy_upload_endpoint: true
+        verbose: true
 
   gcc9-x86-nostacktrace: # the fastest of all build jobs
     runs-on: ubuntu-20.04

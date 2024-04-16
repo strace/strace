@@ -142,10 +142,6 @@ case "${STACKTRACE-}" in
 esac
 
 case "${CHECK-}" in
-	coverage)
-		curl -s -S https://codecov.io/bash > codecov.bash
-		chmod u+x codecov.bash
-		;;
 	valgrind)
 		apt_get_install valgrind
 		;;
