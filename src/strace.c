@@ -310,6 +310,9 @@ Startup:\n\
                  trace process with process id PID, may be repeated\n\
   -u USERNAME, --user=USERNAME\n\
                  run command as USERNAME handling setuid and/or setgid\n\
+                 USERNAME may be a user name or a UID:GID pair, where UID\n\
+                 and GID are numbers. In the latter case, strace does not\n\
+                 perform name lookups.\n\
   --argv0=NAME   set PROG argv[0] to NAME\n\
 \n\
 Tracing:\n\
@@ -1515,6 +1518,28 @@ startup_attach(void)
 	}
 }
 
+static bool
+is_uid_gid_pair(const char *username, uid_t *uid_ptr, gid_t *gid_ptr)
+{
+	const char *colon = strchr(username, ':');
+	if (!colon)
+		return false;
+	if (uid_ptr) {
+		const unsigned long long max_uid =
+			zero_extend_signed_to_ull((uid_t) -1) - 1;
+		*uid_ptr = (uid_t) string_to_uint_ex(username, NULL,
+						     max_uid, ":");
+	}
+	if (gid_ptr) {
+		const unsigned long long max_gid =
+			zero_extend_signed_to_ull((gid_t) -1) - 1;
+		*gid_ptr = (gid_t) string_to_uint_ex(colon + 1, NULL,
+						     max_gid, ":");
+	}
+	return true;
+}
+
+
 static void
 maybe_init_seccomp_filter(void)
 {
@@ -1556,11 +1581,19 @@ exec_or_die(void)
 
 	if (username != NULL) {
 		/*
-		 * It is important to set groups before we
-		 * lose privileges on setuid.
+		 * It is important to set groups before we lose privileges on
+		 * setuid.  Unless UID:GID was passed, which is relevant e.g.
+		 * for statically linked builds, initgroups() is invoked.
+		 * Otherwise, to avoid leaking groups, setgroups() is invoked
+		 * to set an empty list of supplementary groups.
 		 */
-		if (initgroups(username, run_gid) < 0)
-			perror_msg_and_die("initgroups");
+		if (is_uid_gid_pair(username, NULL, NULL)) {
+			if (setgroups(0, NULL) < 0)
+				perror_msg_and_die("setgroups");
+		} else {
+			if (initgroups(username, run_gid) < 0)
+				perror_msg_and_die("initgroups");
+		}
 		if (setregid(run_gid, params->run_egid) < 0)
 			perror_msg_and_die("setregid");
 
@@ -2965,18 +2998,27 @@ init(int argc, char *argv[])
 
 	/* See if they want to run as another user. */
 	if (username != NULL) {
-		struct passwd *pent;
-
 		if (getuid() != 0 || geteuid() != 0) {
 			error_msg_and_die("You must be root to use "
 					  "the -u/--username option");
 		}
-		pent = getpwnam(username);
-		if (pent == NULL) {
-			error_msg_and_die("Cannot find user '%s'", username);
+
+		/*
+		 * If the username is in the form of UID:GID,
+		 * do not perform name lookups.
+		 */
+		if (is_uid_gid_pair(username, &run_uid, &run_gid)) {
+			if (run_uid == (uid_t) -1 || run_gid == (gid_t) -1)
+				error_msg_and_die("Invalid UID:GID pair '%s'",
+						  username);
+		} else {
+			struct passwd *pent = getpwnam(username);
+			if (pent == NULL)
+				error_msg_and_die("Cannot find user '%s'",
+						  username);
+			run_uid = pent->pw_uid;
+			run_gid = pent->pw_gid;
 		}
-		run_uid = pent->pw_uid;
-		run_gid = pent->pw_gid;
 	} else {
 		run_uid = getuid();
 		run_gid = getgid();

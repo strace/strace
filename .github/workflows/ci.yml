@@ -22,6 +22,7 @@ jobs:
       TARGET: x86_64
       KHEADERS: torvalds/linux
       STACKTRACE: libdw
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
     - uses: actions/checkout@v4
       with:

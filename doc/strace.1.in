@@ -358,6 +358,13 @@ This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
+.TQ
+.BI "\-u " UID:GID
+.TQ
+.BR "\-\-user" = \fIUID:GID\fR
+Alternative syntax where the program is started with exactly the given user
+and group IDs, and an empty list of supplementary groups.  In this case,
+user and group name lookups are not performed.
 .TP
 .BR "\-\-argv0" = \fIname\fR
 Set argv[0] of the command being executed to

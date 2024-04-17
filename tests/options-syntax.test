@@ -342,26 +342,38 @@ diff -u -- "$EXP" "$LOG" > /dev/null || {
 		"zeroargc $STRACE $args output mismatch"
 }
 
+check_uid_gid_syntax()
+{
+	check_e "Invalid UID:GID pair 'uid:gid'" -u uid:gid true
+	check_e "Invalid UID:GID pair '4294967295:4294967294'" \
+		-u 4294967295:4294967294 true
+	check_e "Invalid UID:GID pair '4294967294:4294967295'" \
+		-u 4294967294:4294967295 true
+	run_strace --user="$(id -u):$(id -g)" -qq -enone /bin/true
+}
+
 uid="${UID:-`id -u`}"
 if [ "$uid" -ge 0 ]; then
 	if [ "$uid" -eq 0 ]; then
-		umsg="Cannot find user ':nosuchuser:'"
+		check_uid_gid_syntax
+		umsg="Cannot find user '!no such user!'"
 	else
 		if [ "$(fakeroot ../block_reset_run 15 id -u 2>&1)" = 0 ]; then
 			saved_STRACE=$STRACE
 			STRACE="fakeroot -- $STRACE"
-			umsg="Cannot find user ':nosuchuser:'"
-			check_e "$umsg" -u :nosuchuser: true
+			check_uid_gid_syntax
+			umsg="Cannot find user '!no such user!'"
+			check_e "$umsg" -u '!no such user!' true
 			STRACE=$saved_STRACE
 		fi
 		umsg='You must be root to use the -u/--username option'
 	fi
 
-	check_e "$umsg" -u :nosuchuser: true
+	check_e "$umsg" -u '!no such user!' true
 
 	for c in i/--instruction-pointer n/--syscall-number r/--relative-timestamps t/--absolute-timestamps T/--syscall-times y/--decode-fds; do
 		check_e "-$c has no effect with -c/--summary-only
-$STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
+$STRACE_EXE: $umsg" -u '!no such user!' -c -${c%%/*} true
 	done
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
@@ -371,47 +383,47 @@ $STRACE_EXE: -t/--absolute-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u :nosuchuser: -cinrtTyzZ true
+$STRACE_EXE: $umsg" -u '!no such user!' -cinrtTyzZ true
 
 	if [ -n "$compiled_with_secontext" ]; then
 		check_e "--secontext has no effect with -c/--summary-only
-$STRACE_EXE: $umsg" -u :nosuchuser: -c --secontext true
+$STRACE_EXE: $umsg" -u '!no such user!' -c --secontext true
 	else
 		check_e "SELinux context printing (--secontext option) is not supported by this build of strace" -c --secontext true
 	fi
 
 	if [ -n "$compiled_with_stacktrace" ]; then
 		check_e "-k/--stack-trace has no effect with -c/--summary-only
-$STRACE_EXE: $umsg" -u :nosuchuser: -c -k true
+$STRACE_EXE: $umsg" -u '!no such user!' -c -k true
 	fi
 
 	for c in --output-separately -A/--output-append-mode; do
 		check_e "$c has no effect without -o/--output
-$STRACE_EXE: $umsg" -u :nosuchuser: ${c%%/*} true
+$STRACE_EXE: $umsg" -u '!no such user!' ${c%%/*} true
 	done
 
 	check_e "-S/--summary-sort-by has no effect without (-c/--summary-only or -C/--summary)
-$STRACE_EXE: $umsg" -u :nosuchuser: --summary-sort-by errors true
+$STRACE_EXE: $umsg" -u '!no such user!' --summary-sort-by errors true
 
 	check_e "--output-separately has no effect without -o/--output
 $STRACE_EXE: -A/--output-append-mode has no effect without -o/--output
-$STRACE_EXE: $umsg" -u :nosuchuser: --output-separately --output-append-mode true
+$STRACE_EXE: $umsg" -u '!no such user!' --output-separately --output-append-mode true
 
-	check_e "$umsg" -u :nosuchuser: -ff true
-	check_e "$umsg" -u :nosuchuser: --output-separately --follow-forks true
+	check_e "$umsg" -u '!no such user!' -ff true
+	check_e "$umsg" -u '!no such user!' --output-separately --follow-forks true
 
 	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u :nosuchuser: -z --successful-only true
+$STRACE_EXE: $umsg" -u '!no such user!' -z --successful-only true
 	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only -Z true
+$STRACE_EXE: $umsg" -u '!no such user!' --successful-only -Z true
 	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only --failed-only true
+$STRACE_EXE: $umsg" -u '!no such user!' --successful-only --failed-only true
 
 	check_e "-n/--syscall-number has no effect with -c/--summary-only
-$STRACE_EXE: $umsg" --user=:nosuchuser: --syscall-number --summary-only true
+$STRACE_EXE: $umsg" --user='!no such user!' --syscall-number --summary-only true
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
-$STRACE_EXE: $umsg" --user=:nosuchuser: --instruction-pointer --summary-only true
+$STRACE_EXE: $umsg" --user='!no such user!' --instruction-pointer --summary-only true
 fi
 
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
@@ -431,7 +443,7 @@ if [ -z "$compiled_with_stacktrace" ]; then
 		--stack-trace-frame-limit=1
 else
 	check_e "--stack-trace-frame-limit has no effect without -k/--stack-trace
-$STRACE_EXE: $umsg" -u :nosuchuser: --stack-trace-frame-limit=1 true
+$STRACE_EXE: $umsg" -u '!no such user!' --stack-trace-frame-limit=1 true
 	if [ -n "$compiled_with_libunwind" ]; then
 		check_e "Stack traces with source line information (-kk/--stack-trace=source option) are not supported by this build of strace" -kk
 		check_e "Stack traces with source line information (-kk/--stack-trace=source option) are not supported by this build of strace" --stack-trace=source
