@@ -86,7 +86,7 @@ main(void)
 
 	tv[0].tv_sec = 0xdeadbeefU;
 	tv[0].tv_usec = 0xfacefeedU;
-	tv[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv[1].tv_sec = (typeof(tv[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	tv[1].tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 
 	k_utimes(kfname, (uintptr_t) tv);

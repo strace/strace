@@ -57,7 +57,7 @@ main(void)
 	       fds[0], &mh, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	rc = recv_mmsg(fds[0], &mh, 1, 0, ts);

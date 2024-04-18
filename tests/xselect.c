@@ -213,7 +213,7 @@ main(void)
 	 * Very odd timeout.
 	 */
 	*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
-	tv_in.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv_in.tv_sec = (typeof(tv_in.tv_sec)) 0xcafef00ddeadbeefLL;
 	tv_in.tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 	memcpy(tv, &tv_in, sizeof(tv_in));
 	rc = xselect(nfds, a_rs, a_rs, a_rs, a_tv);
