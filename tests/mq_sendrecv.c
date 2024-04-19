@@ -195,11 +195,11 @@ main(void)
 	static const kernel_ulong_t bogus_prio =
 		(kernel_ulong_t) 0xdec0ded1defaced3ULL;
 	static const kernel_old_timespec_t bogus_tmout_data = {
-		.tv_sec = (time_t) 0xdeadfacebeeff00dLL,
+		.tv_sec = (typeof(bogus_tmout_data.tv_sec)) 0xdeadfacebeeff00dLL,
 		.tv_nsec = (long) 0xfacefee1deadfeedLL,
 	};
 	static const kernel_old_timespec_t future_tmout_data = {
-		.tv_sec = (time_t) 0x7ea1fade7e57faceLL,
+		.tv_sec = (typeof(future_tmout_data.tv_sec)) 0x7ea1fade7e57faceLL,
 		.tv_nsec = 999999999,
 	};
 	struct_sigevent bogus_sev_data = {
