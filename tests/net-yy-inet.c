@@ -63,8 +63,6 @@ main(void)
 
 	if (listen(listen_fd, 1))
 		perror_msg_and_skip("listen");
-	printf("listen(%d<" TCP_STR ":[%lu]>, 1) = 0\n",
-	       listen_fd, listen_inode);
 
 	memset(listen_sa, 0, sizeof(addr));
 	*len = sizeof(addr);

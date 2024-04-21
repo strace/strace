@@ -17,5 +17,9 @@ run_prog > /dev/null
 run_strace -a22 -yy -eclose,network $args > "$EXP"
 
 # Filter out close() calls made by ld.so and libc.
-sed -n '/socket/,$p' < "$LOG" > "$OUT"
+#
+# Filter out listen() call as we cannot easily predict the kernel
+# behaviour because there is no easy way to tell whether the Linux kernel
+# contains commit v6.8-rc1~131^2~223.
+sed -n '/^listen/d;/^socket/,$p' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
