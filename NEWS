@@ -4,7 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * The --user|-u option has learned to recognize numeric UID:GID pair, allowing
     e.g. statically-built strace to be used without invoking nss plugins.
-  * Updated lists of CAN_*, NT_*, RWF_*, and TCP_* constants.
+  * Updated lists of CAN_*, KEY_*, NT_*, RWF_*, and TCP_* constants.
   * Updated lists of ioctl commands from Linux 6.9.
 
 Noteworthy changes in release 6.8 (2024-03-20)
