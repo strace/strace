@@ -526,7 +526,7 @@ lookup_dcookie	-a27
 lsm_get_self_attr	-a49 -s2
 lsm_get_self_attr-success	--inject=lsm_get_self_attr:retval=96 -a49 -s2 --trace=lsm_get_self_attr
 lsm_list_modules	-a32
-lsm_list_modules-success	--inject=lsm_list_modules:retval=15 -a32 --trace=lsm_list_modules
+lsm_list_modules-success	--inject=lsm_list_modules:retval=17 -a32 --trace=lsm_list_modules
 lsm_set_self_attr	-a46
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full

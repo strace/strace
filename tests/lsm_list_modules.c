@@ -47,6 +47,8 @@ main(void)
 		{ ARG_STR(LSM_ID_APPARMOR) },
 		{ ARG_STR(LSM_ID_BPF) },
 		{ ARG_STR(LSM_ID_CAPABILITY) },
+		{ ARG_STR(LSM_ID_EVM) },
+		{ ARG_STR(LSM_ID_IMA) },
 		{ ARG_STR(LSM_ID_LANDLOCK) },
 		{ ARG_STR(LSM_ID_LOADPIN) },
 		{ ARG_STR(LSM_ID_LOCKDOWN) },
@@ -58,7 +60,7 @@ main(void)
 		{ ARG_STR(LSM_ID_YAMA) },
 		{ 1, "0x1 /* LSM_ID_??? */" },
 		{ 99, "0x63 /* LSM_ID_??? */" },
-		{ 111, "0x6f /* LSM_ID_??? */" }
+		{ 113, "0x71 /* LSM_ID_??? */" }
 	};
 	TAIL_ALLOC_OBJECT_CONST_ARR(uint64_t, ids, ARRAY_SIZE(test_ids));
 	for (unsigned int i = 0; i < ARRAY_SIZE(test_ids); ++i)
