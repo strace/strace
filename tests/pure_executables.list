@@ -784,6 +784,7 @@ status-successful-long
 status-successful-status
 status-unfinished
 statx
+strace--always-show-pid
 strace--strings-in-hex
 strace--strings-in-hex-all
 strace--strings-in-hex-non-ascii
