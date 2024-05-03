@@ -72,14 +72,26 @@ main(void)
 	printf("pidfd_open(-1, PIDFD_NONBLOCK) = %s\n", errstr);
 #endif
 
+	k_pidfd_open(0, O_EXCL);
+#ifndef PATH_TRACING
+	pidns_print_leader();
+	printf("pidfd_open(0, PIDFD_THREAD) = %s\n", errstr);
+#endif
+
+	k_pidfd_open(-1U, O_EXCL);
+#ifndef PATH_TRACING
+	pidns_print_leader();
+	printf("pidfd_open(-1, PIDFD_THREAD) = %s\n", errstr);
+#endif
+
 	k_pidfd_open(0, -1U);
 #ifndef PATH_TRACING
 	pidns_print_leader();
-	printf("pidfd_open(0, PIDFD_NONBLOCK|%#x) = %s\n",
-	       -1U & (~O_NONBLOCK), errstr);
+	printf("pidfd_open(0, PIDFD_NONBLOCK|PIDFD_THREAD|%#x) = %s\n",
+	       -1U & (~(O_NONBLOCK | O_EXCL)), errstr);
 #endif
 
-	const unsigned int flags = 0xfacefeed & (~O_NONBLOCK);
+	const unsigned int flags = 0xfacefeed & (~(O_NONBLOCK | O_EXCL));
 	const int pid = getpid();
 
 	k_pidfd_open(pid, flags);
