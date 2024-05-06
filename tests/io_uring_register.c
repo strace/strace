@@ -1142,6 +1142,99 @@ main(void)
 		}
 	}
 
+	/* IORING_REGISTER_SYNC_CANCEL */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} sync_cancel_reg_ops[] = {
+		{ 24, "IORING_REGISTER_SYNC_CANCEL" },
+	};
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_sync_cancel_reg,
+				  sync_cancel_reg);
+
+	for (size_t i = 0; i < ARRAY_SIZE(sync_cancel_reg_ops); i++) {
+		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(sync_cancel_reg_ops[i].op,
+			        sync_cancel_reg_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+				      sync_cancel_reg + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(sync_cancel_reg_ops[i].op, sync_cancel_reg_ops[i].str),
+		       sync_cancel_reg + 1, errstr);
+
+		for (size_t j = 0; j < 0x100; j++) {
+			memset(sync_cancel_reg, 0, sizeof(*sync_cancel_reg));
+			sync_cancel_reg->addr =
+				j & 0x1 ? (uintptr_t) sync_cancel_reg : 0;
+			sync_cancel_reg->fd = j & 0x2 ? fd_null : -1;
+			sync_cancel_reg->flags = j & 0x4 ? 0x3f : 0xffffffc0U;
+			sync_cancel_reg->timeout.tv_sec =
+				j & 0x8 ? 0xdeface1 : -1;
+			sync_cancel_reg->timeout.tv_nsec =
+				j & 0x10 ? 0xdeface2 : -1;
+			sync_cancel_reg->opcode =
+				j & 0x20 ? IORING_OP_LAST - 1
+					 : IORING_OP_LAST;
+			if (j & 0x40)
+				sync_cancel_reg->pad[6] = 0xfe;
+			if (j & 0x80)
+				sync_cancel_reg->pad2[2] = 0xbadc0de1dadface2ULL;
+
+			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+					      sync_cancel_reg, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(sync_cancel_reg_ops[i].op,
+				        sync_cancel_reg_ops[i].str),
+			       sync_cancel_reg, errstr);
+
+			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+					      sync_cancel_reg, 1);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT
+			       ", {",
+			       fd_null, path_null,
+			       XLAT_SEL(sync_cancel_reg_ops[i].op,
+				        sync_cancel_reg_ops[i].str));
+			if (j & 0x1)
+				printf("addr=%p", sync_cancel_reg);
+			else
+				printf("addr=NULL");
+			if (j & 0x2)
+				printf(", fd=%u<%s>", fd_null, path_null);
+			else
+				printf(", fd=-1");
+			if (j & 0x4)
+				printf(", flags=" XLAT_FMT,
+				       XLAT_ARGS(IORING_ASYNC_CANCEL_ALL|IORING_ASYNC_CANCEL_FD|IORING_ASYNC_CANCEL_ANY|IORING_ASYNC_CANCEL_FD_FIXED|IORING_ASYNC_CANCEL_USERDATA|IORING_ASYNC_CANCEL_OP));
+			else
+				printf(", flags=0xffffffc0"
+				       NRAW(" /* IORING_ASYNC_CANCEL_??? */"));
+			printf(", timeout={tv_sec=%jd, tv_nsec=%jd}",
+			       (intmax_t) sync_cancel_reg->timeout.tv_sec,
+			       (intmax_t) sync_cancel_reg->timeout.tv_nsec);
+			if (j & 0x20)
+				printf(", opcode=" XLAT_FMT,
+				       XLAT_ARGS(IORING_OP_FTRUNCATE));
+			else
+				printf(", opcode=%#x"
+				       NRAW(" /* IORING_OP_??? */"),
+				       sync_cancel_reg->opcode);
+			if (j & 0x40)
+				printf(", pad=[0, 0, 0, 0, 0, 0, 0xfe]");
+			if (j & 0x80)
+				printf(", pad2=[0, 0, 0xbadc0de1dadface2]");
+			printf("}, 1) = %s\n", errstr);
+		}
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

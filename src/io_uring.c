@@ -12,6 +12,7 @@
 #define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
+#include "xlat/uring_async_cancel_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_files_update_fds.h"
 #include "xlat/uring_iowq_acct.h"
@@ -595,6 +596,54 @@ print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
+static void
+print_io_uring_sync_cancel_reg(struct tcb *tcp, const kernel_ulong_t addr,
+			       const unsigned int nargs)
+{
+	struct io_uring_sync_cancel_reg arg;
+
+	if (nargs != 1) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(arg, addr);
+
+	tprint_struct_next();
+	PRINT_FIELD_FD(arg, fd, tcp);
+
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(arg, flags, uring_async_cancel_flags,
+			  "IORING_ASYNC_CANCEL_???");
+
+	tprint_struct_next();
+	tprints_field_name("timeout");
+	tprint_struct_begin();
+        PRINT_FIELD_D(arg.timeout, tv_sec);
+        tprint_struct_next();
+        PRINT_FIELD_D(arg.timeout, tv_nsec);
+        tprint_struct_end();
+
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(arg, opcode, uring_ops, "IORING_OP_???");
+
+	if (!IS_ARRAY_ZERO(arg.pad)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, pad, tcp, print_xint_array_member);
+	}
+
+	if (!IS_ARRAY_ZERO(arg.pad2)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, pad2, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -660,6 +709,9 @@ SYS_FUNC(io_uring_register)
 	case IORING_REGISTER_PBUF_RING:
 	case IORING_UNREGISTER_PBUF_RING:
 		print_io_uring_buf_reg(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_SYNC_CANCEL:
+		print_io_uring_sync_cancel_reg(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
