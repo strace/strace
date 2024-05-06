@@ -559,12 +559,18 @@ print_io_uring_ringfds_unregister(struct tcb *tcp, const kernel_ulong_t arg,
 }
 
 static void
-print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
+print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr,
+		       const unsigned int nargs)
 {
 	struct io_uring_buf_reg arg;
 	CHECK_TYPE_SIZE(arg, 40);
 	CHECK_TYPE_SIZE(arg.flags, sizeof(uint16_t));
 	CHECK_TYPE_SIZE(arg.resv, sizeof(uint64_t) * 3);
+
+	if (nargs != 1) {
+		printaddr(addr);
+		return;
+	}
 
 	if (umove_or_printaddr(tcp, addr, &arg))
 		return;
@@ -653,7 +659,7 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_PBUF_RING:
 	case IORING_UNREGISTER_PBUF_RING:
-		print_io_uring_buf_reg(tcp, arg);
+		print_io_uring_buf_reg(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

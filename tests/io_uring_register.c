@@ -1112,6 +1112,14 @@ main(void)
 
 			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
 					      buf_reg, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+			       buf_reg, errstr);
+
+			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+					      buf_reg, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT
 			       ", {ring_addr=",
 			       fd_null, path_null,
@@ -1130,7 +1138,7 @@ main(void)
 				       j &  64 ? "0xdecaffedbeefdead" : "0",
 				       j & 128 ? "0xbadc0dedfacefeed" : "0");
 			}
-			printf("}, 66) = %s\n", errstr);
+			printf("}, 1) = %s\n", errstr);
 		}
 	}
 
