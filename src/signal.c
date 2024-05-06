@@ -729,6 +729,8 @@ SYS_FUNC(rt_tgsigqueueinfo)
 	return RVAL_DECODED;
 }
 
+#include "xlat/pidfd_send_signal_flags.h"
+
 SYS_FUNC(pidfd_send_signal)
 {
 	/* int pidfd */
@@ -740,7 +742,7 @@ SYS_FUNC(pidfd_send_signal)
 	tprint_arg_next();
 
 	/* unsigned int flags */
-	PRINT_VAL_X((unsigned int) tcp->u_arg[3]);
+	printflags(pidfd_send_signal_flags, tcp->u_arg[3], "PIDFD_SIGNAL_???");
 
 	return RVAL_DECODED;
 }

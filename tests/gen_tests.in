@@ -526,7 +526,7 @@ lookup_dcookie	-a27
 lsm_get_self_attr	-a49 -s2
 lsm_get_self_attr-success	--inject=lsm_get_self_attr:retval=96 -a49 -s2 --trace=lsm_get_self_attr
 lsm_list_modules	-a32
-lsm_list_modules-success	--inject=lsm_list_modules:retval=15 -a32 --trace=lsm_list_modules
+lsm_list_modules-success	--inject=lsm_list_modules:retval=17 -a32 --trace=lsm_list_modules
 lsm_set_self_attr	-a46
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
@@ -1068,6 +1068,7 @@ strace--absolute-timestamps-format-unix-precision-ms +strace-ttt.test 3 --absolu
 strace--absolute-timestamps-format-unix-precision-ns +strace-ttt.test 9 --absolute-timestamps=format:unix --absolute-timestamps=precision:ns
 strace--absolute-timestamps-format-unix-precision-s +strace-ttt.test 0 --absolute-timestamps=format:unix --absolute-timestamps=precision:s
 strace--absolute-timestamps-format-unix-precision-us +strace-ttt.test 6 --absolute-timestamps=precision:us --absolute-timestamps=format:unix
+strace--always-show-pid	--always-show-pid --trace=fchdir -a15
 strace--decode-pids-comm	--decode-pids=comm --trace=getppid,tgkill --signal='!SIGCHLD,SIGCONT' -q -f -a 18
 strace--follow-forks-output-separately +strace-ff.test --follow-forks --output-separately
 strace--relative-timestamps +strace-r.test --relative-timestamps

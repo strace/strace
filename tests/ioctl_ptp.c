@@ -204,8 +204,9 @@ test_no_device(void)
 	static const struct strval32 extts_flags[] = {
 		{ ARG_XLAT_KNOWN(0x1, "PTP_ENABLE_FEATURE") },
 		{ ARG_XLAT_KNOWN(0xdeadbabe, "PTP_RISING_EDGE|PTP_FALLING_EDGE"
-					     "|PTP_STRICT_FLAGS|0xdeadbab0") },
-		{ ARG_XLAT_UNKNOWN(0xbadbeef0, "PTP_???") },
+					     "|PTP_STRICT_FLAGS|PTP_EXT_OFFSET"
+					     "|0xdeadbaa0") },
+		{ ARG_XLAT_UNKNOWN(0xbadbeee0, "PTP_???") },
 		{ ARG_STR(0) },
 	};
 	for (const struct strval32 *c = ioc_extts; c < ARRAY_END(ioc_extts);

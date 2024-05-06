@@ -59,9 +59,13 @@ main(void)
 	pidns_print_leader();
 	printf("pidfd_send_signal(%d, SIGUSR2, {si_signo=SIGUSR1"
 	       ", si_code=SI_QUEUE, si_errno=%u, si_pid=%d%s, si_uid=%d"
-	       ", si_int=%d, si_ptr=%p}, %#x) = %s\n",
+	       ", si_int=%d, si_ptr=%p}, %s|0xfffffff8) = %s\n",
 	       fd, si->si_errno, si->si_pid, pidns_pid2str(PT_TGID), si->si_uid,
-	       si->si_int, si->si_ptr, -1U, errstr);
+	       si->si_int, si->si_ptr,
+	       "PIDFD_SIGNAL_THREAD"
+	       "|PIDFD_SIGNAL_THREAD_GROUP"
+	       "|PIDFD_SIGNAL_PROCESS_GROUP",
+	       errstr);
 
 	pidns_print_leader();
 	puts("+++ exited with 0 +++");

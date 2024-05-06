@@ -1085,6 +1085,7 @@ status-successful-threads
 status-unfinished
 status-unfinished-threads
 statx
+strace--always-show-pid
 strace--decode-pids-comm
 strace--strings-in-hex
 strace--strings-in-hex-all
