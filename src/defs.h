@@ -1440,6 +1440,7 @@ extern void qualify_write(const char *);
 extern void qualify_fault(const char *);
 extern void qualify_inject(const char *);
 extern void qualify_kvm(const char *);
+extern void qualify_namespace(const char *);
 extern unsigned int qual_flags(const unsigned int);
 
 # define DECL_IOCTL(name)						\
@@ -1595,6 +1596,8 @@ extern void unwind_tcb_capture(struct tcb *);
 extern void kvm_run_structure_decoder_init(void);
 extern void kvm_vcpu_info_free(struct tcb *);
 # endif
+
+extern void namespace_auxstr_init(void);
 
 extern void maybe_load_task_comm(struct tcb *tcp);
 /* Print the contents of /proc/$pid/comm. */
