@@ -644,6 +644,34 @@ print_io_uring_sync_cancel_reg(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
+static void
+print_io_uring_file_index_range(struct tcb *tcp, const kernel_ulong_t addr,
+				const unsigned int nargs)
+{
+	struct io_uring_file_index_range arg;
+
+	if (nargs != 1) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(arg, off);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, len);
+
+	if (arg.resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv);
+	}
+
+	tprint_struct_end();
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -712,6 +740,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_SYNC_CANCEL:
 		print_io_uring_sync_cancel_reg(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_FILE_ALLOC_RANGE:
+		print_io_uring_file_index_range(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

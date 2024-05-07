@@ -1234,6 +1234,62 @@ main(void)
 		}
 	}
 
+	/* IORING_REGISTER_FILE_ALLOC_RANGE */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} file_index_range_ops[] = {
+		{ 25, "IORING_REGISTER_FILE_ALLOC_RANGE" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_file_index_range,
+				    file_index_range);
+
+	for (size_t i = 0; i < ARRAY_SIZE(file_index_range_ops); i++) {
+		sys_io_uring_register(fd_null, file_index_range_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(file_index_range_ops[i].op,
+			        file_index_range_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+				      file_index_range + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(file_index_range_ops[i].op, file_index_range_ops[i].str),
+		       file_index_range + 1, errstr);
+
+		for (size_t j = 0; j < (1U << 3); j++) {
+			memset(file_index_range, 0, sizeof(*file_index_range));
+			file_index_range->off = j & 1 ? 0xfacefeedU : 0;
+			file_index_range->len = j & 2 ? 0xcafef00dU : 0;
+			file_index_range->resv = j & 4 ? 0xbadc0de1dadface2ULL : 0;
+
+			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+					      file_index_range, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(file_index_range_ops[i].op,
+				        file_index_range_ops[i].str),
+			       file_index_range, errstr);
+
+			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+					      file_index_range, 1);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT
+			       ", {off=%u, len=%u",
+			       fd_null, path_null,
+			       XLAT_SEL(file_index_range_ops[i].op,
+				        file_index_range_ops[i].str),
+			       file_index_range->off, file_index_range->len);
+			if (j & 4)
+				printf(", resv=0xbadc0de1dadface2");
+			printf("}, 1) = %s\n", errstr);
+		}
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
