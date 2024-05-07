@@ -996,6 +996,19 @@ if the tracee is in a different PID namespace.
 Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
 or higher.
 .TP
+.BR "\-e\ namespace" = switchTo
+.TQ
+.BR "\-\-namespace" = switchTo
+Print the namespaces where the tracee switches to.
+.BR clone (2)
+,
+.BR clone3 (2)
+,
+.BR setns (2)
+, and
+.BR unshare (2)
+are supported.
+.TP
 .B \-i
 .TQ
 .B \-\-instruction\-pointer

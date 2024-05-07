@@ -14,6 +14,9 @@
 #include "scno.h"
 #include <linux/sched.h>
 
+#include "xstring.h"
+#include <unistd.h>
+
 #include "xlat/clone_flags.h"
 #include "xlat/clone3_flags.h"
 #include "xlat/setns_types.h"
@@ -53,6 +56,76 @@
 # define ARG_CTID	4
 #endif
 
+static bool show_namespace = false;
+extern void namespace_auxstr_init(void)
+{
+	show_namespace = true;
+}
+
+/* derrived from print_dirfd */
+static const char *
+read_namespace_id(int pid, const char *const ns_type)
+{
+	static const char ns_path[] = "/proc/%d/ns/%s";
+	/* "cgroup" is the longest name in the dentries in /proc/$pid/ns. */
+	char linkpath[sizeof(ns_path) + sizeof(int) * 3 + sizeof("cgroup")];
+	xsprintf(linkpath, ns_path, pid, ns_type);
+
+	static char buf[PATH_MAX + 1];
+	ssize_t n = readlink(linkpath, buf, sizeof(buf));
+	if ((size_t) n >= sizeof(buf))
+		return NULL;
+	buf[n] = '\0';
+	return buf;
+}
+
+static const char *
+get_namespace_auxstr(int pid, uint64_t flags)
+{
+	static char str[sizeof("cgroup:[4026531835], "
+			          "ipc:[4026531839], "
+			          "mnt:[4026531841], "
+			          "net:[4026531840], "
+			          "pid:[4026531836], "
+			         "time:[4026531834], "
+			         "user:[4026531837], "
+			          "uts:[4026531838]" )
+			/* for the last null char */
+			+ 1];
+	char *p = str;
+
+#define APPEND(NS_TYPE) do {				\
+		const char *ns_name = read_namespace_id(pid, NS_TYPE); \
+		if (ns_name == NULL)				       \
+			break;				\
+		if (str != p)				\
+			p = xappendstr(str, p, ", ");	\
+		p = xappendstr(str, p, "%s", ns_name);	\
+	} while (0)
+
+	*p = '\0';
+	if (flags & CLONE_NEWCGROUP)
+		APPEND("cgroup");
+	if (flags & CLONE_NEWIPC)
+		APPEND("ipc");
+	if (flags & CLONE_NEWNS)
+		APPEND("mnt");
+	if (flags & CLONE_NEWNET)
+		APPEND("net");
+	if (flags & CLONE_NEWPID)
+		APPEND("pid");
+	if (flags & CLONE_NEWTIME)
+		APPEND("time");
+	if (flags & CLONE_NEWUTS)
+		APPEND("uts");
+	if (flags & CLONE_NEWUSER)
+		APPEND("user");
+
+#undef APPEND
+
+	return (str != p)? str: NULL;
+}
+
 static void
 print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -71,6 +144,10 @@ print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(clone)
 {
 	const kernel_ulong_t flags = tcp->u_arg[ARG_FLAGS] & ~CSIGNAL;
+	const kernel_ulong_t nsflags = show_namespace
+		? (CLONE_NEWCGROUP|CLONE_NEWIPC|CLONE_NEWNS|CLONE_NEWNET|CLONE_NEWPID|CLONE_NEWTIME|CLONE_NEWUTS|CLONE_NEWUSER)
+		: 0;
+	int r_extra = 0;
 
 	if (entering(tcp)) {
 		const unsigned int sig = tcp->u_arg[ARG_FLAGS] & CSIGNAL;
@@ -114,7 +191,8 @@ SYS_FUNC(clone)
 		 * use of this flag which we should respect.
 		 */
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_PIDFD|CLONE_CHILD_SETTID
-			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
+			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS
+			      |nsflags)) == 0)
 			return RVAL_DECODED | RVAL_TID;
 	} else {
 		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
@@ -140,8 +218,13 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_CTID]);
 			tprint_arg_name_end();
 		}
+		if (show_namespace && tcp->u_rval >= 0) {
+			tcp->auxstr = get_namespace_auxstr((int)tcp->u_rval, (uint64_t)flags);
+			if (tcp->auxstr)
+				r_extra = RVAL_STR;
+		}
 	}
-	return RVAL_TID;
+	return RVAL_TID | r_extra;
 }
 
 static void
@@ -162,6 +245,11 @@ SYS_FUNC(clone3)
 	kernel_ulong_t fetch_size;
 
 	fetch_size = MIN(size, sizeof(arg));
+
+	const kernel_ulong_t nsflags = show_namespace
+		? (CLONE_NEWCGROUP|CLONE_NEWIPC|CLONE_NEWNS|CLONE_NEWNET|CLONE_NEWPID|CLONE_NEWTIME|CLONE_NEWUTS|CLONE_NEWUSER)
+		: 0;
+	int r_extra = 0;
 
 	if (entering(tcp)) {
 		if (fetch_size < minsz) {
@@ -246,7 +334,7 @@ SYS_FUNC(clone3)
 
 		tprint_struct_end();
 
-		if ((arg.flags & (CLONE_PIDFD | CLONE_PARENT_SETTID)) ||
+		if ((arg.flags & (CLONE_PIDFD | CLONE_PARENT_SETTID | nsflags)) ||
 		    (size > fetch_size))
 			return RVAL_TID;
 
@@ -297,27 +385,53 @@ SYS_FUNC(clone3)
 	if (prefix_fun != tprint_value_changed_struct_begin)
 		tprint_struct_end();
 
+	if (show_namespace && tcp->u_rval >= 0) {
+		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, (uint64_t)arg.flags);
+		if (tcp->auxstr)
+			r_extra = RVAL_STR;
+	}
+
 out:
 	tprint_arg_next();
 	PRINT_VAL_U(size);
 
-	return RVAL_DECODED | RVAL_TID;
+	return RVAL_DECODED | RVAL_TID | r_extra;
 }
 
 
 SYS_FUNC(setns)
 {
-	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
-	printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprint_arg_next();
+		printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
+		return show_namespace? 0: RVAL_DECODED;
+	}
 
-	return RVAL_DECODED;
+	int r_extra = 0;
+	if (show_namespace && tcp->u_rval == 0) {
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, (uint64_t)tcp->u_arg[1]);
+		if (tcp->auxstr)
+			r_extra = RVAL_STR;
+	}
+	return RVAL_DECODED | r_extra;
+
 }
 
 SYS_FUNC(unshare)
 {
-	printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
-	return RVAL_DECODED;
+	if (entering(tcp)) {
+		printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
+		return show_namespace? 0: RVAL_DECODED;
+	}
+
+	int r_extra = 0;
+	if (show_namespace && tcp->u_rval == 0) {
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, (uint64_t)tcp->u_arg[0]);
+		if (tcp->auxstr)
+			r_extra = RVAL_STR;
+	}
+	return RVAL_DECODED | r_extra;
 }
 
 SYS_FUNC(fork)
