@@ -404,7 +404,7 @@ main(void)
 	char *kckdfp_otherinfo2 = tail_memdup(otherinfo2_data,
 					      sizeof(otherinfo2_data));
 	char *kckdfp_char = tail_alloc(sizeof(kckdfp_data[0]));
-	struct iovec *key_iov = tail_alloc(sizeof(*key_iov) * IOV_SIZE);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct iovec, key_iov, IOV_SIZE);
 	char *bogus_buf1 = tail_alloc(9);
 	char *bogus_buf2 = tail_alloc(256);
 	char *key_iov_str2 = tail_alloc(4096);
@@ -1195,8 +1195,7 @@ main(void)
 
 	char *pkey1 = tail_memdup(pkey_str1, sizeof(pkey_str1) - 1);
 	char *pkey2 = tail_memdup(pkey_str2, sizeof(pkey_str2) - 1);
-	struct keyctl_pkey_params *pkey_params =
-		tail_alloc(sizeof(*pkey_params));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct keyctl_pkey_params, pkey_params);
 
 	for (size_t i = 0; i < ARRAY_SIZE(pkey_ops); ++i) {
 		do_keyctl(pkey_ops[i].op, pkey_ops[i].str,

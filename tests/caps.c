@@ -22,7 +22,7 @@ main(void)
 	const int v2 = 0x20071026;
 	const int v3 = 0x20080522;
 
-	int * const head = tail_alloc(sizeof(int) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(int, head, 2);
 	head[0] = v3;
 	head[1] = 0;
 	int * const tail_data = tail_alloc(sizeof(data));

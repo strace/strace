@@ -453,8 +453,8 @@ main(int ac, char **av)
 	 */
 # define PROG_INFO_SZ (sizeof(*prog_info) + 64)
 	struct bpf_prog_info_struct *prog_info = tail_alloc(PROG_INFO_SZ);
-	struct bpf_insn *xlated_prog = tail_alloc(sizeof(*xlated_prog) * 42);
-	uint32_t *map_ids = tail_alloc(sizeof(*map_ids) * 3);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct bpf_insn, xlated_prog, 42);
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint32_t, map_ids, 3);
 	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_prog_get_info_attr = {
 		.bpf_fd   = prog_fd,
 		.info_len = PROG_INFO_SZ,

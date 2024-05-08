@@ -164,7 +164,7 @@ main(void)
 	printf("ioctl(-1, %s, [%u])" RVAL_EBADF,
 	       XLAT_STR(EVIOCSCLOCKID), *val_int);
 
-	int *pair_int = tail_alloc(sizeof(*pair_int) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(int, pair_int, 2);
 	pair_int[0] = 0xdeadbeef;
 	pair_int[1] = 0xbadc0ded;
 

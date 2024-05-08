@@ -95,7 +95,7 @@ main(int argc, char *argv[])
 	ids[3] = getsid(0);
 	ids[4] = -1;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(uint64_t, uptr);
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, uptr);
 	uint64_t *uptrs[] = { NULL, uptr + 1, uptr };
 
 	for (size_t i = 0; i < ARRAY_SIZE(ops); i++) {

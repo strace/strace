@@ -229,7 +229,7 @@ check_kbdent(unsigned int c, const char *s)
 		{ ARG_STR(0xf00d) NRAW(" /* K(0xf0, 0xd) */") },
 	};
 
-	struct kbentry *kbe = tail_alloc(sizeof(*kbe));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct kbentry, kbe);
 
 	int saved_errno;
 	long rc;
@@ -285,7 +285,7 @@ check_kbdsent(unsigned int c, const char *s)
 		{ ARG_XLAT_KNOWN(0xff, "KVAL(K_UNDO)") },
 	};
 
-	struct kbsentry *kbse = tail_alloc(sizeof(*kbse));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct kbsentry, kbse);
 
 	int saved_errno;
 
@@ -402,7 +402,7 @@ check_diacr(unsigned int c, const char *s)
 	struct kbdiacrs *diacrs0 = tail_alloc(sizeof(diacrs0->kb_cnt));
 	struct kbdiacrs *diacrs1 = tail_alloc(sizeof(diacrs1->kb_cnt) +
 					      4 * sizeof(struct kbdiacr));
-	struct kbdiacrs *diacrs2 = tail_alloc(sizeof(*diacrs2));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct kbdiacrs, diacrs2);
 
 	int saved_errno;
 
@@ -621,8 +621,8 @@ check_font(unsigned int c, const char *s)
 static void
 check_unimap(unsigned int c, const char *s)
 {
-	struct unimapdesc *umd = tail_alloc(sizeof(*umd));
-	struct unipair *ups = tail_alloc(33 * sizeof(*ups));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct unimapdesc, umd);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct unipair, ups, 33);
 
 	fill_memory16(ups, 33 * sizeof(*ups));
 	ups[0].unicode = 0;
@@ -695,7 +695,7 @@ check_unimap(unsigned int c, const char *s)
 static void
 check_uniscrnmap(unsigned int c, const char *s)
 {
-	uint16_t *map = tail_alloc(256 * sizeof(*map));
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint16_t, map, 256);
 	for (unsigned int i = 0; i < 256; i++)
 		map[i] = 0xeff1 + 32 * (i % 112) - i / 8;
 
@@ -739,7 +739,7 @@ static void
 check_fontx(unsigned int c, const char *s)
 {
 	static const short cnts[] = { 1, 32, 256 };
-	struct consolefontdesc *cfd = tail_alloc(sizeof(*cfd));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct consolefontdesc, cfd);
 	char *data = tail_alloc(2048);
 	char *data_end = data + 2048;
 
@@ -880,7 +880,7 @@ check_diacruc(unsigned int c, const char *s)
 	struct kbdiacrsuc *diacrs0 = tail_alloc(sizeof(diacrs0->kb_cnt));
 	struct kbdiacrsuc *diacrs1 = tail_alloc(sizeof(diacrs1->kb_cnt) +
 						4 * sizeof(struct kbdiacruc));
-	struct kbdiacrsuc *diacrs2 = tail_alloc(sizeof(*diacrs2));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct kbdiacrsuc, diacrs2);
 
 	int saved_errno;
 
@@ -1109,7 +1109,7 @@ main(int argc, char *argv[])
 		  XLAT_UNKNOWN(0xf0, "LED_???") },
 	};
 
-	unsigned char *leds = tail_alloc(sizeof(*leds));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned char, leds);
 
 	check_null_invalid(ARG_STR(KDGETLED));
 
@@ -1149,7 +1149,7 @@ main(int argc, char *argv[])
 		  XLAT_UNKNOWN(0xfe, "KB_???") },
 	};
 
-	unsigned char *kbt = tail_alloc(sizeof(*kbt));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned char, kbt);
 
 	check_null_invalid(ARG_STR(KDGKBTYPE));
 
@@ -1227,7 +1227,7 @@ main(int argc, char *argv[])
 
 
 	/* KDGETMODE */
-	unsigned int *mode = tail_alloc(sizeof(*mode));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, mode);
 
 	check_null_invalid(ARG_STR(KDGETMODE));
 
@@ -1376,7 +1376,7 @@ main(int argc, char *argv[])
 		{ (kernel_ulong_t) 0xdeadfacebeeffeedULL,
 		  "0xbeeffeed" NRAW(" /* K_??? */") },
 	};
-	int *meta = tail_alloc(sizeof(*meta));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, meta);
 
 	check_null_invalid(ARG_STR(KDGKBMETA));
 
@@ -1414,7 +1414,7 @@ main(int argc, char *argv[])
 		  XLAT_UNKNOWN(0x88, "LED_???") },
 	};
 
-	unsigned char *kbleds = tail_alloc(sizeof(*kbleds));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned char, kbleds);
 
 	check_null_invalid(ARG_STR(KDGKBLED));
 
@@ -1448,7 +1448,7 @@ main(int argc, char *argv[])
 
 
 	/* PIO_UNIMAPCLR */
-	struct unimapinit *umi = tail_alloc(sizeof(*umi));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct unimapinit, umi);
 
 	check_null_invalid(ARG_STR(PIO_UNIMAPCLR));
 
@@ -1499,7 +1499,7 @@ main(int argc, char *argv[])
 
 
 	/* KDFONTOP */
-	struct console_font_op *cfo = tail_alloc(sizeof(*cfo));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct console_font_op, cfo);
 	unsigned char *cfo_data = tail_alloc(2048);
 	unsigned char *cfo_data_end = cfo_data + 2048;
 

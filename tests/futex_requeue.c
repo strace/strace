@@ -51,8 +51,8 @@ int
 main(void)
 {
 	const unsigned int nr = 2;
-	uint32_t * const futexes = tail_alloc(nr * sizeof(*futexes));
-	struct futex_waitv * const waiters = tail_alloc(nr * sizeof(*waiters));
+	TAIL_ALLOC_OBJECT_CONST_ARR(uint32_t, futexes, nr);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct futex_waitv, waiters, nr);
 	fill_memory(waiters, nr * sizeof(*waiters));
 	const int flags = 0xfacefed0;
 	const int nr_wake = 0xfacefed1;

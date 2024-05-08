@@ -67,8 +67,8 @@ main(void)
 
 	/* check how the second argument is decoded */
 	TAIL_ALLOC_OBJECT_CONST_PTR(const GID_TYPE, g1);
-	GID_TYPE *const g2 = tail_alloc(sizeof(*g2) * 2);
-	GID_TYPE *const g3 = tail_alloc(sizeof(*g3) * 3);
+	TAIL_ALLOC_OBJECT_CONST_ARR(GID_TYPE, g2, 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(GID_TYPE, g3, 3);
 
 	rc = syscall(SYSCALL_NR, 0, g1 + 1);
 	printf("%s(0, []) = %s\n", SYSCALL_NAME, sprintrc(rc));

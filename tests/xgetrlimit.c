@@ -76,7 +76,7 @@ sprint_rlim(kernel_ulong_t lim)
 int
 main(void)
 {
-	kernel_ulong_t *const rlimit = tail_alloc(sizeof(*rlimit) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(kernel_ulong_t, rlimit, 2);
 	const struct xlat_data *xlat;
 	size_t i;
 	long rc;

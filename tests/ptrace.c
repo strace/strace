@@ -147,7 +147,7 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 
 	const unsigned int nsigs = 4;
 	const uid_t uid = geteuid();
-	siginfo_t *sigs = tail_alloc(sizeof(*sigs) * nsigs);
+	TAIL_ALLOC_OBJECT_CONST_ARR(siginfo_t, sigs, nsigs);
 
 	psi->off = 0;
 	psi->flags = 0;

@@ -183,7 +183,7 @@ main(void)
 	const unsigned int nr = ARRAY_SIZE(proto_cb);
 	const unsigned long lnr = (unsigned long) (0xdeadbeef00000000ULL | nr);
 
-	const struct io_event *ev = tail_alloc(nr * sizeof(struct io_event));
+	TAIL_ALLOC_OBJECT_CONST_ARR(const struct io_event, ev, nr);
 	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 
 	(void) close(0);

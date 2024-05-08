@@ -161,7 +161,7 @@ test_print_gpioline_info_unwatch(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_GET_LINEINFO_UNWATCH_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(uint32_t, p_offset);
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint32_t, p_offset);
 
 	*p_offset = 0;
 	do_ioctl_ptr(GPIO_GET_LINEINFO_UNWATCH_IOCTL, p_offset);

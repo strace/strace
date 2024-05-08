@@ -71,7 +71,7 @@ main(void)
 	for (unsigned int i = 0; i < LEN; ++i)
 		buf[i] = i;
 
-	struct iovec *iov = tail_alloc(sizeof(*iov) * LEN);
+	TAIL_ALLOC_OBJECT_VAR_ARR(struct iovec, iov, LEN);
 	for (unsigned int i = 0; i < LEN; ++i) {
 		buf[i] = i;
 		iov[i].iov_base = &buf[i];

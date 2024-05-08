@@ -211,8 +211,7 @@ main(void)
 
 	const char *errstr;
 	long rc;
-	kernel_long_t *bogus_attrs = tail_alloc(sizeof(*bogus_attrs) *
-		NUM_ATTRS);
+	TAIL_ALLOC_OBJECT_CONST_ARR(kernel_long_t, bogus_attrs, NUM_ATTRS);
 	char *msg = tail_alloc(MSG_SIZE);
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, bogus_prio_ptr);
 	kernel_old_timespec_t *bogus_tmout = tail_memdup(&bogus_tmout_data,

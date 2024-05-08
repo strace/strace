@@ -22,7 +22,7 @@ main(void)
 {
 	(void) close(0);
 	(void) close(1);
-	int *const fds = tail_alloc(sizeof(*fds) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(int, fds, 2);
 	if (pipe(fds))
 		perror_msg_and_fail("pipe");
 

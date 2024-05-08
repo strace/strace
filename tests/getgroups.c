@@ -86,7 +86,7 @@ main(void)
 	/* check how the second argument is decoded */
 	GID_TYPE *const g1 =
 		tail_alloc(ngroups ? sizeof(*g1) * ngroups : 1);
-	GID_TYPE *const g2 = tail_alloc(sizeof(*g2) * (ngroups + 1));
+	TAIL_ALLOC_OBJECT_CONST_ARR(GID_TYPE, g2, (ngroups + 1));
 	void *efault = g2 + ngroups + 1;
 
 	get_groups(ngroups, g1);

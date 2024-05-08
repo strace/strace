@@ -281,7 +281,7 @@ test_v4l2_buffer_time32(long inject_retval) {
 		{ ARG_STR(VIDIOC_DQBUF_TIME32) },
 	};
 
-	kernel_v4l2_buffer_time32_t *buf = tail_alloc(sizeof(*buf));
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_v4l2_buffer_time32_t, buf);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_cmds); i++) {
 		ioctl(-1, buf_cmds[i].val, 0);
@@ -444,7 +444,7 @@ main(int argc, char **argv)
 
 
 	/* VIDIOC_QUERYCAP */
-	struct v4l2_capability *caps = tail_alloc(sizeof(*caps));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_capability, caps);
 
 	fill_memory(caps, sizeof(*caps));
 	caps->capabilities = 0xdeadbeef;
@@ -538,7 +538,7 @@ main(int argc, char **argv)
 			      NRAW("v4l2_fourcc('\\xed', '\\x0d', '\\xdc',"
 			           " '\\xba')") },
 	};
-	struct v4l2_fmtdesc *fmtdesc = tail_alloc(sizeof(*fmtdesc));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_fmtdesc, fmtdesc);
 
 	fill_memory(fmtdesc, sizeof(*fmtdesc));
 	fmtdesc->index = 0xdeac0de;
@@ -586,7 +586,7 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0x5, "V4L2_MEMORY_???") },
 		{ ARG_XLAT_UNKNOWN(0xbadc0ded, "V4L2_MEMORY_???") },
 	};
-	struct v4l2_requestbuffers *reqb = tail_alloc(sizeof(*reqb));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_requestbuffers, reqb);
 
 	fill_memory(reqb, sizeof(*reqb));
 	reqb->count = 0xfeedface;
@@ -621,7 +621,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_TRY_FMT) },
 	};
 
-	struct v4l2_format *fmt = tail_alloc(sizeof(*fmt));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_format, fmt);
 
 	for (size_t i = 0; i < ARRAY_SIZE(fmt_cmds); i++) {
 		ioctl(-1, fmt_cmds[i].val, 0);
@@ -667,7 +667,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_DQBUF) },
 	};
 
-	kernel_v4l2_buffer_t *buf = tail_alloc(sizeof(*buf));
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_v4l2_buffer_t, buf);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_cmds); i++) {
 		ioctl(-1, buf_cmds[i].val, 0);
@@ -795,7 +795,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_S_FBUF) },
 	};
 
-	struct v4l2_framebuffer *fbuf = tail_alloc(sizeof(*fbuf));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_framebuffer, fbuf);
 
 	for (size_t i = 0; i < ARRAY_SIZE(fbuf_cmds); i++) {
 		ioctl(-1, fbuf_cmds[i].val, 0);
@@ -825,7 +825,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_S_PARM) },
 	};
 
-	struct v4l2_streamparm *sparm = tail_alloc(sizeof(*sparm));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_streamparm, sparm);
 
 	for (size_t i = 0; i < ARRAY_SIZE(sparm_cmds); i++) {
 		ioctl(-1, sparm_cmds[i].val, 0);
@@ -937,7 +937,7 @@ main(int argc, char **argv)
 		{ ARG_ULL_STR(0xbadc0deddeadface) },
 	};
 
-	v4l2_std_id *stdid = tail_alloc(sizeof(*stdid));
+	TAIL_ALLOC_OBJECT_CONST_PTR(v4l2_std_id, stdid);
 
 	for (size_t i = 0; i < ARRAY_SIZE(stdid_cmds); i++) {
 		ioctl(-1, stdid_cmds[i].val, 0);
@@ -963,7 +963,7 @@ main(int argc, char **argv)
 
 
 	/* VIDIOC_ENUMSTD */
-	struct v4l2_standard *std = tail_alloc(sizeof(*std));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_standard, std);
 
 	ioctl(-1, VIDIOC_ENUMSTD, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1031,7 +1031,7 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0x80000000, "V4L2_IN_CAP_???") },
 	};
 
-	struct v4l2_input *input = tail_alloc(sizeof(*input));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_input, input);
 
 	ioctl(-1, VIDIOC_ENUMINPUT, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1081,7 +1081,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_S_CTRL) },
 	};
 
-	struct v4l2_control *ctrl = tail_alloc(sizeof(*ctrl));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_control, ctrl);
 
 	for (size_t i = 0; i < ARRAY_SIZE(ctrl_cmds); i++) {
 		ioctl(-1, ctrl_cmds[i].val, 0);
@@ -1162,7 +1162,7 @@ main(int argc, char **argv)
 						  ARRAY_SIZE(tuner_rxsc)),
 					      ARRAY_SIZE(tuner_amodes));
 
-	struct v4l2_tuner *tuner = tail_alloc(sizeof(*tuner));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_tuner, tuner);
 
 	for (size_t i = 0; i < ARRAY_SIZE(tuner_cmds); i++) {
 		ioctl(-1, tuner_cmds[i].val, 0);
@@ -1287,7 +1287,7 @@ main(int argc, char **argv)
 						  ARRAY_SIZE(ctrl_types)),
 					       ARRAY_SIZE(ctrl_flags));
 
-	struct v4l2_queryctrl *qctrl = tail_alloc(sizeof(*qctrl));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, qctrl);
 
 	ioctl(-1, VIDIOC_QUERYCTRL, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1340,7 +1340,7 @@ main(int argc, char **argv)
 		{ ARG_STR(4294967295) },
 	};
 
-	int *inputid = tail_alloc(sizeof(*inputid));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, inputid);
 
 	for (size_t i = 0; i < ARRAY_SIZE(input_cmds); i++) {
 		ioctl(-1, input_cmds[i].val, 0);
@@ -1367,7 +1367,7 @@ main(int argc, char **argv)
 
 
 	/* VIDIOC_CROPCAP */
-	struct v4l2_cropcap *ccap = tail_alloc(sizeof(*ccap));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_cropcap, ccap);
 
 	fill_memory32(ccap, sizeof(*ccap));
 
@@ -1400,7 +1400,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_G_CROP) },
 		{ ARG_STR(VIDIOC_S_CROP) },
 	};
-	struct v4l2_crop *crop = tail_alloc(sizeof(*crop));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_crop, crop);
 
 	for (size_t i = 0; i < ARRAY_SIZE(crop_cmds); i++) {
 		fill_memory32(crop, sizeof(*crop));
@@ -1438,7 +1438,7 @@ main(int argc, char **argv)
 	/* static const struct strval32 ectrl_which = {
 	}; */
 
-	struct v4l2_ext_controls *ectrls = tail_alloc(sizeof(*ectrls));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_ext_controls, ectrls);
 	/* struct v4l2_ext_control *ectrl = tail_alloc(sizeof(*ectrl) * 2); */
 
 	for (size_t i = 0; i < ARRAY_SIZE(ectrl_cmds); i++) {
@@ -1464,7 +1464,7 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0xdeadf157, "V4L2_FRMSIZE_TYPE_???") },
 	};
 
-	struct v4l2_frmsizeenum *fse = tail_alloc(sizeof(*fse));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frmsizeenum, fse);
 
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1527,7 +1527,7 @@ main(int argc, char **argv)
 		{ ARG_XLAT_KNOWN(0x3, "V4L2_FRMIVAL_TYPE_STEPWISE") },
 	};
 
-	struct v4l2_frmivalenum *fie = tail_alloc(sizeof(*fie));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frmivalenum, fie);
 
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1584,7 +1584,7 @@ main(int argc, char **argv)
 
 
 	/* VIDIOC_CREATE_BUFS */
-	struct v4l2_create_buffers *cbuf = tail_alloc(sizeof(*cbuf));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_create_buffers, cbuf);
 
 	fill_memory32(cbuf, sizeof(*cbuf));
 
@@ -1628,7 +1628,7 @@ main(int argc, char **argv)
 						  ARRAY_SIZE(ctrl_flags)),
 					      ARRAY_SIZE(qextc_nrdims));
 
-	struct v4l2_query_ext_ctrl *qextc = tail_alloc(sizeof(*qextc));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_query_ext_ctrl, qextc);
 
 	fill_memory32(qextc, sizeof(*qextc));
 

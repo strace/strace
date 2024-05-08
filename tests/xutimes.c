@@ -52,7 +52,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	TEST_STRUCT *const tv = tail_alloc(sizeof(*tv) * 2);
+	TAIL_ALLOC_OBJECT_CONST_ARR(TEST_STRUCT, tv, 2);
 
 	/* pathname */
 	k_utimes(0, 0);

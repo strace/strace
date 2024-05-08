@@ -153,7 +153,7 @@ main(void)
 			.iov_len = sizeof(path_null)
 		}
 	};
-	const struct iovec *arg_iov = tail_memdup(iov, sizeof(iov));
+	const struct iovec *const arg_iov = tail_memdup(iov, sizeof(iov));
 
 	skip_if_unavailable("/proc/self/fd/");
 
@@ -168,7 +168,7 @@ main(void)
 
 	int fds[] = { fd_full, fd_null, -1, -2, -3 };
 	const char *paths[ARRAY_SIZE(fds)] = { path_full, path_null };
-	const int *arg_fds = tail_memdup(fds, sizeof(fds));
+	const int *const arg_fds = tail_memdup(fds, sizeof(fds));
 
 
 	/* Invalid op */
@@ -275,7 +275,7 @@ main(void)
 	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
 	       (unsigned int) ARRAY_SIZE(fds), errstr);
 
-	struct io_uring_probe *probe = tail_alloc(sizeof(*probe) +
+	struct io_uring_probe *const probe = tail_alloc(sizeof(*probe) +
 		       (DEFAULT_STRLEN + 1) * sizeof(struct io_uring_probe_op));
 
 
@@ -498,11 +498,10 @@ main(void)
 		{ 4, " /* IORING_RESTRICTION_??? */", false, "", 239 },
 		{ 137, " /* IORING_RESTRICTION_??? */", false, "", 0 },
 	};
-	struct io_uring_restriction *restrictions =
-			tail_alloc(sizeof(*restrictions)
-				   * ARRAY_SIZE(restrictions_data));
-	char *restrictions_end = (char *) (restrictions
-					   + ARRAY_SIZE(restrictions_data));
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct io_uring_restriction, restrictions,
+				    ARRAY_SIZE(restrictions_data));
+	char *const restrictions_end =
+		(char *) (restrictions + ARRAY_SIZE(restrictions_data));
 
 	sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS, NULL,
 			      0xfacefeed);
@@ -660,11 +659,11 @@ main(void)
 	};
 	static const uint64_t tags[] = { 0x1337, 1, 0xdead, 0xfacefeed,
 					 0xbadc0deddadfacedULL, 0 };
-	const uint64_t *arg_tags = tail_memdup(tags, sizeof(tags));
+	const uint64_t *const arg_tags = tail_memdup(tags, sizeof(tags));
 
-	struct io_uring_rsrc_register *bogus_rsrc_reg = tail_alloc(24);
-	struct io_uring_rsrc_register *rsrc_reg = tail_alloc(sizeof(*rsrc_reg));
-	struct io_uring_rsrc_register *big_rsrc_reg =
+	struct io_uring_rsrc_register *const bogus_rsrc_reg = tail_alloc(24);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_rsrc_register, rsrc_reg);
+	struct io_uring_rsrc_register *const big_rsrc_reg =
 		tail_alloc(sizeof(*big_rsrc_reg) + 8);
 
 	fill_memory(big_rsrc_reg, sizeof(*big_rsrc_reg) + 8);
@@ -765,9 +764,9 @@ main(void)
 		{ 16, "IORING_REGISTER_BUFFERS_UPDATE" },
 	};
 
-	struct io_uring_rsrc_update2 *bogus_rsrc_upd = tail_alloc(24);
-	struct io_uring_rsrc_update2 *rsrc_upd = tail_alloc(sizeof(*rsrc_upd));
-	struct io_uring_rsrc_update2 *big_rsrc_upd =
+	struct io_uring_rsrc_update2 *const bogus_rsrc_upd = tail_alloc(24);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_rsrc_update2, rsrc_upd);
+	struct io_uring_rsrc_update2 *const big_rsrc_upd =
 		tail_alloc(sizeof(*big_rsrc_upd) + 8);
 
 	fill_memory(big_rsrc_upd, sizeof(*big_rsrc_upd) + 8);
@@ -868,7 +867,7 @@ main(void)
 		(unsigned long) 0xbadc0deddadfacedULL,
 		(unsigned long) 0xfacefeeddeadbeefULL,
 	};
-	const unsigned long *arg_aff = tail_memdup(aff, sizeof(aff));
+	const unsigned long *const arg_aff = tail_memdup(aff, sizeof(aff));
 	const unsigned long *arg_aff_end = arg_aff + ARRAY_SIZE(aff);
 
 	sys_io_uring_register(fd_null, 17, NULL, 0xfacefeed);
@@ -931,7 +930,7 @@ main(void)
 
 	/* IORING_REGISTER_IOWQ_MAX_WORKERS */
 	unsigned int maxw[] = { 0, 1, 0xbedfaced };
-	const unsigned int *arg_maxw = tail_memdup(maxw, sizeof(maxw));
+	const unsigned int *const arg_maxw = tail_memdup(maxw, sizeof(maxw));
 	const unsigned int *arg_maxw_end = arg_maxw + ARRAY_SIZE(maxw);
 
 	sys_io_uring_register(fd_null, 19, NULL, 0xfacefeed);
@@ -992,8 +991,8 @@ main(void)
 	static const size_t ringfd_count = DEFAULT_STRLEN + 1;
 	static const uint32_t ringfd_off[] =
 		{ -1U, 0, 1, 2, 161803398, 3141592653, -2U };
-	TAIL_ALLOC_OBJECT_VAR_ARR(struct io_uring_rsrc_update, ringfds,
-				  ringfd_count);
+	TAIL_ALLOC_OBJECT_CONST_ARR(struct io_uring_rsrc_update, ringfds,
+				    ringfd_count);
 
 	fill_memory(ringfds, sizeof(*ringfds) * ringfd_count);
 	for (size_t i = 0; i < ringfd_count; i++) {
@@ -1082,7 +1081,7 @@ main(void)
 		{ 22, "IORING_REGISTER_PBUF_RING" },
 		{ 23, "IORING_UNREGISTER_PBUF_RING" },
 	};
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_buf_reg, buf_reg);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_buf_reg, buf_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_reg_ops); i++) {
 		sys_io_uring_register(fd_null, buf_reg_ops[i].op, 0,
@@ -1149,8 +1148,8 @@ main(void)
 	} sync_cancel_reg_ops[] = {
 		{ 24, "IORING_REGISTER_SYNC_CANCEL" },
 	};
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_sync_cancel_reg,
-				  sync_cancel_reg);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sync_cancel_reg,
+				    sync_cancel_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(sync_cancel_reg_ops); i++) {
 		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op, 0,
@@ -1231,6 +1230,62 @@ main(void)
 				printf(", pad=[0, 0, 0, 0, 0, 0, 0xfe]");
 			if (j & 0x80)
 				printf(", pad2=[0, 0, 0xbadc0de1dadface2]");
+			printf("}, 1) = %s\n", errstr);
+		}
+	}
+
+	/* IORING_REGISTER_FILE_ALLOC_RANGE */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} file_index_range_ops[] = {
+		{ 25, "IORING_REGISTER_FILE_ALLOC_RANGE" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_file_index_range,
+				    file_index_range);
+
+	for (size_t i = 0; i < ARRAY_SIZE(file_index_range_ops); i++) {
+		sys_io_uring_register(fd_null, file_index_range_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(file_index_range_ops[i].op,
+			        file_index_range_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+				      file_index_range + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(file_index_range_ops[i].op, file_index_range_ops[i].str),
+		       file_index_range + 1, errstr);
+
+		for (size_t j = 0; j < (1U << 3); j++) {
+			memset(file_index_range, 0, sizeof(*file_index_range));
+			file_index_range->off = j & 1 ? 0xfacefeedU : 0;
+			file_index_range->len = j & 2 ? 0xcafef00dU : 0;
+			file_index_range->resv = j & 4 ? 0xbadc0de1dadface2ULL : 0;
+
+			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+					      file_index_range, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(file_index_range_ops[i].op,
+				        file_index_range_ops[i].str),
+			       file_index_range, errstr);
+
+			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+					      file_index_range, 1);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT
+			       ", {off=%u, len=%u",
+			       fd_null, path_null,
+			       XLAT_SEL(file_index_range_ops[i].op,
+				        file_index_range_ops[i].str),
+			       file_index_range->off, file_index_range->len);
+			if (j & 4)
+				printf(", resv=0xbadc0de1dadface2");
 			printf("}, 1) = %s\n", errstr);
 		}
 	}
