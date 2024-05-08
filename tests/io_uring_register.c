@@ -1290,6 +1290,73 @@ main(void)
 		}
 	}
 
+	/* IORING_REGISTER_PBUF_STATUS */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} buf_status_ops[] = {
+		{ 26, "IORING_REGISTER_PBUF_STATUS" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_buf_status, buf_status);
+
+	for (size_t i = 0; i < ARRAY_SIZE(buf_status_ops); i++) {
+		sys_io_uring_register(fd_null, buf_status_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(buf_status_ops[i].op,
+			        buf_status_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, buf_status_ops[i].op,
+				      buf_status + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(buf_status_ops[i].op, buf_status_ops[i].str),
+		       buf_status + 1, errstr);
+
+		for (size_t j = 0; j < (1U << 3); j++) {
+			memset(buf_status, 0, sizeof(*buf_status));
+			buf_status->buf_group = j & 1 ? 0xfacefeedU : 0;
+			buf_status->head = j & 2 ? 0xcafef00dU : 0;
+			buf_status->resv[7] = j & 4 ? 0xbadc0dedU : 0;
+
+			sys_io_uring_register(fd_null, buf_status_ops[i].op,
+					      buf_status, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(buf_status_ops[i].op,
+				        buf_status_ops[i].str),
+			       buf_status, errstr);
+
+			sys_io_uring_register(fd_null, buf_status_ops[i].op,
+					      buf_status, 1);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", "
+#if RETVAL_INJECTED
+			       "{buf_group=%#x, head=%#x",
+#else
+			       "%p",
+#endif
+			       fd_null, path_null,
+			       XLAT_SEL(buf_status_ops[i].op,
+				        buf_status_ops[i].str),
+#if RETVAL_INJECTED
+			       buf_status->buf_group, buf_status->head
+#else
+			       buf_status
+#endif
+			       );
+#if RETVAL_INJECTED
+			if (j & 4)
+				printf(", resv=[0, 0, 0, 0, 0, 0, 0, 0xbadc0ded]");
+			printf("}");
+#endif
+			printf(", 1) = %s\n", errstr);
+		}
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

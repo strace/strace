@@ -672,6 +672,39 @@ print_io_uring_file_index_range(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
+static int
+print_io_uring_buf_status(struct tcb *tcp, const kernel_ulong_t addr,
+			  const unsigned int nargs)
+{
+	struct io_uring_buf_status arg;
+
+	if (nargs != 1) {
+		printaddr(addr);
+		return RVAL_DECODED;
+	}
+
+	if (entering(tcp))
+		return 0;
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return RVAL_DECODED;
+
+	tprint_struct_begin();
+	PRINT_FIELD_X(arg, buf_group);
+
+	tprint_struct_next();
+	PRINT_FIELD_X(arg, head);
+
+	if (!IS_ARRAY_ZERO(arg.resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -743,6 +776,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_FILE_ALLOC_RANGE:
 		print_io_uring_file_index_range(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_PBUF_STATUS:
+		rc = print_io_uring_buf_status(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

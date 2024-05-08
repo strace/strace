@@ -5,8 +5,9 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented --always-show-pid option.
   * The --user|-u option has learned to recognize numeric UID:GID pair, allowing
     e.g. statically-built strace to be used without invoking nss plugins.
-  * Implemented decoding of IORING_REGISTER_SYNC_CANCEL and
-    IORING_REGISTER_FILE_ALLOC_RANGE opcodes of io_uring_register syscall.
+  * Implemented decoding of IORING_REGISTER_SYNC_CANCEL,
+    IORING_REGISTER_FILE_ALLOC_RANGE, and IORING_REGISTER_PBUF_STATUS opcodes
+    of io_uring_register syscall.
   * Updated decoding of pidfd_send_signal syscall.
   * Updated lists of CAN_*, IORING_*, KEY_*, LSM_*, MPOL_*, NT_*, RWF_*,
     PIDFD_*, PTP_*, TCP_*, and *_MAGIC constants.
