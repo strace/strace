@@ -1357,6 +1357,77 @@ main(void)
 		}
 	}
 
+	/* IORING_REGISTER_NAPI, IORING_UNREGISTER_NAPI */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} napi_ops[] = {
+		{ 27, "IORING_REGISTER_NAPI" },
+		{ 28, "IORING_UNREGISTER_NAPI" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_napi, napi);
+
+	for (size_t i = 0; i < ARRAY_SIZE(napi_ops); i++) {
+		sys_io_uring_register(fd_null, napi_ops[i].op, 0, 0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(napi_ops[i].op,
+			        napi_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, napi_ops[i].op, napi + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(napi_ops[i].op, napi_ops[i].str),
+		       napi + 1, errstr);
+
+		for (size_t j = 0; j < (1U << 4); j++) {
+			memset(napi, 0, sizeof(*napi));
+			napi->busy_poll_to = j & 1 ? 0xfacefeedU : 0;
+			napi->prefer_busy_poll = j & 2 ? 0xfe : 0;
+			napi->pad[2] = j & 4 ? 0x10 : 0;
+			napi->resv = j & 8 ? 0xbadc0dedU : 0;
+
+			sys_io_uring_register(fd_null, napi_ops[i].op, napi,
+					      0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(napi_ops[i].op,
+				        napi_ops[i].str),
+			       napi, errstr);
+
+			sys_io_uring_register(fd_null, napi_ops[i].op, napi, 1);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", ",
+			       fd_null, path_null,
+			       XLAT_SEL(napi_ops[i].op,
+				        napi_ops[i].str));
+			if (i == 0 || RETVAL_INJECTED) {
+				printf("{busy_poll_to=%#x, prefer_busy_poll=%#x",
+				       napi->busy_poll_to,
+				       napi->prefer_busy_poll);
+				if (j & 4)
+					printf(", pad=[0, 0, 0x10]");
+				if (j & 8)
+					printf(", resv=0xbadc0ded");
+				printf("}");
+			} else
+				printf("%p", napi);
+			if (i == 0 && RETVAL_INJECTED) {
+				printf(" => {busy_poll_to=%#x, prefer_busy_poll=%#x",
+				       napi->busy_poll_to,
+				       napi->prefer_busy_poll);
+				if (j & 4)
+					printf(", pad=[0, 0, 0x10]");
+				if (j & 8)
+					printf(", resv=0xbadc0ded");
+				printf("}");
+			}
+			printf(", 1) = %s\n", errstr);
+		}
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
