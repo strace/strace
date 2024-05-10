@@ -280,6 +280,9 @@ check_h 'deprecated option -F ignored
 check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
 check_e "invalid -e kvm= argument: 'chdir'" --kvm=chdir
 
+check_e "invalid -e namespace= argument: 'NOSUCHITEM'" -e namespace=NOSUCHITEM
+check_e "invalid -e namespace= argument: 'NOSUCHITEM'" --namespace=NOSUCHITEM
+
 check_h "must have PROG [ARGS] or -p PID" -e decode-pid=all
 check_h "must have PROG [ARGS] or -p PID" --decode-pid=none
 check_h "must have PROG [ARGS] or -p PID" -e decode-pids=comm
