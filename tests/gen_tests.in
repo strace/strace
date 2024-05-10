@@ -1219,6 +1219,7 @@ umovestr_cached_adjacent	+umovestr_cached.test 3
 unlink	-a24
 unlinkat	-a35
 unshare	-a11
+unshare-report-ns-id	-a11	-e trace=unshare -e namespace=new
 userfaultfd	-a15
 ustat	-a33
 utime	-a16

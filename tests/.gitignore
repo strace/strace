@@ -1208,6 +1208,7 @@ unix-pair-sendto-recvfrom
 unlink
 unlinkat
 unshare
+unshare-report-ns-id
 userfaultfd
 ustat
 utime

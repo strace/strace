@@ -861,6 +861,7 @@ uname
 unlink
 unlinkat
 unshare
+unshare-report-ns-id
 userfaultfd
 ustat
 utime
