@@ -1035,6 +1035,7 @@ setgroups
 setgroups32
 sethostname
 setns
+setns-report-ns-id
 setpgrp-exec
 setregid
 setregid32
