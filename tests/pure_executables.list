@@ -741,6 +741,7 @@ setgroups
 setgroups32
 sethostname
 setns
+setns-report-ns-id
 setregid
 setregid32
 setresgid
