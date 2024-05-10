@@ -172,7 +172,13 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 29 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 29 };
+	static const struct {
+		unsigned int val;
+		const char *str;
+	} op_flags[] = {
+		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
+	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -181,6 +187,18 @@ main(void)
 		       NRAW(" /* IORING_REGISTER_??? */") ", %p, %u) = %s\n",
 		       fd_null, path_null, invalid_ops[i], path_null,
 		       0xdeadbeef, errstr);
+
+		for (size_t j = 0; j < ARRAY_SIZE(op_flags); ++j) {
+			sys_io_uring_register(fd_null, invalid_ops[i] |
+						       op_flags[j].val,
+					      path_null, 0xdeadbeef);
+			printf("io_uring_register(%u, %#x"
+			       NRAW(" /* IORING_REGISTER_??? */") "|" XLAT_FMT
+			       ", %p, %u) = %s\n",
+			       fd_null, invalid_ops[i],
+			       XLAT_SEL(op_flags[j].val, op_flags[j].str),
+			       path_null, 0xdeadbeef, errstr);
+		}
 	}
 
 
@@ -205,6 +223,18 @@ main(void)
 		       fd_null, path_null,
 		       XLAT_SEL(no_arg_ops[i].op, no_arg_ops[i].str),
 		       path_null, 0xdeadbeef, errstr);
+
+		for (size_t j = 0; j < ARRAY_SIZE(op_flags); ++j) {
+			sys_io_uring_register(fd_null, no_arg_ops[i].op |
+						       op_flags[j].val,
+					      path_null, 0xdeadbeef);
+			printf("io_uring_register(%u, " XLAT_FMT "|" XLAT_FMT
+			       ", %p, %u) = %s\n",
+			       fd_null,
+			       XLAT_SEL(no_arg_ops[i].op, no_arg_ops[i].str),
+			       XLAT_SEL(op_flags[j].val, op_flags[j].str),
+			       path_null, 0xdeadbeef, errstr);
+		}
 	}
 
 
