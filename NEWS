@@ -10,7 +10,7 @@ Noteworthy changes in release ?.? (????-??-??)
     IORING_REGISTER_NAPI, and IORING_UNREGISTER_NAPI opcodes of
     io_uring_register syscall.
   * Updated decoding of io_uring_register and pidfd_send_signal syscalls.
-  * Updated lists of CAN_*, IORING_*, KEY_*, LSM_*, MPOL_*, NT_*, RWF_*,
+  * Updated lists of BPF_*, CAN_*, IORING_*, KEY_*, LSM_*, MPOL_*, NT_*, RWF_*,
     PIDFD_*, PTP_*, TCP_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 6.9.
 
