@@ -22,6 +22,7 @@
 #include "xlat/uring_setup_flags.h"
 #include "xlat/uring_sqe_flags.h"
 #include "xlat/uring_register_opcodes.h"
+#include "xlat/uring_register_opcode_flags.h"
 #include "xlat/uring_register_rsrc_flags.h"
 #include "xlat/uring_restriction_opcodes.h"
 
@@ -769,23 +770,45 @@ print_ioring_unregister_napi(struct tcb *tcp, const kernel_ulong_t addr,
 	return RVAL_DECODED;
 }
 
+static void
+print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
+			       const unsigned int flags)
+{
+	if (flags)
+		tprint_flags_begin();
+
+	printxval(uring_register_opcodes, opcode, "IORING_REGISTER_???");
+
+	if (flags) {
+		tprint_flags_or();
+		printflags_in(uring_register_opcode_flags, flags, NULL);
+		tprint_flags_end();
+	}
+
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
-	const unsigned int opcode = tcp->u_arg[1];
+	unsigned int opcode = tcp->u_arg[1];
 	const kernel_ulong_t arg = tcp->u_arg[2];
 	const unsigned int nargs = tcp->u_arg[3];
+	const unsigned int opcode_flags =
+		opcode & IORING_REGISTER_USE_REGISTERED_RING;
+	opcode &= ~IORING_REGISTER_USE_REGISTERED_RING;
 	int rc = RVAL_DECODED;
 	int buf;
 
 	if (entering(tcp)) {
 		/* fd */
-		printfd(tcp, fd);
+		if (opcode_flags)
+			PRINT_VAL_U(fd);
+		else
+			printfd(tcp, fd);
 		tprint_arg_next();
 
 		/* opcode */
-		printxval(uring_register_opcodes, opcode,
-			  "IORING_REGISTER_???");
+		print_io_uring_register_opcode(tcp, opcode, opcode_flags);
 		tprint_arg_next();
 	}
 
