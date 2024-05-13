@@ -482,4 +482,13 @@ struct BPF_PROG_BIND_MAP_struct /* prog_bind_map */ {
 	sizeof(struct BPF_PROG_BIND_MAP_struct)
 # define expected_BPF_PROG_BIND_MAP_struct_size 12
 
+struct BPF_TOKEN_CREATE_struct /* token_create */ {
+	uint32_t flags;
+	uint32_t bpffs_fd;
+};
+
+# define BPF_TOKEN_CREATE_struct_size \
+	sizeof(struct BPF_TOKEN_CREATE_struct)
+# define expected_BPF_TOKEN_CREATE_struct_size 8
+
 #endif /* !STRACE_BPF_ATTR_H */
