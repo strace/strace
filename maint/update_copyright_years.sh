@@ -2,7 +2,7 @@
 #
 # Update copyright notices for source files.
 #
-# Copyright (c) 2017-2023 The strace developers.
+# Copyright (c) 2017-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

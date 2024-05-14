@@ -1,7 +1,7 @@
 /*
  * Check decoding of pidfd_send_signal syscall.
  *
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
