@@ -2,7 +2,7 @@
  * Check decoding of io_uring_register syscall.
  *
  * Copyright (c) 2019 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2019-2023 The strace developers.
+ * Copyright (c) 2019-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

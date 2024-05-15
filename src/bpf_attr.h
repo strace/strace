@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2018-2023 The strace developers.
+ * Copyright (c) 2018-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -481,5 +481,14 @@ struct BPF_PROG_BIND_MAP_struct /* prog_bind_map */ {
 # define BPF_PROG_BIND_MAP_struct_size \
 	sizeof(struct BPF_PROG_BIND_MAP_struct)
 # define expected_BPF_PROG_BIND_MAP_struct_size 12
+
+struct BPF_TOKEN_CREATE_struct /* token_create */ {
+	uint32_t flags;
+	uint32_t bpffs_fd;
+};
+
+# define BPF_TOKEN_CREATE_struct_size \
+	sizeof(struct BPF_TOKEN_CREATE_struct)
+# define expected_BPF_TOKEN_CREATE_struct_size 8
 
 #endif /* !STRACE_BPF_ATTR_H */

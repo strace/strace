@@ -1,7 +1,7 @@
 /*
  * Check decoding of get_mempolicy syscall.
  *
- * Copyright (c) 2016-2023 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2024 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

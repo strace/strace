@@ -1,7 +1,7 @@
 /*
  * Check decoding of successful PERF_EVENT_IOC_{ID,QUERY_BPF} ioctls.
  *
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
