@@ -1774,7 +1774,7 @@ print_array_ex(struct tcb *const tcp,
 	}
 
 	const kernel_ulong_t abbrev_end =
-		(abbrev(tcp) && max_strlen < nmemb) ?
+		sequence_truncation_needed(tcp, nmemb) ?
 			start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
 	kernel_ulong_t idx = 0;
@@ -1936,4 +1936,10 @@ read_int_from_file(const char *const fname, int *const pvalue)
 
 	*pvalue = (int) lval;
 	return 0;
+}
+
+bool
+sequence_truncation_needed(const struct tcb *tcp, unsigned int len)
+{
+	return abbrev(tcp) && len > max_strlen;
 }

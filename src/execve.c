@@ -53,7 +53,8 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 		if (n != 0)
 			tprint_array_next();
 
-		if (abbrev(tcp) && n >= max_strlen) {
+		/* n starts with 0, hence n + 1 */
+		if (sequence_truncation_needed(tcp, n + 1)) {
 			tprint_more_data_follows();
 			break;
 		}
