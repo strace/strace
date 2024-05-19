@@ -133,6 +133,7 @@ execve
 execve-v
 execveat
 execveat-v
+execveat-notruncate
 faccessat
 faccessat-P
 faccessat-y
@@ -276,6 +277,7 @@ ioctl_counter-Xraw
 ioctl_counter-Xverbose
 ioctl_dm
 ioctl_dm-v
+ioctl_dm-notruncate
 ioctl_evdev
 ioctl_evdev-Xabbrev
 ioctl_evdev-Xraw
@@ -612,6 +614,7 @@ netlink_kobject_uevent
 netlink_netfilter
 netlink_netlink_diag
 netlink_protocol
+netlink_protocol-notruncate
 netlink_route
 netlink_selinux
 netlink_sock_diag
@@ -1143,6 +1146,7 @@ tkill--pidns-translation
 tracer_ppid_pgid_sid
 trie_test
 truncate
+truncate-notruncate
 truncate64
 ugetrlimit
 uio

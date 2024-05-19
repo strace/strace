@@ -190,7 +190,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
 
-		if (i >= max_strlen) {
+		if (truncation_needed(i, max_strlen)) {
 			tprint_more_data_follows();
 			break;
 		}
@@ -323,7 +323,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
 
-		if (count >= max_strlen) {
+		if (truncation_needed(count, max_strlen)) {
 			tprint_more_data_follows();
 			break;
 		}
@@ -413,7 +413,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
 
-		if (count >= max_strlen) {
+		if (truncation_needed(count, max_strlen)) {
 			tprint_more_data_follows();
 			break;
 		}

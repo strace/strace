@@ -144,6 +144,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	detach-vfork \
 	execve-v \
 	execveat-v \
+	execveat-notruncate \
 	fcntl--pidns-translation \
 	fcntl64--pidns-translation \
 	filter-unavailable \
@@ -166,6 +167,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	io_uring_register-success-Xverbose \
 	ioctl_block--pidns-translation \
 	ioctl_dm-v \
+	ioctl_dm-notruncate \
 	ioctl_evdev-success \
 	ioctl_evdev-success-Xabbrev \
 	ioctl_evdev-success-Xraw \
@@ -273,6 +275,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	netlink_inet_diag \
 	netlink_netlink_diag \
 	netlink_unix_diag \
+	netlink_protocol-notruncate \
 	nlattr_ifla_xdp-y \
 	nsyscalls \
 	nsyscalls-d \
@@ -414,6 +417,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	tkill--pidns-translation \
 	tracer_ppid_pgid_sid \
 	trie_test \
+	truncate-notruncate \
 	unblock_reset_raise \
 	unix-pair-send-recv \
 	unix-pair-sendto-recvfrom \
@@ -526,6 +530,7 @@ DECODER_TESTS = \
 	btrfs-vX.test \
 	btrfs-vw.test \
 	btrfs-vwX.test \
+	btrfs-notruncate.test \
 	btrfs-w.test \
 	btrfs-wX.test \
 	caps-abbrev.test \

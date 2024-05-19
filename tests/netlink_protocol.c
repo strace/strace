@@ -168,6 +168,7 @@ send_query(const int fd)
 	/* abbreviated output */
 # define ABBREV_LEN (DEFAULT_STRLEN + 1)
 	const unsigned int msg_len = sizeof(struct nlmsghdr) * ABBREV_LEN;
+	unsigned int limit = DEFAULT_STRLEN;
 	struct nlmsghdr *const msgs = tail_alloc(msg_len);
 	for (unsigned int i = 0; i < ABBREV_LEN; ++i) {
 		msgs[i].nlmsg_len = sizeof(*msgs);
@@ -180,15 +181,23 @@ send_query(const int fd)
 	rc = sendto(fd, msgs, msg_len, MSG_DONTWAIT, NULL, 0);
 	errstr = sprintrc(rc);
 	printf("sendto(%d, [", fd);
-	for (unsigned int i = 0; i < DEFAULT_STRLEN; ++i) {
-		if (i)
-			printf(", ");
-		printf("{nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
-		       ", nlmsg_flags=NLM_F_REQUEST|0x%x"
-		       ", nlmsg_seq=%u, nlmsg_pid=0}",
-		       msgs[i].nlmsg_len, NLM_F_DUMP, msgs[i].nlmsg_seq);
-	}
-	printf(", ...], %u, MSG_DONTWAIT, NULL, 0) = %s\n", msg_len, errstr);
+	#ifdef NO_TRUNCATE
+		limit = ABBREV_LEN;
+	#endif
+		for (unsigned int i = 0; i < limit; ++i) {
+			if (i)
+				printf(", ");
+			printf("{nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
+				", nlmsg_flags=NLM_F_REQUEST|0x%x"
+				", nlmsg_seq=%u, nlmsg_pid=0}",
+				msgs[i].nlmsg_len, NLM_F_DUMP, msgs[i].nlmsg_seq);
+		}
+
+	#ifdef NO_TRUNCATE
+		printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n", msg_len, errstr);
+	#else
+		printf(", ...], %u, MSG_DONTWAIT, NULL, 0) = %s\n", msg_len, errstr);
+	#endif
 }
 
 static void

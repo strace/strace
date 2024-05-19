@@ -16,12 +16,14 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <math.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 #ifdef HAVE_SYS_XATTR_H
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
+#include <sys/sysinfo.h>
 
 #include "largefile_wrappers.h"
 #include "number_set.h"
@@ -1270,6 +1272,15 @@ printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 }
 
 /*
+ * In printstr_ex(), we allocate 2 strings 'str' and 'outstr', whose length is
+ * (4 * len(str) + 3). Make sure that both can fit in the available memory.
+ */
+uint64_t get_max_size(void)
+{
+	return (uint64_t) floor((info.freeram - 3) / 5);
+}
+
+/*
  * Print string specified by address `addr' and length `len'.
  * If `user_style' has QUOTE_0_TERMINATED bit set, treat the string
  * as a NUL-terminated string.
@@ -1287,8 +1298,9 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	static char *str;
 	static char *outstr;
 
-	unsigned int size;
+	uint64_t size;
 	unsigned int style = user_style;
+	uint64_t max_len = (truncate_output) ? max_strlen : get_max_size();
 	int rc;
 	int ellipsis;
 
@@ -1296,21 +1308,23 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_null();
 		return -1;
 	}
+
 	/* Allocate static buffers if they are not allocated yet. */
+
 	if (!str) {
-		const unsigned int outstr_size =
-			4 * max_strlen + /* for quotes and NUL */ 3;
+		const uint64_t outstr_size =
+			4 * max_len + /* for quotes and NUL */ 3;
 		/*
 		 * We can assume that outstr_size / 4 == max_strlen
 		 * since we have a guarantee that max_strlen <= -1U / 4.
 		 */
 
-		str = xmalloc(max_strlen + 1);
+		str = xmalloc(max_len + 1);
 		outstr = xmalloc(outstr_size);
 	}
 
 	/* Fetch one byte more because string_quote may look one byte ahead. */
-	size = max_strlen + 1;
+	size = max_len + 1;
 
 	if (size > len)
 		size = len;
@@ -1324,7 +1338,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 		return rc;
 	}
 
-	if (size > max_strlen)
+	if (truncation_needed(size, max_strlen + 1))
 		size = max_strlen;
 	else
 		str[size] = '\xff';
@@ -1341,7 +1355,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	ellipsis = string_quote(str, outstr, size, style, NULL)
 		   && len
 		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
-		       || len > max_strlen);
+		       || truncation_needed(len, max_strlen + 1));
 
 	tprints_string(outstr);
 	if (ellipsis)
@@ -1774,7 +1788,7 @@ print_array_ex(struct tcb *const tcp,
 	}
 
 	const kernel_ulong_t abbrev_end =
-		(abbrev(tcp) && max_strlen < nmemb) ?
+		(abbrev(tcp) && truncation_needed(nmemb, max_strlen + 1)) ?
 			start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
 	kernel_ulong_t idx = 0;
@@ -1803,7 +1817,7 @@ print_array_ex(struct tcb *const tcp,
 		if (cur == start_addr)
 			tprint_array_begin();
 
-		if (cur >= abbrev_end) {
+		if (truncation_needed(cur, abbrev_end)) {
 			tprint_more_data_follows();
 			cur = end_addr;
 			truncated = true;
@@ -1936,4 +1950,11 @@ read_int_from_file(const char *const fname, int *const pvalue)
 
 	*pvalue = (int) lval;
 	return 0;
+}
+
+bool truncation_needed(unsigned int size, unsigned int limit)
+{
+	if (truncate_output && size >= limit)
+		return true;
+	return false;
 }

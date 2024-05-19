@@ -17,8 +17,14 @@
 int
 main(void)
 {
-	static const char fname[] = "truncate\nfilename";
-	static const char qname[] = "truncate\\nfilename";
+	#ifdef NO_TRUNCATE
+		static const char fname[] = "truncate\nthis_very_long_fake_filename";
+		static const char qname[] = "truncate\\nthis_very_long_fake_filename";
+	#else
+		static const char fname[] = "truncate\nfilename";
+		static const char qname[] = "truncate\\nfilename";
+	#endif
+
 	const kernel_ulong_t len = (kernel_ulong_t) 0xdefaced0badc0deULL;
 	long rc;
 

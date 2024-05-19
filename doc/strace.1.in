@@ -1102,6 +1102,16 @@ option.
 Specify the maximum string size to print (the default is 32).  Note
 that filenames are not considered strings and are always printed in
 full.
+.I strsize
+can be one of the following:
+.RS
+.TP 14
+.B size
+The max string size beyond which strings are truncated.
+.TQ
+.B inf
+disable string truncation - no limit on string size.
+.RE
 .TP
 .BR \-\-absolute\-timestamps [=[[ format: ] \fIformat\fR ],[[ precision: ] \fIprecision ]]
 .TQ

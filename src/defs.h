@@ -20,6 +20,7 @@
 # include <stdint.h>
 # include <inttypes.h>
 # include <sys/types.h>
+# include <sys/sysinfo.h>
 # include <stddef.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -563,11 +564,15 @@ extern enum stack_trace_modes stack_trace_mode;
 #  define stack_trace_mode STACK_TRACE_OFF
 # endif
 extern unsigned max_strlen;
+extern bool truncate_output;
+extern struct sysinfo info;
 extern unsigned os_release;
 # undef KERNEL_VERSION
 # define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 
 extern int read_int_from_file(const char *, int *);
+
+extern bool truncation_needed(unsigned int size, unsigned int limit);
 
 extern void set_sortby(const char *);
 extern int set_overhead(const char *);
@@ -1202,6 +1207,8 @@ dumpiov_upto(struct tcb *, int len, kernel_ulong_t addr, kernel_ulong_t data_siz
 
 extern void
 dumpstr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
+
+extern uint64_t get_max_size(void);
 
 extern int
 printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
