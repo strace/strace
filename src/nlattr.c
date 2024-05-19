@@ -128,7 +128,7 @@ decode_nlattr(struct tcb *const tcp,
 	for (unsigned int elt = 0;
 	     fetch_nlattr(tcp, &nla, addr, len, is_array);
 	     ++elt) {
-		if (abbrev(tcp) && elt == max_strlen) {
+		if (abbrev(tcp) && truncation_needed(elt, max_strlen)) {
 			tprint_more_data_follows();
 			break;
 		}

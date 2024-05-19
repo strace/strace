@@ -123,6 +123,7 @@ execveat--secontext_full	--secontext=full --trace=execveat
 execveat--secontext_full_mismatch	--secontext=full,mismatch --trace=execveat
 execveat--secontext_mismatch	--secontext=mismatch --trace=execveat
 execveat-v	-v -e trace=execveat
+execveat-notruncate -sinf -e trace=execveat
 faccessat--secontext	+faccessat.test -a24 --secontext
 faccessat--secontext_full	+faccessat.test -a24 --secontext=full
 faccessat--secontext_full_mismatch	+faccessat.test -a24 --secontext=full,mismatch
@@ -298,6 +299,7 @@ ioctl_counter-Xraw	+ioctl.test -a18 -Xraw
 ioctl_counter-Xverbose	+ioctl.test -a52 -Xverbose
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
+ioctl_dm-notruncate	+ioctl.test -sinf
 ioctl_evdev	+ioctl.test -a26
 ioctl_evdev-Xabbrev	+ioctl.test -a26 -Xabbrev
 ioctl_evdev-Xraw	+ioctl.test -a28 -Xraw
@@ -617,7 +619,8 @@ netlink_crypto	+netlink_sock_diag.test
 netlink_generic	+netlink_sock_diag.test -e trace=sendto,sendmsg
 netlink_kobject_uevent	+netlink_sock_diag.test
 netlink_netfilter	+netlink_sock_diag.test
-netlink_protocol	+netlink_sock_diag.test
+netlink_protocol 	+netlink_sock_diag.test
+netlink_protocol-notruncate 	+netlink_sock_diag.test -sinf
 netlink_route	+netlink_sock_diag.test
 netlink_selinux	+netlink_sock_diag.test
 netlink_xfrm	+netlink_sock_diag.test
@@ -1163,7 +1166,8 @@ trace_stat_like	test_trace_expr '' -e%%stat -v -P stat.sample -P /dev/full
 trace_statfs	test_trace_expr '' -e%statfs
 trace_statfs_like	test_trace_expr '' -e%%statfs
 trie_test    run_prog
-truncate
+truncate -e trace=truncate
+truncate-notruncate -sinf -e trace=truncate
 truncate64
 ugetrlimit	-a28 'QUIRK:START-OF-TEST-OUTPUT:ugetrlimit(0x10 /* RLIMIT_??? */, NULL)'
 umask	-a11

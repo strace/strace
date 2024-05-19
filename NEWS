@@ -5,6 +5,9 @@ Noteworthy changes in release ?.? (????-??-??)
 
 Noteworthy changes in release 6.9 (2024-05-14)
 ==============================================
+* Improvements
+  * Enhance --string-limit/-s to introduce a new value argument ('inf') to remove
+    max string length limit.
 
 * Improvements
   * Implemented --always-show-pid option.

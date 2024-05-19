@@ -25,12 +25,19 @@
 
 #define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
 
+#ifdef NO_TRUNCATE
+# define DEV_NAME "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnoo"
+#else
+# define DEV_NAME "nnn"
+#endif
+
 #define ALIGNED_SIZE(s_, t_) \
 	(((s_) + (ALIGNOF(t_) - 1UL)) & ~(ALIGNOF(t_) - 1UL))
 #define ALIGNED_OFFSET(t_, m_) \
 	ALIGNED_SIZE(offsetof(t_, m_), t_)
 
 static const char str129[] = STR32 STR32 STR32 STR32 "6";
+static const char device_name[] = DEV_NAME;
 
 static const __u64 dts_sector_base = (__u64) 0xdeadca75facef157ULL;
 static const __u64 dts_sector_step = (__u64) 0x100000001ULL;
@@ -103,7 +110,7 @@ init_s(struct dm_ioctl *s, size_t size, size_t offs)
 	s->data_size = size;
 	s->data_start = offs;
 	s->dev = 0x1234;
-	strcpy(s->name, "nnn");
+	strcpy(s->name, device_name);
 	strcpy(s->uuid, "uuu");
 }
 
@@ -234,8 +241,8 @@ main(void)
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}])"
-	       RVAL_EBADF, min_sizeof_dm_ioctl);
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}])"
+	       RVAL_EBADF, min_sizeof_dm_ioctl, device_name);
 
 	/* Zero dev, name, uuid */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -254,7 +261,7 @@ main(void)
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags="
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags="
 	       "DM_READONLY_FLAG|DM_SUSPEND_FLAG|DM_EXISTS_FLAG|"
 	       "DM_PERSISTENT_DEV_FLAG|DM_STATUS_TABLE_FLAG|"
 	       "DM_ACTIVE_PRESENT_FLAG|DM_INACTIVE_PRESENT_FLAG|"
@@ -263,15 +270,15 @@ main(void)
 	       "DM_UEVENT_GENERATED_FLAG|DM_UUID_FLAG|DM_SECURE_DATA_FLAG|"
 	       "DM_DATA_OUT_FLAG|DM_DEFERRED_REMOVE|DM_INTERNAL_SUSPEND_FLAG|"
 	       "DM_IMA_MEASUREMENT_FLAG|0xfff00080}])" RVAL_EBADF,
-	       min_sizeof_dm_ioctl);
+	       min_sizeof_dm_ioctl, device_name);
 
 	/* Normal call */
 	init_s(&s.ioc, sizeof(s.ioc), 0);
 	ioctl(-1, DM_VERSION, &s);
 	printf("ioctl(-1, DM_VERSION, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}])"
-	       RVAL_EBADF, sizeof(s.ioc));
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}])"
+	       RVAL_EBADF, sizeof(s.ioc), device_name);
 
 
 	/* DM_REMOVE_ALL */
@@ -300,10 +307,11 @@ main(void)
 		init_s(dm_arg, min_sizeof_dm_ioctl, 0);
 		ioctl(-1, dummy_check_cmds[i].arg, dm_arg);
 		printf("ioctl(-1, %s, [{version=[4, 1, 2], data_size=%zu%s, "
-		       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\"%s, "
+		       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\"%s, "
 		       "flags=0}])" RVAL_EBADF,
 		       dummy_check_cmds[i].str, min_sizeof_dm_ioctl,
 		       dummy_check_cmds[i].has_params ? ", data_start=0" : "",
+			   device_name,
 		       dummy_check_cmds[i].has_event_nr ? ", event_nr=0" : "");
 	}
 
@@ -315,16 +323,16 @@ main(void)
 	ioctl(-1, DM_DEV_SUSPEND, &s);
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
 	       "[{version=[4, 1, 2], data_size=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
-	       "flags=DM_SUSPEND_FLAG}])" RVAL_EBADF, sizeof(s.ioc));
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
+	       "flags=DM_SUSPEND_FLAG}])" RVAL_EBADF, sizeof(s.ioc), device_name);
 
 	init_s(&s.ioc, sizeof(s.ioc), 0);
 	s.ioc.event_nr = 0xbadc0ded;
 	ioctl(-1, DM_DEV_SUSPEND, &s);
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
 	       "[{version=[4, 1, 2], data_size=%zu, dev=makedev(0x12, 0x34), "
-	       "name=\"nnn\", uuid=\"uuu\", event_nr=3134983661, "
-	       "flags=0}])" RVAL_EBADF, sizeof(s.ioc));
+	       "name=\"%s\", uuid=\"uuu\", event_nr=3134983661, "
+	       "flags=0}])" RVAL_EBADF, sizeof(s.ioc), device_name);
 
 
 	/* DM_TABLE_LOAD */
@@ -339,7 +347,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, &s);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=1, flags=0}, "
 #if VERBOSE
 	       "{sector_start=16, length=32, target_type=\"tgt\", "
@@ -347,7 +355,7 @@ main(void)
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
-	       "])" RVAL_EBADF, s.ioc.data_size, s.ioc.data_start);
+	       "])" RVAL_EBADF, s.ioc.data_size, s.ioc.data_start, device_name);
 
 	/* No targets */
 	init_s(dm_arg, min_sizeof_dm_ioctl, min_sizeof_dm_ioctl);
@@ -356,9 +364,9 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=0, flags=0}])" RVAL_EBADF,
-	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
+	       sizeof(*dm_arg), min_sizeof_dm_ioctl, device_name);
 
 	/* Invalid data_start */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0xfffffff8);
@@ -367,14 +375,14 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=1234, flags=0}, "
 #if VERBOSE
 	       "??? /* misplaced struct dm_target_spec */"
 #else
 	       "..."
 #endif /* VERBOSE */
-	       "])" RVAL_EBADF, sizeof(*dm_arg), 0xfffffff8);
+	       "])" RVAL_EBADF, sizeof(*dm_arg), 0xfffffff8, device_name);
 
 	/* Inaccessible pointer */
 	init_s(&dm_arg_open1->ioc, offsetof(struct dm_table_open_test, target1),
@@ -384,7 +392,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg_open1);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=3735936673, flags=0}, "
 #if VERBOSE
 	       "%p"
@@ -392,7 +400,7 @@ main(void)
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF, sizeof(*dm_arg_open1),
-	       offsetof(struct dm_table_open_test, target1)
+	       offsetof(struct dm_table_open_test, target1), device_name
 #if VERBOSE
 	       , (char *) dm_arg_open1 +
 	       offsetof(struct dm_table_open_test, target1)
@@ -412,10 +420,10 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=2, flags=0}, ",
 	       sizeof(*dm_arg_open2),
-	       offsetof(struct dm_table_open_test, target1));
+	       offsetof(struct dm_table_open_test, target1), device_name);
 #if VERBOSE
 	print_dm_target_spec(&dm_arg_open2->target1, 7);
 	printf("%p}, %p",
@@ -456,10 +464,10 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=4, flags=0}, ",
 	       offsetof(struct dm_table_open_test, target5),
-	       offsetof(struct dm_table_open_test, target0));
+	       offsetof(struct dm_table_open_test, target0), device_name);
 #if VERBOSE
 	print_dm_target_spec(&dm_arg_open3->target0, 9);
 	printf("\"\"}, ");
@@ -507,10 +515,10 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=3134983661, flags=0}, ",
 	       sizeof(*dm_arg_open3),
-	       offsetof(struct dm_table_open_test, target0));
+	       offsetof(struct dm_table_open_test, target0), device_name);
 #if VERBOSE
 	PRINT_DM_TARGET(0);
 	PRINT_DM_TARGET(1);
@@ -533,14 +541,14 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, &s);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, "
 #if VERBOSE
 	       "{sector=4660, message=\"long targ\"...}"
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       s.ioc.data_size, s.ioc.data_start);
+	       s.ioc.data_size, s.ioc.data_start, device_name);
 
 	/* Invalid data_start */
 	init_s(dm_arg, min_sizeof_dm_ioctl, min_sizeof_dm_ioctl);
@@ -548,14 +556,14 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, "
 #if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
+	       sizeof(*dm_arg), min_sizeof_dm_ioctl, device_name);
 
 	/* Invalid data_start */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0xffffffff);
@@ -563,14 +571,14 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, "
 #if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       sizeof(*dm_arg), 0xffffffff);
+	       sizeof(*dm_arg), 0xffffffff, device_name);
 
 	/* Inaccessible pointer */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
@@ -579,7 +587,7 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, "
 #if VERBOSE
 	       "%p"
 #else /* !VERBOSE */
@@ -587,7 +595,7 @@ main(void)
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
 	       sizeof(*dm_arg) + sizeof(struct dm_target_msg),
-	       sizeof(*dm_arg)
+	       sizeof(*dm_arg), device_name
 #if VERBOSE
 	       , (char *) dm_arg + sizeof(*dm_arg)
 #endif /* VERBOSE */
@@ -602,9 +610,9 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, ",
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, ",
 	       sizeof(*dm_arg_msg) + 1,
-	       offsetof(struct dm_target_msg_test, msg));
+	       offsetof(struct dm_target_msg_test, msg), device_name);
 #if VERBOSE
 	printf("{sector=%" PRI__u64 ", message=%p}",
 	       (__u64) 0xdeadbeeffacef157ULL,
@@ -623,8 +631,8 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, ",
-	       sizeof(*dm_arg_msg), offsetof(struct dm_target_msg_test, msg));
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, ",
+	       sizeof(*dm_arg_msg), offsetof(struct dm_target_msg_test, msg), device_name);
 #if VERBOSE
 	printf("{sector=%" PRI__u64 ", message=\"\"}",
 	       (__u64) 0xdeadbeeffacef157ULL);
@@ -640,14 +648,14 @@ main(void)
 	ioctl(-1, DM_DEV_SET_GEOMETRY, &s);
 	printf("ioctl(-1, DM_DEV_SET_GEOMETRY, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", flags=0}, "
 #if VERBOSE
 	       "{string=\"10 20 30 \"...}"
 #else /* !VERBOSE */
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       s.ioc.data_size, s.ioc.data_start);
+	       s.ioc.data_size, s.ioc.data_start, device_name);
 
 
 	/* DM_DEV_RENAME */
@@ -658,7 +666,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, unaligned_dm_arg);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "[{version=[4, 1, 2], data_size=%zu, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0}, "
 #if VERBOSE
 	       "{string=%p}"
@@ -666,7 +674,7 @@ main(void)
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       sizeof(*unaligned_dm_arg), min_sizeof_dm_ioctl
+	       sizeof(*unaligned_dm_arg), min_sizeof_dm_ioctl, device_name
 #if VERBOSE
 	       , (char *) unaligned_dm_arg + min_sizeof_dm_ioctl
 #endif /* VERBOSE */
@@ -678,7 +686,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=3735928559, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0}, "
 #if VERBOSE
 	       "??? /* misplaced string */"
@@ -686,7 +694,7 @@ main(void)
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       s.ioc.data_size);
+	       s.ioc.data_size, device_name);
 
 	/* Strange but still valid data_start */
 	init_s(&s.ioc, sizeof(s), offsetof(struct s, u));
@@ -695,7 +703,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%zu, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0}, "
 #if VERBOSE
 	       "{string=\"nn\"}"
@@ -704,7 +712,7 @@ main(void)
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
 	       s.ioc.data_size,
-	       offsetof(struct dm_ioctl, name) + 1);
+	       offsetof(struct dm_ioctl, name) + 1, device_name);
 
 	/* Correct data */
 	init_s(&s.ioc, sizeof(s), offsetof(struct s, u));
@@ -712,7 +720,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0}, "
 #if VERBOSE
 	       "{string=\"new long \"...}"
@@ -720,7 +728,7 @@ main(void)
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       s.ioc.data_size, s.ioc.data_start);
+	       s.ioc.data_size, s.ioc.data_start, device_name);
 
 
 	/* DM_TABLE_LOAD */
@@ -729,7 +737,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, &s);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "[{version=[4, 1, 2], data_size=%u, data_start=%u, "
-	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"%s\", uuid=\"uuu\", "
 	       "target_count=4294967295, flags=0}, "
 #if VERBOSE
 	       "{sector_start=0, length=0, target_type=\"\", string=\"\"}"
@@ -738,7 +746,7 @@ main(void)
 	       "..."
 #endif /* VERBOSE */
 	       "])" RVAL_EBADF,
-	       s.ioc.data_size, s.ioc.data_start);
+	       s.ioc.data_size, s.ioc.data_start, device_name);
 
 	puts("+++ exited with 0 +++");
 	return 0;

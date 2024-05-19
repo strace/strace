@@ -27,6 +27,7 @@
 #include <locale.h>
 #include <sys/utsname.h>
 #include <sys/prctl.h>
+#include <ctype.h>
 
 #include "kill_save_errno.h"
 #include "exitkill.h"
@@ -155,6 +156,8 @@ static uid_t run_uid;
 static gid_t run_gid;
 
 unsigned int max_strlen = DEFAULT_STRLEN;
+bool truncate_output = true;
+struct sysinfo info;
 static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 
@@ -2633,10 +2636,16 @@ init(int argc, char *argv[])
 				error_opt_arg(c, lopt, optarg);
 			break;
 		case 's':
-			i = string_to_uint(optarg);
-			if (i < 0 || (unsigned int) i > -1U / 4)
+			if (isdigit(*optarg)) {
+				i = string_to_uint(optarg);
+				if (i < 0 || (unsigned int) i > -1U / 4)
+					error_opt_arg(c, lopt, optarg);
+				max_strlen = i;
+			} else if (strcmp(optarg, "inf") == 0) {
+				truncate_output = false;
+				sysinfo(&info);
+			} else
 				error_opt_arg(c, lopt, optarg);
-			max_strlen = i;
 			break;
 		case 'S':
 			set_sortby(optarg);

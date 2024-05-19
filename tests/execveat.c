@@ -109,8 +109,13 @@ tests_with_existing_file(void)
 	leave_and_remove_subdir();
 }
 
-# define FILENAME "test.execveat\nfilename"
-# define Q_FILENAME "test.execveat\\nfilename"
+#ifdef NO_TRUNCATE
+	#define FILENAME "long_testname_for_file.execve\nfilename"
+	#define Q_FILENAME "long_testname_for_file.execve\\nfilename"
+# else
+	#define FILENAME "test.execve\nfilename"
+	#define Q_FILENAME "test.execve\\nfilename"
+#endif
 
 static const char * const argv[] = {
 	FILENAME, "first", "second", (const char *) -1L,
@@ -135,6 +140,28 @@ main(void)
 	const char ** const tail_envp = tail_memdup(envp, sizeof(envp));
 	char *my_secontext = SECONTEXT_PID_MY();
 
+#ifdef NO_TRUNCATE
+	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
+	printf("%s%s(AT_FDCWD, \"%s\""
+	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
+# if VERBOSE
+	       ", [\"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
+# else
+	       ", %p /* 5 vars, unterminated */"
+# endif
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
+	       my_secontext, "execveat",
+	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
+	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv),
+# if VERBOSE
+	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
+	       (char *) tail_envp + sizeof(envp),
+# else
+	       tail_envp,
+# endif
+	       sprintrc(-1));
+
+#else
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\""
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
@@ -279,6 +306,7 @@ main(void)
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, efault, sprintrc(-1));
+#endif
 
 	tests_with_existing_file();
 
