@@ -521,8 +521,11 @@ main(void)
 	PRINT_DM_TARGET(6);
 	PRINT_DM_TARGET(7);
 	PRINT_DM_TARGET(8);
+	printf("%p", &dm_arg_open3->target9);
+#else
+	printf("...");
 #endif /* VERBOSE */
-	printf("...]) = %s\n", errstr);
+	printf("]) = %s\n", errstr);
 
 
 	/* DM_TARGET_MSG */
