@@ -274,6 +274,7 @@ check_kbdsent(unsigned int c, const char *s)
 		{ sizeof(struct kbsentry) - 2, "KVAL(K_F1)" },
 		{ sizeof(struct kbsentry) - 34, "KVAL(K_F214)" },
 		{ sizeof(struct kbsentry) - 35, "KVAL(K_F213)" },
+		{ sizeof(struct kbsentry) - 36, "KVAL(K_F212)" },
 		{ 1, "KVAL(K_F1)" },
 		{ 0, "KVAL(K_F245)" },
 	};
@@ -304,15 +305,15 @@ check_kbdsent(unsigned int c, const char *s)
 				  (kbse_offsets[i].val + 254) % 0xff, NULL));
 
 		if (RETVAL_INJECTED || c == KDSKBSENT) {
+			const char *str =
+				(char *) kbse->kb_string + kbse_offsets[i].val;
 			printf(", kb_string=");
 			if (kbse_offsets[i].val < 255 * 2) {
-				print_quoted_stringn(
-					(char *) kbse->kb_string +
-					kbse_offsets[i].val,
-					MIN(DEFAULT_STRLEN,
-					    sizeof(kbse->kb_string)));
+				size_t len = strlen(str) > DEFAULT_STRLEN
+					     ? DEFAULT_STRLEN : DEFAULT_STRLEN + 1;
+				print_quoted_stringn(str, len);
 			} else {
-				printf("???");
+				printf("%p", str);
 			}
 		}
 
