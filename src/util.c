@@ -647,9 +647,17 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 
 typedef bool (*scan_fdinfo_fn)(const char *value, void *data);
 
-static bool
-scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
-	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
+struct scan_fdinfo {
+	const char *search_pfx;
+	size_t search_pfx_len;
+	scan_fdinfo_fn fn;
+	void *data;
+	size_t matches;
+};
+
+static size_t
+scan_fdinfo_lines(pid_t pid_of_fd, int fd, struct scan_fdinfo *fdinfo_search_array,
+		  size_t fdinfo_array_size)
 {
 	int proc_pid = 0;
 	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
@@ -665,21 +673,47 @@ scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
 
 	char *line = NULL;
 	size_t sz = 0;
-	bool result = false;
+	size_t matches = 0;
 
-	while (getline(&line, &sz, f) > 0) {
-		const char *value =
-			str_strip_prefix_len(line, search_pfx, search_pfx_len);
-		if (value != line && fn(value, data)) {
-			result = true;
-			break;
+	while (matches < fdinfo_array_size && getline(&line, &sz, f) > 0) {
+		for (size_t i = 0; i < fdinfo_array_size ; ++i) {
+			if (fdinfo_search_array[i].matches)
+				continue;
+
+			scan_fdinfo_fn fn = fdinfo_search_array[i].fn;
+			void *data = fdinfo_search_array[i].data;
+			const char *value =
+				str_strip_prefix_len(line, fdinfo_search_array[i].search_pfx,
+				                     fdinfo_search_array[i].search_pfx_len);
+			if (value != line && fn(value, data)) {
+				++fdinfo_search_array[i].matches;
+				++matches;
+				break;
+			}
 		}
 	}
 
 	free(line);
 	fclose(f);
 
-	return result;
+	return matches;
+}
+
+static inline bool
+scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
+	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
+{
+	struct scan_fdinfo fdinfo_lines[] = {
+		{
+			.search_pfx = search_pfx,
+			.search_pfx_len = search_pfx_len,
+			.fn = fn,
+			.data = data
+		}
+	};
+
+	return scan_fdinfo_lines(pid_of_fd, fd, fdinfo_lines,
+				 ARRAY_SIZE(fdinfo_lines)) > 0;
 }
 
 static bool
