@@ -24,19 +24,6 @@ SYS_FUNC(sysmips)
 	tprint_arg_next();
 
 	switch (tcp->u_arg[0]) {
-	case SETNAME: {
-		char nodename[__NEW_UTS_LEN + 1];
-
-		if (!verbose(tcp))
-			break;
-		if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN + 1),
-			     nodename) < 0) {
-			printaddr(tcp->u_arg[1]);
-		} else {
-			print_quoted_cstring(nodename, __NEW_UTS_LEN + 1);
-		}
-		return RVAL_DECODED;
-	}
 	case MIPS_ATOMIC_SET:
 		printaddr(tcp->u_arg[1]);
 		tprint_arg_next();
