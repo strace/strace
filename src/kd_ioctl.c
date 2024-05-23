@@ -10,6 +10,7 @@
 
 #include "defs.h"
 
+#include <linux/ioctl.h>
 #include <linux/kd.h>
 #include <linux/keyboard.h>
 
