@@ -892,6 +892,107 @@ printsignalfd(pid_t pid_of_fd, int fd, const char *path)
 			   print_fdinfo_sigmask, NULL);
 }
 
+static bool
+parse_fdinfo_efd_semaphore(const char *value, void *data)
+{
+	int *efd_semaphore = data;
+	*efd_semaphore = string_to_uint_ex(value, NULL, INT_MAX, "\n");
+	return true;
+}
+
+static bool
+parse_fdinfo_efd_id(const char *value, void *data)
+{
+	int *efd_id = data;
+	*efd_id = string_to_uint_ex(value, NULL, INT_MAX, "\n");
+	return true;
+}
+
+static bool
+parse_fdinfo_efd_counter(const char *value, void *data)
+{
+	char *ptr = (char *) value;
+
+	ptr += strspn(ptr, " \t");
+	ptr[strcspn(ptr, "\n")] = '\0';
+
+	if (*ptr == '\0')
+		ptr = NULL;
+
+	*(char **) data = xstrdup(ptr);
+	return true;
+}
+
+static bool
+printeventfd(pid_t pid_of_fd, int fd, const char *path)
+{
+	static const char eventfd_path[] = "anon_inode:[eventfd]";
+	/* Linux kernel commit v3.8-rc1~74^2~8 */
+	static const char efd_counter_pfx[] = "eventfd-count:";
+	/* Linux kernel commit v5.2-rc1~62^2~38 */
+	static const char efd_id_pfx[] = "eventfd-id:";
+	/* Linux kernel commit v6.5-rc1~246^2~5 */
+	static const char efd_semaphore_pfx[] = "eventfd-semaphore:";
+
+	if (strcmp(path, eventfd_path))
+		return false;
+
+	char *efd_counter = NULL;
+	int efd_id = -1;
+	int efd_semaphore = -1;
+
+	struct scan_fdinfo fdinfo_lines[] = {
+		{
+			.search_pfx = efd_counter_pfx,
+			.search_pfx_len = sizeof(efd_counter_pfx) - 1,
+			.fn = parse_fdinfo_efd_counter,
+			.data = &efd_counter
+		},
+		{
+			.search_pfx = efd_id_pfx,
+			.search_pfx_len = sizeof(efd_id_pfx) - 1,
+			.fn = parse_fdinfo_efd_id,
+			.data = &efd_id
+		},
+		{
+			.search_pfx = efd_semaphore_pfx,
+			.search_pfx_len = sizeof(efd_semaphore_pfx) - 1,
+			.fn = parse_fdinfo_efd_semaphore,
+			.data = &efd_semaphore
+		}
+	};
+
+	scan_fdinfo_lines(pid_of_fd, fd, fdinfo_lines, ARRAY_SIZE(fdinfo_lines));
+
+	if (efd_counter) {
+		tprint_associated_info_begin();
+		tprint_struct_begin();
+		tprints_field_name("eventfd-count");
+		if (efd_counter[0] != '0')
+			tprints_string("0x");
+		tprints_string(efd_counter);
+		free(efd_counter);
+
+		if (efd_id != -1) {
+			tprint_struct_next();
+			tprints_field_name("eventfd-id");
+			PRINT_VAL_U(efd_id);
+
+			if (efd_semaphore != -1) {
+				tprint_struct_next();
+				tprints_field_name("eventfd-semaphore");
+				PRINT_VAL_U(efd_semaphore);
+			}
+		}
+
+		tprint_struct_end();
+		tprint_associated_info_end();
+	} else
+		print_string_in_angle_brackets(path);
+
+	return true;
+}
+
 static void
 print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 {
@@ -919,6 +1020,9 @@ printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *f
 			goto printed;
 		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
 		    printdev(tcp, fd, path, finfo))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_EVENTFD, decode_fd_set) &&
+		    printeventfd(pid, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
