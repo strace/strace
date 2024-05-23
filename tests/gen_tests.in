@@ -113,6 +113,8 @@ epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full
 epoll_pwait2-y	--trace=epoll_pwait2 -y
 epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
+eventfd-yy -a15 --trace=eventfd2,fchdir -yy -qq
+eventfd--decode-fd-eventfd	-a15 --trace=eventfd2,fchdir --decode-fds=eventfd -qq
 execve--secontext	+execve.test --secontext
 execve--secontext_full	+execve.test --secontext=full
 execve--secontext_full_mismatch	+execve.test --secontext=full,mismatch
