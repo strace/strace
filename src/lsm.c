@@ -87,7 +87,8 @@ decode_lsm_ctx_sequence(struct tcb *const tcp, kernel_ulong_t addr, uint32_t len
 	for (unsigned int elt = 0;
 	     fetch_lsm_ctx_header(tcp, &ctx, addr, len, is_sequence);
 	     ++elt) {
-		if (abbrev(tcp) && elt == max_strlen) {
+		/* elt starts with 0, hence elt + 1 */
+		if (sequence_truncation_needed(tcp, elt + 1)) {
 			tprint_more_data_follows();
 			break;
 		}

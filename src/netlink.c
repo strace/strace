@@ -684,7 +684,8 @@ decode_netlink(struct tcb *const tcp,
 	for (unsigned int elt = 0;
 	     fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
 	     ++elt) {
-		if (abbrev(tcp) && elt == max_strlen) {
+		/* elt starts with 0, hence elt + 1 */
+		if (sequence_truncation_needed(tcp, elt + 1)) {
 			tprint_more_data_follows();
 			break;
 		}

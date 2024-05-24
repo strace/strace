@@ -1166,6 +1166,9 @@ print_local_array_ex(struct tcb *tcp,
 			     sizeof((start_addr_)[0]), (print_func_),        \
 			     NULL, 0, NULL, NULL)
 
+extern bool
+sequence_truncation_needed(const struct tcb *, unsigned int len);
+
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);
 

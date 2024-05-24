@@ -10,6 +10,7 @@
 
 #include "defs.h"
 
+#include <linux/ioctl.h>
 #include <linux/kd.h>
 #include <linux/keyboard.h>
 
@@ -446,20 +447,8 @@ kd_kbd_str_entry(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	tprint_struct_next();
 	tprints_field_name("kb_string");
-
-	int ret = umovestr(tcp, arg + offsetof(struct kbsentry, kb_string),
-			   sizeof(val.kb_string), (char *) val.kb_string);
-
-	if (ret < 0) {
-		tprint_unavailable();
-		goto out;
-	}
-
-	if (print_quoted_string((char *) val.kb_string,
-				MIN(max_strlen,
-				   (unsigned int) ret ?: sizeof(val.kb_string)),
-				QUOTE_OMIT_TRAILING_0))
-		tprint_more_data_follows();
+	printstr_ex(tcp, arg + offsetof(struct kbsentry, kb_string),
+		    sizeof(val.kb_string), QUOTE_0_TERMINATED);
 
 out:
 	tprint_struct_end();

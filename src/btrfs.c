@@ -381,7 +381,7 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 			struct btrfs_ioctl_search_header sh;
 			uint64_t addr = buf_addr + off;
 			if (addr < buf_addr || off + sizeof(sh) > buf_size ||
-			    i > max_strlen) {
+			    sequence_truncation_needed(tcp, i + 1)) {
 				tprint_more_data_follows();
 				break;
 			}
