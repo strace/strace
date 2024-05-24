@@ -31,6 +31,7 @@ check_strace_log_merge
 echo '1234567890.123456 +++ exited with 0 +++' > "$LOG".0
 check_strace_log_merge
 
+echo "strace-log-merge: $LOG.* files do not look like log files produced by 'strace -tt'" > "$EXP"
 echo > "$LOG".1
 check_strace_log_merge
 
