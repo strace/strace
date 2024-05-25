@@ -65,7 +65,7 @@ enum stack_trace_modes stack_trace_mode;
 # define fork() vfork()
 #endif
 
-const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
+static const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
 bool followfork;
