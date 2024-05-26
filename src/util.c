@@ -1252,8 +1252,7 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 	if (nul_seen < 0)
 		printaddr(addr);
 	else {
-		path[n++] = !nul_seen;
-		print_quoted_cstring(path, n);
+		print_quoted_cstring(path, (unsigned int) nul_seen ?: n + 1);
 
 		if (nul_seen)
 			selinux_printfilecon(tcp, path);
