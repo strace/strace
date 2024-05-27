@@ -23,11 +23,38 @@
 static const int child_exit_status = 42;
 static pid_t pid;
 
-static pid_t
-wait_cloned(pid_t pid, int sig, const char *text)
+static void
+retrieve_userns(pid_t pid, char *userns_buf, size_t userns_buflen)
 {
-	if (pid < 0)
+	char *fname = xasprintf("/proc/%d/ns/user", pid);
+	ssize_t rc = readlink(fname, userns_buf, userns_buflen - 1);
+	if (rc < 0) {
+		perror(fname);
+		userns_buf[0] = '\0';
+	} else if ((size_t) rc >= userns_buflen)
+		error_msg_and_fail("readlink: %s: result is too long", fname);
+	else
+		userns_buf[rc] = '\0';
+	free(fname);
+}
+
+static pid_t
+wait_cloned(pid_t pid, int sig, const char *text, char *userns_buf, size_t userns_buflen)
+{
+	if (pid < 0) {
+		if (userns_buf) {
+			/*
+			 * Creating user namespaces can be disabled,
+			 * and it would be undesirable to skip the
+			 * whole test because of that.  Let's just
+			 * return pid here.
+			 */
+			return pid;
+		}
 		perror_msg_and_fail("clone %s", text);
+	}
+	if (userns_buf)
+		retrieve_userns(pid, userns_buf, userns_buflen);
 	int status;
 	pid_t rc = wait(&status);
 	if (sig) {
@@ -50,14 +77,20 @@ wait_cloned(pid_t pid, int sig, const char *text)
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
-			     ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...)	\
+	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone2"
 # define STACK_SIZE_FMT ", stack_size=%#lx"
 # define STACK_SIZE_ARG child_stack_size,
 #else
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
-			  ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...) \
+	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone"
 # define STACK_SIZE_FMT ""
 # define STACK_SIZE_ARG
@@ -142,6 +175,18 @@ main(void)
 		       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
 		       "CLONE_PIDFD|SIGCHLD", *ptid, buf, pid);
 	}
+
+	pid = do_clone_newns(buf, child_stack, child_stack, child_stack_size,
+			     CLONE_NEWUSER, 0);
+	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s) = ",
+	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+	       "CLONE_NEWUSER");
+	if (pid < 0)
+		printf("%s\n", sprintrc(pid));
+	else if (buf[0])
+		printf("%d (%s)\n", pid, buf);
+	else
+		printf("%d\n", pid);
 
 	return 0;
 }
