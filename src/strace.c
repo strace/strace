@@ -65,7 +65,7 @@ enum stack_trace_modes stack_trace_mode;
 # define fork() vfork()
 #endif
 
-const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
+static const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
 bool followfork;
@@ -1175,7 +1175,7 @@ droptcb_verbose(struct tcb *tcp)
 
 /* Returns true when the tracee has to be waited for. */
 static bool
-interrupt_or_stop(struct tcb *tcp)
+detach_or_interrupt_or_stop(struct tcb *tcp)
 {
 	/*
 	 * Linux wrongly insists the child be stopped
@@ -1186,7 +1186,8 @@ interrupt_or_stop(struct tcb *tcp)
 	if (!(tcp->flags & TCB_ATTACHED))
 		return false;
 
-	/* We attached but possibly didn't see the expected SIGSTOP.
+	/*
+	 * We attached but possibly didn't see the expected SIGSTOP yet.
 	 * We must catch exactly one as otherwise the detached process
 	 * would be left stopped (process state T).
 	 */
@@ -1315,7 +1316,7 @@ detach_interrupted_or_stopped(struct tcb *tcp, int status)
 static void
 detach(struct tcb *tcp)
 {
-	if (!interrupt_or_stop(tcp))
+	if (!detach_or_interrupt_or_stop(tcp))
 		goto drop;
 
 	/*
@@ -3284,7 +3285,7 @@ cleanup(int fatal_sig)
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, fatal_sig);
 		}
-		if (interrupt_or_stop(tcp))
+		if (detach_or_interrupt_or_stop(tcp))
 			++num_to_wait;
 		else
 			droptcb_verbose(tcp);
