@@ -1227,8 +1227,9 @@ print_quoted_cstring(const char *str, unsigned int size)
 }
 
 /*
- * Print path string specified by address `addr' and length `n'.
- * If path length exceeds `n', append `...' to the output.
+ * Print path string specified by address `addr' and length `n',
+ * including the terminating NUL.
+ * If path length exceeds `n - 1', append `...' to the output.
  *
  * Returns the result of umovestr.
  */
@@ -1243,17 +1244,19 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 		return -1;
 	}
 
-	/* Cap path length to the path buffer size */
-	if (n > sizeof(path) - 1)
-		n = sizeof(path) - 1;
+	/* Cap path size to the path buffer size */
+	if (n > sizeof(path))
+		n = sizeof(path);
 
-	/* Fetch one byte more to find out whether path length > n. */
-	nul_seen = umovestr(tcp, addr, n + 1, path);
+	/*
+	 * Fetch including the terminating NUL to find out
+	 * whether path length >= n.
+	 */
+	nul_seen = umovestr(tcp, addr, n, path);
 	if (nul_seen < 0)
 		printaddr(addr);
 	else {
-		path[n++] = !nul_seen;
-		print_quoted_cstring(path, n);
+		print_quoted_cstring(path, (unsigned int) nul_seen ?: n);
 
 		if (nul_seen)
 			selinux_printfilecon(tcp, path);
@@ -1266,7 +1269,7 @@ int
 printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
-	return printpathn(tcp, addr, PATH_MAX - 1);
+	return printpathn(tcp, addr, PATH_MAX);
 }
 
 /*
