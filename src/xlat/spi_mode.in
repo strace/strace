@@ -1,0 +1,2 @@
+SPI_CPHA (1 << 0)
+SPI_CPOL (1 << 1)
