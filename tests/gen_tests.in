@@ -66,6 +66,7 @@ clone3-success-Xabbrev	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xabbrev
 clone3-success-Xraw	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xraw
 clone3-success-Xverbose	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xverbose
 clone_parent +clone_ptrace.test
+clone3-report-ns-id	-etrace=clone3 -a35 -e namespace=new
 clone_parent--quiet-exit +clone_ptrace.test --quiet=exit,personality
 clone_parent-q +clone_ptrace.test -q
 clone_parent-qq +clone_ptrace.test -qq
