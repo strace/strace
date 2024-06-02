@@ -503,9 +503,9 @@ or
 options are not considered when keeping track of the number of syscalls that are captured.
 .TP
 .B \-\-kill\-on\-exit
-Set
+Apply
 .B PTRACE_O_EXITKILL
-ptrace option to all tracee processes (which send a SIGKILL signal to
+ptrace option to all tracee processes (which sends a SIGKILL signal to
 the tracee if the tracer exits) and do not detach them on cleanup so
 they will not be left running after the tracer exit.
 .B \-\-kill\-on\-exit
