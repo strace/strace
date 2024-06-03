@@ -53,6 +53,8 @@ print_spi_buf(struct tcb * tcp, kernel_ulong_t buf_k, const char* field_name, un
     tprint_struct_next();
 
     free(local_buf);
+
+    return true;
 }
 
 static bool
