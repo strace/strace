@@ -1,0 +1,5 @@
+#unconditional
+#From include/uapi/linux/if_link.h
+#Prefix MACVLAN_FLAG_
+MACVLAN_FLAG_NOPROMISC
+MACVLAN_FLAG_NODST

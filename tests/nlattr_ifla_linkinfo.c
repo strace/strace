@@ -255,7 +255,7 @@ main(void)
 		"ifb", "ip6erspan", "ip6gre", "ip6gretap", "ip6tnl",
 		"ipip", "ipoib", "ipvlan", "ipvtap",
 		"lowpan",
-		"macsec", "macvlan", "macvtap",
+		"macsec", "macvtap",
 		"netdevsim", "nlmon",
 		"openvswitch",
 		"ppp",
@@ -270,6 +270,7 @@ main(void)
 	};
 	static const char *const unsupported_xstats_types[] = {
 		"bridge",
+		"macvlan",
 		"tun",
 		NULL
 	};
@@ -286,6 +287,7 @@ main(void)
 	static const char *const supported_tunnel_types[] = {
 		"bridge",
 		"can",
+		"macvlan",
 		"tun",
 		NULL
 	};
@@ -706,6 +708,131 @@ main(void)
 				     { qstate_attrs[k].sz - 1, crop_str },
 				     { qstate_attrs[k].sz,     str });
 	}
+
+	/* macvlan attrs */
+	static const struct strval32 und_macvlan_attrs[] = {
+		{ ARG_STR(IFLA_MACVLAN_UNSPEC) },
+		{ ARG_STR(IFLA_MACVLAN_MACADDR) },
+		{ ARG_STR(IFLA_MACVLAN_MACADDR_DATA) },
+		{ 10, "0xa /* IFLA_MACVLAN_??? */" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(und_macvlan_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "macvlan",
+				     und_macvlan_attrs[k].val,
+				     und_macvlan_attrs[k].str,
+				     unknown_msg, pattern,
+				     { 2, "\"\\xab\\xac\"" },
+				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" });
+	}
+
+	static const struct strval32 u32_macvlan_attrs[] = {
+		{ ARG_STR(IFLA_MACVLAN_MACADDR_COUNT) },
+		{ ARG_STR(IFLA_MACVLAN_BC_QUEUE_LEN) },
+		{ ARG_STR(IFLA_MACVLAN_BC_QUEUE_LEN_USED) },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(u32_macvlan_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "macvlan",
+				     u32_macvlan_attrs[k].val,
+				     u32_macvlan_attrs[k].str,
+				     u32_val, pattern,
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
+				     { 4, "3134983661" });
+	}
+
+	static const int32_t bc_cutoff = -2;
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     9, "IFLA_MACVLAN_BC_CUTOFF",
+			     bc_cutoff, pattern,
+			     { 3, BE_LE("\"\\xff\\xff\\xff\"",
+					"\"\\xfe\\xff\\xff\"") },
+			     { 4, "-2" });
+
+	static const struct strval32 macvlan_modes[] = {
+		{ 0, "0 /* MACVLAN_MODE_??? */" },
+		{ ARG_STR(MACVLAN_MODE_PRIVATE) },
+		{ ARG_STR(MACVLAN_MODE_VEPA) },
+		{ ARG_STR(MACVLAN_MODE_BRIDGE) },
+		{ ARG_STR(MACVLAN_MODE_PASSTHRU) },
+		{ ARG_STR(MACVLAN_MODE_SOURCE) },
+		{ 3, "0x3 /* MACVLAN_MODE_??? */" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(macvlan_modes); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "macvlan",
+				     1, "IFLA_MACVLAN_MODE",
+				     macvlan_modes[k].val, pattern,
+				     { 4, macvlan_modes[k].str },
+				     { 5, macvlan_modes[k].str });
+	}
+
+	static const uint32_t short_macvlan_mode = MACVLAN_MODE_PRIVATE;
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     1, "IFLA_MACVLAN_MODE",
+			     short_macvlan_mode, pattern,
+			     { 3, BE_LE("\"\\x00\\x00\\x00\"",
+					"\"\\x01\\x00\\x00\"") },
+			     { 4, "MACVLAN_MODE_PRIVATE" });
+
+	static const struct strval16 macvlan_flags[] = {
+		{ 0, "0" },
+		{ ARG_STR(MACVLAN_FLAG_NOPROMISC) },
+		{ ARG_STR(MACVLAN_FLAG_NODST) },
+		{ 3, "MACVLAN_FLAG_NOPROMISC|MACVLAN_FLAG_NODST" },
+		{ 0xfffc, "0xfffc /* MACVLAN_FLAG_??? */" },
+		{ 0xffff, "MACVLAN_FLAG_NOPROMISC|MACVLAN_FLAG_NODST"
+			    "|0xfffc" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(macvlan_flags); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "macvlan",
+				     2, "IFLA_MACVLAN_FLAGS",
+				     macvlan_flags[k].val, pattern,
+				     { 2, macvlan_flags[k].str },
+				     { 3, macvlan_flags[k].str });
+	}
+
+	static const uint16_t short_macvlan_flags = MACVLAN_FLAG_NOPROMISC;
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     2, "IFLA_MACVLAN_FLAGS",
+			     short_macvlan_flags, pattern,
+			     { 1, BE_LE("\"\\x00\"", "\"\\x01\"") },
+			     { 2, "MACVLAN_FLAG_NOPROMISC" });
+
+	static const struct strval32 macvlan_macaddr_modes[] = {
+		{ ARG_STR(MACVLAN_MACADDR_ADD) },
+		{ ARG_STR(MACVLAN_MACADDR_DEL) },
+		{ ARG_STR(MACVLAN_MACADDR_FLUSH) },
+		{ ARG_STR(MACVLAN_MACADDR_SET) },
+		{ 4, "0x4 /* MACVLAN_MACADDR_??? */" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(macvlan_macaddr_modes); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "macvlan",
+				     3, "IFLA_MACVLAN_MACADDR_MODE",
+				     macvlan_macaddr_modes[k].val, pattern,
+				     { 4, macvlan_macaddr_modes[k].str },
+				     { 5, macvlan_macaddr_modes[k].str });
+	}
+
+	static const uint32_t short_macvlan_macaddr_mode = MACVLAN_MACADDR_DEL;
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     3, "IFLA_MACVLAN_MACADDR_MODE",
+			     short_macvlan_macaddr_mode, pattern,
+			     { 3, BE_LE("\"\\x00\\x00\\x00\"",
+					"\"\\x01\\x00\\x00\"") },
+			     { 4, "MACVLAN_MACADDR_DEL" });
 
 	/* tun attrs */
 	static const struct strval32 u8_tun_attrs[] = {

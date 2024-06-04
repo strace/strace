@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of fchroot syscall.
   * Implemented decoding of SO_RIGHTS_NOTRUNC socket option.
   * Implemented decoding of IFA_MC_USERS and IFA_PROTO netlink attributes.
+  * Implemented decoding of macvlan IFLA_INFO_DATA netlink attributes.
   * Implemented decoding of NHA_DST_PORT, NHA_GROUP_STATS,
     NHA_HW_STATS_ENABLE, NHA_HW_STATS_USED, and NHA_OP_FLAGS netlink
     nexthop attributes.

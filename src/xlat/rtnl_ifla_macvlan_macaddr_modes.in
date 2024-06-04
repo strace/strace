@@ -1,0 +1,8 @@
+#unconditional
+#value_indexed
+#From include/uapi/linux/if_link.h
+#Prefix MACVLAN_MACADDR_
+MACVLAN_MACADDR_ADD
+MACVLAN_MACADDR_DEL
+MACVLAN_MACADDR_FLUSH
+MACVLAN_MACADDR_SET
