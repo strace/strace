@@ -1976,6 +1976,15 @@ traced processes which are descended from
 .I command
 may be left running after an interrupt signal
 .RB ( CTRL\-C ).
+.LP
+By using
+.B CLONE_UNTRACED
+flag of
+.B clone
+system call a tracee can break the guarantee that
+.B \-\-seccomp\-bpf
+will not leave any processes with a seccomp program installed
+for syscall filtering purposes.
 .SH HISTORY
 The original
 .B strace
