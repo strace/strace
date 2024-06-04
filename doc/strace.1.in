@@ -1688,6 +1688,15 @@ is activated and
 option is not used,
 .B \-\-kill\-on\-exit
 option is activated as well.
+.IP
+Note that in cases when the tracee has another seccomp filter that
+returns an action value with a precedence greater than
+.BR SECCOMP_RET_TRACE ,
+.B strace \-\-seccomp\-bpf
+will not be notified.  That is, if another seccomp filter, for example,
+disables the syscall or kills the tracee, then
+.B strace \-\-seccomp\-bpf
+will not be aware of that syscall invocation at all.
 .TP
 .BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
 Show strace tips, tricks, and tweaks before exit.
@@ -2053,6 +2062,7 @@ mailing list
 .BR trace-cmd (1),
 .BR time (1),
 .BR ptrace (2),
+.BR seccomp (2),
 .BR syscall (2),
 .BR proc (5),
 .BR signal (7)
