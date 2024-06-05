@@ -503,9 +503,9 @@ or
 options are not considered when keeping track of the number of syscalls that are captured.
 .TP
 .B \-\-kill\-on\-exit
-Set
+Apply
 .B PTRACE_O_EXITKILL
-ptrace option to all tracee processes (which send a SIGKILL signal to
+ptrace option to all tracee processes (which sends a SIGKILL signal to
 the tracee if the tracer exits) and do not detach them on cleanup so
 they will not be left running after the tracer exit.
 .B \-\-kill\-on\-exit
@@ -1659,6 +1659,7 @@ Try to enable use of seccomp-bpf (see
 to have
 .BR ptrace (2)-stops
 only when system calls that are being traced occur in the traced processes.
+.IP
 This option has no effect unless
 .BR \-f / \-\-follow\-forks
 is also specified.
@@ -1669,7 +1670,9 @@ and
 .BR \-b / \-\-detach\-on
 options.  It is also not applicable to processes attached using
 .BR \-p / \-\-attach
-option.  An attempt to enable system calls filtering using seccomp-bpf may
+option.
+.IP
+An attempt to enable system calls filtering using seccomp-bpf may
 fail for various reasons, e.g. there are too many system calls to filter,
 the seccomp API is not available, or
 .B strace
@@ -1677,6 +1680,7 @@ itself is being traced.
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
+.IP
 When
 .B \-\-seccomp\-bpf
 is activated and
@@ -1684,6 +1688,15 @@ is activated and
 option is not used,
 .B \-\-kill\-on\-exit
 option is activated as well.
+.IP
+Note that in cases when the tracee has another seccomp filter that
+returns an action value with a precedence greater than
+.BR SECCOMP_RET_TRACE ,
+.B strace \-\-seccomp\-bpf
+will not be notified.  That is, if another seccomp filter, for example,
+disables the syscall or kills the tracee, then
+.B strace \-\-seccomp\-bpf
+will not be aware of that syscall invocation at all.
 .TP
 .BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
 Show strace tips, tricks, and tweaks before exit.
@@ -1963,6 +1976,15 @@ traced processes which are descended from
 .I command
 may be left running after an interrupt signal
 .RB ( CTRL\-C ).
+.LP
+By using
+.B CLONE_UNTRACED
+flag of
+.B clone
+system call a tracee can break the guarantee that
+.B \-\-seccomp\-bpf
+will not leave any processes with a seccomp program installed
+for syscall filtering purposes.
 .SH HISTORY
 The original
 .B strace
@@ -2049,6 +2071,7 @@ mailing list
 .BR trace-cmd (1),
 .BR time (1),
 .BR ptrace (2),
+.BR seccomp (2),
 .BR syscall (2),
 .BR proc (5),
 .BR signal (7)
