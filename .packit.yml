@@ -1,0 +1,37 @@
+# Docs: https://packit.dev/docs
+---
+
+specfile_path: strace.spec
+upstream_package_name: strace
+downstream_package_name: strace
+
+# list of packages needed for bootstrap, make dist-gzip and rpm build
+srpm_build_deps:
+  - autoconf
+  - automake
+  - libtool
+  - make
+
+actions:
+  # generate spec file from input file
+  post-upstream-clone:
+    - ./bootstrap
+    - ./configure --disable-dependency-tracking --enable-Werror --enable-maintainer-mode
+  create-archive:
+    - make dist-gzip
+    - sh -c "ls ./strace-*.tar.gz"
+
+jobs:
+  - &copr
+    job: copr_build
+    trigger: pull_request
+    targets:
+      - fedora-rawhide-aarch64
+      - fedora-rawhide-i386
+      - fedora-rawhide-ppc64le
+      - fedora-rawhide-s390x
+      - fedora-rawhide-x86_64
+
+  - <<: *copr
+    trigger: commit
+    branch: master
