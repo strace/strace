@@ -279,8 +279,8 @@ SYS_FUNC(mremap)
 	/* flags */
 	printflags64(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 
-	if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
-	    (MREMAP_MAYMOVE | MREMAP_FIXED)) {
+	if (tcp->u_arg[3] & (MREMAP_FIXED | MREMAP_DONTUNMAP) &&
+	    tcp->u_arg[3] & MREMAP_MAYMOVE) {
 		/* new_address */
 		tprint_arg_next();
 		printaddr(tcp->u_arg[4]);
