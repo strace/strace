@@ -143,6 +143,10 @@ print_fcntl(struct tcb *tcp)
 		tprint_arg_next();
 		printflags64(notifyflags, tcp->u_arg[2], "DN_???");
 		break;
+	case F_DUPFD_QUERY:
+		tprint_arg_next();
+		printfd(tcp, tcp->u_arg[2]);
+		break;
 	case F_SETLEASE:
 		tprint_arg_next();
 		printxval64(lockfcmds, tcp->u_arg[2], "F_???");
