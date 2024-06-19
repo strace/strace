@@ -3,7 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of F_DUPFD_QUERY fcntl.
-  * Updated lists of BPF_* constants.
+  * Updated lists of BPF_* and KEY_* constants.
 
 Noteworthy changes in release 6.9 (2024-05-14)
 ==============================================
