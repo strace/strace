@@ -314,6 +314,10 @@ print_stat(const STRUCT_STAT *st)
 		printf(", ");
 		PRINT_FIELD_U(*st, stx_dio_offset_align);
 	}
+	if (st->stx_mask & STATX_SUBVOL) {
+		printf(", ");
+		PRINT_FIELD_X(*st, stx_subvol);
+	}
 	printf("}");
 }
 

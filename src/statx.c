@@ -152,6 +152,10 @@ SYS_FUNC(statx)
 				tprint_struct_next();
 				PRINT_FIELD_U(stx, stx_dio_offset_align);
 			}
+			if (stx.stx_mask & STATX_SUBVOL) {
+				tprint_struct_next();
+				PRINT_FIELD_X(stx, stx_subvol);
+			}
 		} else {
 			tprint_struct_next();
 			tprint_more_data_follows();
