@@ -1356,13 +1356,14 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 	{
 		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = {
 			.prog_fd = 0xdeadbeef,
+			.cookie = 0xfacefeeddeadbeefULL,
 		} },
 		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
-				    prog_fd),
+				    cookie),
 		.init_fn = init_BPF_RAW_TRACEPOINT_attr2,
 		.str = "raw_tracepoint="
 		       "{name=\"0123456789qwertyuiop0123456789qw\"..."
-		       ", prog_fd=-559038737}",
+		       ", prog_fd=-559038737, cookie=0xfacefeeddeadbeef}",
 	}
 };
 

@@ -257,11 +257,13 @@ struct BPF_PROG_QUERY_struct /* query */ {
 struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) name;
 	uint32_t prog_fd;
+	uint32_t dummy;
+	uint64_t ATTRIBUTE_ALIGNED(8) cookie;
 };
 
 # define BPF_RAW_TRACEPOINT_OPEN_struct_size \
-	offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, prog_fd)
-# define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
+	sizeof(struct BPF_RAW_TRACEPOINT_OPEN_struct)
+# define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 24
 
 struct BPF_BTF_LOAD_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) btf;
