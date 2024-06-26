@@ -1250,13 +1250,13 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 1 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 55,
+			.attach_type = 56,
 			.query_flags = 1,
 			.attach_flags = 3,
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, attach_flags),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=BPF_NETKIT_PEER"
+		       ", attach_type=BPF_TRACE_KPROBE_SESSION"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE"
 		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
 		       ", prog_ids=NULL, prog_cnt=0}",
@@ -1264,7 +1264,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 2 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 56,
+			.attach_type = 57,
 			.query_flags = 0xfffffffe,
 			.attach_flags = 0xffffdfc0,
 			.prog_ids = 0xffffffffffffffffULL,
@@ -1272,7 +1272,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=0x38 /* BPF_??? */"
+		       ", attach_type=0x39 /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
 		       ", attach_flags=0xffffdfc0 /* BPF_F_??? */"
 		       ", prog_ids="
@@ -1356,13 +1356,14 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 	{
 		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = {
 			.prog_fd = 0xdeadbeef,
+			.cookie = 0xfacefeeddeadbeefULL,
 		} },
 		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
-				    prog_fd),
+				    cookie),
 		.init_fn = init_BPF_RAW_TRACEPOINT_attr2,
 		.str = "raw_tracepoint="
 		       "{name=\"0123456789qwertyuiop0123456789qw\"..."
-		       ", prog_fd=-559038737}",
+		       ", prog_fd=-559038737, cookie=0xfacefeeddeadbeef}",
 	}
 };
 

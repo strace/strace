@@ -314,6 +314,10 @@ print_stat(const STRUCT_STAT *st)
 		printf(", ");
 		PRINT_FIELD_U(*st, stx_dio_offset_align);
 	}
+	if (st->stx_mask & STATX_SUBVOL) {
+		printf(", ");
+		PRINT_FIELD_X(*st, stx_subvol);
+	}
 	printf("}");
 }
 
@@ -502,13 +506,13 @@ main(void)
 	TEST_SYSCALL_STATX_FLAGS_STR = old_flags_str;
 
 	SET_MASK_INVOKE(0, "0");
-	SET_MASK_INVOKE(0xffff8000U, "0xffff8000 /* STATX_??? */");
+	SET_MASK_INVOKE(0xffff0000U, "0xffff0000 /* STATX_??? */");
 
 	SET_MASK_INVOKE(0xfffffffbU,
 		"STATX_TYPE|STATX_MODE|STATX_UID|STATX_GID|STATX_ATIME|"
 		"STATX_MTIME|STATX_CTIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|"
 		"STATX_BTIME|STATX_MNT_ID|STATX_DIOALIGN|STATX_MNT_ID_UNIQUE|"
-		"0xffff8000");
+		"STATX_SUBVOL|0xffff0000");
 
 	SET_MASK_INVOKE(STATX_UID, "STATX_UID");
 

@@ -52,9 +52,9 @@ main(void)
 			"0xda7a0000 /* KEXEC_ARCH_??? */|0x",
 			"1050 /* KEXEC_??? */" },
 		{ 0, "", "", "KEXEC_ARCH_DEFAULT" },
-		{ 0x2a0007, "", "",
+		{ 0x2a000f, "", "",
 			"KEXEC_ARCH_SH|KEXEC_ON_CRASH|KEXEC_PRESERVE_CONTEXT"
-			"|KEXEC_UPDATE_ELFCOREHDR" },
+			"|KEXEC_UPDATE_ELFCOREHDR|KEXEC_CRASH_HOTPLUG_SUPPORT" },
 		{ 0xdead0000, "", "", "0xdead0000 /* KEXEC_ARCH_??? */" },
 	};
 

@@ -1180,6 +1180,15 @@ BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, prog_fd, tcp);
 
+	/*
+	 * cookie field was added in Linux commit v6.10-rc1~153^2~432^2~13^2~2.
+	 */
+	if (len >= offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, cookie)) {
+		tprint_struct_next();
+		tprints_field_name("cookie");
+		PRINT_VAL_X(attr.cookie);
+	}
+
 	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
