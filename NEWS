@@ -3,6 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of F_DUPFD_QUERY fcntl.
+  * Implemented decoding of mseal syscall.
   * Updated decoding of statx syscall.
   * Updated decoding of BPF_RAW_TRACEPOINT_OPEN bpf command.
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, LANDLOCK_*, PR_*, STATX_*,

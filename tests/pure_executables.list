@@ -406,6 +406,7 @@ mq
 mq_sendrecv
 mq_sendrecv-read
 mq_sendrecv-write
+mseal
 msg_control
 msg_name
 munlockall
