@@ -9,6 +9,10 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, LANDLOCK_*, PR_*, STATX_*,
     TCP_*, TEE_*, V4L2_*, and *_MAGIC constants.
 
+* Bug fixes
+  * Worked around a bug introduced in Linux 6.5 that affected system call
+    tampering on riscv64.
+
 Noteworthy changes in release 6.9 (2024-05-14)
 ==============================================
 
