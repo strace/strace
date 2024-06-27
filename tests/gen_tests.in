@@ -591,6 +591,7 @@ mq	-a32 -e trace=mq_getsetattr,mq_open,mq_unlink
 mq_sendrecv	-a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
 mq_sendrecv-read	-eread=0 -a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
 mq_sendrecv-write	-ewrite=0 -a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
+mseal
 msg_control	-a21 -e trace=sendmsg
 msg_control-v	-v -a21 -e trace=sendmsg
 msg_name	-a20 -e trace=recvmsg

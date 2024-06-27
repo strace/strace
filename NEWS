@@ -3,10 +3,15 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of F_DUPFD_QUERY fcntl.
+  * Implemented decoding of mseal syscall.
   * Updated decoding of statx syscall.
   * Updated decoding of BPF_RAW_TRACEPOINT_OPEN bpf command.
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, LANDLOCK_*, PR_*, STATX_*,
     TCP_*, TEE_*, V4L2_*, and *_MAGIC constants.
+
+* Bug fixes
+  * Worked around a bug introduced in Linux 6.5 that affected system call
+    tampering on riscv64.
 
 Noteworthy changes in release 6.9 (2024-05-14)
 ==============================================

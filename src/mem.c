@@ -492,6 +492,22 @@ SYS_FUNC(remap_file_pages)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(mseal)
+{
+	/* addr */
+	printaddr(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* length */
+	PRINT_VAL_U(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* flags, reserved for future use */
+	PRINT_VAL_X(tcp->u_arg[2]);
+
+	return RVAL_DECODED;
+}
+
 #if defined(POWERPC)
 static bool
 print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)

@@ -512,10 +512,6 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 				if (scno != -1)
 					tcp->flags |= TCB_TAMPERED_NO_FAIL;
 #if ARCH_NEEDS_SET_ERROR_FOR_SCNO_TAMPERING
-				/*
-				 * So far it's just a workaround for hppa,
-				 * but let's pretend it could be used elsewhere.
-				 */
 				else {
 					kernel_long_t rval =
 						(opts->data.flags & INJECT_F_RETVAL) ?
