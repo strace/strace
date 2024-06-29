@@ -609,11 +609,11 @@ net-yy-unix
 netlink_audit
 netlink_audit--pidns-translation
 netlink_crypto
-netlink_generic
 netlink_inet_diag
 netlink_kobject_uevent
 netlink_netfilter
 netlink_netlink_diag
+netlink_nlctrl
 netlink_protocol
 netlink_route
 netlink_selinux

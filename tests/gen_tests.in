@@ -617,9 +617,9 @@ net-tpacket_stats-success -einject=getsockopt:retval=42 -etrace=getsockopt
 net-yy-inet6	+net-yy-inet.test
 netlink_audit	+netlink_sock_diag.test
 netlink_crypto	+netlink_sock_diag.test
-netlink_generic	+netlink_sock_diag.test -e trace=sendto,sendmsg
 netlink_kobject_uevent	+netlink_sock_diag.test
 netlink_netfilter	+netlink_sock_diag.test
+netlink_nlctrl	+netlink_sock_diag.test -e trace=sendto,sendmsg
 netlink_protocol	+netlink_sock_diag.test
 netlink_route	+netlink_sock_diag.test
 netlink_selinux	+netlink_sock_diag.test
