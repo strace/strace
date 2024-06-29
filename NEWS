@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Added -e namespace=switchTo option for printing the namespaces
+    where the tracee switches to.
   * Implemented decoding of F_DUPFD_QUERY fcntl.
   * Implemented decoding of mseal syscall.
   * Updated decoding of statx syscall.

@@ -632,6 +632,16 @@ qualify_kvm(const char *const str)
 	}
 }
 
+void
+qualify_namespace(const char *const str)
+{
+	if (strcmp(str, "switchTo") == 0) {
+		namespace_auxstr_init();
+	} else {
+		error_msg_and_die("invalid -e namespace= argument: '%s'", str);
+	}
+}
+
 #ifdef ENABLE_SECONTEXT
 struct number_set *secontext_set;
 
@@ -698,6 +708,7 @@ static const struct qual_options {
 	{ "decode-pid",	qualify_decode_pid },
 	{ "decode-pids", qualify_decode_pid },
 	{ "secontext",  qualify_secontext },
+	{ "namespace",  qualify_namespace },
 };
 
 void
