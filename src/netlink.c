@@ -609,6 +609,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 
 static const netlink_decoder_t netlink_decoders[] = {
 	[NETLINK_CRYPTO] = decode_netlink_crypto,
+	[NETLINK_GENERIC] = decode_netlink_generic,
 	[NETLINK_NETFILTER] = decode_netlink_netfilter,
 	[NETLINK_ROUTE] = decode_netlink_route,
 	[NETLINK_SELINUX] = decode_netlink_selinux,
