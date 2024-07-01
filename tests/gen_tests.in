@@ -759,7 +759,7 @@ pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
 pkey_mprotect	-a37
-poke-sendfile	--trace=/sendfile --inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff
+poke-sendfile	--inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff --trace=/sendfile
 ppoll				-s2
 ppoll-P				-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
 ppoll-e-trace-fds-23		-s2 -e trace=ppoll -e trace-fds=23
