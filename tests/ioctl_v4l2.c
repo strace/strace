@@ -429,7 +429,7 @@ main(void)
 		81 /* VIDIOC_G_CHIP_IDENT_OLD */,
 		83 /* VIDIOC_ENUM_DV_PRESETS */, 84 /* VIDIOC_S_DV_PRESET */,
 		85 /* VIDIOC_G_DV_PRESET */, 86 /* VIDIOC_QUERY_DV_PRESET */,
-		104 /* 103 is the last existing */, 255
+		105 /* 104 is the last existing */, 255
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(unknown_cmds); i++) {
