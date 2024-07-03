@@ -113,6 +113,8 @@ epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full
 epoll_pwait2-y	--trace=epoll_pwait2 -y
 epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
+eventfd-yy -a15 --trace=eventfd2,fchdir -yy -qq
+eventfd--decode-fd-eventfd	-a15 --trace=eventfd2,fchdir --decode-fds=eventfd -qq
 execve--secontext	+execve.test --secontext
 execve--secontext_full	+execve.test --secontext=full
 execve--secontext_full_mismatch	+execve.test --secontext=full,mismatch
@@ -757,7 +759,7 @@ pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
 pkey_mprotect	-a37
-poke-sendfile	--trace=/sendfile --inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff
+poke-sendfile	--inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff --trace=/sendfile
 ppoll				-s2
 ppoll-P				-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
 ppoll-e-trace-fds-23		-s2 -e trace=ppoll -e trace-fds=23
@@ -859,7 +861,7 @@ printstrn-umoven-peekdata	-e signal=none -e trace=add_key
 printstrn-umoven-undumpable	-e signal=none -e trace=add_key
 prlimit64			-a36 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
 prlimit64--pidns-translation	test_pidns -a36 -e trace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
-prlimit64-success			-a36 -einject=prlimit64:retval=42:when=256+ -etrace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+prlimit64-success			check_scno_tampering; run_strace_match_diff -a36 -einject=prlimit64:retval=42:when=256+ -etrace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
 prlimit64-success--pidns-translation	check_scno_tampering; test_pidns -a36 -einject=prlimit64:retval=42:when=256+ -etrace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
 process_madvise
 process_madvise-y	--trace=process_madvise -y

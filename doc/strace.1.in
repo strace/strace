@@ -959,10 +959,13 @@ Also enables printing of tracee's current working directory when
 constant is used.
 .TQ
 .B socket
-Print socket protocol-specific information,
+Print socket protocol-specific information.
 .TQ
 .B dev
 Print character/block device numbers.
+.TQ
+.B eventfd
+Print eventfd object details associated with eventfd file descriptors.
 .TQ
 .B pidfd
 Print PIDs associated with pidfd file descriptors.

@@ -105,6 +105,7 @@ decode_fd_str_to_uint(const char *str)
 		{ DECODE_FD_PATH,      "path" },
 		{ DECODE_FD_SOCKET,    "socket" },
 		{ DECODE_FD_DEV,       "dev" },
+		{ DECODE_FD_EVENTFD,   "eventfd" },
 		{ DECODE_FD_PIDFD,     "pidfd" },
 		{ DECODE_FD_SIGNALFD,  "signalfd" },
 	};

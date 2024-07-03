@@ -84,6 +84,8 @@ epoll_pwait2-y
 epoll_wait
 erestartsys
 eventfd
+eventfd--decode-fd-eventfd
+eventfd-yy
 execve
 execveat
 faccessat
