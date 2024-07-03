@@ -28,6 +28,29 @@ DECL_NETLINK_GENERIC_DECODER(decode_genl_msg)
 	}
 }
 
+typedef DECL_NETLINK_GENERIC_DECODER((*netlink_generic_decoder_t));
+
+static netlink_generic_decoder_t
+lookup_genl_decoder(const char *family)
+{
+	static const struct {
+		const char *family;
+		netlink_generic_decoder_t decoder;
+	} decoders[] = {
+		{ "nlctrl", decode_nlctrl },
+	};
+
+	if (family) {
+		for (size_t i = 0; i < ARRAY_SIZE(decoders); ++i) {
+			if (strcmp(family, decoders[i].family) == 0) {
+				return decoders[i].decoder;
+			}
+		}
+	}
+
+        return decode_genl_msg;
+}
+
 bool
 decode_netlink_generic(struct tcb *const tcp,
 		       const struct nlmsghdr *const nlmsghdr,
@@ -39,8 +62,12 @@ decode_netlink_generic(struct tcb *const tcp,
 	if (len < GENL_HDRLEN || nlmsghdr->nlmsg_type == NLMSG_DONE)
 		return false;
 
-	if (!umove_or_printaddr(tcp, addr, &h))
-		decode_genl_msg(tcp, &h, addr + GENL_HDRLEN, len - GENL_HDRLEN);
+	if (!umove_or_printaddr(tcp, addr, &h)) {
+		const char *family =
+			xlookup(genl_families_xlat(tcp), nlmsghdr->nlmsg_type);
+		netlink_generic_decoder_t decoder = lookup_genl_decoder(family);
+		decoder(tcp, &h, addr + GENL_HDRLEN, len - GENL_HDRLEN);
+	}
 
 	return true;
 }

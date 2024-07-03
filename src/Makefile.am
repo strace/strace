@@ -232,6 +232,7 @@ libstrace_a_SOURCES =	\
 	netlink_kobject_uevent.h \
 	netlink_netfilter.c \
 	netlink_netlink_diag.c \
+	netlink_nlctrl.c \
 	netlink_packet_diag.c \
 	netlink_route.c	\
 	netlink_route.h	\
