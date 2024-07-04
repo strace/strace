@@ -26,7 +26,7 @@ ds='\([0-9][0-9]*\)'
 if [ $# -ne 1 ]; then
 	show_usage >&2
 	exit 1
-elif [ "$1" = '--help' ]; then
+elif [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
 	show_usage
 	exit 0
 fi
@@ -86,5 +86,5 @@ iterate_logfiles process_logfile |
 
 rc=$?
 [ $rc -eq 1 ] &&
-	echo >&2 "${0##*/}: $logfile: strace output not found"
+	echo >&2 "${0##*/}: $logfile.* files do not look like log files produced by 'strace -tt'"
 exit $rc
