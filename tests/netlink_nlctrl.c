@@ -77,17 +77,82 @@ print_genlmsghdr(const unsigned int msg_len)
 }
 
 static void
-test_nla(const int fd, void *const nlh0)
+test_nla_unknown(const int fd, void *const nlh0)
 {
 	static char pattern[DEFAULT_STRLEN];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-	const char *nla_type_str = xasprintf("%#x", CTRL_ATTR_FAMILY_NAME);
+	const char *nla_type_str = xasprintf("%#x /* CTRL_ATTR_??? */",
+					     CTRL_ATTR_OP + 1);
 
 	TEST_NLATTR_(fd, nlh0, sizeof(struct genlmsghdr),
 		     init_genlmsghdr, print_genlmsghdr,
-		     CTRL_ATTR_FAMILY_NAME, nla_type_str,
+		     CTRL_ATTR_OP + 1, nla_type_str,
 		     sizeof(pattern), pattern, sizeof(pattern),
 		     print_quoted_hex(pattern, sizeof(pattern)));
+}
+
+static void
+test_nla_x16(const int fd, void *const nlh0)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_FAMILY_ID) },
+	};
+	char pattern[sizeof(uint16_t)];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	for (size_t i = 0; i < ARRAY_SIZE(attrs); ++i) {
+		check_x16_nlattr(fd, nlh0, sizeof(struct genlmsghdr),
+				 init_genlmsghdr, print_genlmsghdr,
+				 attrs[i].val, attrs[i].str, pattern, 0);
+	}
+}
+
+static void
+test_nla_u32(const int fd, void *const nlh0)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_VERSION) },
+		{ ARG_STR(CTRL_ATTR_HDRSIZE) },
+		{ ARG_STR(CTRL_ATTR_MAXATTR) },
+		{ ARG_STR(CTRL_ATTR_OP) },
+	};
+	char pattern[sizeof(uint32_t)];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	for (size_t i = 0; i < ARRAY_SIZE(attrs); ++i) {
+		check_u32_nlattr(fd, nlh0, sizeof(struct genlmsghdr),
+				 init_genlmsghdr, print_genlmsghdr,
+				 attrs[i].val, attrs[i].str, pattern, 0);
+	}
+}
+
+static void
+test_nla_str(const int fd, void *const nlh0)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_FAMILY_NAME) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(attrs); ++i) {
+		char str[DEFAULT_STRLEN];
+
+		fill_memory_ex(str, sizeof(str), '0', 10);
+	        TEST_NLATTR_(fd, nlh0, sizeof(struct genlmsghdr),
+			     init_genlmsghdr, print_genlmsghdr,
+			     attrs[i].val, attrs[i].str,
+			     sizeof(str), str, sizeof(str),
+			     printf("\"%.*s\"...", (int) sizeof(str), str)
+			    );
+
+		str[sizeof(str) - 1] = '\0';
+	        TEST_NLATTR_(fd, nlh0, sizeof(struct genlmsghdr),
+			     init_genlmsghdr, print_genlmsghdr,
+			     attrs[i].val, attrs[i].str,
+			     sizeof(str), str, sizeof(str),
+			     printf("\"%s\"", str)
+			    );
+	}
+
 }
 
 static void
@@ -111,7 +176,10 @@ main(void)
 					 NLA_HDRLEN + DEFAULT_STRLEN);
 
 	test_hdr(fd);
-	test_nla(fd, nlh0);
+	test_nla_unknown(fd, nlh0);
+	test_nla_x16(fd, nlh0);
+	test_nla_u32(fd, nlh0);
+	test_nla_str(fd, nlh0);
 	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
