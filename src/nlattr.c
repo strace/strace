@@ -287,7 +287,7 @@ decode_nla_ifindex(struct tcb *const tcp,
 bool
 decode_nla_xval(struct tcb *const tcp,
 		const kernel_ulong_t addr,
-		unsigned int len,
+		const unsigned int len,
 		const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
@@ -296,10 +296,9 @@ decode_nla_xval(struct tcb *const tcp,
 	if (len > sizeof(data) || len < opts->size)
 		return false;
 
-	if (opts->size)
-		len = MIN(len, opts->size);
+	const unsigned int fetch_len = opts->size ? MIN(len, opts->size) : len;
 
-	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
+	if (!umoven_to_uint64_or_printaddr(tcp, addr, fetch_len, &data)) {
 		if (opts->process_fn)
 			data = opts->process_fn(data);
 		if (opts->fn_str)
@@ -404,7 +403,7 @@ decode_nla_in6_addr(struct tcb *const tcp,
 bool
 decode_nla_flags(struct tcb *const tcp,
 		 const kernel_ulong_t addr,
-		 unsigned int len,
+		 const unsigned int len,
 		 const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
@@ -413,10 +412,9 @@ decode_nla_flags(struct tcb *const tcp,
 	if (len > sizeof(data) || len < opts->size)
 		return false;
 
-	if (opts->size)
-		len = MIN(len, opts->size);
+	const unsigned int fetch_len = opts->size ? MIN(len, opts->size) : len;
 
-	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
+	if (!umoven_to_uint64_or_printaddr(tcp, addr, fetch_len, &data)) {
 		if (opts->process_fn)
 			data = opts->process_fn(data);
 		if (opts->fn_str)
