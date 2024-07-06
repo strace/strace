@@ -51,9 +51,11 @@ decode_nlattr(struct tcb *,
 	      const void *opaque_data);
 
 # define DECL_NLA(name)					\
-extern bool						\
-decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
-		    unsigned int len, const void *)	\
+bool							\
+decode_nla_ ## name(struct tcb *const tcp,		\
+		    const kernel_ulong_t addr,		\
+		    const unsigned int len,		\
+		    const void *const opaque_data)	\
 /* End of DECL_NLA definition. */
 
 DECL_NLA(x8);
