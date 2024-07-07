@@ -166,11 +166,7 @@ decode_nlattr(struct tcb *const tcp,
 	}
 }
 
-bool
-decode_nla_str(struct tcb *const tcp,
-	       const kernel_ulong_t addr,
-	       const unsigned int len,
-	       const void *const opaque_data)
+DECL_NLA(str)
 {
 	printstr_ex(tcp, addr, len,
 		    QUOTE_OMIT_TRAILING_0 | QUOTE_EXPECT_TRAILING_0);
@@ -178,22 +174,14 @@ decode_nla_str(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_strn(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(strn)
 {
 	printstrn(tcp, addr, len);
 
 	return true;
 }
 
-bool
-decode_nla_meminfo(struct tcb *const tcp,
-		   const kernel_ulong_t addr,
-		   const unsigned int len,
-		   const void *const opaque_data)
+DECL_NLA(meminfo)
 {
 	uint32_t mem;
 	const size_t nmemb = len / sizeof(mem);
@@ -210,11 +198,7 @@ decode_nla_meminfo(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_fd(struct tcb *const tcp,
-	      const kernel_ulong_t addr,
-	      const unsigned int len,
-	      const void *const opaque_data)
+DECL_NLA(fd)
 {
 	int fd;
 
@@ -226,11 +210,7 @@ decode_nla_fd(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_uid(struct tcb *const tcp,
-	       const kernel_ulong_t addr,
-	       const unsigned int len,
-	       const void *const opaque_data)
+DECL_NLA(uid)
 {
 	uint32_t uid;
 
@@ -242,20 +222,12 @@ decode_nla_uid(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_gid(struct tcb *const tcp,
-	       const kernel_ulong_t addr,
-	       const unsigned int len,
-	       const void *const opaque_data)
+DECL_NLA(gid)
 {
 	return decode_nla_uid(tcp, addr, len, opaque_data);
 }
 
-bool
-decode_nla_clock_t(struct tcb *const tcp,
-		   const kernel_ulong_t addr,
-		   const unsigned int len,
-		   const void *const opaque_data)
+DECL_NLA(clock_t)
 {
 	uint64_t val;
 
@@ -268,11 +240,7 @@ decode_nla_clock_t(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_ifindex(struct tcb *const tcp,
-	       const kernel_ulong_t addr,
-	       const unsigned int len,
-	       const void *const opaque_data)
+DECL_NLA(ifindex)
 {
 	uint32_t ifindex;
 
@@ -284,11 +252,7 @@ decode_nla_ifindex(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_xval(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(xval)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
 	uint64_t data;
@@ -317,11 +281,7 @@ process_host_order(uint64_t val)
 	return ntohs(val);
 }
 
-bool
-decode_nla_ether_proto(struct tcb *const tcp,
-		       const kernel_ulong_t addr,
-		       const unsigned int len,
-		       const void *const opaque_data)
+DECL_NLA(ether_proto)
 {
 	static const struct decode_nla_xlat_opts opts = {
 		.xlat = ethernet_protocols,
@@ -334,11 +294,7 @@ decode_nla_ether_proto(struct tcb *const tcp,
 	return decode_nla_xval(tcp, addr, len, &opts);
 }
 
-bool
-decode_nla_ip_proto(struct tcb *const tcp,
-		    const kernel_ulong_t addr,
-		    const unsigned int len,
-		    const void *const opaque_data)
+DECL_NLA(ip_proto)
 {
 	static const struct decode_nla_xlat_opts opts = {
 		.xlat = inet_protocols,
@@ -348,11 +304,7 @@ decode_nla_ip_proto(struct tcb *const tcp,
 	return decode_nla_xval(tcp, addr, len, &opts);
 }
 
-bool
-decode_nla_hwaddr(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(hwaddr)
 {
 	if (len > MAX_ADDR_LEN)
 		return false;
@@ -368,11 +320,7 @@ decode_nla_hwaddr(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_in_addr(struct tcb *const tcp,
-		   const kernel_ulong_t addr,
-		   const unsigned int len,
-		   const void *const opaque_data)
+DECL_NLA(in_addr)
 {
 	struct in_addr in;
 
@@ -384,11 +332,7 @@ decode_nla_in_addr(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_in6_addr(struct tcb *const tcp,
-		    const kernel_ulong_t addr,
-		    const unsigned int len,
-		    const void *const opaque_data)
+DECL_NLA(in6_addr)
 {
 	struct in6_addr in6;
 
@@ -400,11 +344,7 @@ decode_nla_in6_addr(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_flags(struct tcb *const tcp,
-		 const kernel_ulong_t addr,
-		 const unsigned int len,
-		 const void *const opaque_data)
+DECL_NLA(flags)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
 	uint64_t data;
@@ -456,11 +396,7 @@ decode_nla_af_spec(struct tcb *const tcp,
 }
 
 
-bool
-decode_nla_be16(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(be16)
 {
 	uint16_t num;
 
@@ -475,11 +411,7 @@ decode_nla_be16(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_be64(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(be64)
 {
 #if defined HAVE_BE64TOH || defined be64toh
 	uint64_t num;
@@ -499,11 +431,7 @@ decode_nla_be64(struct tcb *const tcp,
 }
 
 #define DECODE_NLA_INTEGER(name, type, fmt)		\
-bool							\
-decode_nla_ ## name(struct tcb *const tcp,		\
-		    const kernel_ulong_t addr,		\
-		    const unsigned int len,		\
-		    const void *const opaque_data)	\
+DECL_NLA(name)						\
 {							\
 	type num;					\
 							\
@@ -527,11 +455,7 @@ DECODE_NLA_INTEGER(s16, int16_t, "%" PRId16)
 DECODE_NLA_INTEGER(s32, int32_t, "%" PRId32)
 DECODE_NLA_INTEGER(s64, int64_t, "%" PRId64)
 
-bool
-decode_nla_xint(struct tcb *const tcp,
-		const kernel_ulong_t addr,
-		const unsigned int len,
-		const void *const opaque_data)
+DECL_NLA(xint)
 {
 	nla_decoder_t f = NULL;
 

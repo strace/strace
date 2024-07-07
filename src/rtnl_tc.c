@@ -179,11 +179,7 @@ static const nla_decoder_t tca_stats_nla_decoders[] = {
 	[TCA_STATS_PKT64]	= decode_nla_u64,
 };
 
-bool
-decode_nla_tc_stats(struct tcb *const tcp,
-		    const kernel_ulong_t addr,
-		    const unsigned int len,
-		    const void *const opaque_data)
+DECL_NLA(tc_stats)
 {
 	decode_nlattr(tcp, addr, len, rtnl_tca_stats_attrs, "TCA_STATS_???",
 		      tca_stats_nla_decoders,

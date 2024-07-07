@@ -425,11 +425,8 @@ print_sockaddr_array_member(struct tcb *const tcp, void *const elem_buf,
 	return true;
 }
 
-static bool
-decode_nla_sockaddrs(struct tcb *const tcp,
-		     const kernel_ulong_t addr,
-		     const unsigned int len,
-		     const void *const opaque_data)
+static
+DECL_NLA(sockaddrs)
 {
 	struct sockaddr_storage sas;
 	const size_t nmemb = len / sizeof(sas);
