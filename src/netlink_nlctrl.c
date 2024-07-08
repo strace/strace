@@ -11,6 +11,55 @@
 
 #include "xlat/genl_ctrl_cmd.h"
 #include "xlat/genl_ctrl_attr.h"
+#include "xlat/genl_ctrl_attr_op.h"
+#include "xlat/genl_ctrl_attr_op_flags.h"
+
+static
+DECL_NLA(ctrl_attr_op_id)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = genl_ctrl_cmd,
+		.dflt = "CTRL_CMD_???",
+		.size = 4,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static
+DECL_NLA(ctrl_attr_op_flags)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = genl_ctrl_attr_op_flags,
+		.dflt = "GENL_???",
+		.size = 4,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static
+DECL_NLA(ctrl_attr_op_item)
+{
+	static const nla_decoder_t decoders[] = {
+		[CTRL_ATTR_OP_UNSPEC] = NULL,
+		[CTRL_ATTR_OP_ID] = decode_nla_ctrl_attr_op_id,
+		[CTRL_ATTR_OP_FLAGS] = decode_nla_ctrl_attr_op_flags,
+	};
+
+	decode_nlattr(tcp, addr, len,
+		      genl_ctrl_attr_op, "CTRL_ATTR_OP_???",
+		      ARRSZ_PAIR(decoders), opaque_data);
+	return true;
+}
+
+static
+DECL_NLA(ctrl_attr_ops)
+{
+	nla_decoder_t decoder = &decode_nla_ctrl_attr_op_item;
+	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	return true;
+}
 
 DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 {
@@ -32,7 +81,7 @@ DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 			[CTRL_ATTR_VERSION] = decode_nla_u32,
 			[CTRL_ATTR_HDRSIZE] = decode_nla_u32,
 			[CTRL_ATTR_MAXATTR] = decode_nla_u32,
-			[CTRL_ATTR_OPS] = NULL,
+			[CTRL_ATTR_OPS] = decode_nla_ctrl_attr_ops,
 			[CTRL_ATTR_MCAST_GROUPS] = NULL,
 			[CTRL_ATTR_POLICY] = NULL,
 			[CTRL_ATTR_OP_POLICY] = NULL,

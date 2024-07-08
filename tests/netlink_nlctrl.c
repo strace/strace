@@ -156,6 +156,82 @@ test_nla_str(const int fd, void *const nlh0)
 }
 
 static void
+test_nla_ops(const int fd)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_OP_ID) },
+		{ ARG_STR(CTRL_ATTR_OP_FLAGS) },
+	};
+	static const struct strval32 cmds[] = {
+		{ ARG_STR(CTRL_CMD_GETFAMILY) },
+		{ ARG_STR(CTRL_CMD_GETPOLICY) },
+	};
+	static const struct strval32 flags[] = {
+		{ ARG_STR(GENL_CMD_CAP_DO|GENL_CMD_CAP_DUMP|GENL_CMD_CAP_HASPOL) },
+		{ ARG_STR(GENL_ADMIN_PERM|GENL_UNS_ADMIN_PERM) },
+	};
+
+	const struct {
+		struct nlattr h;
+		struct {
+			struct nlattr h;
+			uint32_t v;
+		} a[2];
+	} src[] = {
+		{
+			{ sizeof(src[0]), 1 },
+			{
+				{
+					{ sizeof(src[0].a[0]), attrs[0].val },
+					cmds[0].val
+				}, {
+					{ sizeof(src[0].a[1]), attrs[1].val },
+					flags[0].val
+				}
+			}
+		}, {
+			{ sizeof(src[1]), 2 },
+			{
+				{
+					{ sizeof(src[1].a[0]), attrs[0].val },
+					cmds[1].val
+				}, {
+					{ sizeof(src[1].a[1]), attrs[1].val },
+					flags[1].val
+				}
+			}
+		}
+	};
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
+					 NLA_HDRLEN + sizeof(src));
+
+	TEST_NLATTR(fd, nlh0, sizeof(struct genlmsghdr),
+		    init_genlmsghdr, print_genlmsghdr, CTRL_ATTR_OPS,
+		    sizeof(src), src, sizeof(src),
+		    printf("["
+			    "[{nla_len=%u, nla_type=%#x}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %s], "
+			      "[{nla_len=%u, nla_type=%s}, %s]"
+			     "]"
+			    "], "
+			    "[{nla_len=%u, nla_type=%#x}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %s], "
+			      "[{nla_len=%u, nla_type=%s}, %s]"
+			     "]"
+			    "]"
+			   "]",
+			   src[0].h.nla_len, src[0].h.nla_type,
+			   src[0].a[0].h.nla_len, attrs[0].str, cmds[0].str,
+			   src[0].a[1].h.nla_len, attrs[1].str, flags[0].str,
+			   src[1].h.nla_len, src[1].h.nla_type,
+			   src[1].a[0].h.nla_len, attrs[0].str, cmds[1].str,
+			   src[1].a[1].h.nla_len, attrs[1].str, flags[1].str)
+		    );
+}
+
+static void
 test_nlmsg_done(const int fd)
 {
 	const int num = 0xabcdefad;
@@ -180,6 +256,7 @@ main(void)
 	test_nla_x16(fd, nlh0);
 	test_nla_u32(fd, nlh0);
 	test_nla_str(fd, nlh0);
+	test_nla_ops(fd);
 	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
