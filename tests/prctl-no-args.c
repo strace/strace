@@ -6,7 +6,7 @@
  * for zero equality and don't have any presentable semantics for the arguments
  * they use and the return code: PR_GET_NO_NEW_PRIVS, PR_GET_THP_DISABLE,
  * PR_MPX_DISABLE_MANAGEMENT, PR_MPX_ENABLE_MANAGEMENT, PR_GET_IO_FLUSHER,
- * and unknown operations.
+ * PR_GET_MEMORY_MERGE, PR_SET_MEMORY_MERGE, and unknown operations.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2016-2021 The strace developers.
@@ -52,6 +52,8 @@ main(int argc, char *argv[])
 		{ 44, "PR_MPX_DISABLE_MANAGEMENT" },
 #endif /* INJECT_RETVAL */
 		{ 58, "PR_GET_IO_FLUSHER" },
+		{ 67, "PR_SET_MEMORY_MERGE" },
+		{ 68, "PR_GET_MEMORY_MERGE" },
 	};
 	static const unsigned int options_unknown[] = {
 		0, 17, 18, 48, 49, 74, 75, 76,

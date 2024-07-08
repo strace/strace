@@ -647,6 +647,8 @@ SYS_FUNC(prctl)
 	case PR_MPX_DISABLE_MANAGEMENT:
 	case PR_MPX_ENABLE_MANAGEMENT:
 	case PR_GET_IO_FLUSHER:
+	case PR_SET_MEMORY_MERGE:
+	case PR_GET_MEMORY_MERGE:
 	default:
 		print_prctl_args(tcp, 1);
 		return RVAL_DECODED;
