@@ -773,6 +773,13 @@ prctl-mce-kill
 prctl-mdwe
 prctl-name
 prctl-no-args
+prctl-no-args-Xabbrev
+prctl-no-args-Xraw
+prctl-no-args-Xverbose
+prctl-no-args-success
+prctl-no-args-success-Xabbrev
+prctl-no-args-success-Xraw
+prctl-no-args-success-Xverbose
 prctl-pac-enabled-keys
 prctl-pac-enabled-keys-Xabbrev
 prctl-pac-enabled-keys-Xraw
