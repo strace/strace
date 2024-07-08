@@ -775,6 +775,13 @@ prctl-mce-kill		+prctl.sh -a21
 prctl-mdwe		+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 2 3 2124532476" -a31
 prctl-name		+prctl.sh -a23
 prctl-no-args		+prctl.sh -a21
+prctl-no-args-Xabbrev	+prctl.sh -a21 -Xabbrev
+prctl-no-args-Xraw	+prctl.sh -a11 -Xraw
+prctl-no-args-Xverbose	+prctl.sh -a31 -Xverbose
+prctl-no-args-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 8 16 32 64 128 256 4096 65536 16777216 2124532476" -a21
+prctl-no-args-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 8 16 32 64 128 256 4096 65536 16777216 2124532476" -a21 -Xabbrev
+prctl-no-args-success-Xraw	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 8 16 32 64 128 256 4096 65536 16777216 2124532476" -a11 -Xraw
+prctl-no-args-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 8 16 32 64 128 256 4096 65536 16777216 2124532476" -a31 -Xverbose
 prctl-pac-enabled-keys		+prctl.sh -a43
 prctl-pac-enabled-keys-Xabbrev	+prctl.sh -a43 -Xabbrev
 prctl-pac-enabled-keys-Xraw	+prctl.sh -a24 -Xraw

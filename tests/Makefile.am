@@ -293,6 +293,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ppoll-v \
 	prctl-fp-mode \
 	prctl-mdwe \
+	prctl-no-args-success \
+	prctl-no-args-success-Xabbrev \
+	prctl-no-args-success-Xraw \
+	prctl-no-args-success-Xverbose \
 	prctl-pac-enabled-keys-success \
 	prctl-pac-enabled-keys-success-Xabbrev \
 	prctl-pac-enabled-keys-success-Xraw \

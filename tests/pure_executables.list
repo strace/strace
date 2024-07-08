@@ -573,6 +573,9 @@ prctl-dumpable
 prctl-mce-kill
 prctl-name
 prctl-no-args
+prctl-no-args-Xabbrev
+prctl-no-args-Xraw
+prctl-no-args-Xverbose
 prctl-pac-enabled-keys
 prctl-pac-enabled-keys-Xabbrev
 prctl-pac-enabled-keys-Xraw
