@@ -190,24 +190,71 @@ SYS_FUNC(prctl)
 	if (entering(tcp))
 		printxval(prctl_options, option, "PR_???");
 
+	/*
+	 * Grouped options with common decoders first (except for the options
+	 * that are decoded the same as the default case, that grouped together
+	 * with it), then sorted according to the option number.
+	 */
 	switch (option) {
-	case PR_GET_KEEPCAPS:
-	case PR_GET_SECCOMP:
-	case PR_GET_TIMERSLACK:
-	case PR_GET_TIMING:
+	/* Group 1: no options */
+	case PR_GET_KEEPCAPS:			/*   7 */
+	case PR_GET_TIMING:			/*  13 */
+	case PR_GET_SECCOMP:			/*  21 */
+	case PR_GET_TIMERSLACK:			/*  30 */
+	case PR_TASK_PERF_EVENTS_DISABLE:	/*  31 */
+	case PR_TASK_PERF_EVENTS_ENABLE:	/*  32 */
 		return RVAL_DECODED;
 
-	case PR_GET_CHILD_SUBREAPER:
-	case PR_GET_ENDIAN:
-	case PR_GET_FPEMU:
-	case PR_GET_FPEXC:
+	/* Group 2: getter with the first options as a uint pointer */
+	case PR_GET_FPEMU:			/*   9 */
+	case PR_GET_FPEXC:			/*  11 */
+	case PR_GET_ENDIAN:			/*  19 */
+	case PR_GET_CHILD_SUBREAPER:		/*  37 */
 		if (entering(tcp))
 			tprint_arg_next();
 		else
 			printnum_int(tcp, arg2, "%u");
 		break;
 
-	case PR_GET_DUMPABLE:
+	/* Group 3: one uint argument */
+	case PR_SET_KEEPCAPS:			/*   8 */
+	case PR_SET_FPEMU:			/*  10 */
+	case PR_SET_FPEXC:			/*  12 */
+	case PR_SET_TIMING:			/*  14 */
+	case PR_SET_ENDIAN:			/*  20 */
+	case PR_SET_CHILD_SUBREAPER:		/*  36 */
+		tprint_arg_next();
+		PRINT_VAL_U(arg2);
+		return RVAL_DECODED;
+
+	/* Group 4: one uint option and zero check for the rest */
+	case PR_SET_NO_NEW_PRIVS:		/*  38 */
+	case PR_SET_THP_DISABLE:		/*  41 */
+	case PR_SET_IO_FLUSHER:			/*  57 */
+		tprint_arg_next();
+		PRINT_VAL_U(arg2);
+		print_prctl_args(tcp, 2);
+		return RVAL_DECODED;
+
+	case PR_GET_PDEATHSIG:			/*   1 */
+		if (entering(tcp)) {
+			tprint_arg_next();
+		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
+			tprint_indirect_begin();
+			printsignal(i);
+			tprint_indirect_end();
+		}
+		break;
+
+	case PR_SET_PDEATHSIG:			/*   2 */
+		tprint_arg_next();
+		if (arg2 > 128)
+			PRINT_VAL_U(arg2);
+		else
+			printsignal(arg2);
+		return RVAL_DECODED;
+
+	case PR_GET_DUMPABLE:			/*   3 */
 		if (entering(tcp))
 			break;
 		if (syserror(tcp))
@@ -215,7 +262,42 @@ SYS_FUNC(prctl)
 		tcp->auxstr = xlookup(pr_dumpable, (kernel_ulong_t) tcp->u_rval);
 		return RVAL_STR;
 
-	case PR_GET_NAME:
+	case PR_SET_DUMPABLE:			/*   4 */
+		tprint_arg_next();
+		printxval64(pr_dumpable, arg2, "SUID_DUMP_???");
+		return RVAL_DECODED;
+
+	case PR_GET_UNALIGN:			/*   5 */
+		if (entering(tcp)) {
+			tprint_arg_next();
+		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
+			tprint_indirect_begin();
+			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
+			tprint_indirect_end();
+		}
+		break;
+
+	case PR_SET_UNALIGN:			/*   6 */
+		tprint_arg_next();
+		printflags(pr_unalign_flags, arg2, "PR_UNALIGN_???");
+		return RVAL_DECODED;
+
+	/* PR_GET_KEEPCAPS - group 1		     7 */
+	/* PR_SET_KEEPCAPS - group 3		     8 */
+	/* PR_GET_FPEMU - group 2		     9 */
+	/* PR_SET_FPEMU - group 3		    10 */
+	/* PR_GET_FPEXC - group 2		    11 */
+	/* PR_SET_FPEXC - group 3		    12 */
+	/* PR_GET_TIMING - group 1		    13 */
+	/* PR_SET_TIMING - group 3		    14 */
+
+	case PR_SET_NAME:			/*  15 */
+		tprint_arg_next();
+		printstr_ex(tcp, arg2, TASK_COMM_LEN - 1,
+			    QUOTE_0_TERMINATED);
+		return RVAL_DECODED;
+
+	case PR_GET_NAME:			/*  16 */
 		if (entering(tcp)) {
 			tprint_arg_next();
 		} else {
@@ -227,34 +309,32 @@ SYS_FUNC(prctl)
 		}
 		break;
 
-	case PR_GET_PDEATHSIG:
-		if (entering(tcp)) {
+	/* There are no options with numbers 17 and 18 */
+	/* PR_GET_ENDIAN - group 1		    19 */
+	/* PR_SET_ENDIAN - group 3		    20 */
+	/* PR_GET_SECCOMP - group 1		    21 */
+
+	case PR_SET_SECCOMP:			/*  22 */
+		tprint_arg_next();
+		printxval64(seccomp_mode, arg2,
+			    "SECCOMP_MODE_???");
+		if (SECCOMP_MODE_STRICT == arg2)
+			return RVAL_DECODED;
+		if (SECCOMP_MODE_FILTER == arg2) {
 			tprint_arg_next();
-		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
-			tprint_indirect_begin();
-			printsignal(i);
-			tprint_indirect_end();
+			decode_seccomp_fprog(tcp, arg3);
+			return RVAL_DECODED;
 		}
-		break;
+		print_prctl_args(tcp, 2);
+		return RVAL_DECODED;
 
-	case PR_GET_SECUREBITS:
-		if (entering(tcp))
-			break;
-		if (syserror(tcp) || tcp->u_rval == 0)
-			return 0;
-		tcp->auxstr = sprintflags_ex("", secbits,
-				(kernel_ulong_t) tcp->u_rval, '\0',
-				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
-		return RVAL_HEX | RVAL_STR;
+	case PR_CAPBSET_READ:			/*  23 */
+	case PR_CAPBSET_DROP:			/*  24 */
+		tprint_arg_next();
+		printxval64(cap, arg2, "CAP_???");
+		return RVAL_DECODED;
 
-	case PR_GET_TID_ADDRESS:
-		if (entering(tcp))
-			tprint_arg_next();
-		else
-			printnum_kptr(tcp, arg2);
-		break;
-
-	case PR_GET_TSC:
+	case PR_GET_TSC:			/*  25 */
 		if (entering(tcp)) {
 			tprint_arg_next();
 		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
@@ -264,17 +344,87 @@ SYS_FUNC(prctl)
 		}
 		break;
 
-	case PR_GET_UNALIGN:
+	case PR_SET_TSC:			/*  26 */
+		tprint_arg_next();
+		printxval(pr_tsc, arg2, "PR_TSC_???");
+		return RVAL_DECODED;
+
+	case PR_GET_SECUREBITS:			/*  27 */
+		if (entering(tcp))
+			break;
+		if (syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = sprintflags_ex("", secbits,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
+
+	case PR_SET_SECUREBITS:			/*  28 */
+		tprint_arg_next();
+		printflags64(secbits, arg2, "SECBIT_???");
+		return RVAL_DECODED;
+
+	case PR_SET_TIMERSLACK:			/*  29 */
+		tprint_arg_next();
+		PRINT_VAL_D(arg2);
+		return RVAL_DECODED;
+
+	/* PR_GET_TIMERSLACK - group 1		    30 */
+	/* PR_TASK_PERF_EVENTS_DISABLE - group 1    31 */
+	/* PR_TASK_PERF_EVENTS_ENABLE - group 1	    32 */
+
+	case PR_MCE_KILL:			/*  33 */
+		tprint_arg_next();
+		printxval64(pr_mce_kill, arg2, "PR_MCE_KILL_???");
+		tprint_arg_next();
+		if (PR_MCE_KILL_SET == arg2)
+			printxval64(pr_mce_kill_policy, arg3,
+				    "PR_MCE_KILL_???");
+		else
+			PRINT_VAL_X(arg3);
+		print_prctl_args(tcp, 3);
+		return RVAL_DECODED;
+
+	case PR_MCE_KILL_GET:			/*  34 */
 		if (entering(tcp)) {
-			tprint_arg_next();
-		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
-			tprint_indirect_begin();
-			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
-			tprint_indirect_end();
+			print_prctl_args(tcp, 1);
+			return 0;
 		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = xlookup(pr_mce_kill_policy,
+				      (kernel_ulong_t) tcp->u_rval);
+		return RVAL_STR;
+
+	case PR_SET_MM:				/*  35 */
+		tprint_arg_next();
+		printxval(pr_set_mm, arg2, "PR_SET_MM_???");
+		print_prctl_args(tcp, 2);
+		return RVAL_DECODED;
+
+	/* PR_SET_CHILD_SUBREAPER - group 3	    36 */
+	/* PR_GET_CHILD_SUBREAPER - group 2	    37 */
+	/* PR_SET_NO_NEW_PRIVS - group 4	    38 */
+	/* PR_GET_NO_NEW_PRIVS - group 5	    39 */
+
+	case PR_GET_TID_ADDRESS:		/*  40 */
+		if (entering(tcp))
+			tprint_arg_next();
+		else
+			printnum_kptr(tcp, arg2);
 		break;
 
-	case PR_GET_FP_MODE:
+	/* PR_SET_THP_DISABLE - group 4		    41 */
+	/* PR_GET_THP_DISABLE - group 5		    42 */
+	/* PR_MPX_ENABLE_MANAGEMENT - group 5	    43 */
+	/* PR_MPX_DISABLE_MANAGEMENT - group 5	    44 */
+
+	case PR_SET_FP_MODE:			/*  45 */
+		tprint_arg_next();
+		printflags(pr_fp_mode, arg2, "PR_FP_MODE_???");
+		return RVAL_DECODED;
+
+	case PR_GET_FP_MODE:			/*  46 */
 		if (entering(tcp))
 			break;
 		if (syserror(tcp) || tcp->u_rval == 0)
@@ -284,7 +434,27 @@ SYS_FUNC(prctl)
 				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
 		return RVAL_HEX | RVAL_STR;
 
-	case PR_SVE_SET_VL:
+	case PR_CAP_AMBIENT:			/*  47 */
+		tprint_arg_next();
+		printxval64(pr_cap_ambient, arg2,
+			       "PR_CAP_AMBIENT_???");
+		switch (arg2) {
+		case PR_CAP_AMBIENT_RAISE:
+		case PR_CAP_AMBIENT_LOWER:
+		case PR_CAP_AMBIENT_IS_SET:
+			tprint_arg_next();
+			printxval64(cap, arg3, "CAP_???");
+			print_prctl_args(tcp, 3);
+			break;
+		default:
+			print_prctl_args(tcp, 2);
+			break;
+		}
+		return RVAL_DECODED;
+
+	/* There are no options with numbers 48 and 49 */
+
+	case PR_SVE_SET_VL:			/*  50 */
 		if (entering(tcp)) {
 			tprint_arg_next();
 			tprints_string(sprint_sve_val(arg2, false));
@@ -292,7 +462,7 @@ SYS_FUNC(prctl)
 		}
 		ATTRIBUTE_FALLTHROUGH;
 
-	case PR_SVE_GET_VL:
+	case PR_SVE_GET_VL:			/*  51 */
 		if (entering(tcp))
 			break;
 		if (syserror(tcp) || tcp->u_rval == 0)
@@ -302,7 +472,7 @@ SYS_FUNC(prctl)
 
 		return RVAL_HEX | RVAL_STR;
 
-	case PR_GET_SPECULATION_CTRL:
+	case PR_GET_SPECULATION_CTRL:		/*  52 */
 		if (entering(tcp)) {
 			tprint_arg_next();
 			printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
@@ -326,221 +496,7 @@ SYS_FUNC(prctl)
 
 		return RVAL_STR;
 
-	case PR_SET_TAGGED_ADDR_CTRL:
-		tprint_arg_next();
-		tprints_string(sprint_tagged_addr_val(arg2, false));
-		print_prctl_args(tcp, 2);
-		return RVAL_DECODED;
-
-	case PR_GET_TAGGED_ADDR_CTRL:
-		if (entering(tcp)) {
-			print_prctl_args(tcp, 1);
-			break;
-		}
-		if (syserror(tcp))
-			return 0;
-		tcp->auxstr = sprint_tagged_addr_val(tcp->u_rval, true);
-
-		return RVAL_HEX | RVAL_STR;
-
-	case PR_SME_SET_VL:
-		if (entering(tcp)) {
-			tprint_arg_next();
-			tprints_string(sprint_sme_val(arg2, false));
-			return 0;
-		}
-		ATTRIBUTE_FALLTHROUGH;
-
-	case PR_SME_GET_VL:
-		if (entering(tcp))
-			break;
-		if (syserror(tcp) || tcp->u_rval == 0)
-			return 0;
-
-		tcp->auxstr = sprint_sme_val(tcp->u_rval, true);
-
-		return RVAL_HEX | RVAL_STR;
-
-	case PR_GET_MDWE:
-		if (entering(tcp)) {
-			print_prctl_args(tcp, 1);
-			break;
-		}
-		if (syserror(tcp))
-			return 0;
-		tcp->auxstr = sprintflags_ex("", pr_mdwe_flags,
-				(kernel_ulong_t) tcp->u_rval, '\0',
-				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
-		return RVAL_HEX | RVAL_STR;
-
-	/* PR_TASK_PERF_EVENTS_* take no arguments. */
-	case PR_TASK_PERF_EVENTS_DISABLE:
-	case PR_TASK_PERF_EVENTS_ENABLE:
-		return RVAL_DECODED;
-
-	case PR_SET_CHILD_SUBREAPER:
-	case PR_SET_ENDIAN:
-	case PR_SET_FPEMU:
-	case PR_SET_FPEXC:
-	case PR_SET_KEEPCAPS:
-	case PR_SET_TIMING:
-		tprint_arg_next();
-		PRINT_VAL_U(arg2);
-		return RVAL_DECODED;
-
-	case PR_SET_DUMPABLE:
-		tprint_arg_next();
-		printxval64(pr_dumpable, arg2, "SUID_DUMP_???");
-		return RVAL_DECODED;
-
-	case PR_CAPBSET_DROP:
-	case PR_CAPBSET_READ:
-		tprint_arg_next();
-		printxval64(cap, arg2, "CAP_???");
-		return RVAL_DECODED;
-
-	case PR_CAP_AMBIENT:
-		tprint_arg_next();
-		printxval64(pr_cap_ambient, arg2,
-			       "PR_CAP_AMBIENT_???");
-		switch (arg2) {
-		case PR_CAP_AMBIENT_RAISE:
-		case PR_CAP_AMBIENT_LOWER:
-		case PR_CAP_AMBIENT_IS_SET:
-			tprint_arg_next();
-			printxval64(cap, arg3, "CAP_???");
-			print_prctl_args(tcp, 3);
-			break;
-		default:
-			print_prctl_args(tcp, 2);
-			break;
-		}
-		return RVAL_DECODED;
-
-	case PR_MCE_KILL:
-		tprint_arg_next();
-		printxval64(pr_mce_kill, arg2, "PR_MCE_KILL_???");
-		tprint_arg_next();
-		if (PR_MCE_KILL_SET == arg2)
-			printxval64(pr_mce_kill_policy, arg3,
-				    "PR_MCE_KILL_???");
-		else
-			PRINT_VAL_X(arg3);
-		print_prctl_args(tcp, 3);
-		return RVAL_DECODED;
-
-	case PR_SET_NAME:
-		tprint_arg_next();
-		printstr_ex(tcp, arg2, TASK_COMM_LEN - 1,
-			    QUOTE_0_TERMINATED);
-		return RVAL_DECODED;
-
-	case PR_SET_VMA:
-		tprint_arg_next();
-		printxval64(pr_set_vma, arg2, "PR_SET_VMA_???");
-		if (arg2 == PR_SET_VMA_ANON_NAME) {
-			tprint_arg_next();
-			printaddr(arg3);
-			tprint_arg_next();
-			PRINT_VAL_U(arg4);
-			tprint_arg_next();
-			printstr(tcp, arg5);
-		} else {
-			/* There are no other sub-options now, but there
-			 * might be in future... */
-			print_prctl_args(tcp, 2);
-		}
-		return RVAL_DECODED;
-
-	case PR_SET_MM:
-		tprint_arg_next();
-		printxval(pr_set_mm, arg2, "PR_SET_MM_???");
-		print_prctl_args(tcp, 2);
-		return RVAL_DECODED;
-
-	case PR_SET_PDEATHSIG:
-		tprint_arg_next();
-		if (arg2 > 128)
-			PRINT_VAL_U(arg2);
-		else
-			printsignal(arg2);
-		return RVAL_DECODED;
-
-	case PR_SET_PTRACER:
-		tprint_arg_next();
-		if ((int) arg2 == -1) {
-			print_xlat_ex((int) arg2, "PR_SET_PTRACER_ANY",
-				      XLAT_STYLE_FMT_D);
-		} else {
-			printpid(tcp, arg2, PT_TGID);
-		}
-		return RVAL_DECODED;
-
-	case PR_SET_SECCOMP:
-		tprint_arg_next();
-		printxval64(seccomp_mode, arg2,
-			    "SECCOMP_MODE_???");
-		if (SECCOMP_MODE_STRICT == arg2)
-			return RVAL_DECODED;
-		if (SECCOMP_MODE_FILTER == arg2) {
-			tprint_arg_next();
-			decode_seccomp_fprog(tcp, arg3);
-			return RVAL_DECODED;
-		}
-		print_prctl_args(tcp, 2);
-		return RVAL_DECODED;
-
-	case PR_SET_SECUREBITS:
-		tprint_arg_next();
-		printflags64(secbits, arg2, "SECBIT_???");
-		return RVAL_DECODED;
-
-	case PR_SET_TIMERSLACK:
-		tprint_arg_next();
-		PRINT_VAL_D(arg2);
-		return RVAL_DECODED;
-
-	case PR_SET_TSC:
-		tprint_arg_next();
-		printxval(pr_tsc, arg2, "PR_TSC_???");
-		return RVAL_DECODED;
-
-	case PR_SET_UNALIGN:
-		tprint_arg_next();
-		printflags(pr_unalign_flags, arg2, "PR_UNALIGN_???");
-		return RVAL_DECODED;
-
-	case PR_SET_MDWE:
-		tprint_arg_next();
-		printflags(pr_mdwe_flags, arg2, "PR_MDWE_???");
-		print_prctl_args(tcp, 2);
-		return RVAL_DECODED;
-
-	case PR_SET_NO_NEW_PRIVS:
-	case PR_SET_THP_DISABLE:
-	case PR_SET_IO_FLUSHER:
-		tprint_arg_next();
-		PRINT_VAL_U(arg2);
-		print_prctl_args(tcp, 2);
-		return RVAL_DECODED;
-
-	case PR_MCE_KILL_GET:
-		if (entering(tcp)) {
-			print_prctl_args(tcp, 1);
-			return 0;
-		}
-		if (syserror(tcp))
-			return 0;
-		tcp->auxstr = xlookup(pr_mce_kill_policy,
-				      (kernel_ulong_t) tcp->u_rval);
-		return RVAL_STR;
-
-	case PR_SET_FP_MODE:
-		tprint_arg_next();
-		printflags(pr_fp_mode, arg2, "PR_FP_MODE_???");
-		return RVAL_DECODED;
-
-	case PR_SET_SPECULATION_CTRL:
+	case PR_SET_SPECULATION_CTRL:		/*  53 */
 		tprint_arg_next();
 		printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
 		tprint_arg_next();
@@ -559,7 +515,7 @@ SYS_FUNC(prctl)
 
 		return RVAL_DECODED;
 
-	case PR_PAC_RESET_KEYS:
+	case PR_PAC_RESET_KEYS:			/*  54 */
 		tprint_arg_next();
 		printflags_ex(arg2, "PR_PAC_???", XLAT_STYLE_DEFAULT,
 			      pr_pac_enabled_keys, pr_pac_keys, NULL);
@@ -567,28 +523,27 @@ SYS_FUNC(prctl)
 
 		return RVAL_DECODED;
 
-	case PR_PAC_SET_ENABLED_KEYS:
+	case PR_SET_TAGGED_ADDR_CTRL:		/*  55 */
 		tprint_arg_next();
-		printflags64(pr_pac_enabled_keys, arg2, "PR_PAC_???");
-		tprint_arg_next();
-		printflags64(pr_pac_enabled_keys, arg3, "PR_PAC_???");
-		print_prctl_args(tcp, 3);
-
+		tprints_string(sprint_tagged_addr_val(arg2, false));
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
-	case PR_PAC_GET_ENABLED_KEYS:
+	case PR_GET_TAGGED_ADDR_CTRL:		/*  56 */
 		if (entering(tcp)) {
 			print_prctl_args(tcp, 1);
-			return 0;
+			break;
 		}
 		if (syserror(tcp))
 			return 0;
-		tcp->auxstr = sprintflags_ex("", pr_pac_enabled_keys,
-					     (kernel_ulong_t) tcp->u_rval, '\0',
-					     XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		tcp->auxstr = sprint_tagged_addr_val(tcp->u_rval, true);
+
 		return RVAL_HEX | RVAL_STR;
 
-	case PR_SET_SYSCALL_USER_DISPATCH:
+	/* PR_SET_IO_FLUSHER - group 4		    57 */
+	/* PR_GET_IO_FLUSHER - group 5		    58 */
+
+	case PR_SET_SYSCALL_USER_DISPATCH:	/*  59 */
 		tprint_arg_next();
 		printxval64(pr_sud_cmds, arg2, "PR_SYS_DISPATCH_???");
 		tprint_arg_next();
@@ -600,7 +555,28 @@ SYS_FUNC(prctl)
 
 		return RVAL_DECODED;
 
-	case PR_SCHED_CORE:
+	case PR_PAC_SET_ENABLED_KEYS:		/*  60 */
+		tprint_arg_next();
+		printflags64(pr_pac_enabled_keys, arg2, "PR_PAC_???");
+		tprint_arg_next();
+		printflags64(pr_pac_enabled_keys, arg3, "PR_PAC_???");
+		print_prctl_args(tcp, 3);
+
+		return RVAL_DECODED;
+
+	case PR_PAC_GET_ENABLED_KEYS:		/*  61 */
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			return 0;
+		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprintflags_ex("", pr_pac_enabled_keys,
+					     (kernel_ulong_t) tcp->u_rval, '\0',
+					     XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
+
+	case PR_SCHED_CORE:			/*  62 */
 		if (entering(tcp)) {
 			tprint_arg_next();
 			printxval(pr_sched_core_cmds, arg2, "PR_SCHED_CORE_???");
@@ -642,13 +618,80 @@ SYS_FUNC(prctl)
 
 		return RVAL_DECODED;
 
-	case PR_GET_NO_NEW_PRIVS:
-	case PR_GET_THP_DISABLE:
-	case PR_MPX_DISABLE_MANAGEMENT:
-	case PR_MPX_ENABLE_MANAGEMENT:
-	case PR_GET_IO_FLUSHER:
-	case PR_SET_MEMORY_MERGE:
-	case PR_GET_MEMORY_MERGE:
+	case PR_SME_SET_VL:			/*  63 */
+		if (entering(tcp)) {
+			tprint_arg_next();
+			tprints_string(sprint_sme_val(arg2, false));
+			return 0;
+		}
+		ATTRIBUTE_FALLTHROUGH;
+
+	case PR_SME_GET_VL:			/*  64 */
+		if (entering(tcp))
+			break;
+		if (syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+
+		tcp->auxstr = sprint_sme_val(tcp->u_rval, true);
+
+		return RVAL_HEX | RVAL_STR;
+
+	case PR_SET_MDWE:			/*  65 */
+		tprint_arg_next();
+		printflags(pr_mdwe_flags, arg2, "PR_MDWE_???");
+		print_prctl_args(tcp, 2);
+		return RVAL_DECODED;
+
+	case PR_GET_MDWE:			/*  66 */
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			break;
+		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprintflags_ex("", pr_mdwe_flags,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
+
+	/* PR_SET_MEMORY_MERGE - group 5	    67 */
+	/* PR_GET_MEMORY_MERGE - group 5	    68 */
+
+	case PR_SET_VMA:			/* 0x53564d41 */
+		tprint_arg_next();
+		printxval64(pr_set_vma, arg2, "PR_SET_VMA_???");
+		if (arg2 == PR_SET_VMA_ANON_NAME) {
+			tprint_arg_next();
+			printaddr(arg3);
+			tprint_arg_next();
+			PRINT_VAL_U(arg4);
+			tprint_arg_next();
+			printstr(tcp, arg5);
+		} else {
+			/* There are no other sub-options now, but there
+			 * might be in future... */
+			print_prctl_args(tcp, 2);
+		}
+		return RVAL_DECODED;
+
+	case PR_SET_PTRACER:			/* 0x59616d61 */
+		tprint_arg_next();
+		if ((int) arg2 == -1) {
+			print_xlat_ex((int) arg2, "PR_SET_PTRACER_ANY",
+				      XLAT_STYLE_FMT_D);
+		} else {
+			printpid(tcp, arg2, PT_TGID);
+		}
+		return RVAL_DECODED;
+
+	/* Group 5: default decoding */
+	case PR_GET_NO_NEW_PRIVS:		/*  39 */
+	case PR_GET_THP_DISABLE:		/*  42 */
+	case PR_MPX_ENABLE_MANAGEMENT:		/*  43 */
+	case PR_MPX_DISABLE_MANAGEMENT:		/*  44 */
+	case PR_GET_IO_FLUSHER:			/*  58 */
+	case PR_SET_MEMORY_MERGE:		/*  67 */
+	case PR_GET_MEMORY_MERGE:		/*  68 */
 	default:
 		print_prctl_args(tcp, 1);
 		return RVAL_DECODED;
