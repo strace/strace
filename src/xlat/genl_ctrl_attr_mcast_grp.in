@@ -1,0 +1,6 @@
+#unconditional
+#value_indexed
+
+CTRL_ATTR_MCAST_GRP_UNSPEC
+CTRL_ATTR_MCAST_GRP_NAME
+CTRL_ATTR_MCAST_GRP_ID

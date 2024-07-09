@@ -232,6 +232,82 @@ test_nla_ops(const int fd)
 }
 
 static void
+test_nla_mcast(const int fd)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_MCAST_GRP_ID) },
+		{ ARG_STR(CTRL_ATTR_MCAST_GRP_NAME) },
+	};
+
+	struct {
+		struct nlattr h;
+		struct {
+			struct nlattr h;
+			uint32_t v;
+		} a0;
+		struct {
+			struct nlattr h;
+			char s[DEFAULT_STRLEN];
+		} a1;
+	} src[] = {
+		{
+			{ sizeof(src[0]), 1 },
+			{
+				{ sizeof(src[0].a0), attrs[0].val },
+				0xcafef00d
+			}, {
+				{ sizeof(src[0].a1), attrs[1].val },
+				""
+			}
+		}, {
+			{ sizeof(src[1]), 2 },
+			{
+				{ sizeof(src[1].a0), attrs[0].val },
+				0xdeadface
+			}, {
+				{ sizeof(src[1].a1), attrs[1].val },
+				""
+			}
+		}
+	};
+
+	char strs[2][DEFAULT_STRLEN];
+	fill_memory_ex(strs, sizeof(strs), '0', 10);
+	strs[0][sizeof(strs[0]) - 1] = '\0';
+	strs[1][sizeof(strs[1]) - 1] = '\0';
+	memcpy(src[0].a1.s, strs[0], DEFAULT_STRLEN);
+	memcpy(src[1].a1.s, strs[1], DEFAULT_STRLEN);
+
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
+					 NLA_HDRLEN + sizeof(src));
+
+	TEST_NLATTR(fd, nlh0, sizeof(struct genlmsghdr),
+		    init_genlmsghdr, print_genlmsghdr, CTRL_ATTR_MCAST_GROUPS,
+		    sizeof(src), src, sizeof(src),
+		    printf("["
+			    "[{nla_len=%u, nla_type=%#x}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %#x], "
+			      "[{nla_len=%u, nla_type=%s}, \"%s\"]"
+			     "]"
+			    "], "
+			    "[{nla_len=%u, nla_type=%#x}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %#x], "
+			      "[{nla_len=%u, nla_type=%s}, \"%s\"]"
+			     "]"
+			    "]"
+			   "]",
+			   src[0].h.nla_len, src[0].h.nla_type,
+			   src[0].a0.h.nla_len, attrs[0].str, src[0].a0.v,
+			   src[0].a1.h.nla_len, attrs[1].str, src[0].a1.s,
+			   src[1].h.nla_len, src[1].h.nla_type,
+			   src[1].a0.h.nla_len, attrs[0].str, src[1].a0.v,
+			   src[1].a1.h.nla_len, attrs[1].str, src[1].a1.s)
+		    );
+}
+
+static void
 test_nlmsg_done(const int fd)
 {
 	const int num = 0xabcdefad;
@@ -257,6 +333,7 @@ main(void)
 	test_nla_u32(fd, nlh0);
 	test_nla_str(fd, nlh0);
 	test_nla_ops(fd);
+	test_nla_mcast(fd);
 	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
