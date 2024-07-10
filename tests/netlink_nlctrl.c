@@ -308,6 +308,78 @@ test_nla_mcast(const int fd)
 }
 
 static void
+test_nla_op_policy(const int fd)
+{
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_POLICY_DO) },
+		{ ARG_STR(CTRL_ATTR_POLICY_DUMP) },
+	};
+	static const struct strval16 types[] = {
+		{ ARG_STR(NLA_F_NESTED|0xfe) },
+		{ ARG_STR(NLA_F_NESTED|0xfd) },
+	};
+	const struct {
+		struct nlattr h;
+		struct {
+			struct nlattr h;
+			uint32_t v;
+		} a[2];
+	} src[] = {
+		{
+			{ sizeof(src[0]), types[0].val },
+			{
+				{
+					{ sizeof(src[0].a[0]), attrs[0].val },
+					0xdefaced1
+				}, {
+					{ sizeof(src[0].a[1]), attrs[1].val },
+					0xdefaced2
+				}
+			}
+		}, {
+			{ sizeof(src[1]), types[1].val },
+			{
+				{
+					{ sizeof(src[1].a[0]), attrs[0].val },
+					0xdefaced3
+				}, {
+					{ sizeof(src[1].a[1]), attrs[1].val },
+					0xdefaced4
+				}
+			}
+		}
+	};
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
+					 NLA_HDRLEN + sizeof(src));
+
+	TEST_NLATTR(fd, nlh0, sizeof(struct genlmsghdr),
+		    init_genlmsghdr, print_genlmsghdr,
+		    NLA_F_NESTED|CTRL_ATTR_OP_POLICY,
+		    sizeof(src), src, sizeof(src),
+		    printf("["
+			    "[{nla_len=%u, nla_type=%s}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %u], "
+			      "[{nla_len=%u, nla_type=%s}, %u]"
+			     "]"
+			    "], "
+			    "[{nla_len=%u, nla_type=%s}, "
+			     "["
+			      "[{nla_len=%u, nla_type=%s}, %u], "
+			      "[{nla_len=%u, nla_type=%s}, %u]"
+			     "]"
+			    "]"
+			   "]",
+			   src[0].h.nla_len, types[0].str,
+			   src[0].a[0].h.nla_len, attrs[0].str, src[0].a[0].v,
+			   src[0].a[1].h.nla_len, attrs[1].str, src[0].a[1].v,
+			   src[1].h.nla_len, types[1].str,
+			   src[1].a[0].h.nla_len, attrs[0].str, src[1].a[0].v,
+			   src[1].a[1].h.nla_len, attrs[1].str, src[1].a[1].v)
+		    );
+}
+
+static void
 test_nlmsg_done(const int fd)
 {
 	const int num = 0xabcdefad;
@@ -334,6 +406,7 @@ main(void)
 	test_nla_str(fd, nlh0);
 	test_nla_ops(fd);
 	test_nla_mcast(fd);
+	test_nla_op_policy(fd);
 	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");

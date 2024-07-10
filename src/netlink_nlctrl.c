@@ -14,6 +14,7 @@
 #include "xlat/genl_ctrl_attr_op.h"
 #include "xlat/genl_ctrl_attr_op_flags.h"
 #include "xlat/genl_ctrl_attr_mcast_grp.h"
+#include "xlat/genl_ctrl_attr_policy.h"
 
 static
 DECL_NLA(ctrl_attr_op_id)
@@ -85,6 +86,29 @@ DECL_NLA(ctrl_attr_mcast_groups)
 	return true;
 }
 
+static
+DECL_NLA(ctrl_attr_op_policy_item)
+{
+	static const nla_decoder_t decoders[] = {
+		[CTRL_ATTR_POLICY_UNSPEC] = NULL,
+		[CTRL_ATTR_POLICY_DO] = decode_nla_u32,
+		[CTRL_ATTR_POLICY_DUMP] = decode_nla_u32,
+	};
+
+	decode_nlattr(tcp, addr, len,
+		      genl_ctrl_attr_policy, "CTRL_ATTR_POLICY_???",
+		      ARRSZ_PAIR(decoders), opaque_data);
+	return true;
+}
+
+static
+DECL_NLA(ctrl_attr_op_policy)
+{
+	nla_decoder_t decoder = &decode_nla_ctrl_attr_op_policy_item;
+	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	return true;
+}
+
 DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 {
 	tprint_struct_begin();
@@ -108,7 +132,7 @@ DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 			[CTRL_ATTR_OPS] = decode_nla_ctrl_attr_ops,
 			[CTRL_ATTR_MCAST_GROUPS] = decode_nla_ctrl_attr_mcast_groups,
 			[CTRL_ATTR_POLICY] = NULL,
-			[CTRL_ATTR_OP_POLICY] = NULL,
+			[CTRL_ATTR_OP_POLICY] = decode_nla_ctrl_attr_op_policy,
 			[CTRL_ATTR_OP] = decode_nla_u32,
 		};
 
