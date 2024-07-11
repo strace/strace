@@ -4,6 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented --decode-fds=eventfd option to retrieve eventfd object details
     associated with eventfd file descriptors.
+  * Implemented decoding of NETLINK_GENERIC nlctrl protocol.
   * Implemented decoding of F_DUPFD_QUERY fcntl.
   * Implemented decoding of mseal syscall.
   * Updated decoding of statx syscall.

@@ -308,6 +308,129 @@ test_nla_mcast(const int fd)
 }
 
 static void
+test_nla_policy(const int fd)
+{
+	static const struct strval16 type_attr_type =
+		{ ARG_STR(NL_POLICY_TYPE_ATTR_TYPE) };
+	static const struct strval32 attr_types[] = {
+		{ ARG_STR(NL_ATTR_TYPE_INVALID) },
+		{ ARG_STR(NL_ATTR_TYPE_FLAG) },
+		{ ARG_STR(NL_ATTR_TYPE_U8) },
+		{ ARG_STR(NL_ATTR_TYPE_U16) },
+		{ ARG_STR(NL_ATTR_TYPE_U32) },
+		{ ARG_STR(NL_ATTR_TYPE_U64) },
+		{ ARG_STR(NL_ATTR_TYPE_S8) },
+		{ ARG_STR(NL_ATTR_TYPE_S16) },
+		{ ARG_STR(NL_ATTR_TYPE_S32) },
+		{ ARG_STR(NL_ATTR_TYPE_S64) },
+		{ ARG_STR(NL_ATTR_TYPE_BINARY) },
+		{ ARG_STR(NL_ATTR_TYPE_STRING) },
+		{ ARG_STR(NL_ATTR_TYPE_NUL_STRING) },
+		{ ARG_STR(NL_ATTR_TYPE_NESTED) },
+		{ ARG_STR(NL_ATTR_TYPE_NESTED_ARRAY) },
+		{ ARG_STR(NL_ATTR_TYPE_BITFIELD32) },
+		{ ARG_STR(NL_ATTR_TYPE_SINT) },
+		{ ARG_STR(NL_ATTR_TYPE_UINT) },
+	};
+	static const struct {
+		struct strval16 name;
+		struct strval64 value;
+	} type_attrs_64[] = {
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MIN_VALUE_S) }, { ARG_STR(-2401053088871166255) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MAX_VALUE_S) }, { ARG_STR(-2401053088871166254) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MIN_VALUE_U) }, { ARG_ULL_STR(16045690984838385363) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MAX_VALUE_U) }, { ARG_ULL_STR(16045690984838385364) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MASK) }, { ARG_STR(0xdeadbeefdefaced5) }, },
+	};
+	static const struct {
+		struct strval16 name;
+		struct strval32 value;
+	} type_attrs_32[] = {
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MIN_LENGTH) }, { ARG_STR(3740978897) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_MAX_LENGTH) }, { ARG_STR(3740978898) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_POLICY_IDX) }, { ARG_STR(0xdefaced3) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE) }, { ARG_STR(0xdefaced4) }, },
+		{ { ARG_STR(NL_POLICY_TYPE_ATTR_BITFIELD32_MASK) }, { ARG_STR(0xdefaced5) }, },
+	};
+	static_assert(ARRAY_SIZE(type_attrs_64) == ARRAY_SIZE(type_attrs_32),
+		      "type attrs size mismatch");
+	struct {
+		struct nlattr h;
+		struct {
+			struct nlattr h;
+			struct {
+				struct nlattr h;
+				uint64_t v;
+			} ATTRIBUTE_PACKED a64;
+			struct {
+				struct nlattr h;
+				uint32_t v;
+			} a32;
+			struct {
+				struct nlattr h;
+				uint32_t v;
+			} at;
+		} a[ARRAY_SIZE(type_attrs_64)];
+	} src[ARRAY_SIZE(attr_types)];
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(src); ++i) {
+		src[i].h.nla_len = sizeof(src[i]);
+		src[i].h.nla_type = NLA_F_NESTED | i;
+		for (unsigned int j = 0; j < ARRAY_SIZE(src[i].a); ++j) {
+			src[i].a[j].h.nla_len = sizeof(src[i].a[j]);
+			src[i].a[j].h.nla_type = NLA_F_NESTED | 0x100 | j;
+			src[i].a[j].a64.h.nla_len = sizeof(src[i].a[j].a64);
+			src[i].a[j].a64.h.nla_type = type_attrs_64[j].name.val;
+			src[i].a[j].a64.v = type_attrs_64[j].value.val;
+			src[i].a[j].a32.h.nla_len = sizeof(src[i].a[j].a32);
+			src[i].a[j].a32.h.nla_type = type_attrs_32[j].name.val;
+			src[i].a[j].a32.v = type_attrs_32[j].value.val;
+			src[i].a[j].at.h.nla_len = sizeof(src[i].a[j].at);
+			src[i].a[j].at.h.nla_type = type_attr_type.val;
+			src[i].a[j].at.v =
+				attr_types[(i + j) % ARRAY_SIZE(attr_types)].val;
+		}
+	}
+
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
+					 NLA_HDRLEN + sizeof(src));
+
+	TEST_NLATTR(fd, nlh0, sizeof(struct genlmsghdr),
+		    init_genlmsghdr, print_genlmsghdr,
+		    NLA_F_NESTED|CTRL_ATTR_POLICY,
+		    sizeof(src), src, sizeof(src),
+		    for (unsigned int i = 0; i < ARRAY_SIZE(src); ++i) {
+			printf("%s", i ? ", " : "[");
+			printf("[{nla_len=%u, nla_type=NLA_F_NESTED|%#x}, ",
+			       src[i].h.nla_len, i);
+			for (unsigned int j = 0; j < ARRAY_SIZE(src[i].a); ++j) {
+			    printf("%s", j ? ", " : "[");
+			    printf("[{nla_len=%u, nla_type=NLA_F_NESTED|%#x}, "
+				    "["
+				     "[{nla_len=%u, nla_type=%s}, %s], "
+				     "[{nla_len=%u, nla_type=%s}, %s], "
+				     "[{nla_len=%u, nla_type=%s}, %s]"
+				    "]"
+				   "]",
+				   src[i].a[j].h.nla_len, 0x100 | j,
+				   src[i].a[j].a64.h.nla_len,
+				   type_attrs_64[j].name.str,
+				   type_attrs_64[j].value.str,
+				   src[i].a[j].a32.h.nla_len,
+				   type_attrs_32[j].name.str,
+				   type_attrs_32[j].value.str,
+				   src[i].a[j].at.h.nla_len,
+				   type_attr_type.str,
+				   attr_types[(i + j) % ARRAY_SIZE(attr_types)].str
+				   );
+			}
+			printf("]]");
+		    }
+		    printf("]");
+		   );
+}
+
+static void
 test_nla_op_policy(const int fd)
 {
 	static const struct strval16 attrs[] = {
@@ -406,6 +529,7 @@ main(void)
 	test_nla_str(fd, nlh0);
 	test_nla_ops(fd);
 	test_nla_mcast(fd);
+	test_nla_policy(fd);
 	test_nla_op_policy(fd);
 	test_nlmsg_done(fd);
 

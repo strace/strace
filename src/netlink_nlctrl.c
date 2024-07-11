@@ -15,6 +15,8 @@
 #include "xlat/genl_ctrl_attr_op_flags.h"
 #include "xlat/genl_ctrl_attr_mcast_grp.h"
 #include "xlat/genl_ctrl_attr_policy.h"
+#include "xlat/nl_attr_type.h"
+#include "xlat/nl_policy_type_attr.h"
 
 static
 DECL_NLA(ctrl_attr_op_id)
@@ -87,6 +89,59 @@ DECL_NLA(ctrl_attr_mcast_groups)
 }
 
 static
+DECL_NLA(policy_type_attr_type)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = nl_attr_type,
+		.dflt = "NL_ATTR_TYPE_???",
+		.size = 4,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static
+DECL_NLA(ctrl_attr_policy_attr)
+{
+	static const nla_decoder_t decoders[] = {
+		[NL_POLICY_TYPE_ATTR_UNSPEC] = NULL,
+		[NL_POLICY_TYPE_ATTR_TYPE] = decode_nla_policy_type_attr_type,
+		[NL_POLICY_TYPE_ATTR_MIN_VALUE_S] = decode_nla_s64,
+		[NL_POLICY_TYPE_ATTR_MAX_VALUE_S] = decode_nla_s64,
+		[NL_POLICY_TYPE_ATTR_MIN_VALUE_U] = decode_nla_u64,
+		[NL_POLICY_TYPE_ATTR_MAX_VALUE_U] = decode_nla_u64,
+		[NL_POLICY_TYPE_ATTR_MIN_LENGTH] = decode_nla_u32,
+		[NL_POLICY_TYPE_ATTR_MAX_LENGTH] = decode_nla_u32,
+		[NL_POLICY_TYPE_ATTR_POLICY_IDX] = decode_nla_x32,
+		[NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE] = decode_nla_x32,
+		[NL_POLICY_TYPE_ATTR_BITFIELD32_MASK] = decode_nla_x32,
+		[NL_POLICY_TYPE_ATTR_PAD] = NULL,
+		[NL_POLICY_TYPE_ATTR_MASK] = decode_nla_x64,
+	};
+
+	decode_nlattr(tcp, addr, len,
+		      nl_policy_type_attr, "NL_POLICY_TYPE_ATTR_???",
+		      ARRSZ_PAIR(decoders), opaque_data);
+	return true;
+}
+
+static
+DECL_NLA(ctrl_attr_policy_item)
+{
+	nla_decoder_t decoder = &decode_nla_ctrl_attr_policy_attr;
+	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	return true;
+}
+
+static
+DECL_NLA(ctrl_attr_policy)
+{
+	nla_decoder_t decoder = &decode_nla_ctrl_attr_policy_item;
+	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	return true;
+}
+
+static
 DECL_NLA(ctrl_attr_op_policy_item)
 {
 	static const nla_decoder_t decoders[] = {
@@ -131,7 +186,7 @@ DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 			[CTRL_ATTR_MAXATTR] = decode_nla_u32,
 			[CTRL_ATTR_OPS] = decode_nla_ctrl_attr_ops,
 			[CTRL_ATTR_MCAST_GROUPS] = decode_nla_ctrl_attr_mcast_groups,
-			[CTRL_ATTR_POLICY] = NULL,
+			[CTRL_ATTR_POLICY] = decode_nla_ctrl_attr_policy,
 			[CTRL_ATTR_OP_POLICY] = decode_nla_ctrl_attr_op_policy,
 			[CTRL_ATTR_OP] = decode_nla_u32,
 		};
