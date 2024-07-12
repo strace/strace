@@ -23,6 +23,8 @@
 #include "xlat/pr_mdwe_flags.h"
 #include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
+#include "xlat/pr_riscv_icache_flush_ctxes.h"
+#include "xlat/pr_riscv_icache_flush_scopes.h"
 #include "xlat/pr_riscv_v_inherit.h"
 #include "xlat/pr_riscv_v_states.h"
 #include "xlat/pr_sched_core_cmds.h"
@@ -716,6 +718,19 @@ SYS_FUNC(prctl)
 		tcp->auxstr = sprint_riscv_v_ctrl_val(tcp->u_rval, true);
 
 		return RVAL_HEX | RVAL_STR;
+
+	case PR_RISCV_SET_ICACHE_FLUSH_CTX:	/*  71 */
+		tprint_arg_next();
+		printxval64(pr_riscv_icache_flush_ctxes, arg2,
+			    "PR_RISCV_CTX_???");
+		tprint_arg_next();
+		printxval64(pr_riscv_icache_flush_scopes, arg3,
+			    "PR_RISCV_SCOPE_???");
+		/*
+		 * PR_RISCV_SET_ICACHE_FLUSH_CTX is a modern option
+		 * that does not check unused arguments for being zero.
+		 */
+		return RVAL_DECODED;
 
 	case PR_SET_VMA:			/* 0x53564d41 */
 		tprint_arg_next();

@@ -793,6 +793,10 @@ prctl-pac-enabled-keys-success-Xraw	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 
 prctl-pac-enabled-keys-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a54 -Xverbose
 prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
+prctl-riscv-icache-flush-ctx		+prctl.sh -a91
+prctl-riscv-icache-flush-ctx-Xabbrev	+prctl.sh -a91 -Xabbrev
+prctl-riscv-icache-flush-ctx-Xraw	+prctl.sh -a18 -Xraw
+prctl-riscv-icache-flush-ctx-Xverbose	+prctl.sh -a106 -Xverbose
 prctl-riscv-v-ctrl		+prctl.sh -a30
 prctl-riscv-v-ctrl-Xabbrev	+prctl.sh -Xabbrev -a30
 prctl-riscv-v-ctrl-Xraw		+prctl.sh -Xraw -a12
