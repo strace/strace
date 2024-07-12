@@ -582,6 +582,10 @@ prctl-pac-enabled-keys-Xraw
 prctl-pac-enabled-keys-Xverbose
 prctl-pac-reset-keys
 prctl-pdeathsig
+prctl-riscv-v-ctrl
+prctl-riscv-v-ctrl-Xabbrev
+prctl-riscv-v-ctrl-Xraw
+prctl-riscv-v-ctrl-Xverbose
 prctl-sched-core
 prctl-sched-core-Xabbrev
 prctl-sched-core-Xraw
