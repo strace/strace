@@ -793,6 +793,14 @@ prctl-pac-enabled-keys-success-Xraw	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 
 prctl-pac-enabled-keys-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a54 -Xverbose
 prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
+prctl-riscv-v-ctrl		+prctl.sh -a30
+prctl-riscv-v-ctrl-Xabbrev	+prctl.sh -Xabbrev -a30
+prctl-riscv-v-ctrl-Xraw		+prctl.sh -Xraw -a12
+prctl-riscv-v-ctrl-Xverbose	+prctl.sh -Xverbose -a40
+prctl-riscv-v-ctrl-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 6 11 12 17 31 32 42 0x57ae57f4" -a30
+prctl-riscv-v-ctrl-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 6 11 12 17 31 32 42 0x57ae57f4" -a30 -Xabbrev
+prctl-riscv-v-ctrl-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 6 11 12 17 31 32 42 0x57ae57f4" -a12 -Xraw
+prctl-riscv-v-ctrl-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 6 11 12 17 31 32 42 0x57ae57f4" -a40 -Xverbose
 prctl-sched-core		+prctl.sh -a71
 prctl-sched-core--pidns-translation		test_pidns -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)"
 prctl-sched-core--pidns-translation-Xabbrev	test_pidns -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xabbrev

@@ -23,6 +23,8 @@
 #include "xlat/pr_mdwe_flags.h"
 #include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
+#include "xlat/pr_riscv_v_inherit.h"
+#include "xlat/pr_riscv_v_states.h"
 #include "xlat/pr_sched_core_cmds.h"
 #include "xlat/pr_sched_core_pidtypes.h"
 #include "xlat/pr_set_mm.h"
@@ -169,6 +171,46 @@ sprint_tagged_addr_val(const kernel_ulong_t arg, bool rval)
 		pos = xappendstr(out, pos, "|%#" PRI_klx "<<PR_MTE_TAG_SHIFT",
 				 mte_tag >> PR_MTE_TAG_SHIFT);
 	}
+	if (rest)
+		pos = xappendstr(out, pos, "|%#" PRI_klx, rest);
+
+	if (!rval && (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE))
+		pos = xappendstr(out, pos, " */");
+
+	return out;
+}
+
+static char *
+sprint_riscv_v_ctrl_val(const kernel_ulong_t arg, bool rval)
+{
+	static char out[sizeof("0x /* PR_RISCV_V_VSTATE_CTRL_DEFAULT"
+			"|PR_RISCV_V_VSTATE_CTRL_DEFAULT<<2"
+			"|!PR_RISCV_V_VSTATE_CTRL_INHERIT|0x */") +
+			sizeof(kernel_ulong_t) * 2 * 2];
+
+	const kernel_ulong_t inherit = arg & PR_RISCV_V_VSTATE_CTRL_INHERIT;
+	const kernel_ulong_t next =
+			(arg & PR_RISCV_V_VSTATE_CTRL_NEXT_MASK) >> 2;
+	const kernel_ulong_t cur = arg & PR_RISCV_V_VSTATE_CTRL_CUR_MASK;
+	const kernel_ulong_t rest =
+			arg & ~((kernel_ulong_t) PR_RISCV_V_VSTATE_CTRL_MASK);
+	char *pos = out;
+
+	if (!rval && (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV))
+		pos = xappendstr(out, pos, "%#" PRI_klx, arg);
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return rval ? NULL : out;
+	if (!rval && (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE))
+		pos = xappendstr(out, pos, " /* ");
+
+	pos += sprintxval_ex(pos, sizeof(out) - (pos - out),
+			     pr_riscv_v_states, cur, NULL, XLAT_STYLE_ABBREV);
+	pos = xappendstr(out, pos, "|");
+	pos += sprintxval_ex(pos, sizeof(out) - (pos - out),
+			     pr_riscv_v_states, next, NULL, XLAT_STYLE_ABBREV);
+	pos = xappendstr(out, pos, "<<2|%s",
+			 sprintflags_ex("", pr_riscv_v_inherit, inherit,
+					'\0', XLAT_STYLE_ABBREV));
 	if (rest)
 		pos = xappendstr(out, pos, "|%#" PRI_klx, rest);
 
@@ -656,6 +698,24 @@ SYS_FUNC(prctl)
 
 	/* PR_SET_MEMORY_MERGE - group 5	    67 */
 	/* PR_GET_MEMORY_MERGE - group 5	    68 */
+
+	case PR_RISCV_V_SET_CONTROL:		/*  69 */
+		tprint_arg_next();
+		tprints_string(sprint_riscv_v_ctrl_val(arg2, false));
+		/*
+		 * PR_RISCV_V_[GS]ET_CONTROL are modern options
+		 * that do not check unused arguments for being zero.
+		 */
+		return RVAL_DECODED;
+
+	case PR_RISCV_V_GET_CONTROL:		/*  70 */
+		if (entering(tcp))
+			break;
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprint_riscv_v_ctrl_val(tcp->u_rval, true);
+
+		return RVAL_HEX | RVAL_STR;
 
 	case PR_SET_VMA:			/* 0x53564d41 */
 		tprint_arg_next();
