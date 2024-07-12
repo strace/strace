@@ -60,8 +60,8 @@ DECL_NLA(ctrl_attr_op_item)
 static
 DECL_NLA(ctrl_attr_ops)
 {
-	nla_decoder_t decoder = &decode_nla_ctrl_attr_op_item;
-	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	decode_nlattr_notype(tcp, addr, len, NULL, NULL,
+			     decode_nla_ctrl_attr_op_item, opaque_data);
 	return true;
 }
 
@@ -83,8 +83,8 @@ DECL_NLA(ctrl_attr_mcast_group_item)
 static
 DECL_NLA(ctrl_attr_mcast_groups)
 {
-	nla_decoder_t decoder = &decode_nla_ctrl_attr_mcast_group_item;
-	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	decode_nlattr_notype(tcp, addr, len, NULL, NULL,
+			     decode_nla_ctrl_attr_mcast_group_item, opaque_data);
 	return true;
 }
 
@@ -128,16 +128,16 @@ DECL_NLA(ctrl_attr_policy_attr)
 static
 DECL_NLA(ctrl_attr_policy_item)
 {
-	nla_decoder_t decoder = &decode_nla_ctrl_attr_policy_attr;
-	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	decode_nlattr_notype(tcp, addr, len, NULL, NULL,
+			     decode_nla_ctrl_attr_policy_attr, opaque_data);
 	return true;
 }
 
 static
 DECL_NLA(ctrl_attr_policy)
 {
-	nla_decoder_t decoder = &decode_nla_ctrl_attr_policy_item;
-	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	decode_nlattr_notype(tcp, addr, len, NULL, NULL,
+			     decode_nla_ctrl_attr_policy_item, opaque_data);
 	return true;
 }
 
@@ -159,8 +159,8 @@ DECL_NLA(ctrl_attr_op_policy_item)
 static
 DECL_NLA(ctrl_attr_op_policy)
 {
-	nla_decoder_t decoder = &decode_nla_ctrl_attr_op_policy_item;
-	decode_nlattr(tcp, addr, len, NULL, NULL, &decoder, 0, opaque_data);
+	decode_nlattr_notype(tcp, addr, len, NULL, NULL,
+			     decode_nla_ctrl_attr_op_policy_item, opaque_data);
 	return true;
 }
 

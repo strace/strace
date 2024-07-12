@@ -79,6 +79,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 			const void *const opaque_data)
 {
 	const unsigned int nla_len = MIN(nla->nla_len, len);
+	const bool use_type = (size != -1U);
 
 	if (nla_len > NLA_HDRLEN)
 		tprint_array_begin();
@@ -87,11 +88,11 @@ decode_nlattr_with_data(struct tcb *const tcp,
 
 	if (nla_len > NLA_HDRLEN) {
 		const unsigned int idx =
-			size ? nla->nla_type & NLA_TYPE_MASK : 0;
+			(use_type && size) ? nla->nla_type & NLA_TYPE_MASK : 0;
 
 		tprint_array_next();
 		if (!decoders
-		    || (size && idx >= size)
+		    || (use_type && size && idx >= size)
 		    || !decoders[idx]
 		    || !decoders[idx](
 				tcp, addr + NLA_HDRLEN,

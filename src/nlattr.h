@@ -50,6 +50,22 @@ decode_nlattr(struct tcb *,
 	      unsigned int size,
 	      const void *opaque_data);
 
+/**
+ * The special case of decode_nlattr with zero size that takes only
+ * a single decoder, and the type is being passed via opaque_data.
+ */
+static inline void
+decode_nlattr_notype(struct tcb *tcp,
+		     kernel_ulong_t addr,
+		     unsigned int len,
+		     const struct xlat *table,
+		     const char *dflt,
+		     const nla_decoder_t decoder,
+		     const void *opaque_data)
+{
+	decode_nlattr(tcp, addr, len, table, dflt, &decoder, -1U, opaque_data);
+}
+
 # define DECL_NLA(name)					\
 bool							\
 decode_nla_ ## name(struct tcb *const tcp,		\
