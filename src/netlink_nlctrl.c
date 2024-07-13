@@ -18,11 +18,37 @@
 #include "xlat/nl_attr_type.h"
 #include "xlat/nl_policy_type_attr.h"
 
+static const struct {
+	const char *family;
+	const struct xlat *cmd;
+} family_names[] = {
+	{ "nlctrl", genl_ctrl_cmd },
+};
+
+static
+DECL_NLA(ctrl_attr_family_name)
+{
+	char name[GENL_NAMSIZ];
+
+	if (len <= sizeof(name) && umoven(tcp, addr, len, name) == 0) {
+		unsigned int *idx = (void *) opaque_data;
+		for (unsigned int i = 0; i < ARRAY_SIZE(family_names); ++i) {
+			if (strncmp(name, family_names[i].family, len) == 0) {
+				*idx = i;
+				break;
+			}
+		}
+	}
+
+	return decode_nla_str(tcp, addr, len, NULL);
+}
+
 static
 DECL_NLA(ctrl_attr_op_id)
 {
-	static const struct decode_nla_xlat_opts opts = {
-		.xlat = genl_ctrl_cmd,
+	const unsigned int *idx = opaque_data;
+	struct decode_nla_xlat_opts opts = {
+		.xlat = family_names[*idx].cmd,
 		.dflt = "CTRL_CMD_???",
 		.size = 4,
 	};
@@ -180,7 +206,7 @@ DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 		static const nla_decoder_t decoders[] = {
 			[CTRL_ATTR_UNSPEC] = NULL,
 			[CTRL_ATTR_FAMILY_ID] = decode_nla_x16,
-			[CTRL_ATTR_FAMILY_NAME] = decode_nla_str,
+			[CTRL_ATTR_FAMILY_NAME] = decode_nla_ctrl_attr_family_name,
 			[CTRL_ATTR_VERSION] = decode_nla_u32,
 			[CTRL_ATTR_HDRSIZE] = decode_nla_u32,
 			[CTRL_ATTR_MAXATTR] = decode_nla_u32,
@@ -191,8 +217,10 @@ DECL_NETLINK_GENERIC_DECODER(decode_nlctrl)
 			[CTRL_ATTR_OP] = decode_nla_u32,
 		};
 
+		unsigned int family_names_idx = 0;
+
 		tprint_array_next();
 		decode_nlattr(tcp, addr, len, genl_ctrl_attr, "CTRL_ATTR_???",
-			      ARRSZ_PAIR(decoders), NULL);
+			      ARRSZ_PAIR(decoders), &family_names_idx);
 	}
 }
