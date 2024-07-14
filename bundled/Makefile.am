@@ -31,6 +31,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/counter.h \
 	linux/include/uapi/linux/cryptouser.h \
 	linux/include/uapi/linux/dcbnl.h \
+	linux/include/uapi/linux/devlink.h \
 	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/dqblk_xfs.h \
 	linux/include/uapi/linux/falloc.h \

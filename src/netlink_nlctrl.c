@@ -8,6 +8,7 @@
 #include "defs.h"
 #include "netlink_generic.h"
 #include "nlattr.h"
+#include <linux/devlink.h>
 
 #include "xlat/genl_ctrl_cmd.h"
 #include "xlat/genl_ctrl_attr.h"
@@ -15,6 +16,7 @@
 #include "xlat/genl_ctrl_attr_op_flags.h"
 #include "xlat/genl_ctrl_attr_mcast_grp.h"
 #include "xlat/genl_ctrl_attr_policy.h"
+#include "xlat/genl_devlink_cmd.h"
 #include "xlat/nl_attr_type.h"
 #include "xlat/nl_policy_type_attr.h"
 
@@ -23,6 +25,7 @@ static const struct {
 	const struct xlat *cmd;
 } family_names[] = {
 	{ "nlctrl", genl_ctrl_cmd },
+	{ DEVLINK_GENL_NAME, genl_devlink_cmd },
 };
 
 static

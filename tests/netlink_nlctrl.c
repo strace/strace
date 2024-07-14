@@ -15,6 +15,7 @@
 #include "test_netlink.h"
 #include "test_nlattr.h"
 #include <linux/genetlink.h>
+#include <linux/devlink.h>
 
 static void
 test_hdr(const int fd)
@@ -503,6 +504,130 @@ test_nla_op_policy(const int fd)
 }
 
 static void
+test_nla_ops_family(const int fd)
+{
+	struct ops {
+		struct nlattr h;
+		struct {
+			struct nlattr h;
+			struct {
+				struct nlattr h;
+				uint32_t v;
+			} id;
+			struct {
+				struct nlattr h;
+				uint32_t v;
+			} flags;
+		} a[2];
+	};
+	static const struct strval16 ctrl_attr_family_name =
+		{ ARG_STR(CTRL_ATTR_FAMILY_NAME) };
+	static const struct strval16 ctrl_attr_ops =
+		{ ARG_STR(CTRL_ATTR_OPS) };
+	static const struct strval16 attrs[] = {
+		{ ARG_STR(CTRL_ATTR_OP_ID) },
+		{ ARG_STR(CTRL_ATTR_OP_FLAGS) },
+	};
+	static const struct strval32 flags[] = {
+		{ ARG_STR(GENL_CMD_CAP_DO|GENL_CMD_CAP_DUMP|GENL_CMD_CAP_HASPOL) },
+		{ ARG_STR(GENL_ADMIN_PERM|GENL_CMD_CAP_DO|GENL_CMD_CAP_HASPOL) },
+	};
+
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
+					 NLA_HDRLEN +
+					 sizeof(struct ops) + GENL_NAMSIZ);
+
+#define TEST_NLA_OPS_FAMILY(family_name, cmds)	\
+	do {	\
+		const struct {	\
+			union {	\
+				char family[sizeof(family_name)];	\
+				char family_a[NLA_ALIGN(sizeof(family_name))];	\
+			};	\
+			struct ops ops;	\
+		} src = {	\
+			{	\
+				family_name	\
+			}, {	\
+				{ sizeof(src.ops), ctrl_attr_ops.val }, {	\
+					{	\
+						{ sizeof(src.ops.a[0]), 1 }, {	\
+							{	\
+								sizeof(src.ops.a[0].id),	\
+								attrs[0].val }	\
+							,	\
+							cmds[0].val	\
+						}, {	\
+							{	\
+								sizeof(src.ops.a[0].flags),	\
+								attrs[1].val	\
+							},	\
+							flags[0].val	\
+						}	\
+					}, {	\
+						{ sizeof(src.ops.a[1]), 2 }, {	\
+							{	\
+								sizeof(src.ops.a[1].id),	\
+								attrs[0].val	\
+							},	\
+							cmds[1].val	\
+						}, {	\
+							{	\
+								sizeof(src.ops.a[1].flags),	\
+								attrs[1].val	\
+							},	\
+							flags[1].val	\
+						}	\
+					}	\
+				}	\
+			}	\
+		};	\
+		\
+		TEST_NLATTR_EX_(fd, nlh0, sizeof(struct genlmsghdr),	\
+				init_genlmsghdr, print_genlmsghdr,	\
+				ctrl_attr_family_name.val,	\
+				ctrl_attr_family_name.str,	\
+				sizeof(src.family), sizeof(src),	\
+				&src, sizeof(src),	\
+				printf("\"%s\"], "	\
+				       "[{nla_len=%u, nla_type=%s}, "	\
+				       "["	\
+					"[{nla_len=%u, nla_type=%#x}, "	\
+					 "["	\
+					  "[{nla_len=%u, nla_type=%s}, %s], "	\
+					  "[{nla_len=%u, nla_type=%s}, %s]"	\
+					 "]"	\
+					"], "	\
+					"[{nla_len=%u, nla_type=%#x}, "	\
+					 "["	\
+					  "[{nla_len=%u, nla_type=%s}, %s], "	\
+					  "[{nla_len=%u, nla_type=%s}, %s]"	\
+					 "]"	\
+					"]"	\
+				       "]",	\
+				       src.family,	\
+				       src.ops.h.nla_len, ctrl_attr_ops.str,	\
+				       src.ops.a[0].h.nla_len, src.ops.a[0].h.nla_type,	\
+				       src.ops.a[0].id.h.nla_len, attrs[0].str,	\
+					cmds[0].str,	\
+				       src.ops.a[0].flags.h.nla_len, attrs[1].str,	\
+					flags[0].str,	\
+				       src.ops.a[1].h.nla_len, src.ops.a[1].h.nla_type,	\
+				       src.ops.a[1].id.h.nla_len, attrs[0].str,	\
+					cmds[1].str,	\
+				       src.ops.a[1].flags.h.nla_len, attrs[1].str,	\
+					flags[1].str)	\
+			       );	\
+	} while (0)
+
+	static const struct strval32 devlink_cmds[] = {
+		{ ARG_STR(DEVLINK_CMD_GET) },
+		{ ARG_STR(DEVLINK_CMD_NOTIFY_FILTER_SET) },
+	};
+	TEST_NLA_OPS_FAMILY(DEVLINK_GENL_NAME, devlink_cmds);
+}
+
+static void
 test_nlmsg_done(const int fd)
 {
 	const int num = 0xabcdefad;
@@ -531,6 +656,7 @@ main(void)
 	test_nla_mcast(fd);
 	test_nla_policy(fd);
 	test_nla_op_policy(fd);
+	test_nla_ops_family(fd);
 	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
