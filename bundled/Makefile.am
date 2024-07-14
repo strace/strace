@@ -34,6 +34,8 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/devlink.h \
 	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/dqblk_xfs.h \
+	linux/include/uapi/linux/ethtool.h \
+	linux/include/uapi/linux/ethtool_netlink.h \
 	linux/include/uapi/linux/falloc.h \
 	linux/include/uapi/linux/fcntl.h \
 	linux/include/uapi/linux/fib_rules.h \
@@ -50,6 +52,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/if_alg.h \
 	linux/include/uapi/linux/if_bonding.h \
 	linux/include/uapi/linux/if_bridge.h \
+	linux/include/uapi/linux/if_ether.h \
 	linux/include/uapi/linux/if_link.h \
 	linux/include/uapi/linux/if_xdp.h \
 	linux/include/uapi/linux/in.h \

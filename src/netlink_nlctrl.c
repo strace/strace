@@ -9,6 +9,7 @@
 #include "netlink_generic.h"
 #include "nlattr.h"
 #include <linux/devlink.h>
+#include <linux/ethtool_netlink.h>
 
 #include "xlat/genl_ctrl_cmd.h"
 #include "xlat/genl_ctrl_attr.h"
@@ -17,16 +18,21 @@
 #include "xlat/genl_ctrl_attr_mcast_grp.h"
 #include "xlat/genl_ctrl_attr_policy.h"
 #include "xlat/genl_devlink_cmd.h"
+#include "xlat/genl_ethtool_msg_send.h"
+#include "xlat/genl_ethtool_msg_recv.h"
 #include "xlat/nl_attr_type.h"
 #include "xlat/nl_policy_type_attr.h"
 
+#define ARG_PAIR(arg) { arg, arg }
 static const struct {
 	const char *family;
-	const struct xlat *cmd;
+	const struct xlat *cmd[2];
 } family_names[] = {
-	{ "nlctrl", genl_ctrl_cmd },
-	{ DEVLINK_GENL_NAME, genl_devlink_cmd },
+	{ "nlctrl", ARG_PAIR(genl_ctrl_cmd) },
+	{ DEVLINK_GENL_NAME, ARG_PAIR(genl_devlink_cmd) },
+	{ ETHTOOL_GENL_NAME, { genl_ethtool_msg_send, genl_ethtool_msg_recv } },
 };
+#undef ARG_PAIR
 
 static
 DECL_NLA(ctrl_attr_family_name)
@@ -51,7 +57,7 @@ DECL_NLA(ctrl_attr_op_id)
 {
 	const unsigned int *idx = opaque_data;
 	struct decode_nla_xlat_opts opts = {
-		.xlat = family_names[*idx].cmd,
+		.xlat = family_names[*idx].cmd[!entering(tcp)],
 		.dflt = "CTRL_CMD_???",
 		.size = 4,
 	};
