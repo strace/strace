@@ -15,6 +15,7 @@
 #include "test_netlink.h"
 #include "test_nlattr.h"
 #include <linux/genetlink.h>
+#include <linux/cgroupstats.h>
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
 #include <linux/ioam6_genl.h>
@@ -646,6 +647,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(SEG6_CMD_GET_TUNSRC) },
 	};
 	TEST_NLA_OPS_FAMILY(SEG6_GENL_NAME, seg6_cmds);
+
+	static const struct strval32 taskstats_cmds[] = {
+		{ ARG_STR(TASKSTATS_CMD_GET) },
+		{ ARG_STR(CGROUPSTATS_CMD_NEW) },
+	};
+	TEST_NLA_OPS_FAMILY(TASKSTATS_GENL_NAME, taskstats_cmds);
 }
 
 static void

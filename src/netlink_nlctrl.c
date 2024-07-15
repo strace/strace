@@ -8,6 +8,7 @@
 #include "defs.h"
 #include "netlink_generic.h"
 #include "nlattr.h"
+#include <linux/cgroupstats.h>
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
 #include <linux/ioam6_genl.h>
@@ -24,6 +25,7 @@
 #include "xlat/genl_ethtool_msg_recv.h"
 #include "xlat/genl_ioam6_cmd.h"
 #include "xlat/genl_seg6_cmd.h"
+#include "xlat/genl_taskstats_cmd.h"
 #include "xlat/nl_attr_type.h"
 #include "xlat/nl_policy_type_attr.h"
 
@@ -37,6 +39,7 @@ static const struct {
 	{ ETHTOOL_GENL_NAME, { genl_ethtool_msg_send, genl_ethtool_msg_recv } },
 	{ IOAM6_GENL_NAME, ARG_PAIR(genl_ioam6_cmd) },
 	{ SEG6_GENL_NAME, ARG_PAIR(genl_seg6_cmd) },
+	{ TASKSTATS_GENL_NAME, ARG_PAIR(genl_taskstats_cmd) },
 };
 #undef ARG_PAIR
 

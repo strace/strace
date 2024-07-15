@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/bsg.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
+	linux/include/uapi/linux/cgroupstats.h \
 	linux/include/uapi/linux/close_range.h \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/counter.h \
@@ -119,6 +120,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/socket.h \
 	linux/include/uapi/linux/stat.h \
 	linux/include/uapi/linux/stddef.h \
+	linux/include/uapi/linux/taskstats.h \
 	linux/include/uapi/linux/tcp.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/tls.h \
