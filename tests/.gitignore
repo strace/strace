@@ -790,6 +790,14 @@ prctl-pac-enabled-keys-success-Xraw
 prctl-pac-enabled-keys-success-Xverbose
 prctl-pac-reset-keys
 prctl-pdeathsig
+prctl-ppc-dexcr
+prctl-ppc-dexcr-Xabbrev
+prctl-ppc-dexcr-Xraw
+prctl-ppc-dexcr-Xverbose
+prctl-ppc-dexcr-success
+prctl-ppc-dexcr-success-Xabbrev
+prctl-ppc-dexcr-success-Xraw
+prctl-ppc-dexcr-success-Xverbose
 prctl-riscv-icache-flush-ctx
 prctl-riscv-icache-flush-ctx-Xabbrev
 prctl-riscv-icache-flush-ctx-Xraw

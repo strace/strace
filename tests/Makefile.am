@@ -301,6 +301,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-pac-enabled-keys-success-Xabbrev \
 	prctl-pac-enabled-keys-success-Xraw \
 	prctl-pac-enabled-keys-success-Xverbose \
+	prctl-ppc-dexcr-success \
+	prctl-ppc-dexcr-success-Xabbrev \
+	prctl-ppc-dexcr-success-Xraw \
+	prctl-ppc-dexcr-success-Xverbose \
 	prctl-riscv-v-ctrl-success \
 	prctl-riscv-v-ctrl-success-Xabbrev \
 	prctl-riscv-v-ctrl-success-Xraw \
