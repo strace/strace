@@ -12,6 +12,7 @@
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
 #include <linux/ioam6_genl.h>
+#include <linux/mptcp_pm.h>
 #include <linux/seg6_genl.h>
 
 #include "xlat/genl_ctrl_cmd.h"
@@ -24,6 +25,7 @@
 #include "xlat/genl_ethtool_msg_send.h"
 #include "xlat/genl_ethtool_msg_recv.h"
 #include "xlat/genl_ioam6_cmd.h"
+#include "xlat/genl_mptcp_pm_cmd.h"
 #include "xlat/genl_seg6_cmd.h"
 #include "xlat/genl_taskstats_cmd.h"
 #include "xlat/nl_attr_type.h"
@@ -38,6 +40,7 @@ static const struct {
 	{ DEVLINK_GENL_NAME, ARG_PAIR(genl_devlink_cmd) },
 	{ ETHTOOL_GENL_NAME, { genl_ethtool_msg_send, genl_ethtool_msg_recv } },
 	{ IOAM6_GENL_NAME, ARG_PAIR(genl_ioam6_cmd) },
+	{ MPTCP_PM_NAME, ARG_PAIR(genl_mptcp_pm_cmd) },
 	{ SEG6_GENL_NAME, ARG_PAIR(genl_seg6_cmd) },
 	{ TASKSTATS_GENL_NAME, ARG_PAIR(genl_taskstats_cmd) },
 };

@@ -19,6 +19,7 @@
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
 #include <linux/ioam6_genl.h>
+#include <linux/mptcp_pm.h>
 #include <linux/seg6_genl.h>
 
 static void
@@ -641,6 +642,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(IOAM6_CMD_NS_SET_SCHEMA) },
 	};
 	TEST_NLA_OPS_FAMILY(IOAM6_GENL_NAME, ioam6_cmds);
+
+	static const struct strval32 mptcp_pm_cmds[] = {
+		{ ARG_STR(MPTCP_PM_CMD_ADD_ADDR) },
+		{ ARG_STR(MPTCP_PM_CMD_SUBFLOW_DESTROY) },
+	};
+	TEST_NLA_OPS_FAMILY(MPTCP_PM_NAME, mptcp_pm_cmds);
 
 	static const struct strval32 seg6_cmds[] = {
 		{ ARG_STR(SEG6_CMD_SETHMAC) },
