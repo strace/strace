@@ -23,6 +23,8 @@
 #include "xlat/pr_mdwe_flags.h"
 #include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
+#include "xlat/pr_ppc_dexcr_aspects.h"
+#include "xlat/pr_ppc_dexcr_ctrl_flags.h"
 #include "xlat/pr_riscv_icache_flush_ctxes.h"
 #include "xlat/pr_riscv_icache_flush_scopes.h"
 #include "xlat/pr_riscv_v_inherit.h"
@@ -730,6 +732,29 @@ SYS_FUNC(prctl)
 		 * PR_RISCV_SET_ICACHE_FLUSH_CTX is a modern option
 		 * that does not check unused arguments for being zero.
 		 */
+		return RVAL_DECODED;
+
+	case PR_PPC_GET_DEXCR:			/*  72 */
+		if (entering(tcp)) {
+			tprint_arg_next();
+			printxval64(pr_ppc_dexcr_aspects, arg2,
+				    "PR_PPC_DEXCR_???");
+			print_prctl_args(tcp, 2);
+		}
+		if (syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = sprintflags_ex("", pr_ppc_dexcr_ctrl_flags,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
+
+	case PR_PPC_SET_DEXCR:			/*  73 */
+		tprint_arg_next();
+		printxval64(pr_ppc_dexcr_aspects, arg2, "PR_PPC_DEXCR_???");
+		tprint_arg_next();
+		printflags64(pr_ppc_dexcr_ctrl_flags, arg3,
+			     "PR_PPC_DEXCR_CTRL_???");
+		print_prctl_args(tcp, 3);
 		return RVAL_DECODED;
 
 	case PR_SET_VMA:			/* 0x53564d41 */

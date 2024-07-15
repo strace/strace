@@ -792,6 +792,14 @@ prctl-pac-enabled-keys-success-Xraw	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 
 prctl-pac-enabled-keys-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a54 -Xverbose
 prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
+prctl-ppc-dexcr			+prctl.sh -a52
+prctl-ppc-dexcr-Xabbrev		+prctl.sh -Xabbrev -a52
+prctl-ppc-dexcr-Xraw		+prctl.sh -Xraw -a20
+prctl-ppc-dexcr-Xverbose	+prctl.sh -Xverbose -a71
+prctl-ppc-dexcr-success			+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 23 42 96 224 0x5a7ebee5 0x57ae57e9" -a52
+prctl-ppc-dexcr-success-Xabbrev		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 23 42 96 224 0x5a7ebee5 0x57ae57e9" -a52 -Xabbrev
+prctl-ppc-dexcr-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 23 42 96 224 0x5a7ebee5 0x57ae57e9" -a20 -Xraw
+prctl-ppc-dexcr-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 23 42 96 224 0x5a7ebee5 0x57ae57e9" -a71 -Xverbose
 prctl-riscv-icache-flush-ctx		+prctl.sh -a91
 prctl-riscv-icache-flush-ctx-Xabbrev	+prctl.sh -a91 -Xabbrev
 prctl-riscv-icache-flush-ctx-Xraw	+prctl.sh -a18 -Xraw
