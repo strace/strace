@@ -21,6 +21,7 @@
 #include <linux/ioam6_genl.h>
 #include <linux/mptcp_pm.h>
 #include <linux/seg6_genl.h>
+#include <linux/tcp_metrics.h>
 
 static void
 test_hdr(const int fd)
@@ -660,6 +661,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(CGROUPSTATS_CMD_NEW) },
 	};
 	TEST_NLA_OPS_FAMILY(TASKSTATS_GENL_NAME, taskstats_cmds);
+
+	static const struct strval32 tcp_metrics_cmds[] = {
+		{ ARG_STR(TCP_METRICS_CMD_GET) },
+		{ ARG_STR(TCP_METRICS_CMD_DEL) },
+	};
+	TEST_NLA_OPS_FAMILY(TCP_METRICS_GENL_NAME, tcp_metrics_cmds);
 }
 
 static void

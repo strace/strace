@@ -122,6 +122,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/stddef.h \
 	linux/include/uapi/linux/taskstats.h \
 	linux/include/uapi/linux/tcp.h \
+	linux/include/uapi/linux/tcp_metrics.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/tls.h \
 	linux/include/uapi/linux/types.h \
