@@ -18,6 +18,7 @@
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
 #include <linux/ioam6_genl.h>
+#include <linux/seg6_genl.h>
 
 static void
 test_hdr(const int fd)
@@ -639,6 +640,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(IOAM6_CMD_NS_SET_SCHEMA) },
 	};
 	TEST_NLA_OPS_FAMILY(IOAM6_GENL_NAME, ioam6_cmds);
+
+	static const struct strval32 seg6_cmds[] = {
+		{ ARG_STR(SEG6_CMD_SETHMAC) },
+		{ ARG_STR(SEG6_CMD_GET_TUNSRC) },
+	};
+	TEST_NLA_OPS_FAMILY(SEG6_GENL_NAME, seg6_cmds);
 }
 
 static void

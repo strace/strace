@@ -113,6 +113,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/sched.h \
 	linux/include/uapi/linux/seccomp.h \
 	linux/include/uapi/linux/securebits.h \
+	linux/include/uapi/linux/seg6_genl.h \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
