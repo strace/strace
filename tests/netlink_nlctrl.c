@@ -17,6 +17,7 @@
 #include <linux/genetlink.h>
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
+#include <linux/ioam6_genl.h>
 
 static void
 test_hdr(const int fd)
@@ -632,6 +633,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(ETHTOOL_MSG_MM_SET) },
 	};
 	TEST_NLA_OPS_FAMILY(ETHTOOL_GENL_NAME, ethtool_cmds);
+
+	static const struct strval32 ioam6_cmds[] = {
+		{ ARG_STR(IOAM6_CMD_ADD_NAMESPACE) },
+		{ ARG_STR(IOAM6_CMD_NS_SET_SCHEMA) },
+	};
+	TEST_NLA_OPS_FAMILY(IOAM6_GENL_NAME, ioam6_cmds);
 }
 
 static void
