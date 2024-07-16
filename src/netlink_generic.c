@@ -30,21 +30,35 @@ DECL_NETLINK_GENERIC_DECODER(decode_genl_msg)
 
 typedef DECL_NETLINK_GENERIC_DECODER((*netlink_generic_decoder_t));
 
-static netlink_generic_decoder_t
-lookup_genl_decoder(const char *family)
-{
-	static const struct {
-		const char *family;
-		netlink_generic_decoder_t decoder;
-	} decoders[] = {
-		{ "nlctrl", decode_nlctrl },
-	};
+static struct {
+	const char *family;
+	const netlink_generic_decoder_t decoder;
+	uint16_t id;		/* Assigned dynamically */
+} genl_decoders[] = {
+	{ "nlctrl", decode_nlctrl, 0 },
+};
 
-	if (family) {
-		for (size_t i = 0; i < ARRAY_SIZE(decoders); ++i) {
-			if (strcmp(family, decoders[i].family) == 0) {
-				return decoders[i].decoder;
-			}
+static void
+initialize_genl_decoders(struct tcb *const tcp)
+{
+	static bool initialized = false;
+
+	if (initialized)
+		return;
+	initialized = true;
+
+	const struct xlat *xlat = genl_families_xlat(tcp);
+	for (size_t i = 0; i < ARRAY_SIZE(genl_decoders); ++i)
+		genl_decoders[i].id =
+			xrlookup(xlat, genl_decoders[i].family, 0);
+}
+
+static netlink_generic_decoder_t
+lookup_genl_decoder(uint16_t id)
+{
+	for (size_t i = 0; i < ARRAY_SIZE(genl_decoders); ++i) {
+		if (genl_decoders[i].id == id) {
+			return genl_decoders[i].decoder;
 		}
 	}
 
@@ -63,9 +77,10 @@ decode_netlink_generic(struct tcb *const tcp,
 		return false;
 
 	if (!umove_or_printaddr(tcp, addr, &h)) {
-		const char *family =
-			xlookup(genl_families_xlat(tcp), nlmsghdr->nlmsg_type);
-		netlink_generic_decoder_t decoder = lookup_genl_decoder(family);
+		initialize_genl_decoders(tcp);
+
+		netlink_generic_decoder_t decoder =
+			lookup_genl_decoder(nlmsghdr->nlmsg_type);
 		decoder(tcp, &h, addr + GENL_HDRLEN, len - GENL_HDRLEN);
 	}
 
