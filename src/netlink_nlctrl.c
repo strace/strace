@@ -14,6 +14,7 @@
 #include <linux/ioam6_genl.h>
 #include <linux/mptcp_pm.h>
 #include <linux/netdev.h>
+#include <linux/nl80211.h>
 #include <linux/seg6_genl.h>
 #include <linux/tcp_metrics.h>
 
@@ -29,6 +30,7 @@
 #include "xlat/genl_ioam6_cmd.h"
 #include "xlat/genl_mptcp_pm_cmd.h"
 #include "xlat/genl_netdev_cmd.h"
+#include "xlat/genl_nl80211_cmd.h"
 #include "xlat/genl_seg6_cmd.h"
 #include "xlat/genl_taskstats_cmd.h"
 #include "xlat/genl_tcp_metrics_cmd.h"
@@ -46,6 +48,7 @@ static const struct {
 	{ IOAM6_GENL_NAME, ARG_PAIR(genl_ioam6_cmd) },
 	{ MPTCP_PM_NAME, ARG_PAIR(genl_mptcp_pm_cmd) },
 	{ NETDEV_FAMILY_NAME, ARG_PAIR(genl_netdev_cmd) },
+	{ NL80211_GENL_NAME, ARG_PAIR(genl_nl80211_cmd) },
 	{ SEG6_GENL_NAME, ARG_PAIR(genl_seg6_cmd) },
 	{ TASKSTATS_GENL_NAME, ARG_PAIR(genl_taskstats_cmd) },
 	{ TCP_METRICS_GENL_NAME, ARG_PAIR(genl_tcp_metrics_cmd) },

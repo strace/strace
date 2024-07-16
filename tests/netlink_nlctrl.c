@@ -21,6 +21,7 @@
 #include <linux/ioam6_genl.h>
 #include <linux/mptcp_pm.h>
 #include <linux/netdev.h>
+#include <linux/nl80211.h>
 #include <linux/seg6_genl.h>
 #include <linux/tcp_metrics.h>
 
@@ -656,6 +657,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(NETDEV_CMD_QSTATS_GET) },
 	};
 	TEST_NLA_OPS_FAMILY(NETDEV_FAMILY_NAME, netdev_cmds);
+
+	static const struct strval32 nl80211_cmds[] = {
+		{ ARG_STR(NL80211_CMD_GET_WIPHY) },
+		{ ARG_STR(NL80211_CMD_SET_TID_TO_LINK_MAPPING) },
+	};
+	TEST_NLA_OPS_FAMILY(NL80211_GENL_NAME, nl80211_cmds);
 
 	static const struct strval32 seg6_cmds[] = {
 		{ ARG_STR(SEG6_CMD_SETHMAC) },
