@@ -24,6 +24,7 @@
 #include <linux/nl80211.h>
 #include <linux/seg6_genl.h>
 #include <linux/tcp_metrics.h>
+#include <linux/thermal.h>
 
 static void
 test_hdr(const int fd)
@@ -681,6 +682,12 @@ test_nla_ops_family(const int fd)
 		{ ARG_STR(TCP_METRICS_CMD_DEL) },
 	};
 	TEST_NLA_OPS_FAMILY(TCP_METRICS_GENL_NAME, tcp_metrics_cmds);
+
+	static const struct strval32 thermal_cmds[] = {
+		{ ARG_STR(THERMAL_GENL_CMD_TZ_GET_ID) },
+		{ ARG_STR(THERMAL_GENL_CMD_CDEV_GET) },
+	};
+	TEST_NLA_OPS_FAMILY(THERMAL_GENL_FAMILY_NAME, thermal_cmds);
 }
 
 static void

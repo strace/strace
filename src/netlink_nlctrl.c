@@ -17,6 +17,7 @@
 #include <linux/nl80211.h>
 #include <linux/seg6_genl.h>
 #include <linux/tcp_metrics.h>
+#include <linux/thermal.h>
 
 #include "xlat/genl_ctrl_cmd.h"
 #include "xlat/genl_ctrl_attr.h"
@@ -34,6 +35,7 @@
 #include "xlat/genl_seg6_cmd.h"
 #include "xlat/genl_taskstats_cmd.h"
 #include "xlat/genl_tcp_metrics_cmd.h"
+#include "xlat/genl_thermal_cmd.h"
 #include "xlat/nl_attr_type.h"
 #include "xlat/nl_policy_type_attr.h"
 
@@ -52,6 +54,7 @@ static const struct {
 	{ SEG6_GENL_NAME, ARG_PAIR(genl_seg6_cmd) },
 	{ TASKSTATS_GENL_NAME, ARG_PAIR(genl_taskstats_cmd) },
 	{ TCP_METRICS_GENL_NAME, ARG_PAIR(genl_tcp_metrics_cmd) },
+	{ THERMAL_GENL_FAMILY_NAME, ARG_PAIR(genl_thermal_cmd) },
 };
 #undef ARG_PAIR
 
