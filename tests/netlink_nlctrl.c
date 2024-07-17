@@ -527,7 +527,7 @@ test_nla_ops_family(const int fd)
 				struct nlattr h;
 				uint32_t v;
 			} flags;
-		} a[2];
+		} a[3];
 	};
 	static const struct strval16 ctrl_attr_family_name =
 		{ ARG_STR(CTRL_ATTR_FAMILY_NAME) };
@@ -540,6 +540,7 @@ test_nla_ops_family(const int fd)
 	static const struct strval32 flags[] = {
 		{ ARG_STR(GENL_CMD_CAP_DO|GENL_CMD_CAP_DUMP|GENL_CMD_CAP_HASPOL) },
 		{ ARG_STR(GENL_ADMIN_PERM|GENL_CMD_CAP_DO|GENL_CMD_CAP_HASPOL) },
+		{ 0xffffffe0, "0xffffffe0 /* GENL_??? */" },
 	};
 
 	void *const nlh0 = midtail_alloc(NLMSG_SPACE(sizeof(struct genlmsghdr)),
@@ -587,6 +588,20 @@ test_nla_ops_family(const int fd)
 							},	\
 							flags[1].val	\
 						}	\
+					}, {	\
+						{ sizeof(src.ops.a[2]), 3 }, {	\
+							{	\
+								sizeof(src.ops.a[2].id),	\
+								attrs[0].val	\
+							},	\
+							cmds[2].val	\
+						}, {	\
+							{	\
+								sizeof(src.ops.a[2].flags),	\
+								attrs[1].val	\
+							},	\
+							flags[2].val	\
+						}	\
 					}	\
 				}	\
 			}	\
@@ -612,6 +627,12 @@ test_nla_ops_family(const int fd)
 					  "[{nla_len=%u, nla_type=%s}, %s], "	\
 					  "[{nla_len=%u, nla_type=%s}, %s]"	\
 					 "]"	\
+					"], "	\
+					"[{nla_len=%u, nla_type=%#x}, "	\
+					 "["	\
+					  "[{nla_len=%u, nla_type=%s}, %#x /* %s */], "	\
+					  "[{nla_len=%u, nla_type=%s}, %s]"	\
+					 "]"	\
 					"]"	\
 				       "]",	\
 				       src.family,	\
@@ -625,67 +646,82 @@ test_nla_ops_family(const int fd)
 				       src.ops.a[1].id.h.nla_len, attrs[0].str,	\
 					cmds[1].str,	\
 				       src.ops.a[1].flags.h.nla_len, attrs[1].str,	\
-					flags[1].str)	\
+					flags[1].str,	\
+				       src.ops.a[2].h.nla_len, src.ops.a[2].h.nla_type,	\
+				       src.ops.a[2].id.h.nla_len, attrs[0].str,	\
+					cmds[2].val, cmds[2].str,	\
+				       src.ops.a[2].flags.h.nla_len, attrs[1].str,	\
+					flags[2].str)	\
 			       );	\
 	} while (0)
 
 	static const struct strval32 devlink_cmds[] = {
 		{ ARG_STR(DEVLINK_CMD_GET) },
 		{ ARG_STR(DEVLINK_CMD_NOTIFY_FILTER_SET) },
+		{ DEVLINK_CMD_NOTIFY_FILTER_SET + 1, "DEVLINK_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(DEVLINK_GENL_NAME, devlink_cmds);
 
 	static const struct strval32 ethtool_cmds[] = {
 		{ ARG_STR(ETHTOOL_MSG_STRSET_GET) },
 		{ ARG_STR(ETHTOOL_MSG_MM_SET) },
+		{ ETHTOOL_MSG_MM_SET + 1, "ETHTOOL_MSG_???" },
 	};
 	TEST_NLA_OPS_FAMILY(ETHTOOL_GENL_NAME, ethtool_cmds);
 
 	static const struct strval32 ioam6_cmds[] = {
 		{ ARG_STR(IOAM6_CMD_ADD_NAMESPACE) },
 		{ ARG_STR(IOAM6_CMD_NS_SET_SCHEMA) },
+		{ IOAM6_CMD_NS_SET_SCHEMA + 1, "IOAM6_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(IOAM6_GENL_NAME, ioam6_cmds);
 
 	static const struct strval32 mptcp_pm_cmds[] = {
 		{ ARG_STR(MPTCP_PM_CMD_ADD_ADDR) },
 		{ ARG_STR(MPTCP_PM_CMD_SUBFLOW_DESTROY) },
+		{ MPTCP_PM_CMD_SUBFLOW_DESTROY + 1, "MPTCP_PM_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(MPTCP_PM_NAME, mptcp_pm_cmds);
 
 	static const struct strval32 netdev_cmds[] = {
 		{ ARG_STR(NETDEV_CMD_DEV_GET) },
 		{ ARG_STR(NETDEV_CMD_QSTATS_GET) },
+		{ NETDEV_CMD_QSTATS_GET + 1, "NETDEV_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(NETDEV_FAMILY_NAME, netdev_cmds);
 
 	static const struct strval32 nl80211_cmds[] = {
 		{ ARG_STR(NL80211_CMD_GET_WIPHY) },
 		{ ARG_STR(NL80211_CMD_SET_TID_TO_LINK_MAPPING) },
+		{ NL80211_CMD_SET_TID_TO_LINK_MAPPING + 1, "NL80211_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(NL80211_GENL_NAME, nl80211_cmds);
 
 	static const struct strval32 seg6_cmds[] = {
 		{ ARG_STR(SEG6_CMD_SETHMAC) },
 		{ ARG_STR(SEG6_CMD_GET_TUNSRC) },
+		{ SEG6_CMD_GET_TUNSRC + 1, "SEG6_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(SEG6_GENL_NAME, seg6_cmds);
 
 	static const struct strval32 taskstats_cmds[] = {
 		{ ARG_STR(TASKSTATS_CMD_GET) },
 		{ ARG_STR(CGROUPSTATS_CMD_NEW) },
+		{ CGROUPSTATS_CMD_NEW + 1, "TASKSTATS_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(TASKSTATS_GENL_NAME, taskstats_cmds);
 
 	static const struct strval32 tcp_metrics_cmds[] = {
 		{ ARG_STR(TCP_METRICS_CMD_GET) },
 		{ ARG_STR(TCP_METRICS_CMD_DEL) },
+		{ TCP_METRICS_CMD_DEL + 1, "TCP_METRICS_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(TCP_METRICS_GENL_NAME, tcp_metrics_cmds);
 
 	static const struct strval32 thermal_cmds[] = {
 		{ ARG_STR(THERMAL_GENL_CMD_TZ_GET_ID) },
 		{ ARG_STR(THERMAL_GENL_CMD_CDEV_GET) },
+		{ THERMAL_GENL_CMD_CDEV_GET + 1, "THERMAL_GENL_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(THERMAL_GENL_FAMILY_NAME, thermal_cmds);
 }

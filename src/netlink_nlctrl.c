@@ -43,18 +43,53 @@
 static const struct {
 	const char *family;
 	const struct xlat *cmd[2];
+	const char *dflt;
 } family_names[] = {
-	{ "nlctrl", ARG_PAIR(genl_ctrl_cmd) },
-	{ DEVLINK_GENL_NAME, ARG_PAIR(genl_devlink_cmd) },
-	{ ETHTOOL_GENL_NAME, { genl_ethtool_msg_send, genl_ethtool_msg_recv } },
-	{ IOAM6_GENL_NAME, ARG_PAIR(genl_ioam6_cmd) },
-	{ MPTCP_PM_NAME, ARG_PAIR(genl_mptcp_pm_cmd) },
-	{ NETDEV_FAMILY_NAME, ARG_PAIR(genl_netdev_cmd) },
-	{ NL80211_GENL_NAME, ARG_PAIR(genl_nl80211_cmd) },
-	{ SEG6_GENL_NAME, ARG_PAIR(genl_seg6_cmd) },
-	{ TASKSTATS_GENL_NAME, ARG_PAIR(genl_taskstats_cmd) },
-	{ TCP_METRICS_GENL_NAME, ARG_PAIR(genl_tcp_metrics_cmd) },
-	{ THERMAL_GENL_FAMILY_NAME, ARG_PAIR(genl_thermal_cmd) },
+	{
+		"nlctrl",
+		ARG_PAIR(genl_ctrl_cmd),
+		"CTRL_CMD_???"
+	}, {
+		DEVLINK_GENL_NAME,
+		ARG_PAIR(genl_devlink_cmd),
+		"DEVLINK_CMD_???"
+	}, {
+		ETHTOOL_GENL_NAME,
+		{ genl_ethtool_msg_send, genl_ethtool_msg_recv },
+		"ETHTOOL_MSG_???"
+	}, {
+		IOAM6_GENL_NAME,
+		ARG_PAIR(genl_ioam6_cmd),
+		"IOAM6_CMD_???"
+	}, {
+		MPTCP_PM_NAME,
+		ARG_PAIR(genl_mptcp_pm_cmd),
+		"MPTCP_PM_CMD_???"
+	}, {
+		NETDEV_FAMILY_NAME,
+		ARG_PAIR(genl_netdev_cmd),
+		"NETDEV_CMD_???"
+	}, {
+		NL80211_GENL_NAME,
+		ARG_PAIR(genl_nl80211_cmd),
+		"NL80211_CMD_???"
+	}, {
+		SEG6_GENL_NAME,
+		ARG_PAIR(genl_seg6_cmd),
+		"SEG6_CMD_???"
+	}, {
+		TASKSTATS_GENL_NAME,
+		ARG_PAIR(genl_taskstats_cmd),
+		"TASKSTATS_CMD_???"
+	}, {
+		TCP_METRICS_GENL_NAME,
+		ARG_PAIR(genl_tcp_metrics_cmd),
+		"TCP_METRICS_CMD_???"
+	}, {
+		THERMAL_GENL_FAMILY_NAME,
+		ARG_PAIR(genl_thermal_cmd),
+		"THERMAL_GENL_CMD_???"
+	},
 };
 #undef ARG_PAIR
 
@@ -82,7 +117,7 @@ DECL_NLA(ctrl_attr_op_id)
 	const unsigned int *idx = opaque_data;
 	struct decode_nla_xlat_opts opts = {
 		.xlat = family_names[*idx].cmd[!entering(tcp)],
-		.dflt = "CTRL_CMD_???",
+		.dflt = family_names[*idx].dflt,
 		.size = 4,
 	};
 
