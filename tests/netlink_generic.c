@@ -4,98 +4,101 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-/* This test case is based on netlink_selinux.c */
-
 #include "tests.h"
+#include "xmalloc.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include "netlink.h"
+#include "test_netlink.h"
+#include "test_nlattr.h"
 #include <linux/genetlink.h>
 
 static void
-test_nlmsg_type(const int fd)
+test_hdr(const int fd)
 {
-	/*
-	 * Though GENL_ID_CTRL number is statically fixed in this test case,
-	 * strace does not have a builtin knowledge that the corresponding
-	 * string is "nlctrl".
-	 */
-	long rc;
-	struct {
-		const struct nlmsghdr nlh;
-		struct genlmsghdr gnlh;
-	} req = {
-		.nlh = {
-			.nlmsg_len = sizeof(req),
-			.nlmsg_type = GENL_ID_CTRL,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
-		},
-		.gnlh = {
-			.cmd = CTRL_CMD_GETFAMILY
-		}
+	static const struct genlmsghdr hdr = {
+		.cmd = CTRL_CMD_GETFAMILY,
+		.version = 1
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(hdr));
 
-	rc = sendto(fd, &req, sizeof(req), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=nlctrl"
-	       ", nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", \"\\x03\\x00\\x00\\x00\"], %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, req.nlh.nlmsg_len,
-	       (unsigned int) sizeof(req), sprintrc(rc));
+	TEST_NETLINK_OBJECT_EX_(fd, nlh0,
+				0xffff, "0xffff /* GENERIC_FAMILY_??? */",
+				NLM_F_REQUEST | NLM_F_DUMP,
+				"NLM_F_REQUEST|NLM_F_DUMP",
+				hdr, print_quoted_hex,
+				printf("{cmd=%#x, version=1}", hdr.cmd);
+				);
 }
 
 static void
-test_sendmsg_nlmsg_type(const int fd)
+init_genlmsghdr(struct nlmsghdr *const nlh, const unsigned int msg_len)
 {
-	/*
-	 * Though GENL_ID_CTRL number is statically fixed in this test case,
-	 * strace does not have a builtin knowledge that the corresponding
-	 * string is "nlctrl".
-	 */
-	long rc;
-	struct {
-		const struct nlmsghdr nlh;
-		struct genlmsghdr gnlh;
-	} req = {
-		.nlh = {
-			.nlmsg_len = sizeof(req),
-			.nlmsg_type = GENL_ID_CTRL,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
-		},
-		.gnlh = {
-			.cmd = CTRL_CMD_GETFAMILY
-		}
-	};
+	SET_STRUCT(struct nlmsghdr, nlh,
+		.nlmsg_len = msg_len,
+		.nlmsg_type = 0xffff,
+		.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP
+	);
 
-        struct iovec iov[1] = {
-		{ .iov_base = &req, .iov_len = sizeof(req) }
-        };
-        struct msghdr msg = {
-		.msg_iov = iov,
-		.msg_iovlen = 1
-        };
-
-        rc = sendmsg(fd, &msg, MSG_DONTWAIT);
-        printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0"
-	       ", msg_iov=[{iov_base=[{nlmsg_len=%u, nlmsg_type=nlctrl"
-	       ", nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", \"\\x03\\x00\\x00\\x00\"], iov_len=%u}], msg_iovlen=1"
-	       ", msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = %s\n",
-	       fd, req.nlh.nlmsg_len, (unsigned int) iov[0].iov_len,
-	       sprintrc(rc));
+	struct genlmsghdr *const hdr = NLMSG_DATA(nlh);
+	SET_STRUCT(struct genlmsghdr, hdr,
+		.cmd = CTRL_CMD_GETFAMILY,
+		.version = 2,
+		.reserved = 0xfeed
+	);
 }
 
-int main(void)
+static void
+print_genlmsghdr(const unsigned int msg_len)
+{
+	printf("{nlmsg_len=%u, nlmsg_type=%s, nlmsg_flags=%s, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, {cmd=%#x, version=2, reserved=%#x}",
+	       msg_len, "0xffff /* GENERIC_FAMILY_??? */",
+	       "NLM_F_REQUEST|NLM_F_DUMP", CTRL_CMD_GETFAMILY, 0xfeed);
+}
+
+static void
+test_nla(const int fd)
+{
+	static char pattern[DEFAULT_STRLEN];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+	const char *nla_type_str = xasprintf("%#x", CTRL_ATTR_OP);
+
+	const unsigned int hdrlen = sizeof(struct genlmsghdr);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN + sizeof(pattern));
+
+	TEST_NLATTR_(fd, nlh0, hdrlen,
+		     init_genlmsghdr, print_genlmsghdr,
+		     CTRL_ATTR_OP, nla_type_str,
+		     sizeof(pattern), pattern, sizeof(pattern),
+		     print_quoted_hex(pattern, sizeof(pattern)));
+}
+
+static void
+test_nlmsg_done(const int fd)
+{
+	const int num = 0xabcdefad;
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(num));
+
+	TEST_NETLINK(fd, nlh0, NLMSG_DONE, NLM_F_REQUEST,
+		     sizeof(num), &num, sizeof(num),
+		     printf("%d", num));
+}
+
+int
+main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
 	int fd = create_nl_socket(NETLINK_GENERIC);
 
-	test_nlmsg_type(fd);
-	test_sendmsg_nlmsg_type(fd);
+	test_hdr(fd);
+	test_nla(fd);
+	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
 

@@ -419,11 +419,8 @@ update_ctx_str(struct tcb *const tcp,
 	}
 }
 
-static bool
-decode_nla_linkinfo_kind(struct tcb *const tcp,
-			 const kernel_ulong_t addr,
-			 const unsigned int len,
-			 const void *const opaque_data)
+static
+DECL_NLA(linkinfo_kind)
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 
@@ -434,11 +431,8 @@ decode_nla_linkinfo_kind(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
-			       const kernel_ulong_t addr,
-			       const unsigned int len,
-			       const void *const opaque_data)
+static
+DECL_NLA(linkinfo_xstats_can)
 {
 	struct strace_can_device_stats {
 		uint32_t bus_error;
@@ -474,11 +468,8 @@ decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_linkinfo_xstats(struct tcb *const tcp,
-			   const kernel_ulong_t addr,
-			   const unsigned int len,
-			   const void *const opaque_data)
+static
+DECL_NLA(linkinfo_xstats)
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 	nla_decoder_t func = NULL;
@@ -592,11 +583,8 @@ static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_MCAST_QUERIER_STATE]		= decode_ifla_br_mcast_qstate,
 };
 
-static bool
-decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
-				const kernel_ulong_t addr,
-				const unsigned int len,
-				const void *const opaque_data)
+static
+DECL_NLA(linkinfo_data_bridge)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_bridge_attrs,
 		      "IFLA_BR_???",
@@ -606,11 +594,8 @@ decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_tun_type(struct tcb *const tcp,
-		    const kernel_ulong_t addr,
-		    const unsigned int len,
-		    const void *const opaque_data)
+static
+DECL_NLA(tun_type)
 {
 	static const struct decode_nla_xlat_opts opts = {
 		.xlat = tun_device_types,
@@ -634,11 +619,8 @@ static const nla_decoder_t ifla_info_data_tun_nla_decoders[] = {
 	[IFLA_TUN_NUM_DISABLED_QUEUES]	= decode_nla_u32,
 };
 
-static bool
-decode_nla_linkinfo_data_tun(struct tcb *const tcp,
-			     const kernel_ulong_t addr,
-			     const unsigned int len,
-			     const void *const opaque_data)
+static
+DECL_NLA(linkinfo_data_tun)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_tun_attrs,
 		      "IFLA_TUN_???",
@@ -648,11 +630,8 @@ decode_nla_linkinfo_data_tun(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_linkinfo_data(struct tcb *const tcp,
-			 const kernel_ulong_t addr,
-			 const unsigned int len,
-			 const void *const opaque_data)
+static
+DECL_NLA(linkinfo_data)
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 	nla_decoder_t func = NULL;
@@ -668,11 +647,8 @@ decode_nla_linkinfo_data(struct tcb *const tcp,
 	return false;
 }
 
-static bool
-decode_nla_linkinfo_slave_kind(struct tcb *const tcp,
-			       const kernel_ulong_t addr,
-			       const unsigned int len,
-			       const void *const opaque_data)
+static
+DECL_NLA(linkinfo_slave_kind)
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 
@@ -683,11 +659,8 @@ decode_nla_linkinfo_slave_kind(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_linkinfo_slave_data_bridge(struct tcb *const tcp,
-				      const kernel_ulong_t addr,
-				      const unsigned int len,
-				      const void *const opaque_data)
+static
+DECL_NLA(linkinfo_slave_data_bridge)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_brport_attrs,
 		      "IFLA_BRPORT_???",
@@ -697,11 +670,8 @@ decode_nla_linkinfo_slave_data_bridge(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_nla_linkinfo_slave_data(struct tcb *const tcp,
-			       const kernel_ulong_t addr,
-			       const unsigned int len,
-			       const void *const opaque_data)
+static
+DECL_NLA(linkinfo_slave_data)
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 	nla_decoder_t func = NULL;
@@ -1121,11 +1091,7 @@ decode_ifla_vfinfo_list(struct tcb *const tcp,
 	return true;
 }
 
-bool
-decode_nla_rtnl_link_stats64(struct tcb *const tcp,
-			     const kernel_ulong_t addr,
-			     const unsigned int len,
-			     const void *const opaque_data)
+DECL_NLA(rtnl_link_stats64)
 {
 	struct rtnl_link_stats64 st;
 	const unsigned int min_size =

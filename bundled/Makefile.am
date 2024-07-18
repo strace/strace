@@ -26,13 +26,17 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/bsg.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
+	linux/include/uapi/linux/cgroupstats.h \
 	linux/include/uapi/linux/close_range.h \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/counter.h \
 	linux/include/uapi/linux/cryptouser.h \
 	linux/include/uapi/linux/dcbnl.h \
+	linux/include/uapi/linux/devlink.h \
 	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/dqblk_xfs.h \
+	linux/include/uapi/linux/ethtool.h \
+	linux/include/uapi/linux/ethtool_netlink.h \
 	linux/include/uapi/linux/falloc.h \
 	linux/include/uapi/linux/fcntl.h \
 	linux/include/uapi/linux/fib_rules.h \
@@ -41,6 +45,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/fscrypt.h \
 	linux/include/uapi/linux/futex.h \
 	linux/include/uapi/linux/gen_stats.h \
+	linux/include/uapi/linux/genetlink.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/hiddev.h \
 	linux/include/uapi/linux/if_addr.h \
@@ -48,6 +53,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/if_alg.h \
 	linux/include/uapi/linux/if_bonding.h \
 	linux/include/uapi/linux/if_bridge.h \
+	linux/include/uapi/linux/if_ether.h \
 	linux/include/uapi/linux/if_link.h \
 	linux/include/uapi/linux/if_xdp.h \
 	linux/include/uapi/linux/in.h \
@@ -56,6 +62,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/input-event-codes.h \
 	linux/include/uapi/linux/input.h \
 	linux/include/uapi/linux/io_uring.h \
+	linux/include/uapi/linux/ioam6_genl.h \
 	linux/include/uapi/linux/ip_vs.h \
 	linux/include/uapi/linux/kcmp.h \
 	linux/include/uapi/linux/kexec.h \
@@ -77,6 +84,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/mroute6.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netconf.h \
+	linux/include/uapi/linux/netdev.h \
 	linux/include/uapi/linux/netfilter/ipset/ip_set.h \
 	linux/include/uapi/linux/netfilter/nf_tables.h \
 	linux/include/uapi/linux/netfilter/nf_tables_compat.h \
@@ -94,6 +102,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/netlink_diag.h \
 	linux/include/uapi/linux/nexthop.h \
 	linux/include/uapi/linux/nfc.h \
+	linux/include/uapi/linux/nl80211.h \
 	linux/include/uapi/linux/nsfs.h \
 	linux/include/uapi/linux/openat2.h \
 	linux/include/uapi/linux/packet_diag.h \
@@ -107,13 +116,17 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/sched.h \
 	linux/include/uapi/linux/seccomp.h \
 	linux/include/uapi/linux/securebits.h \
+	linux/include/uapi/linux/seg6_genl.h \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
 	linux/include/uapi/linux/stat.h \
 	linux/include/uapi/linux/stddef.h \
+	linux/include/uapi/linux/taskstats.h \
 	linux/include/uapi/linux/tcp.h \
+	linux/include/uapi/linux/tcp_metrics.h \
 	linux/include/uapi/linux/tee.h \
+	linux/include/uapi/linux/thermal.h \
 	linux/include/uapi/linux/tls.h \
 	linux/include/uapi/linux/types.h \
 	linux/include/uapi/linux/unix_diag.h \

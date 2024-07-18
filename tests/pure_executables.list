@@ -436,6 +436,7 @@ netlink_crypto
 netlink_generic
 netlink_kobject_uevent
 netlink_netfilter
+netlink_nlctrl
 netlink_protocol
 netlink_route
 netlink_selinux

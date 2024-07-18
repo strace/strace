@@ -21,11 +21,8 @@
 #include "xlat/rtnl_ipmra_msg_types.h"
 #include "xlat/rtnl_family.h"
 
-static bool
-decode_nla_ipmra_msg_type(struct tcb *const tcp,
-			  const kernel_ulong_t addr,
-			  const unsigned int len,
-			  const void *const opaque_data)
+static
+DECL_NLA(ipmra_msg_type)
 {
 	const struct decode_nla_xlat_opts opts = {
 		.xlat = rtnl_ipmra_msg_types,
@@ -46,11 +43,8 @@ static const nla_decoder_t rtnl_creport_ipmra_decoders[] = {
 	[IPMRA_CREPORT_TABLE]		= decode_nla_u32,
 };
 
-static bool
-decode_nla_ip6mra_msg_type(struct tcb *const tcp,
-			   const kernel_ulong_t addr,
-			   const unsigned int len,
-			   const void *const opaque_data)
+static
+DECL_NLA(ip6mra_msg_type)
 {
 	const struct decode_nla_xlat_opts opts = {
 		.xlat = rtnl_ip6mra_msg_types,

@@ -614,6 +614,7 @@ netlink_inet_diag
 netlink_kobject_uevent
 netlink_netfilter
 netlink_netlink_diag
+netlink_nlctrl
 netlink_protocol
 netlink_route
 netlink_selinux
