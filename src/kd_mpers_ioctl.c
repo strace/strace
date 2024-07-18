@@ -2,6 +2,7 @@
  * Support for decoding of personality-dependent VT ioctl commands.
  *
  * Copyright (c) 2019-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2019-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
