@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.? (????-??-??)
-==============================================
+Noteworthy changes in release 6.10 (2024-07-21)
+===============================================
 
 * Improvements
   * Implemented --decode-fds=eventfd option to retrieve eventfd object details
