@@ -202,6 +202,7 @@ io_uring_register-Xraw
 io_uring_register-Xverbose
 io_uring_setup
 ioctl
+ioctl-v
 ioctl_block
 ioctl_counter
 ioctl_counter-Xabbrev

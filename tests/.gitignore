@@ -270,6 +270,7 @@ io_uring_register-success-Xraw
 io_uring_register-success-Xverbose
 io_uring_setup
 ioctl
+ioctl-v
 ioctl_block
 ioctl_block--pidns-translation
 ioctl_counter
