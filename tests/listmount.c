@@ -54,8 +54,9 @@ main(void)
 	const void *const bad_mnt_ids = mnt_ids + 2;
 
 	k_listmount(bad_req, bad_mnt_ids, bad, -1U);
-	printf("listmount(%p, %p, %ju, %#x) = %s" INJ_STR,
-	       bad_req, bad_mnt_ids, (uintmax_t) bad, -1U, errstr);
+	printf("listmount(%p, %p, %ju, %s|%#x) = %s" INJ_STR,
+	       bad_req, bad_mnt_ids, (uintmax_t) bad, "LISTMOUNT_REVERSE",
+	       -1U & ~LISTMOUNT_REVERSE, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(typeof(req->size), size);
 	const void *const bad_size = (void *) size + 1;

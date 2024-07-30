@@ -8,6 +8,7 @@
 #include "defs.h"
 #include <linux/mount.h>
 #include "xlat/listmount_mnt_id.h"
+#include "xlat/listmount_flags.h"
 
 static void
 print_mnt_id_req(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -81,7 +82,7 @@ SYS_FUNC(listmount)
 	PRINT_VAL_U(nr_mnt_ids);
 	tprint_arg_next();
 
-	PRINT_VAL_X(flags);
+	printflags(listmount_flags, flags, "LISTMOUNT_???");
 
 	return 0;
 }
