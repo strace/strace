@@ -98,6 +98,11 @@ print_statmount(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_U(st, size);
 
+	if (st.mask & STATMOUNT_MNT_OPTS) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, mnt_opts, str_buf, str_size);
+	}
+
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(st, mask, statmount_mask, "STATMOUNT_???");
 
@@ -148,6 +153,11 @@ print_statmount(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING_OFFSET(st, mnt_point, str_buf, str_size);
+
+	if (st.mask & STATMOUNT_MNT_NS_ID) {
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_ns_id);
+	}
 
 	tprint_struct_end();
 }
