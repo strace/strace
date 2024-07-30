@@ -179,12 +179,7 @@ main(void)
 		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
 		       stm, (unsigned int) sizeof(stm->size), errstr);
 	else
-		printf("statmount(NULL, {size=%u, mask=0, sb_dev_major=0"
-		       ", sb_dev_minor=0, sb_magic=0, sb_flags=0, fs_type=0"
-		       ", mnt_id=0, mnt_parent_id=0, mnt_id_old=0"
-		       ", mnt_parent_id_old=0, mnt_attr=0, mnt_propagation=0"
-		       ", mnt_peer_group=0, mnt_master=0, propagate_from=0"
-		       ", mnt_root=0, mnt_point=0}, %u, 0) = %s" INJ_STR,
+		printf("statmount(NULL, {size=%u, mask=0}, %u, 0) = %s" INJ_STR,
 		       stm->size, (unsigned int) sizeof(stm->size), errstr);
 
 	stm->size = 0xfacefeed;
@@ -233,6 +228,19 @@ main(void)
 	*size = sizeof(*stm) + sizeof(str);
 	stm->size = *size;
 	stm->mask = INVALID_STATMOUNT;
+
+	if (k_statmount(0, stm, stm->size, 0) < 0)
+		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+		       stm, stm->size, errstr);
+	else {
+		printf("statmount(NULL, {size=%u, mask=%s}, %u, 0) = %s"
+		       INJ_STR,
+		       stm->size,
+		       INVALID_STATMOUNT_STR " /* STATMOUNT_??? */",
+		       stm->size, errstr);
+	}
+
+	stm->mask = VALID_STATMOUNT;
 	stm->sb_flags = INVALID_SB_FLAGS;
 	stm->mnt_attr = INVALID_MOUNT_ATTR;
 	stm->mnt_propagation = INVALID_MNT_PROPAGATION;
@@ -244,16 +252,18 @@ main(void)
 		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
 		       stm, stm->size, errstr);
 	else {
-		printf("statmount(NULL, {size=%u, mask=%s, sb_dev_major=%u"
-		       ", sb_dev_minor=%u, sb_magic=%s, sb_flags=%s"
-		       ", fs_type=%#x, mnt_id=%#jx, mnt_parent_id=%#jx"
-		       ", mnt_id_old=%#x, mnt_parent_id_old=%#x, mnt_attr=%s"
+		printf("statmount(NULL, {size=%u, mnt_opts=%#x, mask=%s"
+		       ", sb_dev_major=%u, sb_dev_minor=%u, sb_magic=%s"
+		       ", sb_flags=%s, fs_type=%#x, mnt_id=%#jx"
+		       ", mnt_parent_id=%#jx, mnt_id_old=%#x"
+		       ", mnt_parent_id_old=%#x, mnt_attr=%s"
 		       ", mnt_propagation=%s, mnt_peer_group=%#jx"
 		       ", mnt_master=%#jx, propagate_from=%#jx"
-		       ", mnt_root=%#x, mnt_point=%#x}, %u, 0) = %s"
-		       INJ_STR,
+		       ", mnt_root=%#x, mnt_point=%#x, mnt_ns_id=%#jx}"
+		       ", %u, 0) = %s" INJ_STR,
 		       stm->size,
-		       INVALID_STATMOUNT_STR " /* STATMOUNT_??? */",
+		       stm->mnt_opts,
+		       VALID_STATMOUNT_STR,
 		       stm->sb_dev_major,
 		       stm->sb_dev_minor,
 		       "PROC_SUPER_MAGIC",
@@ -270,12 +280,12 @@ main(void)
 		       (uintmax_t) stm->propagate_from,
 		       stm->mnt_root,
 		       stm->mnt_point,
+		       (uintmax_t) stm->mnt_ns_id,
 		       stm->size, errstr);
 	}
 
 	stm->mnt_opts =
 		sizeof(STR_0) + sizeof(STR_1) + sizeof(STR_2) + sizeof(STR_3);
-	stm->mask = VALID_STATMOUNT;
 	stm->sb_flags = 0x2000091;
 	stm->mnt_attr = 0x3000ff;
 	stm->mnt_propagation = 0x1e0000;

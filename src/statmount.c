@@ -106,53 +106,65 @@ print_statmount(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(st, mask, statmount_mask, "STATMOUNT_???");
 
-	tprint_struct_next();
-	PRINT_FIELD_U(st, sb_dev_major);
+	if (st.mask & STATMOUNT_SB_BASIC) {
+		tprint_struct_next();
+		PRINT_FIELD_U(st, sb_dev_major);
 
-	tprint_struct_next();
-	PRINT_FIELD_U(st, sb_dev_minor);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, sb_dev_minor);
 
-	tprint_struct_next();
-	PRINT_FIELD_XVAL(st, sb_magic, fsmagic, NULL);
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(st, sb_magic, fsmagic, NULL);
 
-	tprint_struct_next();
-	PRINT_FIELD_FLAGS(st, sb_flags, statmount_sb_flags, "MS_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(st, sb_flags, statmount_sb_flags, "MS_???");
+	}
 
-	tprint_struct_next();
-	PRINT_FIELD_CSTRING_OFFSET(st, fs_type, str_buf, str_size);
+	if (st.mask & STATMOUNT_FS_TYPE) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, fs_type, str_buf, str_size);
+	}
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_id);
+	if (st.mask & STATMOUNT_MNT_BASIC) {
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_id);
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_parent_id);
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_parent_id);
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_id_old);
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_id_old);
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_parent_id_old);
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_parent_id_old);
 
-	tprint_struct_next();
-	PRINT_FIELD_FLAGS(st, mnt_attr, mount_attr_attr, "MOUNT_ATTR_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(st, mnt_attr, mount_attr_attr, "MOUNT_ATTR_???");
 
-	tprint_struct_next();
-	PRINT_FIELD_FLAGS(st, mnt_propagation, statmount_mnt_propagation, "MS_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(st, mnt_propagation, statmount_mnt_propagation, "MS_???");
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_peer_group);
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_peer_group);
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, mnt_master);
+		tprint_struct_next();
+		PRINT_FIELD_X(st, mnt_master);
+	}
 
-	tprint_struct_next();
-	PRINT_FIELD_X(st, propagate_from);
+	if (st.mask & STATMOUNT_PROPAGATE_FROM) {
+		tprint_struct_next();
+		PRINT_FIELD_X(st, propagate_from);
+	}
 
-	tprint_struct_next();
-	PRINT_FIELD_CSTRING_OFFSET(st, mnt_root, str_buf, str_size);
+	if (st.mask & STATMOUNT_MNT_ROOT) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, mnt_root, str_buf, str_size);
+	}
 
-	tprint_struct_next();
-	PRINT_FIELD_CSTRING_OFFSET(st, mnt_point, str_buf, str_size);
+	if (st.mask & STATMOUNT_MNT_POINT) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, mnt_point, str_buf, str_size);
+	}
 
 	if (st.mask & STATMOUNT_MNT_NS_ID) {
 		tprint_struct_next();
