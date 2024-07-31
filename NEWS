@@ -3,7 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated decoding of listmount and statmount syscalls.
-  * Updated lists of IORING_* constants.
+  * Updated lists of ETHTOOL_* and IORING_* constants.
 
 Noteworthy changes in release 6.10 (2024-07-21)
 ===============================================
