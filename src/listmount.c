@@ -8,6 +8,7 @@
 #include "defs.h"
 #include <linux/mount.h>
 #include "xlat/listmount_mnt_id.h"
+#include "xlat/listmount_flags.h"
 
 static void
 print_mnt_id_req(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -45,9 +46,14 @@ print_mnt_id_req(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_X(req, param);
 
-	if (req.size > MNT_ID_REQ_SIZE_VER0) {
+	if (req.size >= offsetofend(struct mnt_id_req, mnt_ns_id)) {
+		tprint_struct_next();
+		PRINT_FIELD_X(req, mnt_ns_id);
+	}
+
+	if (req.size > MNT_ID_REQ_SIZE_VER1) {
 		print_nonzero_bytes(tcp, tprint_struct_next, addr,
-				    MNT_ID_REQ_SIZE_VER0,
+				    MNT_ID_REQ_SIZE_VER1,
 				    MIN(req.size, get_pagesize()),
 				    QUOTE_FORCE_HEX);
 	}
@@ -76,7 +82,7 @@ SYS_FUNC(listmount)
 	PRINT_VAL_U(nr_mnt_ids);
 	tprint_arg_next();
 
-	PRINT_VAL_X(flags);
+	printflags(listmount_flags, flags, "LISTMOUNT_???");
 
 	return 0;
 }

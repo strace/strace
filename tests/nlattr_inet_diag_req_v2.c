@@ -411,8 +411,8 @@ test_inet_diag_proto(const int fd)
 		{ 0, "IPPROTO_IP" },
 		{ 3, "0x3 /* IPPROTO_??? */" },
 		{ 6, "IPPROTO_TCP" },
-		{ 255, "IPPROTO_RAW" },
-		{ 256, "0x100 /* IPPROTO_??? */" },
+		{ 256, "IPPROTO_SMC" },
+		{ 257, "0x101 /* IPPROTO_??? */" },
 		{ 262, "IPPROTO_MPTCP" },
 		{ 0xcafeface, "0xcafeface /* IPPROTO_??? */" },
 	};
