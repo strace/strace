@@ -2,8 +2,9 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated decoding of listmount and statmount syscalls.
-  * Updated lists of ETHTOOL_*, IORING_*, IPPROTO_*, and RWF_* constants.
+  * Updated decoding of listmount, statmount, and statx syscalls.
+  * Updated lists of ETHTOOL_*, IORING_*, IPPROTO_*, RWF_*, and STATX_*
+    constants.
 
 Noteworthy changes in release 6.10 (2024-07-21)
 ===============================================

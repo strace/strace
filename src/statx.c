@@ -156,6 +156,14 @@ SYS_FUNC(statx)
 				tprint_struct_next();
 				PRINT_FIELD_X(stx, stx_subvol);
 			}
+			if (stx.stx_attributes & STATX_ATTR_WRITE_ATOMIC) {
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_atomic_write_unit_min);
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_atomic_write_unit_max);
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_atomic_write_segments_max);
+			}
 		} else {
 			tprint_struct_next();
 			tprint_more_data_follows();
