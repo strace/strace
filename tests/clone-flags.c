@@ -19,15 +19,36 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <linux/sched.h>
+#include <sys/socket.h>
 
 static const int child_exit_status = 42;
 static pid_t pid;
+static int child_sockpair[2];
+
+static void
+retrieve_userns(pid_t pid, char *userns_buf, size_t userns_buflen)
+{
+	char c = 0;
+	if (read(child_sockpair[0], &c, 1) != 1)
+		perror_msg_and_fail("read from the child");
+
+	char *fname = xasprintf("/proc/%d/ns/user", pid);
+	int rc = readlink(fname, userns_buf, userns_buflen - 1);
+	if ((unsigned int) rc >= userns_buflen)
+		perror_msg_and_fail("readlink");
+	userns_buf[rc] = '\0';
+
+	if (write(child_sockpair[0], &c, 1) != 1)
+		perror_msg_and_fail("write to the child");
+}
 
 static pid_t
-wait_cloned(pid_t pid, int sig, const char *text)
+wait_cloned(pid_t pid, int sig, const char *text, char *userns_buf, size_t userns_buflen)
 {
 	if (pid < 0)
 		perror_msg_and_fail("clone %s", text);
+	if (userns_buf)
+		retrieve_userns(pid, userns_buf, userns_buflen);
 	int status;
 	pid_t rc = wait(&status);
 	if (sig) {
@@ -50,14 +71,20 @@ wait_cloned(pid_t pid, int sig, const char *text)
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
-			     ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...)	\
+	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone2"
 # define STACK_SIZE_FMT ", stack_size=%#lx"
 # define STACK_SIZE_ARG child_stack_size,
 #else
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
-			  ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...) \
+	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone"
 # define STACK_SIZE_FMT ""
 # define STACK_SIZE_ARG
@@ -66,6 +93,17 @@ extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
 static int
 child(void *const arg)
 {
+	return child_exit_status;
+}
+
+static int
+child_with_pause(void *const arg)
+{
+	char c = 0;
+	if (write(child_sockpair[1], &c, 1) != 1)
+		return 1;
+	if (read(child_sockpair[1], &c, 1) != 1)
+		return 1;
 	return child_exit_status;
 }
 
@@ -142,6 +180,15 @@ main(void)
 		       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
 		       "CLONE_PIDFD|SIGCHLD", *ptid, buf, pid);
 	}
+
+	char userns[PATH_MAX];
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, child_sockpair) < 0)
+		perror_msg_and_fail("socketpair");
+	pid = do_clone_newns(userns, child_with_pause, child_stack, child_stack_size,
+			     CLONE_NEWUSER, 0);
+	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s) = %d (%s)\n",
+	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+	       "CLONE_NEWUSER", pid, userns);
 
 	return 0;
 }
