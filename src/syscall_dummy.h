@@ -98,6 +98,7 @@
 # define sys_setup		printargs
 # define sys_sync		printargs
 # define sys_syscall		printargs
+# define sys_uretprobe		printargs
 # define sys_vhangup		printargs
 
 /* printargs_u does the right thing */
