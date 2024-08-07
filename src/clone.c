@@ -118,7 +118,7 @@ get_namespace_auxstr(int pid, uint64_t flags)
 		}
 	}
 
-	return (str != p)? str: NULL;
+	return (str != p) ? str : NULL;
 }
 
 static void
