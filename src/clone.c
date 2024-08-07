@@ -89,9 +89,7 @@ get_namespace_auxstr(int pid, uint64_t flags)
 			          "pid:[4026531836], "
 			         "time:[4026531834], "
 			         "user:[4026531837], "
-			          "uts:[4026531838]" )
-			/* for the last null char */
-			+ 1];
+			          "uts:[4026531838]" )];
 	char *p = str;
 
 	struct {
