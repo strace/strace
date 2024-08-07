@@ -62,7 +62,7 @@ extern void namespace_auxstr_init(void)
 	show_namespace = true;
 }
 
-/* derrived from print_dirfd */
+/* derived from print_dirfd */
 static const char *
 read_namespace_id(int pid, const char *const ns_type)
 {
