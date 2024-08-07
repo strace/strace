@@ -92,7 +92,7 @@ get_namespace_auxstr(int pid, uint64_t flags)
 			          "uts:[4026531838]" )];
 	char *p = str;
 
-	struct {
+	static const struct {
 		uint64_t flags;
 		const char *str;
 	} ns[] = {
