@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of uretprobe syscall.
   * Updated decoding of listmount, statmount, and statx syscalls.
   * Updated lists of ETHTOOL_*, IORING_*, IPPROTO_*, RWF_*, STATX_*, and V4L2_*
     constants.
