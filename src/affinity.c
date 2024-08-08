@@ -27,10 +27,17 @@ get_cpuset_size(void)
 		 * This undocumented kernel feature can be used to probe
 		 * the kernel and find out the minimal valid cpuset size
 		 * without allocating any memory for the CPU affinity mask.
+		 *
 		 */
 		cpuset_size = 128;
+		/* 
+		 * As an extra kludge, use a dummy variable in order
+		 * to dodge the _Nonnull pointer attribute from
+		 * sched_getaffinity()'s declaration
+		 */
+		cpu_set_t *nullptr = NULL;
 		while (cpuset_size &&
-		       sched_getaffinity(0, cpuset_size, NULL) == -1 &&
+		       sched_getaffinity(0, cpuset_size, nullptr) == -1 &&
 		       EINVAL == errno) {
 			cpuset_size <<= 1;
 		}
