@@ -84,8 +84,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, usr_ptr);
 
+	sg_io.guard = (unsigned char) 'Q';
 	struct sg_io_v4 *entering_sg_io = xobjdup(&sg_io);
-	entering_sg_io->guard = (unsigned char) 'Q';
 	set_tcb_priv_data(tcp, entering_sg_io, free);
 
 	return 0;
