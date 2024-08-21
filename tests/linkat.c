@@ -19,7 +19,19 @@
 #include <string.h>
 
 #include "secontext.h"
+#include "xlat.h"
 #include "xmalloc.h"
+
+struct xlat_data secontext_types_data[] = {
+	[SECONTEXT_USER] = XLAT_PAIR(SECONTEXT_USER, "user"),
+	[SECONTEXT_ROLE] = XLAT_PAIR(SECONTEXT_ROLE, "role"),
+	[SECONTEXT_TYPE] = XLAT_PAIR(SECONTEXT_TYPE, "type"),
+};
+struct xlat secontext_types = {
+	.data = secontext_types_data,
+	.size = ARRAY_SIZE(secontext_types_data),
+	.type = XT_INDEXED,
+};
 
 static void
 mangle_secontext_field(const char *path, enum secontext_field field,
@@ -29,10 +41,18 @@ mangle_secontext_field(const char *path, enum secontext_field field,
 	if (!orig)
 		return;
 
-	update_secontext_field(path, field,
-			       strcmp(new_val, orig) ? new_val : fallback_val);
+	const char *new = strcmp(new_val, orig) ? new_val : fallback_val;
 
 	free(orig);
+
+	int ret = update_secontext_field(path, field, new);
+	if (ret) {
+		error_msg_and_skip("Failed to mangle secontext %s for "
+				   "'%s' to %s: %d",
+				   sprintxval_abbrev(&secontext_types, field,
+						     "SECONTEXT_???"),
+				   path, new, ret);
+	}
 }
 
 int
@@ -103,8 +123,14 @@ main(void)
 	if (close(fd_sample_2))
 		perror_msg_and_fail("close");
 
-	if (*sample_1_secontext && strstr(sample_1_secontext, "!!"))
-		reset_secontext_file(sample_1);
+	if (*sample_1_secontext && strstr(sample_1_secontext, "!!")) {
+		int ret;
+		if ((ret = reset_secontext_file(sample_1))) {
+			errno = -ret;
+			perror_msg_and_skip("Reset secontext for '%s'",
+					    sample_1);
+		}
+	}
 
 	free(sample_1_secontext);
 

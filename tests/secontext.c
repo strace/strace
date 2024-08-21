@@ -284,14 +284,19 @@ secontext_short_pid(pid_t pid)
 	return FORMAT_SPACE_AFTER(raw_secontext_short_pid(pid));
 }
 
-void reset_secontext_file(const char *file)
+int
+reset_secontext_file(const char *file)
 {
 	char *proper_ctx = raw_expected_secontext_full_file(file);
-	(void) setfilecon(file, proper_ctx);
+	int ret = setfilecon(file, proper_ctx);
+	if (ret && errno)
+		ret = -errno;
 	free(proper_ctx);
+
+	return ret;
 }
 
-void
+int
 update_secontext_field(const char *file, enum secontext_field field,
 		       const char *newvalue)
 {
@@ -300,7 +305,7 @@ update_secontext_field(const char *file, enum secontext_field field,
 
 	char *ctx = raw_secontext_full_file(file);
 	if (ctx == NULL)
-		return;
+		return -1;
 
 	char *saveptr = NULL;
 	char *token;
@@ -319,11 +324,15 @@ update_secontext_field(const char *file, enum secontext_field field,
 	char *newcontext = xasprintf("%s:%s:%s:%s", split[0], split[1],
 				     split[2], split[3]);
 
-	(void) setfilecon(file, newcontext);
+	int ret = setfilecon(file, newcontext);
+	if (ret && errno)
+		ret = -errno;
 
 	free(newcontext);
 	free(ctx);
 	errno = saved_errno;
+
+	return ret;
 }
 
 #endif /* HAVE_SELINUX_RUNTIME */
