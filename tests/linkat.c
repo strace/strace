@@ -160,7 +160,7 @@ main(void)
 
 	errno = 0;
 	mangle_secontext_field(sample_1, SECONTEXT_TYPE, "default_t",
-							 "unconfined_t");
+							 "user_home_t");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 	sample_2_secontext = sample_1_secontext;
 
@@ -192,7 +192,7 @@ main(void)
 
 	errno = 0;
 	mangle_secontext_field(".", SECONTEXT_TYPE, "default_t",
-						    "unconfined_t");
+						    "user_home_t");
 	char *dfd_old_secontext = SECONTEXT_FILE(".");
 
 #ifdef PRINT_SECONTEXT_MISMATCH
