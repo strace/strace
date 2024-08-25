@@ -450,7 +450,9 @@ ioctl_v4l2-v	+ioctl.test -v
 ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
 ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
 ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
-ioctl_watchdog	+ioctl.test
+ioctl_watchdog	+ioctl.test -a14
+ioctl_watchdog-success	+ioctl-success.sh -a14
+ioctl_watchdog-success-v	+ioctl-success.sh -a14 -v
 ioctl_winsize	+ioctl.test
 ioperm	-a27
 iopl	-a8
