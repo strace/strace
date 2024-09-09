@@ -371,6 +371,14 @@ process_file()
 			# Filter out the code that references unknown types.
 			sed '/^struct via_file_private/,/^}/d' < "$s" > "$tmpdir/$f"
 			;;
+		*drm/xe_drm.h)
+			sed -E '/^enum drm_xe/,/^};/d' < "$s" > "$tmpdir/$f"
+			sed -En '/^enum drm_xe/,/^};/ s/^[[:space:]].*/&/p' < "$s" |
+			sed -n 's/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*_\(IO\|IOW\|IOR\|IOWR\|IOC\)[[:space:]]*(/#define \1 _\2(/
+				s/^\(#define .*)\),$/\1/p
+				s/^\(#define .*,\)$/\1 \\/p
+				s/^\([[:space:]]\+[^),]\+)\),$/\1/p' >> "$tmpdir/$f"
+			;;
 		*linux/dma-buf.h)
 			# Filter out duplicates.
 			sed '/\<DMA_BUF_SET_NAME\>/d' < "$s" > "$tmpdir/$f"
