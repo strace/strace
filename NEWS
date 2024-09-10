@@ -6,6 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated decoding of listmount, statmount, and statx syscalls.
   * Updated lists of ETHTOOL_*, IORING_*, IPPROTO_*, RWF_*, STATX_*, and V4L2_*
     constants.
+  * Updated lists of ioctl commands from Linux 6.11.
 
 Noteworthy changes in release 6.10 (2024-07-21)
 ===============================================

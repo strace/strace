@@ -131,6 +131,7 @@
 { "linux/kvm.h", "KVM_MEMORY_ENCRYPT_REG_REGION", _IOC_READ, 0xaebb, 0x10 },
 { "linux/kvm.h", "KVM_MEMORY_ENCRYPT_UNREG_REGION", _IOC_READ, 0xaebc, 0x10 },
 { "linux/kvm.h", "KVM_NMI", _IOC_NONE, 0xae9a, 0x00 },
+{ "linux/kvm.h", "KVM_PRE_FAULT_MEMORY", _IOC_READ|_IOC_WRITE, 0xaed5, 0x40 },
 { "linux/kvm.h", "KVM_REGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae67, 0x10 },
 { "linux/kvm.h", "KVM_REINJECT_CONTROL", _IOC_NONE, 0xae71, 0x00 },
 { "linux/kvm.h", "KVM_RESET_DIRTY_RINGS", _IOC_NONE, 0xaec7, 0x00 },
