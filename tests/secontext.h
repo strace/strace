@@ -7,6 +7,8 @@
 
 #include "tests.h"
 #include "xmalloc.h"
+
+#include <errno.h>
 #include <unistd.h>
 
 char *secontext_full_fd(int) ATTRIBUTE_MALLOC;
@@ -35,10 +37,10 @@ char *get_secontext_field(const char *full_context, enum secontext_field field);
 char *get_secontext_field_fd(int fd, enum secontext_field field);
 char *get_secontext_field_file(const char *file, enum secontext_field field);
 
-void reset_secontext_file(const char *file);
+int reset_secontext_file(const char *file);
 
-void update_secontext_field(const char *file, enum secontext_field field,
-			    const char *newvalue);
+int update_secontext_field(const char *file, enum secontext_field field,
+			   const char *newvalue);
 
 # ifdef PRINT_SECONTEXT_FULL
 
@@ -81,15 +83,17 @@ get_secontext_field_file(const char *file, enum secontext_field field)
 	return NULL;
 }
 
-static inline void
+static inline int
 reset_secontext_file(const char *file)
 {
+	return -ENOSYS;
 }
 
-static inline void
+static inline int
 update_secontext_field(const char *file, enum secontext_field field,
 		       const char *newvalue)
 {
+	return -ENOSYS;
 }
 
 # define SECONTEXT_FD(fd)			xstrdup("")

@@ -243,6 +243,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_v4l2-success-v-Xabbrev \
 	ioctl_v4l2-success-v-Xraw \
 	ioctl_v4l2-success-v-Xverbose \
+	ioctl_watchdog-success \
+	ioctl_watchdog-success-v \
 	ioprio--pidns-translation \
 	ip_local_port_range-success \
 	ip_local_port_range-success-Xabbrev \
