@@ -293,6 +293,7 @@ io_uring_register-success-Xabbrev	-einject=io_uring_register:retval=42 -etrace=i
 io_uring_register-success-Xraw		-einject=io_uring_register:retval=42 -etrace=io_uring_register -y -Xraw
 io_uring_register-success-Xverbose	-einject=io_uring_register:retval=42 -etrace=io_uring_register -y -Xverbose
 io_uring_setup	-a26 -y
+ioctl-v	+ioctl.test -v
 ioctl_block	+ioctl.test
 ioctl_counter	+ioctl.test -a39
 ioctl_counter-Xabbrev	+ioctl.test -a39 -Xabbrev

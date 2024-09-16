@@ -321,6 +321,56 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
 }
 
 /**
+ * Decode arg parameter for unknown ioctl types. */
+static int
+ioctl_decode_unknown_type(struct tcb *const tcp, const unsigned int code,
+                          const kernel_ulong_t arg)
+{
+	bool print_before = false, print_after = false;
+	int ret = 0;
+
+	if (abbrev(tcp) || (_IOC_SIZE(code) == 0) || (arg == 0)) {
+		/* Let the generic handler print arg value.  */
+		return 0;
+	}
+
+	switch (_IOC_DIR(code)) {
+	case _IOC_WRITE:
+		print_before = true;
+		break;
+	case _IOC_READ:
+		print_after = true;
+		break;
+	case _IOC_NONE:
+	case _IOC_READ | _IOC_WRITE:
+	default:
+		print_before = true;
+		print_after = true;
+		break;
+	}
+
+	if (entering(tcp)) {
+		tprint_arg_next();
+		if (print_before)
+			ret = printstr_ex(tcp, arg, _IOC_SIZE(code),
+			                  QUOTE_FORCE_HEX);
+
+		if (!print_after || ret)
+			ret = RVAL_IOCTL_DECODED;
+	} else {
+		if (print_before && print_after)
+			tprint_value_changed();
+
+		if (print_after)
+			printstr_ex(tcp, arg, _IOC_SIZE(code), QUOTE_FORCE_HEX);
+
+		ret = RVAL_IOCTL_DECODED;
+	}
+
+	return ret;
+}
+
+/**
  * Decode arg parameter of the ioctl call.
  *
  * @param finfo The target file descriptor related information.
@@ -433,7 +483,7 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 	case 0xfd:
 		return dm_ioctl(tcp, code, arg);
 	default:
-		break;
+		return ioctl_decode_unknown_type(tcp, code, arg);
 	}
 	return 0;
 }
