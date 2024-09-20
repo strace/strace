@@ -291,7 +291,7 @@ ioctl_decode_command_number(struct tcb *tcp, const struct finfo *finfo)
 	case 'k':
 		if (_IOC_DIR(code) == _IOC_WRITE && _IOC_NR(code) == 0) {
 			tprints_arg_begin("SPI_IOC_MESSAGE");
-			PRINT_VAL_U(_IOC_SIZE(code));
+			PRINT_VAL_U((_IOC_SIZE(code) / 32)); // IOC size is sizeof(spi_ioc_transfer) * arg, so divide to get proper arg
 			tprint_arg_end();
 			return 1;
 		}
@@ -427,6 +427,8 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 		return evdev_ioctl(tcp, code, arg);
 	case 'I':
 		return inotify_ioctl(tcp, code, arg);
+	case 'k':
+		return spidev_ioctl(tcp, code, arg);
 	case 'K':
 		return kd_ioctl(tcp, code, arg);
 	case 'L':
