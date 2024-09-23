@@ -44,6 +44,7 @@ clone3
 clone3-Xabbrev
 clone3-Xraw
 clone3-Xverbose
+clone3-report-ns-id
 copy_file_range
 creat
 delete_module
@@ -736,6 +737,7 @@ setgroups
 setgroups32
 sethostname
 setns
+setns-report-ns-id
 setregid
 setregid32
 setresgid
@@ -856,6 +858,7 @@ uname
 unlink
 unlinkat
 unshare
+unshare-report-ns-id
 userfaultfd
 ustat
 utime

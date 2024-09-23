@@ -72,6 +72,7 @@ clone3
 clone3-Xabbrev
 clone3-Xraw
 clone3-Xverbose
+clone3-report-ns-id
 clone3-success
 clone3-success-Xabbrev
 clone3-success-Xraw
@@ -1035,6 +1036,7 @@ setgroups
 setgroups32
 sethostname
 setns
+setns-report-ns-id
 setpgrp-exec
 setregid
 setregid32
@@ -1197,6 +1199,7 @@ unix-pair-sendto-recvfrom
 unlink
 unlinkat
 unshare
+unshare-report-ns-id
 userfaultfd
 ustat
 utime
