@@ -425,7 +425,7 @@ SYS_FUNC(unshare)
 {
 	if (entering(tcp)) {
 		printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
-		return show_namespace? 0: RVAL_DECODED;
+		return show_namespace ? 0: RVAL_DECODED;
 	}
 
 	int r_extra = 0;
