@@ -408,7 +408,7 @@ SYS_FUNC(setns)
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 		printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
-		return show_namespace? 0: RVAL_DECODED;
+		return show_namespace ? 0: RVAL_DECODED;
 	}
 
 	int r_extra = 0;
