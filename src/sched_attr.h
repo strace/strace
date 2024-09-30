@@ -11,6 +11,9 @@
 
 # include <stdint.h>
 
+# ifndef SCHED_ATTR_SIZE_VER0
+#  define SCHED_ATTR_SIZE_VER0 48
+
 struct sched_attr {
 	uint32_t size;
 	uint32_t sched_policy;
@@ -25,7 +28,10 @@ struct sched_attr {
 	uint32_t sched_util_max;
 };
 
-# define SCHED_ATTR_MIN_SIZE	48
+# endif /* SCHED_ATTR_SIZE_VER0 */
+
+# define SCHED_ATTR_MIN_SIZE	SCHED_ATTR_SIZE_VER0
+
 # ifndef SCHED_ATTR_SIZE_VER1
 #  define SCHED_ATTR_SIZE_VER1  56
 # endif
