@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/ptp_clock.h>
@@ -555,20 +556,28 @@ test_no_device(void)
 		{ ARG_STR(PTP_SYS_OFFSET_EXTENDED) },
 		{ ARG_STR(PTP_SYS_OFFSET_EXTENDED2) },
 	};
+	static const struct strval32 clock_names[] = {
+		{ ARG_STR(CLOCK_REALTIME) },
+		{ ARG_STR(CLOCK_MONOTONIC) },
+		{ ARG_STR(CLOCK_PROCESS_CPUTIME_ID) },
+		{ ARG_STR(CLOCK_THREAD_CPUTIME_ID) },
+	};
 	for (const struct strval32 *c = ioc_soext; c < ARRAY_END(ioc_soext);
 	     c++) {
 		check_bad_ptr(c->val, c->str, soext, sizeof(*soext));
 
 		memset(soext, 0, sizeof(*soext));
 		rc = sys_ioctl(-1, c->val, (uintptr_t) soext);
-		printf("ioctl(-1, " XLAT_FMT ", {n_samples=0%s}) = %s\n",
-		       XLAT_SEL(c->val, c->str),
+		printf("ioctl(-1, " XLAT_FMT
+		       ", {n_samples=0, clockid=%s%s}) = %s\n",
+		       XLAT_SEL(c->val, c->str), XLAT_STR(CLOCK_REALTIME),
 		       rc >= 0 ? ", ts=[]" : "", errstr);
 
 		for (size_t i = 0; i < 4; i++) {
 			soext->n_samples = i > 2 ? 0xdeadface : i * 12 + 1;
+			soext->clockid = i;
 			soext->rsv[0] = i & 1 ? 0xbadfaced : 0;
-			soext->rsv[2] = i & 2 ? 0xcafeface : 0;
+			soext->rsv[1] = i & 2 ? 0xcafeface : 0;
 			for (size_t j = 0; j < PTP_MAX_SAMPLES; j++) {
 				soext->ts[j][0].sec =
 						SAFE_TIME_T(2345678901U + j);
@@ -590,8 +599,10 @@ test_no_device(void)
 			printf("ioctl(-1, " XLAT_FMT ", {n_samples=%zu",
 			       XLAT_SEL(c->val, c->str),
 			       i > 2 ? 0xdeadface : i * 12 + 1);
+			printf(", clockid=" XLAT_FMT,
+			       XLAT_SEL(clock_names[i].val, clock_names[i].str));
 			if (i & 3) {
-				printf(", rsv=[%#x, 0, %#x]",
+				printf(", rsv=[%#x, %#x]",
 				       i & 1 ? 0xbadfaced : 0,
 				       i & 2 ? 0xcafeface : 0);
 			}
