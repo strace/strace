@@ -97,10 +97,10 @@ static void
 print_nh_grp(const struct nexthop_grp *const elem, size_t idx)
 {
 	switch (idx) {
-	case 0: printf("{id=3735928559, weight=0}"); break;
-	case 1:	printf("{id=0, weight=218, resvd2=0xdead}"); break;
-	case 2: printf("{id=4207869677, weight=190, resvd1=0xec}"); break;
-	case 3: printf("{id=0, weight=0, resvd1=0xca, resvd2=0xbeef}"); break;
+	case 0: printf("{id=3735928559, weight=0, weight_high=0}"); break;
+	case 1:	printf("{id=0, weight=218, weight_high=0, resvd2=0xdead}"); break;
+	case 2: printf("{id=4207869677, weight=190, weight_high=236}"); break;
+	case 3: printf("{id=0, weight=0, weight_high=202, resvd2=0xbeef}"); break;
 	default: error_msg_and_fail("Unexpected grp index: %zu", idx);
 	}
 }
@@ -162,10 +162,10 @@ main(void)
 
 	/* NHA_GROUP */
 	static const struct nexthop_grp grps[] = {
-		{ .id = 0xdeadbeef, .weight = 0, .resvd1 = 0, .resvd2 = 0 },
-		{ .id = 0, .weight = 218, .resvd1 = 0, .resvd2 = 0xdead },
-		{ .id = 0xfacefeed, .weight = 190, .resvd1 = 236, .resvd2 = 0 },
-		{ .id = 0, .weight = 0, .resvd1 = 202, .resvd2 = 0xbeef },
+		{ .id = 0xdeadbeef, .weight = 0, .weight_high = 0, .resvd2 = 0 },
+		{ .id = 0, .weight = 218, .weight_high = 0, .resvd2 = 0xdead },
+		{ .id = 0xfacefeed, .weight = 190, .weight_high = 236, .resvd2 = 0 },
+		{ .id = 0, .weight = 0, .weight_high = 202, .resvd2 = 0xbeef },
 	};
 	TEST_NLATTR_ARRAY_(fd, nlh0, hdrlen, init_nhmsg, print_nhmsg,
 			   NHA_GROUP, XLAT_KNOWN(0x2, "NHA_GROUP"),
