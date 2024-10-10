@@ -146,9 +146,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc-11
+      CC: gcc
       KHEADERS: torvalds/linux
       STACKTRACE: no
       TARGET: x86_64
@@ -162,9 +162,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-dw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc-11
+      CC: gcc
       STACKTRACE: libdw
       TARGET: x86_64
     steps:
@@ -177,9 +177,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-unwind:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc-11
+      CC: gcc
       STACKTRACE: libunwind
       TARGET: x86_64
     steps:
@@ -746,9 +746,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc-11
+      CC: gcc
       KHEADERS: torvalds/linux
       STACKTRACE: no
       TARGET: x86
@@ -762,9 +762,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc-11
+      CC: gcc
       STACKTRACE: no
       TARGET: x86
     steps:
