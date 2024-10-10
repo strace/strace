@@ -38,8 +38,8 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         working-directory: src
 
-  gcc9-x86-nostacktrace: # the fastest of all build jobs
-    runs-on: ubuntu-20.04
+  gcc11-x86-nostacktrace: # the fastest of all build jobs
+    runs-on: ubuntu-22.04
     env:
       CC: gcc
       STACKTRACE: no
@@ -761,21 +761,6 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  gcc11-x86-nostacktrace:
-    runs-on: ubuntu-22.04
-    env:
-      CC: gcc
-      STACKTRACE: no
-      TARGET: x86
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
   gcc10-x86-kheaders:
     runs-on: ubuntu-20.04
     env:
@@ -812,6 +797,21 @@ jobs:
     env:
       CC: gcc
       KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86-nostacktrace:
+    runs-on: ubuntu-20.04
+    env:
+      CC: gcc
       STACKTRACE: no
       TARGET: x86
     steps:
