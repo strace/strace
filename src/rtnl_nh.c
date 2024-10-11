@@ -28,10 +28,8 @@ print_nh_grp(struct tcb *const tcp, void *const elem_buf,
 	PRINT_FIELD_U(*grp, id);
 	tprint_struct_next();
 	PRINT_FIELD_U(*grp, weight);
-	if (grp->resvd1) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*grp, resvd1);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_U(*grp, weight_high);
 	if (grp->resvd2) {
 		tprint_struct_next();
 		PRINT_FIELD_X(*grp, resvd2);
