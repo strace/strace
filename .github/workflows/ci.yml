@@ -53,6 +53,52 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc14-x86_64-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: gcc-14
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc14-x86_64-dw:
+    runs-on: ubuntu-24.04
+    env:
+      CC: gcc-14
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc14-x86_64-unwind:
+    runs-on: ubuntu-24.04
+    env:
+      CC: gcc-14
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc13-x86_64-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -272,6 +318,144 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       CC: gcc
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang18-x86_64-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-18
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang18-x86_64-dw:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-18
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang18-x86_64-unwind:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-18
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang17-x86_64-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-17
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang17-x86_64-dw:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-17
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang17-x86_64-unwind:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-17
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang16-x86_64-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-16
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang16-x86_64-dw:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-16
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang16-x86_64-unwind:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-16
       STACKTRACE: libunwind
       TARGET: x86_64
     steps:
@@ -683,6 +867,37 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc14-x86-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: gcc-14
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc14-x86-nostacktrace:
+    runs-on: ubuntu-24.04
+    env:
+      CC: gcc-14
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc13-x86-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -812,6 +1027,99 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       CC: gcc
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang18-x86-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-18
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang18-x86-nostacktrace:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-18
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang17-x86-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-17
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang17-x86-nostacktrace:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-17
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang16-x86-kheaders:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-16
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang16-x86-nostacktrace:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-16
       STACKTRACE: no
       TARGET: x86
     steps:
