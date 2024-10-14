@@ -93,14 +93,14 @@ main(void)
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, %u, 0) = 0\n",
+	       ", sched_runtime=%llu, sched_deadline=%llu"
+	       ", sched_period=%llu}, %u, 0) = 0\n",
 	       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
 	       attr->sched_nice,
 	       attr->sched_priority,
-	       attr->sched_runtime,
-	       attr->sched_deadline,
-	       attr->sched_period,
+	       (unsigned long long)attr->sched_runtime,
+	       (unsigned long long)attr->sched_deadline,
+	       (unsigned long long)attr->sched_period,
 	       (unsigned) SCHED_ATTR_MIN_SIZE);
 
 	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
