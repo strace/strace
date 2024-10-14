@@ -93,8 +93,8 @@ main(void)
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, %u, 0) = 0\n",
+	       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+	       ", sched_period=%" PRI__u64 "}, %u, 0) = 0\n",
 	       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
 	       attr->sched_nice,
 	       attr->sched_priority,
@@ -114,8 +114,8 @@ main(void)
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64,
+	       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+	       ", sched_period=%" PRI__u64,
 	       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
 	       attr->sched_nice,
 	       attr->sched_priority,
@@ -146,8 +146,8 @@ main(void)
 		printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 		printxval(schedulers, attr->sched_policy, NULL);
 		printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-		       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-		       ", sched_period=%" PRIu64,
+		       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+		       ", sched_period=%" PRI__u64,
 		       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
 		       attr->sched_nice,
 		       attr->sched_priority,
@@ -175,8 +175,8 @@ main(void)
 		pid, pid_str, attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64,
+	       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+	       ", sched_period=%" PRI__u64,
 	       "SCHED_FLAG_RESET_ON_FORK",
 	       attr->sched_nice,
 	       attr->sched_priority,
@@ -196,8 +196,8 @@ main(void)
 	printf("sched_setattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64,
+	       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+	       ", sched_period=%" PRI__u64,
 	       "SCHED_FLAG_RESET_ON_FORK",
 	       attr->sched_nice,
 	       attr->sched_priority,
@@ -224,8 +224,8 @@ main(void)
 	printf("sched_setattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, 0) = 0\n",
+	       ", sched_runtime=%" PRI__u64 ", sched_deadline=%" PRI__u64
+	       ", sched_period=%" PRI__u64 "}, 0) = 0\n",
 	       "SCHED_FLAG_RESET_ON_FORK",
 	       attr->sched_nice,
 	       attr->sched_priority,
@@ -259,9 +259,9 @@ main(void)
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
 	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
-	       "sched_flags=%#" PRIx64 " /* SCHED_FLAG_??? */, "
-	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
-	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_flags=%#" PRI__x64 " /* SCHED_FLAG_??? */, "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
+	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
 	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
@@ -304,8 +304,8 @@ main(void)
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|0x80, "
-	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
-	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
+	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
 	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
@@ -343,8 +343,8 @@ main(void)
 	printf("sched_setattr(%d, {size=%u, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_KEEP_POLICY|0x80, "
-	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
-	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "}, %u)"
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
+	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 "}, %u)"
 	       " = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
@@ -379,8 +379,8 @@ main(void)
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_UTIL_CLAMP_MIN"
 	       "|SCHED_FLAG_UTIL_CLAMP_MAX|0x80, "
-	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
-	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
+	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
 	       "sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,

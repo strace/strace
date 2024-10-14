@@ -18,7 +18,9 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <linux/sched.h>
+#ifndef SCHED_NORMAL
+# include <linux/sched.h>
+#endif
 
 static const int child_exit_status = 42;
 static pid_t pid;

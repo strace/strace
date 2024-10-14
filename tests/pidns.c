@@ -20,7 +20,9 @@
 #include <sched.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <linux/sched.h>
+#ifndef SCHED_NORMAL
+# include <linux/sched.h>
+#endif
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
