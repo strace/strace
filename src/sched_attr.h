@@ -16,7 +16,7 @@ struct sched_attr {
 	uint32_t size;
 	uint32_t sched_policy;
 	uint64_t sched_flags;
-	int32_t sched_nice;
+	uint32_t sched_nice;
 	uint32_t sched_priority;
 	uint64_t sched_runtime;
 	uint64_t sched_deadline;
