@@ -6,6 +6,8 @@ MAP_PRIVATE	0x2
 
 MAP_SHARED_VALIDATE	0x3
 
+MAP_DROPPABLE	0x8
+
 #if defined __hppa__
 MAP_FIXED	0x4
 #elif defined __alpha__
