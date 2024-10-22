@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of MAP_* and MSG_* constants.
+  * Updated lists of MAP_*, MSG_*, and SCM_* constants.
 
 Noteworthy changes in release 6.11 (2024-09-15)
 ===============================================
