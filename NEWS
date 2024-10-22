@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of MAP_*, MSG_*, SCM_*, and SO_* constants.
+  * Updated lists of ETHTOOL_*, MAP_*, MSG_*, SCM_*, and SO_* constants.
 
 Noteworthy changes in release 6.11 (2024-09-15)
 ===============================================
