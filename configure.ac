@@ -290,8 +290,8 @@ AC_CACHE_CHECK(
 
 AM_CONDITIONAL([USE_BUNDLED_HEADERS], [test $st_cv_use_bundled_headers = yes])
 AS_IF([test $st_cv_use_bundled_headers = yes],
-      [CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
-       CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
+      [CPPFLAGS="$CPPFLAGS -isystem $srcdir/bundled/linux/arch/$karch/include/uapi"
+       CPPFLAGS="$CPPFLAGS -isystem $srcdir/bundled/linux/include/uapi"
       ]
 )
 

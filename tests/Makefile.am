@@ -21,8 +21,8 @@ ARCH_MFLAGS =
 AM_CFLAGS = $(WARN_CFLAGS)
 bundled_CPPFLAGS =
 if USE_BUNDLED_HEADERS
-bundled_CPPFLAGS += -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
-		    -I$(top_srcdir)/bundled/$(OS)/include/uapi
+bundled_CPPFLAGS += -isystem $(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
+		    -isystem $(top_srcdir)/bundled/$(OS)/include/uapi
 endif
 AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(builddir) \
