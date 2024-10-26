@@ -19,7 +19,7 @@
 # define TEST_SYSCALL_PREFIX_STR ""
 #endif
 
-static const char *sample;
+static const char sample[] = ".";
 
 static void
 test_syscall(unsigned short mode)
@@ -39,9 +39,8 @@ test_syscall(unsigned short mode)
 }
 
 int
-main(int ac, char **av)
+main(void)
 {
-	sample = av[0];
 	test_syscall(0);
 	test_syscall(0xffff);
 	test_syscall(06);

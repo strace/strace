@@ -75,7 +75,7 @@ clone_ptrace-q +clone_ptrace.test -q
 clone_ptrace-qq +clone_ptrace.test -qq
 close_range	-a21 7>>/dev/full
 copy_file_range
-creat	-a20
+creat	-a16
 delete_module	-a23
 dev--decode-fds-all	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=all
 dev--decode-fds-dev	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=dev
@@ -560,8 +560,8 @@ memfd_secret-success-y -einject=memfd_secret:retval=7 -a16 -etrace=memfd_secret 
 migrate_pages	-a33
 migrate_pages--pidns-translation	test_pidns -a33 -e trace=migrate_pages
 mincore	-a22
-mkdir	-a20
-mkdirat	-a28
+mkdir	-a16
+mkdirat	-a22
 mknod	-a18
 mknodat	-a35
 mlock	-a20 -e trace=mlock,munlock
