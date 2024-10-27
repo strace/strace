@@ -80,7 +80,8 @@ read_namespace_id(int pid, const char *const ns_type)
 }
 
 static const char *
-get_namespace_auxstr(int pid, uint64_t flags)
+get_namespace_auxstr(int pid, uint64_t flags,
+		     struct tcb *const tcp_for_pid_translation)
 {
 	static char str[sizeof("cgroup:[4026531835], "
 			          "ipc:[4026531839], "
@@ -105,6 +106,13 @@ get_namespace_auxstr(int pid, uint64_t flags)
 		{ CLONE_NEWUTS, "uts" },
 		{ CLONE_NEWUSER, "user" },
 	};
+
+	if (tcp_for_pid_translation) {
+		int proc_pid;
+		if (translate_pid(tcp_for_pid_translation, pid, PT_TID, &proc_pid) == 0)
+			return NULL;
+		pid = proc_pid;
+	}
 
 	*p = '\0';
 	for (size_t i = 0; i < ARRAY_SIZE(ns); ++i) {
@@ -215,12 +223,9 @@ SYS_FUNC(clone)
 			tprint_arg_name_end();
 		}
 		if (show_namespace && tcp->u_rval >= 0) {
-			int proc_pid;
-			if (translate_pid(tcp, (int)tcp->u_rval, PT_TID, &proc_pid) != 0) {
-				tcp->auxstr = get_namespace_auxstr(proc_pid, flags);
-				if (tcp->auxstr)
-					r_extra = RVAL_STR;
-			}
+			tcp->auxstr = get_namespace_auxstr((int)tcp->u_rval, flags, tcp);
+			if (tcp->auxstr)
+				r_extra = RVAL_STR;
 		}
 	}
 	return RVAL_TID | r_extra;
@@ -386,12 +391,9 @@ SYS_FUNC(clone3)
 		tprint_struct_end();
 
 	if (show_namespace && tcp->u_rval >= 0) {
-		int proc_pid;
-		if (translate_pid(tcp, tcp->u_rval, PT_TID, &proc_pid) != 0) {
-			tcp->auxstr = get_namespace_auxstr(proc_pid, arg.flags);
-			if (tcp->auxstr)
-				r_extra = RVAL_STR;
-		}
+		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, arg.flags, tcp);
+		if (tcp->auxstr)
+			r_extra = RVAL_STR;
 	}
 
 out:
@@ -413,7 +415,7 @@ SYS_FUNC(setns)
 
 	int r_extra = 0;
 	if (show_namespace && tcp->u_rval == 0) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[1]);
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[1], NULL);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
@@ -430,7 +432,7 @@ SYS_FUNC(unshare)
 
 	int r_extra = 0;
 	if (show_namespace && tcp->u_rval == 0) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0]);
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0], NULL);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
