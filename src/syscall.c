@@ -1082,6 +1082,21 @@ ptrace_syscall_info_is_valid(void)
 	       ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
 }
 
+static bool
+ptrace_syscall_info_is_entry(void)
+{
+	return ptrace_get_syscall_info_supported &&
+	       (ptrace_sci.op == PTRACE_SYSCALL_INFO_ENTRY ||
+		ptrace_sci.op == PTRACE_SYSCALL_INFO_SECCOMP);
+}
+
+static bool
+ptrace_syscall_info_is_exit(void)
+{
+	return ptrace_get_syscall_info_supported &&
+	       ptrace_sci.op == PTRACE_SYSCALL_INFO_EXIT;
+}
+
 #define XLAT_MACROS_ONLY
 #include "xlat/nt_descriptor_types.h"
 #undef XLAT_MACROS_ONLY
@@ -1376,8 +1391,23 @@ get_syscall_regs(struct tcb *tcp)
 	if (get_regs_error != -1)
 		return get_regs_error;
 
-	if (ptrace_get_syscall_info_supported)
-		return strace_get_syscall_info(tcp) ? 0 : get_regs_error;
+	if (ptrace_get_syscall_info_supported) {
+		if (!strace_get_syscall_info(tcp))
+			return get_regs_error;
+
+		if ((entering(tcp) && ptrace_syscall_info_is_entry()) ||
+		    (exiting(tcp) && ptrace_syscall_info_is_exit()))
+			return 0;
+
+		/*
+		 * PTRACE_GET_SYSCALL_INFO succeeded but didn't help,
+		 * falling back to get_regs().
+		 *
+		 * This can happen when get_syscall_regs() is called
+		 * from startup_tcb() via get_scno().
+		 */
+		debug_func_msg("ptrace_sci.op = %d", ptrace_sci.op);
+	}
 
 	return get_regs(tcp);
 }
@@ -1408,7 +1438,7 @@ get_scno(struct tcb *tcp)
 	if (get_syscall_regs(tcp) < 0)
 		return -1;
 
-	if (ptrace_syscall_info_is_valid()) {
+	if (ptrace_syscall_info_is_entry()) {
 		/* Apply arch-specific workarounds.  */
 		int rc = arch_check_scno(tcp);
 		if (rc != 1)
@@ -1456,7 +1486,7 @@ get_scno(struct tcb *tcp)
 static int
 get_syscall_args(struct tcb *tcp)
 {
-	if (ptrace_syscall_info_is_valid()) {
+	if (ptrace_syscall_info_is_entry()) {
 		const unsigned int n =
 			MIN(ARRAY_SIZE(tcp->u_arg),
 			    ARRAY_SIZE(ptrace_sci.entry.args));
@@ -1507,7 +1537,7 @@ get_syscall_result(struct tcb *tcp)
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (ptrace_syscall_info_is_valid()) {
+	if (ptrace_syscall_info_is_exit()) {
 		if (ptrace_sci.exit.is_error) {
 			tcp->u_rval = -1;
 			tcp->u_error = -ptrace_sci.exit.rval;
