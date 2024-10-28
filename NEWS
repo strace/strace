@@ -4,6 +4,11 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Updated lists of ETHTOOL_*, F_*, MAP_*, MSG_*, SCM_*, and SO_* constants.
 
+* Bug fixes
+  * Fix the syscall name printed by strace when PTRACE_GET_SYSCALL_INFO
+    is in use and a syscall is restarted by a just attached tracee using
+    restart_syscall mechanism.
+
 Noteworthy changes in release 6.11 (2024-09-15)
 ===============================================
 
