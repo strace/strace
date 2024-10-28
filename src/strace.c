@@ -3549,8 +3549,16 @@ startup_tcb(struct tcb *tcp)
 		}
 	}
 
-	if ((tcp->flags & TCB_GRABBED) && (get_scno(tcp) == 1))
-		tcp->s_prev_ent = tcp->s_ent;
+	if (tcp->flags & TCB_GRABBED) {
+		/*
+		 * There is no guarantee the state of the tracee is such that
+		 * would allow get_scno() to obtain meaningful information.
+		 * However, if the tracee is not in a syscall, then the garbage
+		 * obtained by get_scno() is not going to be used.
+		 */
+		if (get_scno(tcp) == 1)
+			tcp->s_prev_ent = tcp->s_ent;
+	}
 
 	if (cflag) {
 		tcp->atime = tcp->stime;
