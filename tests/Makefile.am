@@ -579,6 +579,7 @@ DECODER_TESTS = \
 	prctl-seccomp-strict.test \
 	qual_fault-exit_group.test \
 	readv.test \
+	restart_syscall-p.test \
 	rt_sigaction.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
@@ -751,6 +752,7 @@ check_DATA = \
 	qual_inject-signal.expected \
 	qualify_personality_empty.in \
 	regex.in \
+	restart_syscall-p.expected \
 	rt_sigaction.awk \
 	sched.in \
 	sigaltstack.expected \

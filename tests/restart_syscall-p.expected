@@ -1,0 +1,2 @@
+restart_syscall(<... resuming interrupted nanosleep ...>) = 0
+exit_group(0) = ?

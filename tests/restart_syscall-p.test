@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Check restart_syscall decoding.
+#
+# Copyright (c) 2015-2024 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../sleep 0
+
+../set_ptracer_any ../sleep 2 > /dev/null &
+tracee_pid=$!
+
+../sleep 1
+
+run_strace -qq -a14  -p $tracee_pid
+match_diff
