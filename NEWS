@@ -3,7 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of EPIOCGPARAMS and EPIOCSPARAMS ioctl commands.
-  * Updated lists of ETHTOOL_*, F_*, MAP_*, MSG_*, SCM_*, and SO_* constants.
+  * Updated lists of AUDIT_*, ETHTOOL_*, F_*, MAP_*, MSG_*, SCM_*, and SO_*
+    constants.
 
 * Bug fixes
   * Fix the syscall name printed by strace when PTRACE_GET_SYSCALL_INFO
