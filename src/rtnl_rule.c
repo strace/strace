@@ -94,6 +94,7 @@ static const nla_decoder_t fib_rule_hdr_nla_decoders[] = {
 	[FRA_IP_PROTO]			= decode_nla_ip_proto,
 	[FRA_SPORT_RANGE]		= decode_rule_port_range,
 	[FRA_DPORT_RANGE]		= decode_rule_port_range,
+	[FRA_DSCP]			= decode_nla_u8,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
