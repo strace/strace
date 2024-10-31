@@ -22,6 +22,7 @@
 # include "kernel_time_types.h"
 # include "kernel_timeval.h"
 # include "kernel_old_timespec.h"
+# include "k_sockopt.h"
 
 # define XLAT_MACROS_ONLY
 #  include "xlat/sock_options.h"
@@ -42,30 +43,6 @@ k_recvmsg(const unsigned int fd, const void *const ptr, const unsigned int flags
 		perror_msg_and_skip("recvmsg");
 	errstr = sprintrc(rc);
 	return rc;
-}
-
-# define SC_setsockopt 14
-static long
-k_setsockopt(const unsigned int fd, const unsigned int level,
-	     const unsigned int optname, const void *const optval,
-	     const unsigned int len)
-{
-	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
-# ifdef __NR_setsockopt
-	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
-# endif
-
-	return syscall(
-# ifdef __NR_setsockopt
-		__NR_setsockopt,
-# else /* socketcall */
-		__NR_socketcall, SC_setsockopt,
-# endif
-		fill | fd , fill | level, fill | optname, optval, fill | len
-# ifdef __NR_setsockopt
-		, bad
-# endif
-		);
 }
 
 static void

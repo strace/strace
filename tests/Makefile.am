@@ -61,6 +61,8 @@ libtests_a_SOURCES = \
 	hexquote_strndup.c \
 	ifindex.c \
 	inode_of_sockfd.c \
+	k_sockopt.c \
+	k_sockopt.h \
 	libmmsg.c \
 	libsocketcall.c \
 	lock_file.c \
