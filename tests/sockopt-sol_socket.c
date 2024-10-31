@@ -13,6 +13,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#include "k_sockopt.h"
+
 #define XLAT_MACROS_ONLY
 # include "xlat/sock_options.h"
 #undef XLAT_MACROS_ONLY
@@ -34,7 +36,7 @@ struct intstr {
 static int
 get_sockopt(int fd, int name, void *val, socklen_t *len)
 {
-	rc = getsockopt(fd, SOL_SOCKET, name, val, len);
+	rc = k_getsockopt(fd, SOL_SOCKET, name, val, len);
 	errstr = sprintrc(rc);
 	return rc;
 }
@@ -42,7 +44,7 @@ get_sockopt(int fd, int name, void *val, socklen_t *len)
 static int
 set_sockopt(int fd, int name, void *val, socklen_t len)
 {
-	rc = setsockopt(fd, SOL_SOCKET, name, val, len);
+	rc = k_setsockopt(fd, SOL_SOCKET, name, val, len);
 	errstr = sprintrc(rc);
 	return rc;
 }
