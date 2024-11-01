@@ -4,8 +4,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented decoding of EPIOCGPARAMS and EPIOCSPARAMS ioctl commands.
   * Implemented decoding of FRA_DSCP netlink attribute.
-  * Updated lists of AUDIT_*, ETHTOOL_*, F_*, MAP_*, MSG_*, NT_*, SCM_*,
-    and SO_* constants.
+  * Updated lists of AUDIT_*, ETHTOOL_*, F_*, IORING_*, MAP_*, MSG_*, NT_*,
+    SCM_*, and SO_* constants.
 
 * Bug fixes
   * Fix the syscall name printed by strace when PTRACE_GET_SYSCALL_INFO
