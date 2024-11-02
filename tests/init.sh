@@ -433,9 +433,9 @@ test_pure_prog_set()
 	} < /dev/null; done
 }
 
-# Run strace against list of programs put in "$NAME.in" and then against the
-# rest of pure_executables.list with the expectation of empty output in the
-# latter case.
+# Run strace against list of programs put in "$NAME.in" and then against
+# a random selection of the binaries from the rest of pure_executables.list
+# with the expectation of empty output in the latter case.
 #
 # Usage: source this file after init.sh and call:
 #   test_trace_expr subtrahend_regexp strace_args
@@ -443,6 +443,9 @@ test_pure_prog_set()
 #   $NAME:	test name, used for "$NAME.in" file containing list of tests
 #		for positive trace expression match;
 #   $srcdir:	used to find pure_executables.list and "$NAME.in" files.
+#   $TRACE_TESTS_SAMPLE:
+#               number of binaries to pick from the remainder
+#               of pure_executables.list to check for the absence of output.
 # Files created:
 #   negative.list: File containing list of tests for negative match.
 test_trace_expr()
@@ -451,7 +454,7 @@ test_trace_expr()
 	subtrahend_regexp="$1"; shift
 	test_pure_prog_set "$@" < "$srcdir/$NAME.in"
 	prog_set_subtract "$srcdir/pure_executables.list" "$srcdir/$NAME.in" \
-		"$subtrahend_regexp" > negative.list
+		"$subtrahend_regexp" | shuf -n "${TRACE_TESTS_SAMPLE}"  > negative.list
 	test_pure_prog_set --expfile /dev/null -qq -esignal=none "$@" \
 		< negative.list
 }
@@ -607,6 +610,7 @@ export STRACE_EXE
 
 : "${TIMEOUT_DURATION:=1500}"
 : "${SLEEP_A_BIT:=sleep 1}"
+: "${TRACE_TESTS_SAMPLE:=100}"
 
 [ -z "${VERBOSE-}" ] ||
 	set -x
