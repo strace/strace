@@ -209,6 +209,10 @@ ioctl_counter-Xabbrev
 ioctl_counter-Xraw
 ioctl_counter-Xverbose
 ioctl_dm
+ioctl_epoll
+ioctl_epoll-Xabbrev
+ioctl_epoll-Xraw
+ioctl_epoll-Xverbose
 ioctl_evdev
 ioctl_evdev-Xabbrev
 ioctl_evdev-Xraw

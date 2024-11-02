@@ -96,6 +96,7 @@ libstrace_a_SOURCES =	\
 	dyxlat.c	\
 	empty.h		\
 	epoll.c		\
+	epoll_ioctl.c	\
 	error_prints.c	\
 	error_prints.h	\
 	evdev.c		\

@@ -301,6 +301,14 @@ ioctl_counter-Xraw	+ioctl.test -a18 -Xraw
 ioctl_counter-Xverbose	+ioctl.test -a52 -Xverbose
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
+ioctl_epoll		+ioctl.test -a30
+ioctl_epoll-Xabbrev	+ioctl.test -a30 -Xabbrev
+ioctl_epoll-Xraw		+ioctl.test -a28 -Xraw
+ioctl_epoll-Xverbose	+ioctl.test -a47 -Xverbose
+ioctl_epoll-success		+ioctl-success.sh -a30
+ioctl_epoll-success-Xabbrev	+ioctl-success.sh -a30 -Xabbrev
+ioctl_epoll-success-Xraw		+ioctl-success.sh -a28 -Xraw
+ioctl_epoll-success-Xverbose	+ioctl-success.sh -a47 -Xverbose
 ioctl_evdev	+ioctl.test -a26
 ioctl_evdev-Xabbrev	+ioctl.test -a26 -Xabbrev
 ioctl_evdev-Xraw	+ioctl.test -a28 -Xraw

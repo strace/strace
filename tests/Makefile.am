@@ -168,6 +168,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	io_uring_register-success-Xverbose \
 	ioctl_block--pidns-translation \
 	ioctl_dm-v \
+	ioctl_epoll-success \
+	ioctl_epoll-success-Xabbrev \
+	ioctl_epoll-success-Xraw \
+	ioctl_epoll-success-Xverbose \
 	ioctl_evdev-success \
 	ioctl_evdev-success-Xabbrev \
 	ioctl_evdev-success-Xraw \
