@@ -15,8 +15,8 @@
 #include <stdio.h>
 #include <sched.h>
 #include <unistd.h>
+#include <linux/sched/types.h>
 #include "pidns.h"
-#include "sched_attr.h"
 #include "xlat.h"
 #include "xlat/schedulers.h"
 
@@ -82,12 +82,12 @@ main(void)
 #endif
 	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
 
-	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_MIN_SIZE, 0);
+	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_SIZE_VER0, 0);
 	pidns_print_leader();
 	printf("sched_getattr(0, %p, %u, 0) = %s\n",
-	       efault, (unsigned) SCHED_ATTR_MIN_SIZE, errstr);
+	       efault, (unsigned) SCHED_ATTR_SIZE_VER0, errstr);
 
-	if (sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_MIN_SIZE, 0))
+	if (sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_SIZE_VER0, 0))
 		perror_msg_and_skip("sched_getattr");
 	pidns_print_leader();
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
@@ -101,7 +101,7 @@ main(void)
 	       attr->sched_runtime,
 	       attr->sched_deadline,
 	       attr->sched_period,
-	       (unsigned) SCHED_ATTR_MIN_SIZE);
+	       (unsigned) SCHED_ATTR_SIZE_VER0);
 
 	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
 	pidns_print_leader();
@@ -241,12 +241,12 @@ main(void)
 	printf("sched_setattr(0, {size=%u} => {size=%u}, 0) = %s\n",
 	       1, attr->size, errstr);
 
-	attr->size = SCHED_ATTR_MIN_SIZE - 1;
+	attr->size = SCHED_ATTR_SIZE_VER0 - 1;
 
 	sys_sched_setattr(0, (unsigned long) attr, 0);
 	pidns_print_leader();
 	printf("sched_setattr(0, {size=%u} => {size=%u}, 0) = %s\n",
-	       SCHED_ATTR_MIN_SIZE - 1, attr->size, errstr);
+	       SCHED_ATTR_SIZE_VER0 - 1, attr->size, errstr);
 
 	attr->size = 0x90807060;
 	attr->sched_policy = 0xca7faced;
@@ -335,7 +335,7 @@ main(void)
 		       (unsigned long long) ill, errstr);
 	}
 
-	attr->size = SCHED_ATTR_MIN_SIZE;
+	attr->size = SCHED_ATTR_SIZE_VER0;
 	attr->sched_policy = 0xdefaced;
 	attr->sched_flags = 0x8fULL;
 

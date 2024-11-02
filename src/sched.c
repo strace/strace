@@ -11,7 +11,7 @@
 #include "defs.h"
 
 #include <sched.h>
-#include "sched_attr.h"
+#include <linux/sched/types.h>
 
 #include "xlat/schedulers.h"
 #include "xlat/sched_flags.h"
@@ -130,9 +130,9 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 			return;
 		usize = attr.size;
 		if (!usize)
-			usize = SCHED_ATTR_MIN_SIZE;
+			usize = SCHED_ATTR_SIZE_VER0;
 		size = usize <= sizeof(attr) ? usize : (unsigned) sizeof(attr);
-		if (size >= SCHED_ATTR_MIN_SIZE) {
+		if (size >= SCHED_ATTR_SIZE_VER0) {
 			if (umoven_or_printaddr(tcp, addr, size, &attr))
 				return;
 		}
@@ -141,7 +141,7 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_U(attr, size);
 
-	if (size < SCHED_ATTR_MIN_SIZE)
+	if (size < SCHED_ATTR_SIZE_VER0)
 		goto end;
 
 	if (!is_set || (int)attr.sched_policy < 0 || !(attr.sched_flags & (SCHED_FLAG_KEEP_POLICY | SCHED_FLAG_KEEP_PARAMS))) {

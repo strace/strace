@@ -332,7 +332,6 @@ libstrace_a_SOURCES =	\
 	rtnl_tc_action.c \
 	s390.c		\
 	sched.c		\
-	sched_attr.h	\
 	scsi.c		\
 	seccomp.c	\
 	seccomp_ioctl.c	\
