@@ -38,8 +38,8 @@ pipe_maxfd(int pipefd[2])
 	if (pipe(pipefd))
 		perror_msg_and_fail("pipe");
 
-	int max_fd = (rlim.rlim_cur > 0 && rlim.rlim_cur < INT_MAX)
-		     ? rlim.rlim_cur - 1 : INT_MAX;
+	int max_fd = (rlim.rlim_cur > 0 && rlim.rlim_cur <= 0x10000)
+		     ? rlim.rlim_cur - 1 : 0x10000;
 
 	move_fd(&pipefd[1], &max_fd);
 	--max_fd;
