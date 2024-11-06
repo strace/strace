@@ -172,7 +172,7 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0x7fffffffU, 29 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 30 };
 	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
@@ -486,10 +486,10 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_UNREGISTER_NAPI),
+		  "register_op=", ARG_STR(IORING_REGISTER_CLOCK),
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 29, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 30, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -1453,6 +1453,74 @@ main(void)
 			}
 			printf(", 1) = %s\n", errstr);
 		}
+	}
+
+	/* IORING_REGISTER_CLOCK */
+	static const struct strval32 clock_ops =
+		{ ARG_STR(IORING_REGISTER_CLOCK) };
+
+	sys_io_uring_register(fd_null, clock_ops.val, 0, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clock_ops.val, clock_ops.str),
+	       errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_clock_register,
+				    clock_register);
+
+	sys_io_uring_register(fd_null, clock_ops.val, clock_register, 0x42);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clock_ops.val, clock_ops.str),
+	       clock_register, errstr);
+
+	sys_io_uring_register(fd_null, clock_ops.val, clock_register + 1, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clock_ops.val, clock_ops.str),
+	       clock_register + 1, errstr);
+
+	sys_io_uring_register(fd_null, clock_ops.val,
+			      (char *) clock_register + 1, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clock_ops.val, clock_ops.str),
+	       (char *) clock_register + 1, errstr);
+
+	static const struct strval32 clockids[] = {
+		{ ARG_XLAT_KNOWN(0, "CLOCK_REALTIME") },
+		{ ARG_XLAT_KNOWN(0x1, "CLOCK_MONOTONIC") },
+		{ ARG_XLAT_KNOWN(0x2, "CLOCK_PROCESS_CPUTIME_ID") },
+		{ ARG_XLAT_KNOWN(0x3, "CLOCK_THREAD_CPUTIME_ID") },
+		{ ARG_XLAT_KNOWN(0x4, "CLOCK_MONOTONIC_RAW") },
+		{ ARG_XLAT_KNOWN(0x5, "CLOCK_REALTIME_COARSE") },
+		{ ARG_XLAT_KNOWN(0x6, "CLOCK_MONOTONIC_COARSE") },
+		{ ARG_XLAT_KNOWN(0x7, "CLOCK_BOOTTIME") },
+		{ ARG_XLAT_KNOWN(0x8, "CLOCK_REALTIME_ALARM") },
+		{ ARG_XLAT_KNOWN(0x9, "CLOCK_BOOTTIME_ALARM") },
+		{ ARG_XLAT_KNOWN(0xa, "CLOCK_SGI_CYCLE") },
+		{ ARG_XLAT_KNOWN(0xb, "CLOCK_TAI") },
+		{ ARG_XLAT_UNKNOWN(0xc, "CLOCK_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(clockids); ++i) {
+		memset(clock_register, 0, sizeof(*clock_register));
+		clock_register->clockid = clockids[i].val;
+		clock_register->__resv[0] = i & 1 ? 0xdefaced1 : 0;
+		clock_register->__resv[1] = i & 2 ? 0xdefaced2 : 0;
+		clock_register->__resv[2] = i & 4 ? 0xdefaced3 : 0;
+		sys_io_uring_register(fd_null, clock_ops.val, clock_register, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		        ", {clockid=%s",
+		       fd_null, path_null,
+		       XLAT_SEL(clock_ops.val, clock_ops.str),
+		       clockids[i].str);
+		if (i & 7)
+			printf(", __resv=[%#x, %#x, %#x]",
+			       clock_register->__resv[0],
+			       clock_register->__resv[1],
+			       clock_register->__resv[2]);
+		printf("}, 0) = %s\n", errstr);
 	}
 
 	puts("+++ exited with 0 +++");

@@ -771,6 +771,39 @@ print_ioring_unregister_napi(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_clock_register(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_clock_register arg;
+	CHECK_TYPE_SIZE(arg, 16);
+	CHECK_TYPE_SIZE(arg.__resv, 3 * sizeof(uint32_t));
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(arg, clockid, clocknames, "CLOCK_???");
+
+	if (!IS_ARRAY_ZERO(arg.__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_clock(struct tcb *tcp, const kernel_ulong_t addr,
+			    const unsigned int nargs)
+{
+	if (nargs == 0)
+		print_io_uring_clock_register(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -872,6 +905,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_UNREGISTER_NAPI:
 		rc = print_ioring_unregister_napi(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_CLOCK:
+		rc = print_ioring_register_clock(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
