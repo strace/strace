@@ -172,7 +172,7 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0x7fffffffU, 30 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 31 };
 	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
@@ -486,10 +486,10 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_REGISTER_CLOCK),
+		  "register_op=", ARG_STR(IORING_REGISTER_CLONE_BUFFERS),
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 30, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 31, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -1521,6 +1521,74 @@ main(void)
 			       clock_register->__resv[1],
 			       clock_register->__resv[2]);
 		printf("}, 0) = %s\n", errstr);
+	}
+
+	/* IORING_REGISTER_CLONE_BUFFERS */
+	static const struct strval32 clone_buffers_ops =
+		{ ARG_STR(IORING_REGISTER_CLONE_BUFFERS) };
+
+	sys_io_uring_register(fd_null, clone_buffers_ops.val, 0, 2);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, 2) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
+	       errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_clone_buffers,
+				    clone_buffers);
+
+	sys_io_uring_register(fd_null, clone_buffers_ops.val,
+			      clone_buffers, 0x42);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
+	       clone_buffers, errstr);
+
+	sys_io_uring_register(fd_null, clone_buffers_ops.val,
+			      clone_buffers + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
+	       clone_buffers + 1, errstr);
+
+	sys_io_uring_register(fd_null, clone_buffers_ops.val,
+			      (char *) clone_buffers + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
+	       (char *) clone_buffers + 1, errstr);
+
+	static const struct strval32 clone_buffers_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "IORING_REGISTER_SRC_REGISTERED") },
+		{ ARG_XLAT_UNKNOWN(0x2, "IORING_REGISTER_???") },
+		{ ARG_XLAT_UNKNOWN(0xfffffffe, "IORING_REGISTER_???") },
+		{ ARG_XLAT_KNOWN(0xffffffff,
+				 "IORING_REGISTER_SRC_REGISTERED|0xfffffffe") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(clone_buffers_flags); ++i) {
+		const size_t pad_len = ARRAY_SIZE(clone_buffers->pad);
+		memset(clone_buffers, 0, sizeof(*clone_buffers));
+		clone_buffers->src_fd = fd_full;
+		clone_buffers->flags = clone_buffers_flags[i].val;
+		clone_buffers->pad[0] = i & 1 ? 0xdefaced1 : 0;
+		clone_buffers->pad[pad_len - 1] = i & 2 ? 0xdefaced2 : 0;
+		sys_io_uring_register(fd_null, clone_buffers_ops.val,
+				      clone_buffers, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		        ", {src_fd=%u<%s>, flags=%s",
+		       fd_null, path_null,
+		       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
+		       fd_full, path_full,
+		       clone_buffers_flags[i].str);
+			if (i & 3) {
+				printf(", pad=[");
+				for (size_t j = 0; j < pad_len; ++j)
+					printf("%s%#x", j ? ", " : "",
+					       clone_buffers->pad[j]);
+				printf("]");
+			}
+		printf("}, 1) = %s\n", errstr);
 	}
 
 	puts("+++ exited with 0 +++");

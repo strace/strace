@@ -13,6 +13,7 @@
 #include <linux/io_uring.h>
 
 #include "xlat/uring_async_cancel_flags.h"
+#include "xlat/uring_clone_buffers_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_files_update_fds.h"
 #include "xlat/uring_iowq_acct.h"
@@ -804,6 +805,43 @@ print_ioring_register_clock(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_clone_buffers(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_clone_buffers arg;
+	CHECK_TYPE_SIZE(arg, 32);
+	CHECK_TYPE_SIZE(arg.pad, 6 * sizeof(uint32_t));
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_FD(arg, src_fd, tcp);
+
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(arg, flags, uring_clone_buffers_flags,
+			  "IORING_REGISTER_???");
+
+	if (!IS_ARRAY_ZERO(arg.pad)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, pad, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_clone_buffers(struct tcb *tcp, const kernel_ulong_t addr,
+				    const unsigned int nargs)
+{
+	if (nargs == 1)
+		print_io_uring_clone_buffers(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -908,6 +946,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_CLOCK:
 		rc = print_ioring_register_clock(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_CLONE_BUFFERS:
+		rc = print_ioring_register_clone_buffers(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

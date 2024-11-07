@@ -4,8 +4,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented decoding of EPIOCGPARAMS and EPIOCSPARAMS ioctl commands.
   * Implemented decoding of FRA_DSCP netlink attribute.
-  * Implemented decoding of IORING_REGISTER_CLOCK opcode of io_uring_register
-    syscall.
+  * Implemented decoding of IORING_REGISTER_CLOCK and
+    IORING_REGISTER_CLONE_BUFFERS opcodes of io_uring_register syscall.
   * Updated lists of AUDIT_*, ETHTOOL_*, F_*, IORING_*, MAP_*, MSG_*, NT_*,
     SCM_*, and SO_* constants.
 
