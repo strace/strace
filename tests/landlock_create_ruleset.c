@@ -63,6 +63,36 @@ sys_landlock_create_ruleset(void *attr, kernel_ulong_t size, unsigned int flags)
 	return rc;
 }
 
+static const char *
+get_fd_str(const long int fd)
+{
+	if (fd < 0)
+		return "";
+
+#if DECODE_FD
+	/*
+	 * The ABI has been broken in commit v5.18-rc1~88^2
+	 * by adding brackets to the link value, hence, we can't
+	 * rely on a specific name anymore and have to fetch it
+	 * ourselves.
+	 */
+
+	static char buf[256];
+	char *path = xasprintf("/proc/self/fd/%ld", fd);
+	ssize_t rc = readlink(path, buf + 1, sizeof(buf) - 3);
+	free(path);
+
+	if (rc >= 0) {
+		buf[0] = '<';
+		buf[rc + 1] = '>';
+		buf[rc + 2] = '\0';
+		return buf;
+	}
+#endif
+
+	return FD_PATH;
+}
+
 int
 main(void)
 {
@@ -75,6 +105,7 @@ main(void)
 	struct attr {
 		uint64_t handled_access_fs;
 		uint64_t handled_access_net;
+		uint64_t scoped;
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct attr, attr);
 	long rc;
@@ -133,83 +164,52 @@ main(void)
 		{ ARG_STR(LANDLOCK_ACCESS_NET_CONNECT_TCP) },
 		{ ARG_ULL_STR(LANDLOCK_ACCESS_NET_BIND_TCP|LANDLOCK_ACCESS_NET_CONNECT_TCP|0xfffffffffffffffc) },
 		{ ARG_ULL_STR(0xfffffffffffffffc) " /* LANDLOCK_ACCESS_NET_??? */" },
+	}, landlock_scope_flags[] = {
+		{ ARG_STR(LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET) },
+		{ ARG_STR(LANDLOCK_SCOPE_SIGNAL) },
+		{ ARG_ULL_STR(LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET|LANDLOCK_SCOPE_SIGNAL|0xfffffffffffffffc) },
+		{ ARG_ULL_STR(0xfffffffffffffffc) " /* LANDLOCK_SCOPE_??? */" },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(fs_vals); i++) {
-		const char *fd_str = FD_PATH;
+		unsigned int size = sizeof(*handled_access_fs);
 
 		*handled_access_fs = fs_vals[i].val;
-		rc = sys_landlock_create_ruleset(handled_access_fs,
-						 sizeof(*handled_access_fs), 0);
-
-#if DECODE_FD
-		/*
-		 * The ABI has been broken in commit v5.18-rc1~88^2
-		 * by adding brackets to the link value, hence, we can't
-		 * rely on a specific name anymore and have to fetch it
-		 * ourselves.
-		 */
-		if (rc >= 0) {
-			static char buf[256];
-			char *path = xasprintf("/proc/self/fd/%ld", rc);
-			ssize_t ret = readlink(path, buf + 1,
-					       sizeof(buf) - 3);
-			free(path);
-
-			if (ret >= 0) {
-				buf[0] = '<';
-				buf[ret + 1] = '>';
-				buf[ret + 2] = '\0';
-				fd_str = buf;
-			}
-		}
-#endif
+		rc = sys_landlock_create_ruleset(handled_access_fs, size, 0);
 
 		printf("landlock_create_ruleset({handled_access_fs=%s}"
-		       ", %llu, 0) = %s%s" INJ_STR,
-		       fs_vals[i].str,
-		       (unsigned long long) sizeof(*handled_access_fs),
-		       errstr, rc >= 0 ? fd_str : "");
+		       ", %u, 0) = %s%s" INJ_STR,
+		       fs_vals[i].str, size,
+		       errstr, get_fd_str(rc));
 	}
 
-	static const kernel_ulong_t sizes[] = { sizeof(*attr), sizeof(*attr) + 4 };
 	for (size_t i = 0; i < ARRAY_SIZE(net_vals); i++) {
-		for (size_t j = 0; j < ARRAY_SIZE(sizes); j++) {
-			const char *fd_str = FD_PATH;
+		unsigned int size = offsetofend(typeof(*attr), handled_access_net);
 
+		attr->handled_access_fs = 0;
+		attr->handled_access_net = net_vals[i].val;
+		rc = sys_landlock_create_ruleset(attr, size, 0);
+
+		printf("landlock_create_ruleset({handled_access_fs=0"
+		       ", handled_access_net=%s}, %u, 0) = %s%s" INJ_STR,
+		       net_vals[i].str, size,
+		       errstr, get_fd_str(rc));
+	}
+
+	static const unsigned int sizes[] = { sizeof(*attr), sizeof(*attr) + 4 };
+	for (size_t i = 0; i < ARRAY_SIZE(landlock_scope_flags); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(sizes); j++) {
 			attr->handled_access_fs = 0;
-			attr->handled_access_net = net_vals[i].val;
+			attr->handled_access_net = 0;
+			attr->scoped = landlock_scope_flags[i].val;
 			rc = sys_landlock_create_ruleset(attr, sizes[j], 0);
 
-#if DECODE_FD
-			/*
-			 * The ABI has been broken in commit v5.18-rc1~88^2
-			 * by adding brackets to the link value, hence, we can't
-			 * rely on a specific name anymore and have to fetch it
-			 * ourselves.
-			 */
-			if (rc >= 0) {
-				static char buf[256];
-				char *path = xasprintf("/proc/self/fd/%ld", rc);
-				ssize_t ret = readlink(path, buf + 1,
-						       sizeof(buf) - 3);
-				free(path);
-
-				if (ret >= 0) {
-					buf[0] = '<';
-					buf[ret + 1] = '>';
-					buf[ret + 2] = '\0';
-					fd_str = buf;
-				}
-			}
-#endif
-
 			printf("landlock_create_ruleset({handled_access_fs=0"
-			       ", handled_access_net=%s%s}, %llu, 0) = %s%s" INJ_STR,
-			       net_vals[i].str,
-			       sizes[j] > sizes[0] ? ", ..." : "",
-			       (unsigned long long) sizes[j],
-			       errstr, rc >= 0 ? fd_str : "");
+			       ", handled_access_net=0, scoped=%s%s}, %u, 0)"
+			       " = %s%s" INJ_STR,
+			       landlock_scope_flags[i].str,
+			       sizes[j] > sizeof(*attr) ? ", ..." : "",
+			       sizes[j], errstr, get_fd_str(rc));
 		}
 	}
 
