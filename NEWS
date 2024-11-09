@@ -7,8 +7,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of IORING_REGISTER_CLOCK and
     IORING_REGISTER_CLONE_BUFFERS opcodes of io_uring_register syscall.
   * Updated decoding of struct landlock_ruleset_attr.
-  * Updated lists of AUDIT_*, ETHTOOL_*, F_*, IORING_*, MAP_*, MSG_*, NT_*,
-    SCM_*, and SO_* constants.
+  * Updated lists of AUDIT_*, ETHTOOL_*, F_*, IORING_*, LSM_*, MAP_*, MSG_*,
+    NT_*, SCM_*, and SO_* constants.
 
 * Bug fixes
   * Fix the syscall name printed by strace when PTRACE_GET_SYSCALL_INFO
