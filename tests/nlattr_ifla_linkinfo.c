@@ -759,10 +759,7 @@ main(void)
 				     { 5, "-1" });
 	}
 
-	static const struct {
-		uint8_t val;
-		const char *str;
-	} tun_types[] = {
+	static const struct strval8 tun_types[] = {
 		{ 0, "0 /* IFF_??? */"},
 		{ 1, "IFF_TUN"},
 		{ 2, "IFF_TAP"},

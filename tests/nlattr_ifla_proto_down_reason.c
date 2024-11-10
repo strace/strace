@@ -38,10 +38,7 @@ main(void)
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	static const struct {
-		uint8_t val;
-		const char *str;
-	} inv_attrs[] = {
+	static const struct strval8 inv_attrs[] = {
 		{ ARG_STR(IFLA_PROTO_DOWN_REASON_UNSPEC) },
 		{ ARG_STR(0x3)  " /* IFLA_PROTO_DOWN_REASON_??? */" },
 		{ ARG_STR(0xfe) " /* IFLA_PROTO_DOWN_REASON_??? */" },

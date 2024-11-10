@@ -44,10 +44,7 @@ main(void)
 				  IFLA_XDP_FD, pattern, num,
 				  printf("%d", num));
 
-	static const struct {
-		uint8_t val;
-		const char *str;
-	} attach_types[] = {
+	static const struct strval8 attach_types[] = {
 		{ ARG_STR(XDP_ATTACHED_NONE) },
 		{ ARG_STR(XDP_ATTACHED_MULTI) },
 		{ ARG_STR(0x5)  " /* XDP_ATTACHED_??? */" },
