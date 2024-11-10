@@ -32,6 +32,30 @@ sed_slash_escape()
 	printf "%s" "$*" | sed 's/[/]/\\&/g'
 }
 
+# Calculate an integer approximation of the square root of $1:
+# returns 0 and prints the largest number the square of which is no greater
+# than $1 if $1 is non-negative, returns 1 and prints nothing otherwise.
+sq_root()
+{
+	# Handling the negative cases
+	[ 0 -le "$1" ] || return 1;
+
+	# Handling the 0 and 1 cases
+	[ 1 -lt "$1" ] || { echo "$1"; return 0; }
+
+	local upper="$1"
+	local lower=1
+	local cur
+
+	while :; do
+		cur="$(( (lower + upper) / 2 ))"
+		[ "$((cur * cur))" -ne "$1" ] || { echo "$cur"; return 0; }
+		[ "$((cur * cur))" -lt "$1" ] || { upper="$cur"; continue; }
+		[ "$cur" -ne "$lower" ] || { echo "$cur"; return 0; }
+		lower="$cur"
+	done
+}
+
 # get_config_str OPTION
 #
 # Returns the value of OPTION from config.h (path to which set
