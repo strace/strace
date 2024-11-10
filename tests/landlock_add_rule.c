@@ -110,10 +110,7 @@ main(void)
 		{ ARG_ULL_STR(0xfffffffffffffffc)
 			" /* LANDLOCK_ACCESS_NET_??? */" },
 	};
-	static const struct {
-		int val;
-		const char *str;
-	} parent_fd_vals[] = {
+	static const struct strival32 parent_fd_vals[] = {
 		{ ARG_STR(-1) },
 		{ ARG_STR(11630) },
 		{ PARENT_FD, PARENT_FD_STR },

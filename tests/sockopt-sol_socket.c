@@ -28,11 +28,6 @@
 static int rc;
 static const char *errstr;
 
-struct intstr {
-	int val;
-	const char *str;
-};
-
 static int
 get_sockopt(int fd, int name, void *val, socklen_t *len)
 {
@@ -50,7 +45,7 @@ set_sockopt(int fd, int name, void *val, socklen_t len)
 }
 
 static void
-print_optval(int val, const struct intstr *vecs, size_t vecs_sz)
+print_optval(int val, const struct strival32 *vecs, size_t vecs_sz)
 {
 	for (size_t k = 0; k < vecs_sz; k++) {
 		if (vecs[k].val == val) {
@@ -65,13 +60,13 @@ print_optval(int val, const struct intstr *vecs, size_t vecs_sz)
 int
 main(void)
 {
-	static const struct intstr int_vecs[] = {
+	static const struct strival32 int_vecs[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(1) },
 		{ ARG_STR(1234567890) },
 		{ ARG_STR(-1234567890) },
 	};
-	static const struct intstr txrehash_vecs[] = {
+	static const struct strival32 txrehash_vecs[] = {
 		{ ARG_XLAT_KNOWN(0, "SOCK_TXREHASH_DISABLED") },
 		{ ARG_XLAT_KNOWN(1, "SOCK_TXREHASH_ENABLED") },
 		{ ARG_XLAT_UNKNOWN(2, "SOCK_TXREHASH_???") },
@@ -84,7 +79,7 @@ main(void)
 	static const struct {
 		int val;
 		const char *str;
-		const struct intstr *const vecs;
+		const struct strival32 *const vecs;
 		size_t vecs_sz;
 		size_t optsz;
 	} names[] = {
@@ -180,7 +175,7 @@ main(void)
 
 	for (size_t i = 0; i < ARRAY_SIZE(names); ++i) {
 		static char so_str[64];
-		const struct intstr *const vecs = names[i].vecs ?: int_vecs;
+		const struct strival32 *const vecs = names[i].vecs ?: int_vecs;
 		size_t vecs_sz = names[i].vecs_sz ?: ARRAY_SIZE(int_vecs);
 
 		if (names[i].str) {

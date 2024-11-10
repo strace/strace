@@ -57,10 +57,7 @@ main(void)
 		{ ARG_STR(9409) },
 		{ RULESET_FD, RULESET_FD_STR },
 	};
-	static const struct {
-		int val;
-		const char *str;
-	} flags_vals[] = {
+	static const struct strival32 flags_vals[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(0x1) },
 		{ ARG_STR(0xffffffff) },

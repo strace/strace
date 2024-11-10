@@ -88,10 +88,7 @@ main(void)
 
 	char *path_quoted = xasprintf("\"%s\"", path);
 
-	struct {
-		int val;
-		const char *str;
-	} dirfds[] = {
+	struct strival32 dirfds[] = {
 		{ ARG_STR(-1) },
 		{ -100, at_fdcwd_str },
 		{ fd, fd_str },

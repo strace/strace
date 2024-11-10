@@ -31,11 +31,6 @@
 # define LONG_STR_PREFIX ""
 #endif /* ULONG_MAX > UINT_MAX */
 
-struct s32_val_str {
-	int32_t val;
-	const char *str;
-};
-
 /* In order to avoid endianness-specific hackery. */
 struct pea_flags {
 	uint64_t disabled			:1,
@@ -568,7 +563,7 @@ main(void)
 		{ 0xffffffffffffffffULL,
 			BRANCH_TYPE_ALL "|0xfffffffffff00000" }
 	};
-	static const struct s32_val_str clockids[] = {
+	static const struct strival32 clockids[] = {
 		{ 11, "CLOCK_TAI" },
 		{ ARG_STR(0xc) " /* CLOCK_??? */" },
 		{ ARG_STR(0xbeeffeed) " /* CLOCK_??? */" },

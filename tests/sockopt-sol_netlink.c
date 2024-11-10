@@ -37,10 +37,7 @@ set_sockopt(int fd, int name, void *val, socklen_t len)
 int
 main(void)
 {
-	static const struct {
-		int val;
-		const char *str;
-	} names[] = {
+	static const struct strival32 names[] = {
 #ifdef NETLINK_ADD_MEMBERSHIP
 		{ ARG_STR(NETLINK_ADD_MEMBERSHIP) },
 #endif
