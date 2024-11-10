@@ -77,10 +77,7 @@ main(int argc, char *argv[])
 	}
 #endif /* INJECT_RETVAL */
 
-	static const struct {
-		uint32_t val;
-		const char *str;
-	} dirs[] = {
+	static const struct strval32 dirs[] = {
 		{ ARG_STR(_IOC_NONE) },
 		{ ARG_STR(_IOC_READ) },
 		{ ARG_STR(_IOC_WRITE) },

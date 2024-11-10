@@ -173,10 +173,7 @@ main(void)
 
 	/* Invalid op */
 	static const unsigned int invalid_ops[] = { 0x7fffffffU, 29 };
-	static const struct {
-		unsigned int val;
-		const char *str;
-	} op_flags[] = {
+	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
 

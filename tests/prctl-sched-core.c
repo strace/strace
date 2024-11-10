@@ -77,10 +77,7 @@ main(int argc, char *argv[])
 		{ false, true,  ARG_STR(PR_SCHED_CORE_SHARE_FROM) },
 		{ false, false, 4, "PR_SCHED_CORE_???" },
 	};
-	static const struct {
-		unsigned int val;
-		const char *str;
-	} pidtypes[] = {
+	static const struct strval32 pidtypes[] = {
 		{ 0, "PIDTYPE_PID" },
 		{ 1, "PIDTYPE_TGID" },
 		{ 2, "PIDTYPE_PGID" },

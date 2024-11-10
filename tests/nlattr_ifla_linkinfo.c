@@ -351,18 +351,13 @@ main(void)
 			      NULL},
 			     printf("\"\\xab\\xac\\xdb\\xcd\""));
 
-	struct val_name {
-		unsigned int val;
-		const char *name;
-	};
-
 	static const uint64_t u64_val = 0xdeadc0defacefeedULL;
 	static const uint32_t u32_val = 0xbadc0dedU;
 	static const uint16_t u16_val = 0xdeed;
 	static const uint8_t  u8_val  = 0xa1;
 
 	/* bridge attrs */
-	static const struct val_name und_br_attrs[] = {
+	static const struct strval32 und_br_attrs[] = {
 		{ 0, "IFLA_BR_UNSPEC" },
 		{ 21, "IFLA_BR_FDB_FLUSH" },
 		{ 40, "IFLA_BR_PAD" },
@@ -372,7 +367,7 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(und_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     und_br_attrs[k].val, und_br_attrs[k].name,
+				     und_br_attrs[k].val, und_br_attrs[k].str,
 				     unknown_msg, pattern,
 				     { 2, "\"\\xab\\xac\"" },
 				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" },
@@ -384,14 +379,14 @@ main(void)
 					"\\x63\\x64\\x65\\x66\"" });
 	}
 
-	static const struct val_name hwa_br_attrs[] = {
+	static const struct strval32 hwa_br_attrs[] = {
 		{ 20, "IFLA_BR_GROUP_ADDR" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(hwa_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     hwa_br_attrs[k].val, hwa_br_attrs[k].name,
+				     hwa_br_attrs[k].val, hwa_br_attrs[k].str,
 				     unknown_msg, pattern,
 				     { 2, "ab:ac" },
 				     { 4, "ab:ac:db:cd" },
@@ -400,7 +395,7 @@ main(void)
 				     { 10, "ab:ac:db:cd:61:62:63:64:65:66" });
 	}
 
-	static const struct val_name c_t_br_attrs[] = {
+	static const struct strval32 c_t_br_attrs[] = {
 		{  1, "IFLA_BR_FORWARD_DELAY" },
 		{  2, "IFLA_BR_HELLO_TIME" },
 		{  3, "IFLA_BR_MAX_AGE" },
@@ -426,7 +421,7 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(c_t_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     c_t_br_attrs[k].val, c_t_br_attrs[k].name,
+				     c_t_br_attrs[k].val, c_t_br_attrs[k].str,
 				     u64_val, pattern,
 				     { 7, sz7_str },
 				     { 8, sz8_str },
@@ -437,7 +432,7 @@ main(void)
 					  "\\x61\"" });
 	}
 
-	static const struct val_name u32_br_attrs[] = {
+	static const struct strval32 u32_br_attrs[] = {
 		{  5, "IFLA_BR_STP_STATE" },
 		{ 13, "IFLA_BR_ROOT_PATH_COST" },
 		{ 26, "IFLA_BR_MCAST_HASH_ELASTICITY" },
@@ -449,7 +444,7 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(u32_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     u32_br_attrs[k].val, u32_br_attrs[k].name,
+				     u32_br_attrs[k].val, u32_br_attrs[k].str,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
 						"\"\\xed\\x0d\\xdc\"") },
@@ -457,7 +452,7 @@ main(void)
 				     { 5, "3134983661" });
 	}
 
-	static const struct val_name u16_br_attrs[] = {
+	static const struct strval32 u16_br_attrs[] = {
 		{  6, "IFLA_BR_PRIORITY" },
 		{ 12, "IFLA_BR_ROOT_PORT" },
 		{ 39, "IFLA_BR_VLAN_DEFAULT_PVID" },
@@ -466,28 +461,28 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(u16_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     u16_br_attrs[k].val, u16_br_attrs[k].name,
+				     u16_br_attrs[k].val, u16_br_attrs[k].str,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "57069" },
 				     { 3, "57069" });
 	}
 
-	static const struct val_name x16_br_attrs[] = {
+	static const struct strval32 x16_br_attrs[] = {
 		{  9, "IFLA_BR_GROUP_FWD_MASK" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(x16_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     x16_br_attrs[k].val, x16_br_attrs[k].name,
+				     x16_br_attrs[k].val, x16_br_attrs[k].str,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "0xdeed" },
 				     { 3, "0xdeed" });
 	}
 
-	static const struct val_name u8_br_attrs[] = {
+	static const struct strval32 u8_br_attrs[] = {
 		{  7, "IFLA_BR_VLAN_FILTERING" },
 		{ 14, "IFLA_BR_TOPOLOGY_CHANGE" },
 		{ 15, "IFLA_BR_TOPOLOGY_CHANGE_DETECTED" },
@@ -508,7 +503,7 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(u8_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     u8_br_attrs[k].val, u8_br_attrs[k].name,
+				     u8_br_attrs[k].val, u8_br_attrs[k].str,
 				     u8_val, pattern,
 				     { 0, NULL },
 				     { 1, "161" },
@@ -526,7 +521,7 @@ main(void)
 
 	static const uint8_t bridge_id[]
 		= { 0xbe, 0xef, 0xfa, 0xce, 0xde, 0xc0, 0xde, 0xad };
-	static const struct val_name br_id_attrs[] = {
+	static const struct strval32 br_id_attrs[] = {
 		{ 10, "IFLA_BR_ROOT_ID" },
 		{ 11, "IFLA_BR_BRIDGE_ID" },
 	};
@@ -534,7 +529,7 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(br_id_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "bridge",
-				     br_id_attrs[k].val, br_id_attrs[k].name,
+				     br_id_attrs[k].val, br_id_attrs[k].str,
 				     bridge_id, pattern,
 				     { 7, "\"\\xbe\\xef\\xfa\\xce"
 					  "\\xde\\xc0\\xde\"" },
@@ -682,7 +677,7 @@ main(void)
 	}
 
 	/* tun attrs */
-	static const struct val_name u8_tun_attrs[] = {
+	static const struct strval32 u8_tun_attrs[] = {
 		{ 4, "IFLA_TUN_PI" },
 		{ 5, "IFLA_TUN_VNET_HDR" },
 		{ 6, "IFLA_TUN_PERSIST" },
@@ -692,14 +687,14 @@ main(void)
 	for (size_t k = 0; k < ARRAY_SIZE(u8_tun_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "tun",
-				     u8_tun_attrs[k].val, u8_tun_attrs[k].name,
+				     u8_tun_attrs[k].val, u8_tun_attrs[k].str,
 				     u8_val, pattern,
 				     { 0, NULL },
 				     { 1, "161" },
 				     { 2, "161" });
 	}
 
-	static const struct val_name u32_tun_attrs[] = {
+	static const struct strval32 u32_tun_attrs[] = {
 		{ 8, "IFLA_TUN_NUM_QUEUES" },
 		{ 9, "IFLA_TUN_NUM_DISABLED_QUEUES" },
 	};
@@ -708,7 +703,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "tun",
 				     u32_tun_attrs[k].val,
-				     u32_tun_attrs[k].name,
+				     u32_tun_attrs[k].str,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
 						"\"\\xed\\x0d\\xdc\"") },
@@ -716,7 +711,7 @@ main(void)
 				     { 5, "3134983661" });
 	}
 
-	static const struct val_name und_tun_attrs[] = {
+	static const struct strval32 und_tun_attrs[] = {
 		{ 0,  "IFLA_TUN_UNSPEC" },
 		{ 10, "0xa /* IFLA_TUN_??? */" },
 	};
@@ -725,7 +720,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "tun",
 				     und_tun_attrs[k].val,
-				     und_tun_attrs[k].name,
+				     und_tun_attrs[k].str,
 				     unknown_msg, pattern,
 				     { 2, "\"\\xab\\xac\"" },
 				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" },
@@ -738,7 +733,7 @@ main(void)
 	}
 
 	static const uint32_t minus_one = 0xffffffffU;
-	static const struct val_name uid_tun_attrs[] = {
+	static const struct strval32 uid_tun_attrs[] = {
 		{ 1, "IFLA_TUN_OWNER" },
 		{ 2, "IFLA_TUN_GROUP" },
 	};
@@ -747,7 +742,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "tun",
 				     uid_tun_attrs[k].val,
-				     uid_tun_attrs[k].name,
+				     uid_tun_attrs[k].str,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
 						"\"\\xed\\x0d\\xdc\"") },
@@ -757,7 +752,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
 				     2, "IFLA_INFO_DATA", "tun",
 				     uid_tun_attrs[k].val,
-				     uid_tun_attrs[k].name,
+				     uid_tun_attrs[k].str,
 				     minus_one, pattern,
 				     { 3, "\"\\xff\\xff\\xff\"" },
 				     { 4, "-1" },
@@ -893,7 +888,7 @@ main(void)
 			     printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 	/* bridge attrs */
-	static const struct val_name und_brport_attrs[] = {
+	static const struct strval32 und_brport_attrs[] = {
 		{ 0, "IFLA_BRPORT_UNSPEC" },
 		{ 24, "IFLA_BRPORT_FLUSH" },
 		{ 26, "IFLA_BRPORT_PAD" },
@@ -905,7 +900,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     und_brport_attrs[k].val,
-				     und_brport_attrs[k].name,
+				     und_brport_attrs[k].str,
 				     unknown_msg, pattern,
 				     { 2, "\"\\xab\\xac\"" },
 				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" },
@@ -917,7 +912,7 @@ main(void)
 					"\\x63\\x64\\x65\\x66\"" });
 	}
 
-	static const struct val_name u8_brport_attrs[] = {
+	static const struct strval32 u8_brport_attrs[] = {
 		{ ARG_STR(IFLA_BRPORT_STATE) },
 		{ ARG_STR(IFLA_BRPORT_MODE) },
 		{ ARG_STR(IFLA_BRPORT_GUARD) },
@@ -948,14 +943,14 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     u8_brport_attrs[k].val,
-				     u8_brport_attrs[k].name,
+				     u8_brport_attrs[k].str,
 				     u8_val, pattern,
 				     { 0, NULL },
 				     { 1, "161" },
 				     { 2, "161" });
 	}
 
-	static const struct val_name u16_brport_attrs[] = {
+	static const struct strval32 u16_brport_attrs[] = {
 		{ ARG_STR(IFLA_BRPORT_PRIORITY) },
 		{ ARG_STR(IFLA_BRPORT_DESIGNATED_PORT) },
 		{ ARG_STR(IFLA_BRPORT_DESIGNATED_COST) },
@@ -967,14 +962,14 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     u16_brport_attrs[k].val,
-				     u16_brport_attrs[k].name,
+				     u16_brport_attrs[k].str,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "57069" },
 				     { 3, "57069" });
 	}
 
-	static const struct val_name x16_brport_attrs[] = {
+	static const struct strval32 x16_brport_attrs[] = {
 		{ ARG_STR(IFLA_BRPORT_GROUP_FWD_MASK) },
 	};
 
@@ -982,14 +977,14 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     x16_brport_attrs[k].val,
-				     x16_brport_attrs[k].name,
+				     x16_brport_attrs[k].str,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "0xdeed" },
 				     { 3, "0xdeed" });
 	}
 
-	static const struct val_name u32_brport_attrs[] = {
+	static const struct strval32 u32_brport_attrs[] = {
 		{  3, "IFLA_BRPORT_COST" },
 		{ 37, "IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT" },
 		{ 38, "IFLA_BRPORT_MCAST_EHT_HOSTS_CNT" },
@@ -1002,7 +997,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     u32_brport_attrs[k].val,
-				     u32_brport_attrs[k].name,
+				     u32_brport_attrs[k].str,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
 						"\"\\xed\\x0d\\xdc\"") },
@@ -1010,7 +1005,7 @@ main(void)
 				     { 5, "3134983661" });
 	}
 
-	static const struct val_name brport_id_attrs[] = {
+	static const struct strval32 brport_id_attrs[] = {
 		{ 13, "IFLA_BRPORT_ROOT_ID" },
 		{ 14, "IFLA_BRPORT_BRIDGE_ID" },
 	};
@@ -1019,7 +1014,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     brport_id_attrs[k].val,
-				     brport_id_attrs[k].name,
+				     brport_id_attrs[k].str,
 				     bridge_id, pattern,
 				     { 7, "\"\\xbe\\xef\\xfa\\xce"
 					  "\\xde\\xc0\\xde\"" },
@@ -1029,7 +1024,7 @@ main(void)
 					  ", addr=fa:ce:de:c0:de:ad}" });
 	}
 
-	static const struct val_name c_t_brport_attrs[] = {
+	static const struct strval32 c_t_brport_attrs[] = {
 		{ 21, "IFLA_BRPORT_MESSAGE_AGE_TIMER" },
 		{ 22, "IFLA_BRPORT_FORWARD_DELAY_TIMER" },
 		{ 23, "IFLA_BRPORT_HOLD_TIMER" },
@@ -1039,7 +1034,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     c_t_brport_attrs[k].val,
-				     c_t_brport_attrs[k].name,
+				     c_t_brport_attrs[k].str,
 				     u64_val, pattern,
 				     { 7, sz7_str },
 				     { 8, sz8_str },
@@ -1050,7 +1045,7 @@ main(void)
 					  "\\x61\"" });
 	}
 
-	static const struct val_name ifidx_brport_attrs[] = {
+	static const struct strval32 ifidx_brport_attrs[] = {
 		{ 34, "IFLA_BRPORT_BACKUP_PORT" },
 	};
 	const uint32_t ifidx_lo = ifindex_lo();
@@ -1059,7 +1054,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     ifidx_brport_attrs[k].val,
-				     ifidx_brport_attrs[k].name,
+				     ifidx_brport_attrs[k].str,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
 						"\"\\xed\\x0d\\xdc\"") },
@@ -1069,7 +1064,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
 				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
 				     ifidx_brport_attrs[k].val,
-				     ifidx_brport_attrs[k].name,
+				     ifidx_brport_attrs[k].str,
 				     ifidx_lo, pattern,
 				     { 3, BE_LE("\"\\x00\\x00\\x00\"",
 						"\"\\x01\\x00\\x00\"") },

@@ -35,10 +35,7 @@ main(void)
 				| SECCOMP_GET_ACTION_AVAIL;
 	kernel_ulong_t flags = (kernel_ulong_t) 0xdeadbeef00000000ULL;
 
-	struct {
-		uint32_t val;
-		const char *str;
-	} actions [] = {
+	static const struct strval32 actions[] = {
 		{ 0, "SECCOMP_RET_KILL_THREAD" },
 		{ ARG_STR(SECCOMP_RET_KILL_PROCESS) },
 		{ ARG_STR(SECCOMP_RET_TRAP) },

@@ -52,10 +52,7 @@ main(void)
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
 	/* Valid attr ptr */
-	static const struct {
-		uint64_t val;
-		const char *str;
-	} ruleset_fd_vals[] = {
+	static const struct strval64 ruleset_fd_vals[] = {
 		{ ARG_STR(-1) },
 		{ ARG_STR(9409) },
 		{ RULESET_FD, RULESET_FD_STR },

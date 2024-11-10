@@ -126,10 +126,7 @@ main(void)
 	}
 
 	/* Default decoder */
-	static const struct {
-		unsigned int val;
-		const char *str;
-	} nla_default[] = {
+	static const struct strval32 nla_default[] = {
 		{ ARG_XLAT_KNOWN(0, "TCA_ROOT_UNSPEC") },
 	};
 	for (size_t i = 0; i < ARRAY_SIZE(nla_default); i++) {
@@ -155,10 +152,7 @@ main(void)
 	tab_idx++;
 
 	/* TCA_ROOT_TAB: item: default decoder */
-	static const struct {
-		unsigned int val;
-		const char *str;
-	} tcaa_default[] = {
+	static const struct strval32 tcaa_default[] = {
 		{ ARG_XLAT_KNOWN(0, "TCA_ACT_UNSPEC") },
 		{ ARG_XLAT_KNOWN(0x2, "TCA_ACT_OPTIONS") },
 		{ ARG_XLAT_KNOWN(0x5, "TCA_ACT_PAD") },

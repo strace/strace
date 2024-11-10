@@ -68,10 +68,7 @@ main(void)
 				  IFLA_XDP_FLAGS, pattern, flags,
 				  printf("XDP_FLAGS_UPDATE_IF_NOEXIST"));
 
-	static const struct {
-		uint32_t val;
-		const char *str;
-	} attrs[] = {
+	static const struct strval32 attrs[] = {
 		{ ARG_STR(IFLA_XDP_PROG_ID) },
 		{ ARG_STR(IFLA_XDP_DRV_PROG_ID) },
 		{ ARG_STR(IFLA_XDP_SKB_PROG_ID) },

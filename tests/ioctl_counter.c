@@ -44,10 +44,7 @@ sys_ioctl(kernel_long_t fd, kernel_ulong_t cmd, kernel_ulong_t arg)
 int
 main(void)
 {
-	static const struct {
-		uint32_t val;
-		const char *str;
-	} dirs[] = {
+	static const struct strval32 dirs[] = {
 		{ ARG_STR(_IOC_NONE) },
 		{ ARG_STR(_IOC_READ) },
 		{ ARG_STR(_IOC_WRITE) },

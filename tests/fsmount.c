@@ -43,10 +43,7 @@ main(void)
         if (fd < 0)
                 perror_msg_and_fail("open: %s", path);
 
-	struct {
-		unsigned int val;
-		const char *str;
-	} flags[] = {
+	static const struct strval32 flags[] = {
 		{ ARG_STR(0) },
 		{ 1, "FSMOUNT_CLOEXEC" },
 		{ 2, "0x2 /* FSMOUNT_??? */" },

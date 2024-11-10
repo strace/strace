@@ -33,10 +33,7 @@ k_userfaultfd(const unsigned int flags)
 int
 main(void)
 {
-	struct {
-		unsigned int val;
-		const char *str;
-	} flags[] = {
+	static const struct strval32 flags[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(O_NONBLOCK) },
 		{ ARG_STR(O_CLOEXEC) },

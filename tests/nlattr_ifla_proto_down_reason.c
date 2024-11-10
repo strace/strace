@@ -60,10 +60,7 @@ main(void)
 					      );
 	}
 
-	static const struct {
-		uint32_t val;
-		const char *str;
-	} attrs[] = {
+	static const struct strval32 attrs[] = {
 		{ ARG_STR(IFLA_PROTO_DOWN_REASON_MASK) },
 		{ ARG_STR(IFLA_PROTO_DOWN_REASON_VALUE) },
 	};

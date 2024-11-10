@@ -67,10 +67,7 @@ main(void)
 	       waiters + nr, flags, nr_wake, nr_requeue, errstr);
 
 	for (size_t f = 0; f < ARRAY_SIZE(futex2_flags); ++f) {
-		struct {
-			unsigned int val;
-			const char *str;
-		} pair[] = {
+		struct strval32 pair[] = {
 			{ futex2_flags[f].val, futex2_flags[f].XLAT_name },
 			{ flags0.val, flags0.XLAT_name }
 		};
