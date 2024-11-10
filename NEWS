@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of EPIOCGPARAMS and EPIOCSPARAMS ioctl commands.
+  * Implemented decoding of NS_GET_MNTNS_ID ioctl command.
   * Implemented decoding of FRA_DSCP netlink attribute.
   * Implemented decoding of IORING_REGISTER_CLOCK and
     IORING_REGISTER_CLONE_BUFFERS opcodes of io_uring_register syscall.

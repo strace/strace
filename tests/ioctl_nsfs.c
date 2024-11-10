@@ -11,6 +11,7 @@
 #include "tests.h"
 
 #include <fcntl.h>
+#include <inttypes.h>
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,8 @@ test_no_namespace(void)
 	printf("ioctl(-1, NS_GET_NSTYPE)" RVAL_EBADF);
 	ioctl(-1, NS_GET_OWNER_UID, NULL);
 	printf("ioctl(-1, NS_GET_OWNER_UID, NULL)" RVAL_EBADF);
+	ioctl(-1, NS_GET_MNTNS_ID, NULL);
+	printf("ioctl(-1, NS_GET_MNTNS_ID, NULL)" RVAL_EBADF);
 }
 
 static void
@@ -70,6 +73,16 @@ test_clone(pid_t pid)
 	} else {
 		printf("ioctl(%d, NS_GET_OWNER_UID, [%u]) = %d\n",
 		       userns_fd, *uid, rc);
+	}
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, mntns_id);
+	rc = ioctl(userns_fd, NS_GET_MNTNS_ID, mntns_id);
+	if (rc == -1) {
+		printf("ioctl(%d, NS_GET_MNTNS_ID, %p) = %s\n",
+		       userns_fd, mntns_id, sprintrc(rc));
+	} else {
+		printf("ioctl(%d, NS_GET_MNTNS_ID, [%" PRIx64 "]) = %d\n",
+		       userns_fd, *mntns_id, rc);
 	}
 }
 

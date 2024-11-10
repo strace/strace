@@ -35,6 +35,12 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 			tprint_indirect_end();
 		}
 		return RVAL_IOCTL_DECODED;
+	case NS_GET_MNTNS_ID:
+		if (entering(tcp))
+			return 0;
+		tprint_arg_next();
+		printnum_int64(tcp, arg, "%" PRIx64);
+		return RVAL_IOCTL_DECODED;
 	default:
 		return RVAL_DECODED;
 	}
