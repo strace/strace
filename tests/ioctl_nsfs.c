@@ -37,6 +37,23 @@ test_no_namespace(void)
 	printf("ioctl(-1, NS_GET_OWNER_UID, NULL)" RVAL_EBADF);
 	ioctl(-1, NS_GET_MNTNS_ID, NULL);
 	printf("ioctl(-1, NS_GET_MNTNS_ID, NULL)" RVAL_EBADF);
+
+	static const char mnt_path[] = "/proc/self/ns/mnt";
+	int mnt_fd = open(mnt_path, O_RDONLY);
+	if (mnt_fd < 0) {
+		perror(mnt_path);
+	} else {
+		TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, mntns_id);
+		int rc = ioctl(mnt_fd, NS_GET_MNTNS_ID, mntns_id);
+		if (rc < 0) {
+			printf("ioctl(%d, NS_GET_MNTNS_ID, %p) = %s\n",
+			       mnt_fd, mntns_id, sprintrc(rc));
+		} else {
+			printf("ioctl(%d, NS_GET_MNTNS_ID, [%" PRIx64 "])"
+			       " = %d\n", mnt_fd, *mntns_id, rc);
+		}
+		close(mnt_fd);
+	}
 }
 
 static void
@@ -73,16 +90,6 @@ test_clone(pid_t pid)
 	} else {
 		printf("ioctl(%d, NS_GET_OWNER_UID, [%u]) = %d\n",
 		       userns_fd, *uid, rc);
-	}
-
-	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, mntns_id);
-	rc = ioctl(userns_fd, NS_GET_MNTNS_ID, mntns_id);
-	if (rc == -1) {
-		printf("ioctl(%d, NS_GET_MNTNS_ID, %p) = %s\n",
-		       userns_fd, mntns_id, sprintrc(rc));
-	} else {
-		printf("ioctl(%d, NS_GET_MNTNS_ID, [%" PRIx64 "]) = %d\n",
-		       userns_fd, *mntns_id, rc);
 	}
 }
 
