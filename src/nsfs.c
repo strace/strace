@@ -39,7 +39,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 		if (entering(tcp))
 			return 0;
 		tprint_arg_next();
-		printnum_int64(tcp, arg, "%" PRIx64);
+		printnum_int64(tcp, arg, "%#" PRIx64);
 		return RVAL_IOCTL_DECODED;
 	default:
 		return RVAL_DECODED;

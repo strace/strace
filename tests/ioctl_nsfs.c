@@ -49,7 +49,7 @@ test_no_namespace(void)
 			printf("ioctl(%d, NS_GET_MNTNS_ID, %p) = %s\n",
 			       mnt_fd, mntns_id, sprintrc(rc));
 		} else {
-			printf("ioctl(%d, NS_GET_MNTNS_ID, [%" PRIx64 "])"
+			printf("ioctl(%d, NS_GET_MNTNS_ID, [%#" PRIx64 "])"
 			       " = %d\n", mnt_fd, *mntns_id, rc);
 		}
 		close(mnt_fd);
