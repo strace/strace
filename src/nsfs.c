@@ -41,6 +41,22 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 		tprint_arg_next();
 		printnum_int64(tcp, arg, "%#" PRIx64);
 		return RVAL_IOCTL_DECODED;
+	case NS_GET_PID_FROM_PIDNS:
+		tprint_arg_next();
+		printpid(tcp, arg, PT_NONE);
+		return RVAL_IOCTL_DECODED | RVAL_TID;
+	case NS_GET_TGID_FROM_PIDNS:
+		tprint_arg_next();
+		printpid(tcp, arg, PT_NONE);
+		return RVAL_IOCTL_DECODED | RVAL_TGID;
+	case NS_GET_PID_IN_PIDNS:
+		tprint_arg_next();
+		printpid(tcp, arg, PT_TID);
+		return RVAL_IOCTL_DECODED;
+	case NS_GET_TGID_IN_PIDNS:
+		tprint_arg_next();
+		printpid(tcp, arg, PT_TGID);
+		return RVAL_IOCTL_DECODED;
 	default:
 		return RVAL_DECODED;
 	}

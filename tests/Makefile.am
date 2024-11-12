@@ -221,6 +221,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_loop-v \
 	ioctl_mtd-success \
 	ioctl_nsfs \
+	ioctl_nsfs-ns_get_pid \
+	ioctl_nsfs-ns_get_pid--pidns-translation \
 	ioctl_perf-success \
 	ioctl_ptp-success \
 	ioctl_ptp-success-Xabbrev \

@@ -405,6 +405,8 @@ ioctl_mtd	+ioctl.test
 ioctl_mtd-success	+ioctl-success.sh -a26
 ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
+ioctl_nsfs-ns_get_pid	+ioctl.test -a33
+ioctl_nsfs-ns_get_pid--pidns-translation	test_pidns -etrace=ioctl -a25 "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, NS_GET_USERNS)"
 ioctl_perf	+ioctl.test
 ioctl_perf-success +ioctl-success.sh -a35
 ioctl_ptp			+ioctl.test -a29
