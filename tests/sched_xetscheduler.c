@@ -53,6 +53,11 @@ main(void)
 			scheduler = "SCHED_DEADLINE";
 			break;
 #endif
+#ifdef SCHED_EXT
+		case SCHED_EXT:
+			scheduler = "SCHED_EXT";
+			break;
+#endif
 		default:
 			scheduler = "SCHED_OTHER";
 	}
