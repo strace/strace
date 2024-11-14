@@ -1,6 +1,8 @@
 #unconditional
 #sorted sed -En 's/.*v4l2_fourcc(_be)?\('"'(.)', '(.)', '(.)', '(.)'"'\).*/\10\5\4\3\2\t\0/p' |LC_COLLATE=C sort -k1,1 -t' ' |cut -f2-
+V4L2_META_FMT_RPI_BE_CFG
 V4L2_META_FMT_VIVID
+V4L2_META_FMT_RK_ISP1_EXT_PARAMS
 V4L2_META_FMT_UVC
 V4L2_META_FMT_VSP1_HGO
 V4L2_META_FMT_RK_ISP1_PARAMS

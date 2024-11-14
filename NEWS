@@ -11,7 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     IORING_REGISTER_CLONE_BUFFERS opcodes of io_uring_register syscall.
   * Updated decoding of struct landlock_ruleset_attr.
   * Updated lists of AUDIT_*, ETHTOOL_*, F_*, IORING_*, LSM_*, MAP_*, MSG_*,
-    NT_*, SCHED_*, SCM_*, and SO_* constants.
+    NT_*, SCHED_*, SCM_*, SO_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 6.12.
 
 * Bug fixes
