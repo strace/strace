@@ -386,6 +386,7 @@ ioctl_nbd
 ioctl_nsfs
 ioctl_nsfs-ns_get_pid
 ioctl_nsfs-ns_get_pid--pidns-translation
+ioctl_nsfs-ns_mnt_get
 ioctl_perf
 ioctl_perf-success
 ioctl_ptp
