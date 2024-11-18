@@ -2,6 +2,7 @@
  * Check decoding of seccomp SECCOMP_GET_ACTION_AVAIL.
  *
  * Copyright (c) 2017-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2017-2024 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

@@ -2,7 +2,7 @@
 #
 # Check tracing of looping threads.
 #
-# Copyright (c) 2009-2023 The strace developers.
+# Copyright (c) 2009-2024 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
