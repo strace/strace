@@ -554,7 +554,6 @@ test_pidns()
 
 check_scno_tampering()
 {
-	uname_r="$(uname -r)"
 	case "$STRACE_ARCH" in
 		arm)
 			# PTRACE_SET_SYSCALL is supported by linux kernel
