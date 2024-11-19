@@ -208,6 +208,15 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Mon Nov 18 2024 Dmitry V. Levin <ldv@strace.io> - 6.12-1
+- v6.11 -> v6.12.
+
+* Mon Oct 28 2024 Florian Weimer <fweimer@redhat.com> - 6.11-3
+- Backport upstream patch for compatibility with kernel MAP_DENYWRITE changes
+
+* Fri Oct 25 2024 Florian Weimer <fweimer@redhat.com> - 6.11-2
+- Fix FTBFS with glibc 2.41 (#2317070)
+
 * Sun Sep 15 2024 Dmitry V. Levin <ldv@strace.io> - 6.11-1
 - v6.10 -> v6.11.
 
