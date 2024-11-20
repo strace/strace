@@ -108,9 +108,9 @@ epoll_create	-a17
 epoll_create1	-a28
 epoll_ctl
 epoll_pwait
-epoll_pwait2
-epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full
-epoll_pwait2-y	--trace=epoll_pwait2 -y
+epoll_pwait2	9>>/dev/full
+epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full 9>>/dev/full
+epoll_pwait2-y	--trace=epoll_pwait2 -y 9>>/dev/full
 epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
 eventfd-yy -a15 --trace=eventfd2,fchdir -yy -qq

@@ -10,15 +10,14 @@
 #include "tests.h"
 #include "scno.h"
 #include "xmalloc.h"
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/epoll.h>
 #include "kernel_timespec.h"
 
-#ifndef DECODE_FDS
-# define DECODE_FDS 0
+#ifndef FD9_PATH
+# define FD9_PATH ""
 #endif
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
@@ -52,14 +51,8 @@ main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-	static const char fd_path[] = "/dev/full";
-	int fd = open(fd_path, O_WRONLY);
-	if (fd < 0)
-		perror_msg_and_fail("open: %s", fd_path);
-	char *fd_str = xasprintf("%d%s%s%s", fd,
-				 DECODE_FDS ? "<" : "",
-				 DECODE_FDS ? fd_path : "",
-				 DECODE_FDS ? ">" : "");
+	int fd = 9;
+	char *fd_str = xasprintf("%d%s", fd, FD9_PATH);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct epoll_event, events);
 	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_timespec64_t, timeout);
