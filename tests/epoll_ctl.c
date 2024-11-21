@@ -12,8 +12,8 @@
 
 #include <inttypes.h>
 #include <stdio.h>
-#include <sys/epoll.h>
 #include <unistd.h>
+#include <linux/eventpoll.h>
 
 static long
 invoke_syscall(unsigned long epfd, unsigned long op, unsigned long fd, void *ev)
@@ -30,8 +30,8 @@ main(void)
 
 	long rc = invoke_syscall(-1U, EPOLL_CTL_ADD, -2U, ev);
 	printf("epoll_ctl(-1, EPOLL_CTL_ADD, -2"
-	       ", {events=EPOLLIN, data={u32=%u, u64=%" PRIu64 "}}) = %s\n",
-	       ev->data.u32, ev->data.u64, sprintrc(rc));
+	       ", {events=EPOLLIN, data=%#" PRI__x64 "}) = %s\n",
+	       ev->data, sprintrc(rc));
 
 	rc = invoke_syscall(-3U, EPOLL_CTL_DEL, -4U, ev);
 	printf("epoll_ctl(-3, EPOLL_CTL_DEL, -4, %p) = %s\n",

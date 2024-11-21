@@ -11,8 +11,8 @@
 #ifdef __NR_epoll_wait
 
 # include <stdio.h>
-# include <sys/epoll.h>
 # include <unistd.h>
+# include <linux/eventpoll.h>
 
 int
 main(void)

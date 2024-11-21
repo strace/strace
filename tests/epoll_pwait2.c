@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/epoll.h>
+#include <linux/eventpoll.h>
 #include "kernel_timespec.h"
 
 #ifndef FD9_PATH
