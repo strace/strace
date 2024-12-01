@@ -34,7 +34,7 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        plugin: gcov
+        plugins: gcov
         token: ${{ secrets.CODECOV_TOKEN }}
         working-directory: src
 
