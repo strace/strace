@@ -31,7 +31,7 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
     - name: upload coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         fail_ci_if_error: true
         plugins: gcov
