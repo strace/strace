@@ -1385,57 +1385,75 @@ main(void)
 	}
 
 	/* IORING_REGISTER_NAPI, IORING_UNREGISTER_NAPI */
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} napi_ops[] = {
-		{ 27, "IORING_REGISTER_NAPI" },
-		{ 28, "IORING_UNREGISTER_NAPI" },
+	static const struct strval32 napi_ops[] = {
+		{ ARG_STR(IORING_REGISTER_NAPI) },
+		{ ARG_STR(IORING_UNREGISTER_NAPI) },
+	};
+	static const struct strval32 napi_opcodes[] = {
+		{ ARG_XLAT_KNOWN(0, "IO_URING_NAPI_REGISTER_OP") },
+		{ ARG_XLAT_KNOWN(0x1, "IO_URING_NAPI_STATIC_ADD_ID") },
+		{ ARG_XLAT_KNOWN(0x2, "IO_URING_NAPI_STATIC_DEL_ID") },
+		{ ARG_XLAT_UNKNOWN(0xff, "IO_URING_NAPI_???") }
+	};
+	static const struct strval32 napi_tracking_strategies[] = {
+		{ ARG_XLAT_KNOWN(0, "IO_URING_NAPI_TRACKING_DYNAMIC") },
+		{ ARG_XLAT_KNOWN(0x1, "IO_URING_NAPI_TRACKING_STATIC") },
+		{ ARG_XLAT_KNOWN(0xff, "IO_URING_NAPI_TRACKING_INACTIVE") },
+		{ ARG_XLAT_UNKNOWN(0xfacefeed, "IO_URING_NAPI_TRACKING_???") }
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_napi, napi);
 
 	for (size_t i = 0; i < ARRAY_SIZE(napi_ops); i++) {
-		sys_io_uring_register(fd_null, napi_ops[i].op, 0, 0xdeadbeef);
+		sys_io_uring_register(fd_null, napi_ops[i].val, 0, 0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(napi_ops[i].op,
+		       XLAT_SEL(napi_ops[i].val,
 			        napi_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, napi_ops[i].op, napi + 1, 0);
+		sys_io_uring_register(fd_null, napi_ops[i].val, napi + 1, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(napi_ops[i].op, napi_ops[i].str),
+		       XLAT_SEL(napi_ops[i].val, napi_ops[i].str),
 		       napi + 1, errstr);
 
 		for (size_t j = 0; j < (1U << 4); j++) {
+			const unsigned int tracking_idx = (j >> 2) & 3;
 			memset(napi, 0, sizeof(*napi));
 			napi->busy_poll_to = j & 1 ? 0xfacefeedU : 0;
 			napi->prefer_busy_poll = j & 2 ? 0xfe : 0;
-			napi->pad[2] = j & 4 ? 0x10 : 0;
+			napi->opcode = napi_opcodes[j & 3].val;
+			napi->pad[1] = j & 4 ? 0x10 : 0;
+			napi->op_param = napi_tracking_strategies[tracking_idx].val;
 			napi->resv = j & 8 ? 0xbadc0dedU : 0;
 
-			sys_io_uring_register(fd_null, napi_ops[i].op, napi,
+			sys_io_uring_register(fd_null, napi_ops[i].val, napi,
 					      0x42);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(napi_ops[i].op,
+			       XLAT_SEL(napi_ops[i].val,
 				        napi_ops[i].str),
 			       napi, errstr);
 
-			sys_io_uring_register(fd_null, napi_ops[i].op, napi, 1);
+			sys_io_uring_register(fd_null, napi_ops[i].val, napi, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", ",
 			       fd_null, path_null,
-			       XLAT_SEL(napi_ops[i].op,
+			       XLAT_SEL(napi_ops[i].val,
 				        napi_ops[i].str));
 			if (i == 0 || RETVAL_INJECTED) {
 				printf("{busy_poll_to=%#x, prefer_busy_poll=%#x",
 				       napi->busy_poll_to,
 				       napi->prefer_busy_poll);
+				printf(", opcode=%s", napi_opcodes[j & 3].str);
 				if (j & 4)
-					printf(", pad=[0, 0, 0x10]");
+					printf(", pad=[0, 0x10]");
+				if (napi->opcode == 0)
+					printf(", op_param=%s",
+					       napi_tracking_strategies[tracking_idx].str);
+				else
+					printf(", op_param=%#x", napi->op_param);
 				if (j & 8)
 					printf(", resv=0xbadc0ded");
 				printf("}");
@@ -1445,8 +1463,14 @@ main(void)
 				printf(" => {busy_poll_to=%#x, prefer_busy_poll=%#x",
 				       napi->busy_poll_to,
 				       napi->prefer_busy_poll);
+				printf(", opcode=%s", napi_opcodes[j & 3].str);
 				if (j & 4)
-					printf(", pad=[0, 0, 0x10]");
+					printf(", pad=[0, 0x10]");
+				if (napi->opcode == 0)
+					printf(", op_param=%s",
+					       napi_tracking_strategies[tracking_idx].str);
+				else
+					printf(", op_param=%#x", napi->op_param);
 				if (j & 8)
 					printf(", resv=0xbadc0ded");
 				printf("}");
@@ -1571,16 +1595,23 @@ main(void)
 		memset(clone_buffers, 0, sizeof(*clone_buffers));
 		clone_buffers->src_fd = fd_full;
 		clone_buffers->flags = clone_buffers_flags[i].val;
+		clone_buffers->src_off = 0xfacefed1 + i;
+		clone_buffers->dst_off = 0xfacefed2 + i;
+		clone_buffers->nr = 0xfacefed3 + i;
 		clone_buffers->pad[0] = i & 1 ? 0xdefaced1 : 0;
 		clone_buffers->pad[pad_len - 1] = i & 2 ? 0xdefaced2 : 0;
 		sys_io_uring_register(fd_null, clone_buffers_ops.val,
 				      clone_buffers, 1);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT
-		        ", {src_fd=%u<%s>, flags=%s",
+		        ", {src_fd=%u<%s>, flags=%s"
+			", src_off=%u, dst_off=%u, nr=%u",
 		       fd_null, path_null,
 		       XLAT_SEL(clone_buffers_ops.val, clone_buffers_ops.str),
 		       fd_full, path_full,
-		       clone_buffers_flags[i].str);
+		       clone_buffers_flags[i].str,
+		       clone_buffers->src_off,
+		       clone_buffers->dst_off,
+		       clone_buffers->nr);
 			if (i & 3) {
 				printf(", pad=[");
 				for (size_t j = 0; j < pad_len; ++j)

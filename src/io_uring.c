@@ -26,6 +26,8 @@
 #include "xlat/uring_register_opcode_flags.h"
 #include "xlat/uring_register_rsrc_flags.h"
 #include "xlat/uring_restriction_opcodes.h"
+#include "xlat/uring_napi_ops.h"
+#include "xlat/uring_napi_tracking_strategies.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -721,10 +723,20 @@ print_io_uring_napi(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_X(arg, prefer_busy_poll);
 
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(arg, opcode, uring_napi_ops, "IO_URING_NAPI_???");
+
 	if (!IS_ARRAY_ZERO(arg.pad)) {
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(arg, pad, tcp, print_xint_array_member);
 	}
+
+	tprint_struct_next();
+	if (arg.opcode == IO_URING_NAPI_REGISTER_OP)
+		PRINT_FIELD_XVAL(arg, op_param, uring_napi_tracking_strategies,
+				 "IO_URING_NAPI_TRACKING_???");
+	else
+		PRINT_FIELD_X(arg, op_param);
 
 	if (arg.resv) {
 		tprint_struct_next();
@@ -809,7 +821,7 @@ print_io_uring_clone_buffers(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_clone_buffers arg;
 	CHECK_TYPE_SIZE(arg, 32);
-	CHECK_TYPE_SIZE(arg.pad, 6 * sizeof(uint32_t));
+	CHECK_TYPE_SIZE(arg.pad, 3 * sizeof(uint32_t));
 
 	if (umove_or_printaddr(tcp, addr, &arg))
 		return;
@@ -820,6 +832,15 @@ print_io_uring_clone_buffers(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(arg, flags, uring_clone_buffers_flags,
 			  "IORING_REGISTER_???");
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, src_off);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, dst_off);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, nr);
 
 	if (!IS_ARRAY_ZERO(arg.pad)) {
 		tprint_struct_next();
