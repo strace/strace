@@ -426,9 +426,19 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(*attr, aux_sample_size);
 
-	STRACE_PERF_CHECK_FIELD(__reserved_3);
-	if (attr->__reserved_3)
-		tprintf_comment("bytes 116..119: %#x", attr->__reserved_3);
+	STRACE_PERF_CHECK_FIELD(aux_action);
+	STRACE_PERF_PRINT_FLAG(aux_start_paused);
+	STRACE_PERF_PRINT_FLAG(aux_pause);
+	STRACE_PERF_PRINT_FLAG(aux_resume);
+	/*
+	 * Print it only in case it is non-zero, since it may contain flags
+	 * we are not aware of.
+	 */
+	if (attr->__reserved_3) {
+		tprint_struct_next();
+		PRINT_FIELD_X_CAST(*attr, __reserved_3, uint32_t);
+		tprintf_comment("Bits 931..959");
+	}
 
 	STRACE_PERF_CHECK_FIELD(sig_data);
 	tprint_struct_next();

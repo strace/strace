@@ -90,7 +90,15 @@ struct perf_event_attr {
 	uint16_t __reserved_2;
 	/* End of ver 5 - 112 bytes */
 	uint32_t aux_sample_size;
-	uint32_t __reserved_3;
+	union {
+		uint32_t aux_action;
+		struct {
+			uint32_t aux_start_paused	:1,
+				 aux_pause		:1,
+				 aux_resume		:1,
+				 __reserved_3		:29;
+		};
+	};
 	/* End of ver 6 - 120 bytes */
 	uint64_t sig_data;
 	/* End of ver 7 - 128 bytes */

@@ -2,7 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated decoding of struct io_uring_clone_buffers and struct io_uring_napi.
+  * Updated decoding of struct io_uring_clone_buffers, struct io_uring_napi,
+    and struct perf_event_attr.
 
 Noteworthy changes in release 6.12 (2024-11-18)
 ===============================================

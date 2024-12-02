@@ -358,9 +358,13 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
+	PRINT_FLAG(aux_start_paused);
+	PRINT_FLAG(aux_pause);
+	PRINT_FLAG(aux_resume);
+
 	val = attr->__reserved_3;
 	if (val)
-		printf(" /* bytes 116..119: %#" PRIx32 " */", (uint32_t) val);
+		printf(", __reserved_3=%#" PRIx64 " /* Bits 931..959 */", val);
 
 	if (size <= 120) {
 		cutoff = 120;
