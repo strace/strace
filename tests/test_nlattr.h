@@ -122,35 +122,44 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		(nla_type_), #nla_type_,				\
 		(nla_data_len_), (src_), (slen_), __VA_ARGS__)
 
-#define TEST_NLATTR_OBJECT_EX_(fd_, nlh0_, hdrlen_,			\
+#define TEST_NLATTR_OBJPTR_EX_(fd_, nlh0_, hdrlen_,			\
 			       init_msg_, print_msg_,			\
 			       nla_type_, nla_type_str_,		\
-			       pattern_, obj_, minsz_, fallback_func, ...) \
+			       pattern_, objptr_, objsz_, minsz_,	\
+			       fallback_func, ...)			\
 	do {								\
 		const unsigned int plen = MIN((minsz_) - 1, DEFAULT_STRLEN); \
-		/* len < sizeof(obj_) */				\
+		/* len < objsz_ */				\
 		if (plen > 0)						\
 			TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),		\
 				(init_msg_), (print_msg_),		\
 				(nla_type_), (nla_type_str_),		\
 				plen, (pattern_), plen,			\
 				(fallback_func)((pattern_), plen));	\
-		/* short read of sizeof(obj_) */			\
+		/* short read of objsz_ */				\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
 			(nla_type_), (nla_type_str_),			\
-			sizeof(obj_),					\
-			(pattern_), (minsz_) - 1,			\
+			(objsz_), (pattern_), (minsz_) - 1,		\
 			printf("%p",					\
 			       RTA_DATA(NLMSG_ATTR(nlh, (hdrlen_)))));	\
-		/* sizeof(obj_) */					\
+		/* objsz_ */						\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
 			(nla_type_), (nla_type_str_),			\
-			sizeof(obj_),					\
-			&(obj_), sizeof(obj_),				\
+			(objsz_),	(objptr_), (objsz_),		\
 			__VA_ARGS__);					\
 	} while (0)
+
+#define TEST_NLATTR_OBJECT_EX_(fd_, nlh0_, hdrlen_,			\
+			       init_msg_, print_msg_,			\
+			       nla_type_, nla_type_str_,		\
+			       pattern_, obj_, minsz_, fallback_func, ...) \
+	TEST_NLATTR_OBJPTR_EX_((fd_), (nlh0_), (hdrlen_),		\
+			       (init_msg_), (print_msg_),		\
+			       (nla_type_), (nla_type_str_),		\
+			       (pattern_), &(obj_), sizeof(obj_),	\
+			       (minsz_), (fallback_func), __VA_ARGS__)
 
 #define TEST_NLATTR_OBJECT_EX(fd_, nlh0_, hdrlen_,			\
 			      init_msg_, print_msg_,			\
