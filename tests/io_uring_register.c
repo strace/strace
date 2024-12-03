@@ -45,8 +45,6 @@
 # define INJ_STR ""
 #endif
 
-#define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
-
 static const char path_null[] = "/dev/null";
 static const char path_full[] = "/dev/full";
 
