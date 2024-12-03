@@ -34,7 +34,6 @@
 #endif
 
 #define ARRAY_END(a_) ((a_) + ARRAY_SIZE(a_))
-#define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
 
 #if STRACE_SIZEOF_KERNEL_LONG_T == SIZEOF_KERNEL_LONG_T
 # define SAFE_TIME_T(t_) t_
