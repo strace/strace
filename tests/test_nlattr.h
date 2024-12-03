@@ -450,6 +450,8 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		}							\
 	}
 
+DEF_NLATTR_INTEGER_CHECK_(s32, int32_t, "%d")
+
 DEF_NLATTR_INTEGER_CHECK_(u8, uint8_t, "%hhu")
 DEF_NLATTR_INTEGER_CHECK_(u16, uint16_t, "%hu")
 DEF_NLATTR_INTEGER_CHECK_(u32, uint32_t, "%u")
