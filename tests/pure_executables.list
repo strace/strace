@@ -471,6 +471,9 @@ nlattr_dcbmsg
 nlattr_fib_rule_hdr
 nlattr_ifaddrlblmsg
 nlattr_ifaddrmsg
+nlattr_ifaddrmsg-Xabbrev
+nlattr_ifaddrmsg-Xraw
+nlattr_ifaddrmsg-Xverbose
 nlattr_ifinfomsg
 nlattr_ifla_af_spec
 nlattr_ifla_brport
