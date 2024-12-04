@@ -382,6 +382,17 @@ require_min_kernel_version_or_skip()
 		skip_ "the kernel release $uname_r is not $1 or newer"
 }
 
+# Usage: require_max_kernel_version_or_skip 6.11
+require_max_kernel_version_or_skip()
+{
+	local uname_r
+	uname_r="$(uname -r)"
+
+	[ "$(kernel_version_code "$uname_r")" -lt \
+	  "$(kernel_version_code "$1")" ] ||
+		skip_ "the kernel release $uname_r is $1 or newer"
+}
+
 # Usage: require_min_nproc 2
 require_min_nproc()
 {
