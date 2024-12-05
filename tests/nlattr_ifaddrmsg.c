@@ -296,8 +296,22 @@ main(void)
 #endif
 					    printf(", ");
 					    PRINT_FIELD_U(cis[i], cstamp);
+#if !XLAT_RAW
+					    if (cis[i].cstamp) {
+						    printf(" /* %u.%02u s */",
+							   cis[i].cstamp / 100,
+							   cis[i].cstamp % 100);
+					    }
+#endif
 					    printf(", ");
 					    PRINT_FIELD_U(cis[i], tstamp);
+#if !XLAT_RAW
+					    if (cis[i].tstamp) {
+						    printf(" /* %u.%02u s */",
+							   cis[i].tstamp / 100,
+							   cis[i].tstamp % 100);
+					    }
+#endif
 					    printf("}"));
 		}
 

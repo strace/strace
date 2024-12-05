@@ -56,9 +56,9 @@ decode_ifa_cacheinfo(struct tcb *const tcp,
 		tprint_struct_next();
 		PRINT_FIELD_XVAL_U_VERBOSE(ci, ifa_valid, ifa_lifetimes, NULL);
 		tprint_struct_next();
-		PRINT_FIELD_U(ci, cstamp);
+		PRINT_FIELD_TICKS(ci, cstamp, 100, 2);
 		tprint_struct_next();
-		PRINT_FIELD_U(ci, tstamp);
+		PRINT_FIELD_TICKS(ci, tstamp, 100, 2);
 		tprint_struct_end();
 	}
 
