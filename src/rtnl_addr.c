@@ -29,6 +29,15 @@ decode_ifa_address(struct tcb *const tcp,
 {
 	const struct ifaddrmsg *const ifaddr = opaque_data;
 
+	/*
+	 * There are two additional address families besides AF_INET{,6},
+	 * that implement (some) address-like IFA_* attribute types,
+	 * AF_PHONET (IFA_LOCAL) and AF_MCTP (IFA_ADDRESS and IFA_LOCAL),
+	 * but since addresses in these address families are simple single-byte
+	 * values, decode_inet_addr() is "good enough" in these cases,
+	 * as it prints the addresses for unsupported address families
+	 * as a hexadecimal string.
+	 */
 	decode_inet_addr(tcp, addr, len, ifaddr->ifa_family, NULL);
 
 	return true;
