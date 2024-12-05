@@ -16,6 +16,7 @@
 #include <linux/if_addr.h>
 
 #include "xlat/ifaddrflags.h"
+#include "xlat/ifa_lifetimes.h"
 #include "xlat/ifa_protocols.h"
 #include "xlat/routing_scopes.h"
 #include "xlat/rtnl_addr_attrs.h"
@@ -45,9 +46,15 @@ decode_ifa_cacheinfo(struct tcb *const tcp,
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ci)) {
 		tprint_struct_begin();
-		PRINT_FIELD_U(ci, ifa_prefered);
+		/*
+		 * ifa_lifetimes contains INFINITY_LIFE_TIME constant,
+		 * that is defined in include/net/addrconf.h and is not exposed
+		 * in UAPI.
+		 */
+		PRINT_FIELD_XVAL_U_VERBOSE(ci, ifa_prefered,
+					   ifa_lifetimes, NULL);
 		tprint_struct_next();
-		PRINT_FIELD_U(ci, ifa_valid);
+		PRINT_FIELD_XVAL_U_VERBOSE(ci, ifa_valid, ifa_lifetimes, NULL);
 		tprint_struct_next();
 		PRINT_FIELD_U(ci, cstamp);
 		tprint_struct_next();

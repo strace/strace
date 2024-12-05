@@ -1,0 +1,2 @@
+#From include/net/addrconf.h
+INFINITY_LIFE_TIME	0xFFFFFFFFU
