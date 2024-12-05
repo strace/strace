@@ -188,7 +188,7 @@ main(void)
 		/* Unimplemented message types */
 		static const struct strval32 unimp_types[] = {
 			{ ARG_XLAT_KNOWN(0, "IFA_UNSPEC") },
-			{ ARG_XLAT_KNOWN(0xb, "IFA_PROTO") } };
+		};
 		for (size_t i = 0; i < ARRAY_SIZE(unimp_types); i++) {
 			for (size_t j = 1; j < DEFAULT_STRLEN + 2; j++) {
 				TEST_NLATTR_(fd, nlh0, hdrlen,
@@ -304,6 +304,23 @@ main(void)
 					    printf("%s", ifa_flags_ext[i].str));
 		}
 
+		/* IFAPROT_* */
+		static const struct strval8 protos[] = {
+			{ ARG_XLAT_KNOWN(0, "IFAPROT_UNSPEC") },
+			{ ARG_XLAT_KNOWN(0x1, "IFAPROT_KERNEL_LO") },
+			{ ARG_XLAT_KNOWN(0x3, "IFAPROT_KERNEL_LL") },
+			{ ARG_XLAT_UNKNOWN(0x4, "IFAPROT_???") },
+			{ ARG_XLAT_UNKNOWN(0x5, "IFAPROT_???") },
+			{ ARG_XLAT_UNKNOWN(0xff, "IFAPROT_???") },
+		};
+		for (size_t i = 0; i < ARRAY_SIZE(protos); i++) {
+			TEST_NLATTR_OBJECT_(fd, nlh0, hdrlen,
+					    init_ifaddrmsg, print_ifaddrmsg,
+					    IFA_PROTO,
+					    XLAT_KNOWN(0xb, "IFA_PROTO"),
+					    pattern, protos[i].val,
+					    printf("%s", protos[i].str));
+		}
 
 		/* u32 */
 		check_u32_nlattr(fd, nlh0, hdrlen,
