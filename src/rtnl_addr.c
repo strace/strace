@@ -63,14 +63,13 @@ decode_ifa_flags(struct tcb *const tcp,
 		 const unsigned int len,
 		 const void *const opaque_data)
 {
-	uint32_t ifa_flags;
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = ifaddrflags,
+		.dflt = "IFA_F_???",
+		.size = 4,
+	};
 
-	if (len < sizeof(ifa_flags))
-		return false;
-	else if (!umove_or_printaddr(tcp, addr, &ifa_flags))
-		printflags(ifaddrflags, ifa_flags, "IFA_F_???");
-
-	return true;
+	return decode_nla_flags(tcp, addr, len, &opts);
 }
 
 static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
