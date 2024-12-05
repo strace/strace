@@ -284,8 +284,16 @@ main(void)
 					    pattern, cis[i],
 					    printf("{");
 					    PRINT_FIELD_U(cis[i], ifa_prefered);
+#if !XLAT_RAW
+					    if (cis[i].ifa_prefered == -1U)
+						    printf(" /* INFINITY_LIFE_TIME */");
+#endif
 					    printf(", ");
 					    PRINT_FIELD_U(cis[i], ifa_valid);
+#if !XLAT_RAW
+					    if (cis[i].ifa_valid == -1U)
+						    printf(" /* INFINITY_LIFE_TIME */");
+#endif
 					    printf(", ");
 					    PRINT_FIELD_U(cis[i], cstamp);
 					    printf(", ");
