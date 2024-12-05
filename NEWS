@@ -3,6 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of SO_RIGHTS_NOTRUNC socket option.
+  * Implemented decoding of IFA_PROTO netlink attribute.
   * Updated lists of ATA_*, KVM_*, and *_MAGIC constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)

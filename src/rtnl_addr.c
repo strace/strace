@@ -16,6 +16,7 @@
 #include <linux/if_addr.h>
 
 #include "xlat/ifaddrflags.h"
+#include "xlat/ifa_protocols.h"
 #include "xlat/routing_scopes.h"
 #include "xlat/rtnl_addr_attrs.h"
 
@@ -72,6 +73,21 @@ decode_ifa_flags(struct tcb *const tcp,
 	return decode_nla_flags(tcp, addr, len, &opts);
 }
 
+static bool
+decode_ifa_proto(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = ifa_protocols,
+		.dflt = "IFAPROT_???",
+		.size = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
 	[IFA_ADDRESS]		= decode_ifa_address,
 	[IFA_LOCAL]		= decode_ifa_address,
@@ -83,6 +99,7 @@ static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
 	[IFA_FLAGS]		= decode_ifa_flags,
 	[IFA_RT_PRIORITY]	= decode_nla_u32,
 	[IFA_TARGET_NETNSID]	= decode_nla_s32,
+	[IFA_PROTO]		= decode_ifa_proto,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
