@@ -166,7 +166,8 @@ static const nla_decoder_t crypto_user_alg_nla_decoders[] = {
 	[CRYPTOCFGA_REPORT_CIPHER]	= decode_crypto_report_cipher,
 	[CRYPTOCFGA_REPORT_AKCIPHER]	= decode_crypto_report_generic,
 	[CRYPTOCFGA_REPORT_KPP]		= decode_crypto_report_generic,
-	[CRYPTOCFGA_REPORT_ACOMP]	= decode_crypto_report_generic
+	[CRYPTOCFGA_REPORT_ACOMP]	= decode_crypto_report_generic,
+	[CRYPTOCFGA_REPORT_SIG]		= decode_crypto_report_generic,
 };
 
 static void

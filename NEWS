@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Updated decoding of struct io_uring_clone_buffers, struct io_uring_napi,
     and struct perf_event_attr.
+  * Updated decoding of crypto_user_alg netlink attributes of NETLINK_CRYPTO.
   * Updated lists of BPF_*, MADV_*, and SCM_* constants.
 
 Noteworthy changes in release 6.12 (2024-11-18)
