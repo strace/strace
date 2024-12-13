@@ -185,11 +185,11 @@ main(void)
 	char *path_secontext = SECONTEXT_FILE(path);
 
 	assert(syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
-		flags | 1) == -1);
+		flags | 0xfc) == -1);
 	if (EINVAL != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0}, %p"
-	       ", AT_SYMLINK_FOLLOW|0x1)" RVAL_EINVAL,
+	       ", AT_SYMLINK_FOLLOW|0xfc)" RVAL_EINVAL,
 	       my_secontext, "name_to_handle_at",
 	       path, path_secontext,
 	       &mount_id);
@@ -237,9 +237,11 @@ main(void)
 		{ (kernel_ulong_t) 0xbadc0ded00001000ULL,
 			"AT_EMPTY_PATH" },
 		{ (kernel_ulong_t) 0xdeadc0deda7a1657ULL,
-			"AT_HANDLE_FID|AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|0xda7a0057" },
-		{ (kernel_ulong_t) 0xdefaced1ffffe9ffULL,
-			"0xffffe9ff /* AT_??? */" },
+			"AT_HANDLE_MNT_ID_UNIQUE|AT_HANDLE_CONNECTABLE|"
+			"AT_HANDLE_FID|AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|"
+			"0xda7a0054" },
+		{ (kernel_ulong_t) 0xdefaced1ffffe9fcULL,
+			"0xffffe9fc /* AT_??? */" },
 	};
 	static const kernel_ulong_t mount_fds[] = {
 		(kernel_ulong_t) 0xdeadca5701234567ULL,
