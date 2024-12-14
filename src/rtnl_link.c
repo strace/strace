@@ -1356,8 +1356,9 @@ static const nla_decoder_t ifla_inet_nla_decoders[] = {
 };
 
 static const nla_decoder_t ifla_mctp_nla_decoders[] = {
-	[IFLA_MCTP_UNSPEC]	= NULL,
-	[IFLA_MCTP_NET]		= decode_nla_u32,
+	[IFLA_MCTP_UNSPEC]		= NULL,
+	[IFLA_MCTP_NET]			= decode_nla_u32,
+	[IFLA_MCTP_PHYS_BINDING]	= decode_nla_x8,
 };
 
 static bool

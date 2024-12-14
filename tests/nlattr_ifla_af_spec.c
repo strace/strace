@@ -343,13 +343,17 @@ main(void)
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_MCTP_msg, print_AF_MCTP_msg,
-				      2, "0x2 /* IFLA_MCTP_??? */", pattern,
+				      3, "0x3 /* IFLA_MCTP_??? */", pattern,
 				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 	/* AF_MCTP: IFLA_MCTP_NET */
 	check_u32_nlattr(fd, nlh0, hdrlen, init_AF_MCTP_msg, print_AF_MCTP_msg,
 			 1, "IFLA_MCTP_NET", pattern, 2);
+
+	/* AF_MCTP: IFLA_MCTP_PHYS_BINDING */
+	check_x8_nlattr(fd, nlh0, hdrlen, init_AF_MCTP_msg, print_AF_MCTP_msg,
+			2, "IFLA_MCTP_PHYS_BINDING", pattern, 2);
 
 	puts("+++ exited with 0 +++");
 	return 0;
