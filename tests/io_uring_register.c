@@ -172,7 +172,7 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0x7fffffffU, 31 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 35 };
 	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
@@ -486,10 +486,10 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_REGISTER_CLONE_BUFFERS),
+		  "register_op=", ARG_STR(IORING_REGISTER_MEM_REGION),
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 31, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 35, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -1584,10 +1584,13 @@ main(void)
 	static const struct strval32 clone_buffers_flags[] = {
 		{ ARG_STR(0) },
 		{ ARG_XLAT_KNOWN(0x1, "IORING_REGISTER_SRC_REGISTERED") },
-		{ ARG_XLAT_UNKNOWN(0x2, "IORING_REGISTER_???") },
-		{ ARG_XLAT_UNKNOWN(0xfffffffe, "IORING_REGISTER_???") },
+		{ ARG_XLAT_KNOWN(0x2, "IORING_REGISTER_DST_REPLACE") },
+		{ ARG_XLAT_UNKNOWN(0x4, "IORING_REGISTER_???") },
+		{ ARG_XLAT_UNKNOWN(0xfffffffc, "IORING_REGISTER_???") },
 		{ ARG_XLAT_KNOWN(0xffffffff,
-				 "IORING_REGISTER_SRC_REGISTERED|0xfffffffe") },
+				 "IORING_REGISTER_SRC_REGISTERED|"
+				 "IORING_REGISTER_DST_REPLACE|"
+				 "0xfffffffc") },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(clone_buffers_flags); ++i) {
