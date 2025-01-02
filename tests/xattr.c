@@ -20,14 +20,15 @@
 int
 main(void)
 {
-	static const char name[] = "strace.test";
+	static const char name[] = "user.strace.test.xattr";
 	static const char c_value[] = "foo\0bar";
 	static const char q_value[] = "foo\\0bar";
 
 	const char *const z_value = tail_memdup(c_value, sizeof(c_value));
 	char *const efault = tail_alloc(1) + 1;
 	const char *const value = tail_memdup(c_value, sizeof(c_value) - 1);
-	char *const big = tail_alloc(XATTR_SIZE_MAX + 1);
+	const unsigned int big_size = XATTR_SIZE_MAX;
+	char *const big = tail_alloc(big_size);
 	long rc;
 	const char *errstr;
 
@@ -42,6 +43,14 @@ main(void)
 	rc = fsetxattr(-1, name, big, XATTR_SIZE_MAX + 1, XATTR_CREATE);
 	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE) = %s\n",
 	       name, big, XATTR_SIZE_MAX + 1, sprintrc(rc));
+
+	fill_memory(big, big_size);
+	rc = fsetxattr(-1, name, big, big_size, XATTR_CREATE);
+	errstr = sprintrc(rc);
+	printf("fsetxattr(-1, \"%s\", ", name);
+	print_quoted_memory(big, DEFAULT_STRLEN);
+	fputs("...", stdout);
+	printf(", %u, XATTR_CREATE) = %s\n", big_size, errstr);
 
 	rc = fsetxattr(-1, name, value, sizeof(c_value), XATTR_CREATE);
 	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE) = %s\n",
@@ -60,34 +69,32 @@ main(void)
 	printf("setxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE) = %s\n",
 	       name, q_value, (unsigned) sizeof(c_value), sprintrc(rc));
 
-	rc = lsetxattr(".", name, value, sizeof(c_value) - 1, XATTR_CREATE);
-	printf("lsetxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE) = %s\n",
+	rc = lsetxattr(".", name, value, sizeof(c_value) - 1, XATTR_REPLACE);
+	printf("lsetxattr(\".\", \"%s\", \"%s\", %u, XATTR_REPLACE) = %s\n",
 	       name, q_value, (unsigned) sizeof(c_value) - 1, sprintrc(rc));
 
 	rc = fgetxattr(-1, name, efault, 4);
 	printf("fgetxattr(-1, \"%s\", %p, 4) = %s\n",
 	       name, efault, sprintrc(rc));
 
-	rc = getxattr(".", name, big, XATTR_SIZE_MAX + 1);
-	printf("getxattr(\".\", \"%s\", %p, %u) = %s\n",
-	       name, big, XATTR_SIZE_MAX + 1, sprintrc(rc));
-
-	rc = lgetxattr(".", name, big + 1, XATTR_SIZE_MAX);
-	printf("lgetxattr(\".\", \"%s\", %p, %u) = %s\n",
-	       name, big + 1, XATTR_SIZE_MAX, sprintrc(rc));
+	rc = lgetxattr(".", name, big, big_size);
+	errstr = sprintrc(rc);
+	printf("lgetxattr(\".\", \"%s\", ", name);
+	if (rc < 0)
+		printf("%p", big);
+	else
+		printf("\"%s\"", q_value);
+	printf(", %u) = %s\n", big_size, errstr);
 
 	rc = flistxattr(-1, efault, 4);
 	printf("flistxattr(-1, %p, 4) = %s\n", efault, sprintrc(rc));
 
-	rc = llistxattr("", efault + 1, 4);
-	printf("llistxattr(\"\", %p, 4) = %s\n", efault + 1, sprintrc(rc));
-
 	rc = listxattr(".", big, 0);
 	printf("listxattr(\".\", %p, 0) = %s\n", big, sprintrc(rc));
 
-	rc = listxattr(".", big, XATTR_SIZE_MAX + 1);
+	rc = llistxattr(".", big, big_size);
 	errstr = sprintrc(rc);
-	printf("listxattr(\".\", ");
+	printf("llistxattr(\".\", ");
 	if (rc < 0)
 		printf("%p", big);
 	else {
@@ -97,7 +104,7 @@ main(void)
 		if (ellipsis)
 			fputs("...", stdout);
 	}
-	printf(", %u) = %s\n", XATTR_SIZE_MAX + 1, errstr);
+	printf(", %u) = %s\n", big_size, errstr);
 
 	rc = fremovexattr(-1, name);
 	printf("fremovexattr(-1, \"%s\") = %s\n", name, sprintrc(rc));
