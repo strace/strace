@@ -9,9 +9,7 @@
 
 #include "defs.h"
 
-#ifdef HAVE_SYS_XATTR_H
-# include <sys/xattr.h>
-#endif
+#include <linux/xattr.h>
 
 #include "xlat/xattrflags.h"
 
