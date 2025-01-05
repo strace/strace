@@ -20,7 +20,6 @@
 static void
 print_xattr_val(struct tcb *const tcp,
 		const kernel_ulong_t addr,
-		const kernel_ulong_t insize,
 		const kernel_ulong_t size)
 {
 	/* value */
@@ -28,10 +27,27 @@ print_xattr_val(struct tcb *const tcp,
 		printaddr(addr);
 	else
 		printstr_ex(tcp, addr, size, QUOTE_OMIT_TRAILING_0);
+}
+
+static int
+decode_setxattr_without_path(struct tcb *const tcp)
+{
+	/* name */
+	printstr(tcp, tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* value */
+	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 	tprint_arg_next();
 
 	/* size */
-	PRINT_VAL_U(insize);
+	PRINT_VAL_U(tcp->u_arg[3]);
+	tprint_arg_next();
+
+	/* flags */
+	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(setxattr)
@@ -40,16 +56,7 @@ SYS_FUNC(setxattr)
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
-	/* name */
-	printstr(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
-
-	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-	tprint_arg_next();
-
-	/* flags */
-	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
-	return RVAL_DECODED;
+	return decode_setxattr_without_path(tcp);
 }
 
 SYS_FUNC(fsetxattr)
@@ -58,16 +65,26 @@ SYS_FUNC(fsetxattr)
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
-	/* name */
-	printstr(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
+	return decode_setxattr_without_path(tcp);
+}
 
-	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-	tprint_arg_next();
+static int
+decode_getxattr_without_path(struct tcb *const tcp)
+{
+	if (entering(tcp)) {
+		/* name */
+		printstr(tcp, tcp->u_arg[1]);
+		tprint_arg_next();
+	} else {
+		/* value */
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_rval);
+		tprint_arg_next();
 
-	/* flags */
-	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
-	return RVAL_DECODED;
+		/* size */
+		PRINT_VAL_U(tcp->u_arg[3]);
+	}
+
+	return 0;
 }
 
 SYS_FUNC(getxattr)
@@ -76,14 +93,9 @@ SYS_FUNC(getxattr)
 		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
-
-		/* name */
-		printstr(tcp, tcp->u_arg[1]);
-		tprint_arg_next();
-	} else {
-		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
-	return 0;
+
+	return decode_getxattr_without_path(tcp);
 }
 
 SYS_FUNC(fgetxattr)
@@ -92,14 +104,9 @@ SYS_FUNC(fgetxattr)
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
-
-		/* name */
-		printstr(tcp, tcp->u_arg[1]);
-		tprint_arg_next();
-	} else {
-		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
-	return 0;
+
+	return decode_getxattr_without_path(tcp);
 }
 
 static void
