@@ -77,6 +77,10 @@ main(void)
 	printf("fgetxattr(-1, \"%s\", %p, 4) = %s\n",
 	       name, efault, sprintrc(rc));
 
+	rc = getxattr(".", name, big, 0);
+	printf("getxattr(\".\", \"%s\", %p, 0) = %s\n",
+	       name, big, sprintrc(rc));
+
 	rc = lgetxattr(".", name, big, big_size);
 	errstr = sprintrc(rc);
 	printf("lgetxattr(\".\", \"%s\", ", name);

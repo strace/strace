@@ -75,6 +75,16 @@ decode_getxattr_without_path(struct tcb *const tcp)
 		/* name */
 		printstr(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
+
+		if (tcp->u_arg[3])
+			return 0;
+
+		/* value */
+		printaddr(tcp->u_arg[2]);
+		tprint_arg_next();
+
+		/* size */
+		PRINT_VAL_U(tcp->u_arg[3]);
 	} else {
 		/* value */
 		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_rval);
@@ -84,7 +94,7 @@ decode_getxattr_without_path(struct tcb *const tcp)
 		PRINT_VAL_U(tcp->u_arg[3]);
 	}
 
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(getxattr)
