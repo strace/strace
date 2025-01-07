@@ -47,3 +47,4 @@
 [BASE_NR + 460] = { 4,	0,		SEN(lsm_set_self_attr),		"lsm_set_self_attr"	},
 [BASE_NR + 461] = { 3,	0,		SEN(lsm_list_modules),		"lsm_list_modules"	},
 [BASE_NR + 462] = { 3,	TM,		SEN(mseal),			"mseal"		},
+[BASE_NR + 463] = { 6,	TD|TF,		SEN(setxattrat),		"setxattrat"	},
