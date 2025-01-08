@@ -1044,6 +1044,10 @@ setrlimit-Xraw	-a19 -e trace=setrlimit -Xraw
 setrlimit-Xverbose	-a36 -e trace=setrlimit -Xverbose
 setuid	-a10
 setuid32	-a12
+setxattrat
+setxattrat-P	--trace=setxattrat -P /dev/full
+setxattrat-y	--trace=setxattrat -y
+setxattrat-yy	--trace=setxattrat -yy
 shmxt	-a11 -e trace='/(osf_)?shmat,shmdt'
 shutdown	-a24
 sigaction	-a31

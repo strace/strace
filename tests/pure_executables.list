@@ -755,6 +755,10 @@ setrlimit-Xraw
 setrlimit-Xverbose
 setuid
 setuid32
+setxattrat
+setxattrat-P
+setxattrat-y
+setxattrat-yy
 shmxt
 shutdown
 sigaction
