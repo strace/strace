@@ -227,10 +227,20 @@ umove_xattr_args_or_printaddr(struct tcb *tcp, struct xattr_args *args,
 
 static void
 print_xattr_args(struct tcb *tcp, struct xattr_args *args,
-		 kernel_ulong_t addr, kernel_ulong_t size)
+		 kernel_ulong_t addr, kernel_ulong_t size,
+		 bool decode_value)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_OBJ_TCB_VAL(*args, value, tcp, print_xattr_val, args->size);
+
+	if (decode_value) {
+		kernel_ulong_t val_size =
+			entering(tcp) ? (kernel_long_t) args->size : tcp->u_rval;
+
+		PRINT_FIELD_OBJ_TCB_VAL(*args, value, tcp, print_xattr_val,
+					val_size);
+	} else {
+		PRINT_FIELD_ADDR64(*args, value);
+	}
 
 	tprint_struct_next();
 	PRINT_FIELD_U(*args, size);
@@ -259,10 +269,47 @@ SYS_FUNC(setxattrat)
 
 	/* args */
 	if (!umove_xattr_args_or_printaddr(tcp, &args, addr, size))
-		print_xattr_args(tcp, &args, addr, size);
+		print_xattr_args(tcp, &args, addr, size, true);
 	tprint_arg_next();
 
 	/* size */
+	PRINT_VAL_U(size);
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(getxattrat)
+{
+	const kernel_ulong_t addr = tcp->u_arg[4];
+	const kernel_ulong_t size = tcp->u_arg[5];
+
+	if (entering(tcp)) {
+		struct xattr_args args;
+
+		/* dirfd, pathname, flags, name */
+		decode_dirfd_pathname_flags_name(tcp);
+		tprint_arg_next();
+
+		/* args */
+		if (!umove_xattr_args_or_printaddr(tcp, &args, addr, size)) {
+			if (args.size) {
+				set_tcb_priv_data(tcp, xobjdup(&args), free);
+				return 0;
+			}
+			print_xattr_args(tcp, &args, addr, size, false);
+		}
+	} else {
+		struct xattr_args *args = get_tcb_priv_data(tcp);
+
+		/* args */
+		if (args)
+			print_xattr_args(tcp, args, addr, size, true);
+		else
+			printaddr(addr);
+	}
+
+	/* size */
+	tprint_arg_next();
 	PRINT_VAL_U(size);
 
 	return RVAL_DECODED;
