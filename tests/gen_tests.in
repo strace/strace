@@ -273,6 +273,10 @@ gettid	-a9
 getuid-creds	+getuid.test
 getuid32	+getuid.test
 getuid32-creds	+getuid.test
+getxattrat
+getxattrat-P	--trace=getxattrat -P /dev/full
+getxattrat-y	--trace=getxattrat -y
+getxattrat-yy	--trace=getxattrat -yy
 getxgid	-a10
 getxpid	-a10
 getxuid	-a10

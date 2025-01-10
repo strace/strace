@@ -184,6 +184,10 @@ getsid
 getsockname
 getuid
 getuid32
+getxattrat
+getxattrat-P
+getxattrat-y
+getxattrat-yy
 getxgid
 getxpid
 getxuid
