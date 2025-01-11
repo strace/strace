@@ -49,3 +49,4 @@
 [BASE_NR + 462] = { 3,	TM,		SEN(mseal),			"mseal"		},
 [BASE_NR + 463] = { 6,	TD|TF,		SEN(setxattrat),		"setxattrat"	},
 [BASE_NR + 464] = { 6,	TD|TF,		SEN(getxattrat),		"getxattrat"	},
+[BASE_NR + 465] = { 5,	TD|TF,		SEN(listxattrat),		"listxattrat"	},

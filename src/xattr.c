@@ -314,3 +314,15 @@ SYS_FUNC(getxattrat)
 
 	return RVAL_DECODED;
 }
+
+SYS_FUNC(listxattrat)
+{
+	if (entering(tcp)) {
+		/* dirfd, pathname, flags */
+		decode_dirfd_pathname_flags(tcp);
+		tprint_arg_next();
+	} else {
+		print_xattr_list(tcp, tcp->u_arg[3], tcp->u_arg[4]);
+	}
+	return 0;
+}

@@ -280,6 +280,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set,
 	case SEN_futimesat:
 	case SEN_getxattrat:
 	case SEN_inotify_add_watch:
+	case SEN_listxattrat:
 	case SEN_mkdirat:
 	case SEN_mknodat:
 	case SEN_mount_setattr:
