@@ -523,6 +523,10 @@ linkat
 list_sigaction_signum
 listmount
 listmount-success
+listxattrat
+listxattrat-P
+listxattrat-y
+listxattrat-yy
 llseek
 localtime
 lookup_dcookie

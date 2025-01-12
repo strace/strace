@@ -542,6 +542,10 @@ linkat--secontext_full_mismatch	--secontext=full,mismatch -e trace=linkat
 linkat--secontext_mismatch	--secontext=mismatch -e trace=linkat
 listmount	-a26
 listmount-success --inject=listmount:retval=42 -a26 --trace=listmount
+listxattrat	-a34
+listxattrat-P	-a34 --trace=listxattrat -P /dev/full
+listxattrat-y	-a34 --trace=listxattrat -y
+listxattrat-yy	-a34 --trace=listxattrat -yy
 lookup_dcookie	-a27
 lsm_get_self_attr	-a49 -s2
 lsm_get_self_attr-success	--inject=lsm_get_self_attr:retval=96 -a49 -s2 --trace=lsm_get_self_attr

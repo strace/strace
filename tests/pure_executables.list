@@ -352,6 +352,10 @@ link
 linkat
 listmount
 listmount-success
+listxattrat
+listxattrat-P
+listxattrat-y
+listxattrat-yy
 llseek
 lookup_dcookie
 lseek
