@@ -2,7 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Implemented decoding of getxattrat, setxattrat, and listxattrat syscalls.
+  * Implemented decoding of getxattrat, setxattrat, listxattrat,
+    and removexattrat syscalls.
   * Updated decoding of struct io_uring_clone_buffers, struct io_uring_napi,
     and struct perf_event_attr.
   * Updated decoding of crypto_user_alg netlink attributes of NETLINK_CRYPTO.

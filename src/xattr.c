@@ -326,3 +326,10 @@ SYS_FUNC(listxattrat)
 	}
 	return 0;
 }
+
+SYS_FUNC(removexattrat)
+{
+	/* dirfd, pathname, flags, name */
+	decode_dirfd_pathname_flags_name(tcp);
+	return RVAL_DECODED;
+}

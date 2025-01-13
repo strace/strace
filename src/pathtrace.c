@@ -290,6 +290,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set,
 	case SEN_openat:
 	case SEN_openat2:
 	case SEN_readlinkat:
+	case SEN_removexattrat:
 	case SEN_setxattrat:
 	case SEN_statx:
 	case SEN_unlinkat:

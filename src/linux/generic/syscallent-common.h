@@ -50,3 +50,4 @@
 [BASE_NR + 463] = { 6,	TD|TF,		SEN(setxattrat),		"setxattrat"	},
 [BASE_NR + 464] = { 6,	TD|TF,		SEN(getxattrat),		"getxattrat"	},
 [BASE_NR + 465] = { 5,	TD|TF,		SEN(listxattrat),		"listxattrat"	},
+[BASE_NR + 466] = { 4,	TD|TF,		SEN(removexattrat),		"removexattrat"	},
