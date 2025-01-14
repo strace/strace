@@ -974,6 +974,10 @@ remap_file_pages
 remap_file_pages-Xabbrev
 remap_file_pages-Xraw
 remap_file_pages-Xverbose
+removexattrat
+removexattrat-P
+removexattrat-y
+removexattrat-yy
 rename
 renameat
 renameat2
