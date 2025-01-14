@@ -74,6 +74,7 @@
 { "asm/uvdevice.h", "UVIO_IOCTL_ATT", _IOC_READ|_IOC_WRITE, 0x7501, 0x40 },
 { "asm/uvdevice.h", "UVIO_IOCTL_LIST_SECRETS", _IOC_READ|_IOC_WRITE, 0x7503, 0x40 },
 { "asm/uvdevice.h", "UVIO_IOCTL_LOCK_SECRETS", _IOC_READ|_IOC_WRITE, 0x7504, 0x40 },
+{ "asm/uvdevice.h", "UVIO_IOCTL_RETR_SECRET", _IOC_READ|_IOC_WRITE, 0x7505, 0x40 },
 { "asm/uvdevice.h", "UVIO_IOCTL_UVDEV_INFO", _IOC_READ|_IOC_WRITE, 0x7500, 0x40 },
 { "asm/vmcp.h", "VMCP_GETCODE", _IOC_READ, 0x1001, 0x04 },
 { "asm/vmcp.h", "VMCP_GETSIZE", _IOC_READ, 0x1003, 0x04 },
