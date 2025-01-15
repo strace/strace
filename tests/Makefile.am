@@ -459,9 +459,11 @@ delay_LDADD = $(clock_LIBS) $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+ftruncate_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 localtime_LDADD = $(clock_LIBS) $(LDADD)
 looping_threads_LDADD = -lpthread $(LDADD)
+lseek_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 maybe_switch_current_tcp_LDADD = -lpthread $(LDADD)
 maybe_switch_current_tcp__quiet_thread_execve_LDADD = -lpthread $(LDADD)
@@ -492,6 +494,7 @@ times_LDADD = $(clock_LIBS) $(LDADD)
 times_Xabbrev_LDADD = $(clock_LIBS) $(LDADD)
 times_Xraw_LDADD = $(clock_LIBS) $(LDADD)
 times_Xverbose_LDADD = $(clock_LIBS) $(LDADD)
+truncate_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 
