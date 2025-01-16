@@ -12,7 +12,7 @@
 
 # include "kernel_types.h"
 
-# if __mips_isa_rev >= 6
+# if defined __mips_isa_rev && __mips_isa_rev >= 6
 #  define SYSCALL_CLOBBERLIST \
 	"memory", "$1", "$3", "$8", "$9", \
 	"$10", "$11", "$12", "$13", "$14", "$15", \
