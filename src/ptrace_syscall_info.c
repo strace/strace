@@ -50,43 +50,37 @@ test_ptrace_get_syscall_info(void)
 	 * leave the default unchanged.
 	 */
 #ifdef HAVE_FORK
-	static const unsigned long args[][7] = {
+	const kernel_ulong_t args[][7] = {
 		/* a sequence of architecture-agnostic syscalls */
 		{
 			__NR_chdir,
-			(unsigned long) "",
-			0xbad1fed1,
-			0xbad2fed2,
-			0xbad3fed3,
-			0xbad4fed4,
-			0xbad5fed5
+			(uintptr_t) "",
+			(kernel_ulong_t) 0xdad1bef1bad1fed1ULL,
+			(kernel_ulong_t) 0xdad2bef2bad2fed2ULL,
+			(kernel_ulong_t) 0xdad3bef3bad3fed3ULL,
+			(kernel_ulong_t) 0xdad4bef4bad4fed4ULL,
+			(kernel_ulong_t) 0xdad5bef5bad5fed5ULL
 		},
 		{
 			__NR_gettid,
-			0xcaf0bea0,
-			0xcaf1bea1,
-			0xcaf2bea2,
-			0xcaf3bea3,
-			0xcaf4bea4,
-			0xcaf5bea5
+			(kernel_ulong_t) 0xdad0bef0caf0bea0ULL,
+			(kernel_ulong_t) 0xdad1bef1caf1bea1ULL,
+			(kernel_ulong_t) 0xdad2bef2caf2bea2ULL,
+			(kernel_ulong_t) 0xdad3bef3caf3bea3ULL,
+			(kernel_ulong_t) 0xdad4bef4caf4bea4ULL,
+			(kernel_ulong_t) 0xdad5bef5caf5bea5ULL
 		},
 		{
 			__NR_exit_group,
 			0,
-			0xfac1c0d1,
-			0xfac2c0d2,
-			0xfac3c0d3,
-			0xfac4c0d4,
-			0xfac5c0d5
+			(kernel_ulong_t) 0xdad1bef1fac1c0d1ULL,
+			(kernel_ulong_t) 0xdad2bef2fac2c0d2ULL,
+			(kernel_ulong_t) 0xdad3bef3fac3c0d3ULL,
+			(kernel_ulong_t) 0xdad4bef4fac4c0d4ULL,
+			(kernel_ulong_t) 0xdad5bef5fac5c0d5ULL
 		}
 	};
-	const unsigned long *exp_args;
-
-# if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
-#  define CAST (unsigned long)
-# else
-#  define CAST
-# endif
+	const kernel_ulong_t *exp_args;
 
 	int pid = fork();
 	if (pid < 0)
@@ -203,12 +197,12 @@ test_ptrace_get_syscall_info(void)
 				    || !info.instruction_pointer
 				    || !info.stack_pointer
 				    || (info.entry.nr != exp_args[0])
-				    || (CAST info.entry.args[0] != exp_args[1])
-				    || (CAST info.entry.args[1] != exp_args[2])
-				    || (CAST info.entry.args[2] != exp_args[3])
-				    || (CAST info.entry.args[3] != exp_args[4])
-				    || (CAST info.entry.args[4] != exp_args[5])
-				    || (CAST info.entry.args[5] != exp_args[6])) {
+				    || ((kernel_ulong_t) info.entry.args[0] != exp_args[1])
+				    || ((kernel_ulong_t) info.entry.args[1] != exp_args[2])
+				    || ((kernel_ulong_t) info.entry.args[2] != exp_args[3])
+				    || ((kernel_ulong_t) info.entry.args[3] != exp_args[4])
+				    || ((kernel_ulong_t) info.entry.args[4] != exp_args[5])
+				    || ((kernel_ulong_t) info.entry.args[5] != exp_args[6])) {
 					debug_func_msg("#%d: entry stop"
 						       " mismatch",
 						       ptrace_stop);

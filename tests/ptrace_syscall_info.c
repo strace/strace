@@ -66,37 +66,6 @@ kill_tracee(void)
 				    __FILE__, __LINE__, ##__VA_ARGS__);	\
 	} while (0)
 
-static const unsigned long args[][7] = {
-	/* a sequence of architecture-agnostic syscalls */
-	{
-		__NR_chdir,
-		(unsigned long) "",
-		0xbad1fed1,
-		0xbad2fed2,
-		0xbad3fed3,
-		0xbad4fed4,
-		0xbad5fed5
-	},
-	{
-		__NR_gettid,
-		0xcaf0bea0,
-		0xcaf1bea1,
-		0xcaf2bea2,
-		0xcaf3bea3,
-		0xcaf4bea4,
-		0xcaf5bea5
-	},
-	{
-		__NR_exit_group,
-		0,
-		0xfac1c0d1,
-		0xfac2c0d2,
-		0xfac3c0d3,
-		0xfac4c0d4,
-		0xfac5c0d5
-	}
-};
-
 #if !XLAT_RAW
 static const char *sc_names[] = {
 	"chdir",
@@ -183,7 +152,7 @@ printed_none:
 }
 
 static void
-test_entry(void)
+test_entry(const kernel_ulong_t args[][7])
 {
 	for (unsigned int size = 0;
 	     size <= sizeof(struct_ptrace_syscall_info); ++size) {
@@ -240,7 +209,7 @@ test_entry(void)
 		       NABBR("%llu") VERB(" /* ") NRAW("__NR_%s") VERB(" */"),
 		       XLAT_SEL((unsigned long long) info.entry.nr,
 				sc_names[ptrace_stop / 2]));
-		const unsigned long *exp_args = args[ptrace_stop / 2];
+		const kernel_ulong_t *exp_args = args[ptrace_stop / 2];
 		if (info.entry.nr != exp_args[0])
 			FAIL("#%d: entry stop mismatch", ptrace_stop);
 
@@ -253,14 +222,9 @@ test_entry(void)
 					break;
 				goto printed_entry_nr;
 			}
-#if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
-# define CAST (unsigned long)
-#else
-# define CAST
-#endif
 			printf("%s%#llx", (i ? ", " : ", args=["),
 			       (unsigned long long) info.entry.args[i]);
-			if (CAST info.entry.args[i] != exp_args[i + 1])
+			if ((kernel_ulong_t) info.entry.args[i] != exp_args[i + 1])
 				FAIL("#%d: entry stop mismatch", ptrace_stop);
 		}
 		printf("]");
@@ -362,6 +326,37 @@ printed_exit_common:
 int
 main(void)
 {
+	const kernel_ulong_t args[][7] = {
+		/* a sequence of architecture-agnostic syscalls */
+		{
+			__NR_chdir,
+			(uintptr_t) "",
+			(kernel_ulong_t) 0xdad1bef1bad1fed1ULL,
+			(kernel_ulong_t) 0xdad2bef2bad2fed2ULL,
+			(kernel_ulong_t) 0xdad3bef3bad3fed3ULL,
+			(kernel_ulong_t) 0xdad4bef4bad4fed4ULL,
+			(kernel_ulong_t) 0xdad5bef5bad5fed5ULL
+		},
+		{
+			__NR_gettid,
+			(kernel_ulong_t) 0xdad0bef0caf0bea0ULL,
+			(kernel_ulong_t) 0xdad1bef1caf1bea1ULL,
+			(kernel_ulong_t) 0xdad2bef2caf2bea2ULL,
+			(kernel_ulong_t) 0xdad3bef3caf3bea3ULL,
+			(kernel_ulong_t) 0xdad4bef4caf4bea4ULL,
+			(kernel_ulong_t) 0xdad5bef5caf5bea5ULL
+		},
+		{
+			__NR_exit_group,
+			0,
+			(kernel_ulong_t) 0xdad1bef1fac1c0d1ULL,
+			(kernel_ulong_t) 0xdad2bef2fac2c0d2ULL,
+			(kernel_ulong_t) 0xdad3bef3fac3c0d3ULL,
+			(kernel_ulong_t) 0xdad4bef4fac4c0d4ULL,
+			(kernel_ulong_t) 0xdad5bef5fac5c0d5ULL
+		}
+	};
+
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
 
 	pid = getpid();
@@ -442,7 +437,7 @@ main(void)
 			case 1: /* entering chdir */
 			case 3: /* entering gettid */
 			case 5: /* entering exit_group */
-				test_entry();
+				test_entry(args);
 				break;
 			case 2: /* exiting chdir */
 			case 4: /* exiting gettid */
