@@ -64,6 +64,7 @@ pushdef([CFLAGS], CFLAGS_FOR_BUILD)dnl
 pushdef([CPPFLAGS], CPPFLAGS_FOR_BUILD)dnl
 pushdef([LDFLAGS], LDFLAGS_FOR_BUILD)dnl
 pushdef([WARN_CFLAGS], WARN_CFLAGS_FOR_BUILD)dnl
+pushdef([TEST_WARN_CFLAGS], TEST_WARN_CFLAGS_FOR_BUILD)dnl
 pushdef([host], build)dnl
 pushdef([host_alias], build_alias)dnl
 pushdef([host_cpu], build_cpu)dnl
@@ -129,6 +130,7 @@ popdef([host_vendor])dnl
 popdef([host_cpu])dnl
 popdef([host_alias])dnl
 popdef([host])dnl
+popdef([TEST_WARN_CFLAGS])dnl
 popdef([WARN_CFLAGS])dnl
 popdef([LDFLAGS])dnl
 popdef([CPPFLAGS])dnl

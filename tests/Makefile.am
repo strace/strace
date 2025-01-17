@@ -18,7 +18,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
 MPERS_NAME =
 MPERS_CC_FLAGS =
 ARCH_MFLAGS =
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(WARN_CFLAGS) $(TEST_WARN_CFLAGS)
 bundled_CPPFLAGS =
 if USE_BUNDLED_HEADERS
 bundled_CPPFLAGS += -isystem $(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \

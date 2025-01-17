@@ -62,4 +62,8 @@ if test "$enable_gcc_Werror" = yes; then
   gl_WARN_ADD([-Werror])
 fi
 AC_SUBST([WARN_CFLAGS])
+
+gl_WARN_ADD([-Wno-error=unterminated-string-initialization], [TEST_WARN_CFLAGS])
+gl_WARN_ADD([-Wno-error=stringop-overflow], [TEST_WARN_CFLAGS])
+AC_SUBST([TEST_WARN_CFLAGS])
 ])

@@ -74,6 +74,7 @@ pushdef([EXEEXT], MPERS_NAME[_EXEEXT])dnl
 pushdef([OBJEXT], MPERS_NAME[_OBJEXT])dnl
 pushdef([LDFLAGS], [LDFLAGS_FOR_]MPERS_NAME)dnl
 pushdef([WARN_CFLAGS], [WARN_CFLAGS_FOR_]MPERS_NAME)dnl
+pushdef([TEST_WARN_CFLAGS], [TEST_WARN_CFLAGS_FOR_]MPERS_NAME)dnl
 
 st_SAVE_VAR([CC])
 st_SAVE_VAR([CPP])
@@ -224,6 +225,7 @@ st_RESTORE_VAR([CPP])
 st_RESTORE_VAR([CFLAGS])
 st_RESTORE_VAR([CPPFLAGS])
 
+popdef([TEST_WARN_CFLAGS])dnl
 popdef([WARN_CFLAGS])dnl
 popdef([LDFLAGS])dnl
 popdef([OBJEXT])dnl
