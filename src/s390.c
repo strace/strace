@@ -1304,7 +1304,7 @@ struct guard_storage_control_block {
 	 *  - Bits 0..J, J == 64-GSC - Guard Storage Origin (GSO)
 	 *  - Bits 53..55 - Guard Load Shift (GLS)
 	 *  - Bits 58..63 - Guard Storage Characteristic (GSC), this is J from
-	 *                  the first item, valud values are 25..56.
+	 *                  the first item, valid values are 25..56.
 	 */
 	uint64_t gsd;
 	uint64_t gssm;     /**< Guard Storage Section Mask */

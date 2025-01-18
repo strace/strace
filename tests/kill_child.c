@@ -1,6 +1,6 @@
 /*
  * Check for the corner case that previously lead to segfault
- * due to an attempt to access unitialised tcp->s_ent.
+ * due to an attempt to access uninitialised tcp->s_ent.
  *
  * 13994 ???( <unfinished ...>
  * ...

@@ -81,7 +81,7 @@ while [ "$i" -lt "$MAX_TIPS" ]; do
 		fi
 	done
 
-	# Finish when come accross the same tip
+	# Finish when come across the same tip
 	if [ 0 != "$i" ]; then
 		if diff -q "${OUT}.0" "${OUT}.$i"; then
 			break
