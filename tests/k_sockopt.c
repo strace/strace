@@ -41,7 +41,7 @@ k_getsockopt(const unsigned int fd, const unsigned int level,
 		);
 }
 
-# define SC_setsockopt 14
+#define SC_setsockopt 14
 long
 k_setsockopt(const unsigned int fd, const unsigned int level,
 	     const unsigned int optname, const void *const optval,

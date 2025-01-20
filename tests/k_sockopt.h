@@ -9,7 +9,7 @@
  */
 
 #ifndef STRACE_K_SOCKOPT_H
-#define STRACE_K_SOCKOPT_H
+# define STRACE_K_SOCKOPT_H
 
 extern long
 k_getsockopt(const unsigned int fd, const unsigned int level,
