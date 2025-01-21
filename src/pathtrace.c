@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Comtrol Corp.
- * Copyright (c) 2011-2023 The strace developers.
+ * Copyright (c) 2011-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

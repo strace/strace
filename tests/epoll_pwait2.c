@@ -1,7 +1,7 @@
 /*
  * Check decoding of epoll_pwait2 syscall.
  *
- * Copyright (c) 2015-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2015-2024 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
