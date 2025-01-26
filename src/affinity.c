@@ -35,9 +35,9 @@ get_cpuset_size(void)
 		 * to dodge the _Nonnull pointer attribute from
 		 * sched_getaffinity()'s declaration
 		 */
-		cpu_set_t *nullptr = NULL;
+		cpu_set_t *null_ptr = NULL;
 		while (cpuset_size &&
-		       sched_getaffinity(0, cpuset_size, nullptr) == -1 &&
+		       sched_getaffinity(0, cpuset_size, null_ptr) == -1 &&
 		       EINVAL == errno) {
 			cpuset_size <<= 1;
 		}
