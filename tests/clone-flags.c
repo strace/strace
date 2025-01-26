@@ -23,11 +23,26 @@
 static const int child_exit_status = 42;
 static pid_t pid;
 
-static pid_t
-wait_cloned(pid_t pid, int sig, const char *text)
+static void
+retrieve_userns(pid_t pid, char *userns_buf, size_t userns_buflen)
 {
-	if (pid < 0)
+	char *fname = xasprintf("/proc/%d/ns/user", pid);
+	int rc = readlink(fname, userns_buf, userns_buflen - 1);
+	if ((unsigned int) rc >= userns_buflen)
+		perror_msg_and_fail("readlink");
+	userns_buf[rc] = '\0';
+}
+
+static pid_t
+wait_cloned(pid_t pid, int sig, const char *text, char *userns_buf, size_t userns_buflen)
+{
+	if (pid < 0) {
+		if (userns_buf)
+			perror_msg_and_skip("clone %s", text);
 		perror_msg_and_fail("clone %s", text);
+	}
+	if (userns_buf)
+		retrieve_userns(pid, userns_buf, userns_buflen);
 	int status;
 	pid_t rc = wait(&status);
 	if (sig) {
@@ -50,14 +65,20 @@ wait_cloned(pid_t pid, int sig, const char *text)
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
-			     ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...)	\
+	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
+			     ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone2"
 # define STACK_SIZE_FMT ", stack_size=%#lx"
 # define STACK_SIZE_ARG child_stack_size,
 #else
 # define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
-			  ## __VA_ARGS__), (flags_) & 0xff, #flags_)
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, NULL, 0)
+# define do_clone_newns(userns_buf_, fn_, stack_, size_, flags_, arg_, ...) \
+	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
+			  ## __VA_ARGS__), (flags_) & 0xff, #flags_, userns_buf_, sizeof(userns_buf_))
 # define SYSCALL_NAME "clone"
 # define STACK_SIZE_FMT ""
 # define STACK_SIZE_ARG
@@ -142,6 +163,13 @@ main(void)
 		       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
 		       "CLONE_PIDFD|SIGCHLD", *ptid, buf, pid);
 	}
+
+	char userns[PATH_MAX];
+	pid = do_clone_newns(userns, child_stack, child_stack, child_stack_size,
+			     CLONE_NEWUSER, 0);
+	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s) = %d (%s)\n",
+	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+	       "CLONE_NEWUSER", pid, userns);
 
 	return 0;
 }
