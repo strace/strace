@@ -183,6 +183,7 @@ libstrace_a_SOURCES =	\
 	kexec.c		\
 	keyctl.c	\
 	keyctl_kdf_params.h \
+	kfd_ioctl.c	\
 	kill_save_errno.h \
 	kvm.c		\
 	landlock.c	\
