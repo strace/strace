@@ -147,16 +147,17 @@ main(void)
 			"FAN_ACCESS_PERM|"
 			"FAN_OPEN_EXEC_PERM|"
 			"FAN_DIR_MODIFY|"
+			"FAN_PRE_ACCESS|"
 			"FAN_ONDIR|"
 			"FAN_EVENT_ON_CHILD|"
 			"FAN_RENAME|"
-			"0xdeadfeeda7f02000"
+			"0xdeadfeeda7e02000"
 #  endif
 #  if XLAT_VERBOSE
 			" */"
 #  endif
 			},
-		{ ARG_ULL_STR(0xffffffffa7f02000)
+		{ ARG_ULL_STR(0xffffffffa7e02000)
 #  if !XLAT_RAW
 			" /* FAN_??? */"
 #  endif
