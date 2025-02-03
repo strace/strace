@@ -664,8 +664,8 @@ test_nla_ops_family(const int fd)
 
 	static const struct strval32 ethtool_cmds[] = {
 		{ ARG_STR(ETHTOOL_MSG_STRSET_GET) },
-		{ ARG_STR(ETHTOOL_MSG_PHY_GET) },
-		{ ETHTOOL_MSG_PHY_GET + 1, "ETHTOOL_MSG_???" },
+		{ ARG_STR(ETHTOOL_MSG_TSCONFIG_SET) },
+		{ ETHTOOL_MSG_TSCONFIG_SET + 1, "ETHTOOL_MSG_???" },
 	};
 	TEST_NLA_OPS_FAMILY(ETHTOOL_GENL_NAME, ethtool_cmds);
 
