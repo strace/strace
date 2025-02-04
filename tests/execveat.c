@@ -11,13 +11,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_execveat
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
-
-# include "secontext.h"
+#include "secontext.h"
 
 static void
 tests_with_existing_file(void)
@@ -109,8 +107,8 @@ tests_with_existing_file(void)
 	leave_and_remove_subdir();
 }
 
-# define FILENAME "test.execveat\nfilename"
-# define Q_FILENAME "test.execveat\\nfilename"
+#define FILENAME "test.execveat\nfilename"
+#define Q_FILENAME "test.execveat\\nfilename"
 
 static const char * const argv[] = {
 	FILENAME, "first", "second", (const char *) -1L,
@@ -138,21 +136,21 @@ main(void)
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\""
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
-# if VERBOSE
+#if VERBOSE
 	       ", [\"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
-# else
+#else
 	       ", %p /* 5 vars, unterminated */"
-# endif
+#endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv),
-# if VERBOSE
+#if VERBOSE
 	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
 	       (char *) tail_envp + sizeof(envp),
-# else
+#else
 	       tail_envp,
-# endif
+#endif
 	       sprintrc(-1));
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
@@ -161,36 +159,36 @@ main(void)
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
-# if VERBOSE
+#if VERBOSE
 	       ", [\"%s\", \"%s\"]"
-# else
+#else
 	       ", %p /* 2 vars */"
-# endif
+#endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
-# if VERBOSE
+#if VERBOSE
 	       q_envp[0], q_envp[1],
-# else
+#else
 	       tail_envp,
-# endif
+#endif
 	       sprintrc(-1));
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"]"
-# if VERBOSE
+#if VERBOSE
 	       ", [\"%s\"]"
-# else
+#else
 	       ", %p /* 1 var */"
-# endif
+#endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, q_argv[2],
-# if VERBOSE
+#if VERBOSE
 	       q_envp[1],
-# else
+#else
 	       tail_envp + 1,
-# endif
+#endif
 	       sprintrc(-1));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(char *, empty);
@@ -199,17 +197,17 @@ main(void)
 
 	syscall(__NR_execveat, -100, FILENAME, empty, empty, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", []"
-# if VERBOSE
+#if VERBOSE
 	       ", []"
-# else
+#else
 	       ", %p /* 0 vars */"
-# endif
+#endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME,
-# if !VERBOSE
+#if !VERBOSE
 	       empty,
-# endif
+#endif
 	       sprintrc(-1));
 
 	char *const str_a = tail_alloc(DEFAULT_STRLEN + 2);
@@ -235,19 +233,19 @@ main(void)
 	       Q_FILENAME, DEFAULT_STRLEN, a[0]);
 	for (i = 1; i < DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
-# if VERBOSE
+#if VERBOSE
 	printf(", \"%s\"", a[i]);
-# else
+#else
 	printf(", ...");
-# endif
-# if VERBOSE
+#endif
+#if VERBOSE
 	printf("], [\"%.*s\"...", DEFAULT_STRLEN, b[0]);
 	for (i = 1; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
 	printf("]");
-# else
+#else
 	printf("], %p /* %u vars */", b, DEFAULT_STRLEN + 1);
-# endif
+#endif
 	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       sprintrc(-1));
 
@@ -257,14 +255,14 @@ main(void)
 	       Q_FILENAME, a[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
-# if VERBOSE
+#if VERBOSE
 	printf("], [\"%s\"", b[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
 	printf("]");
-# else
+#else
 	printf("], %p /* %d vars */", b + 1, DEFAULT_STRLEN);
-# endif
+#endif
 	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       sprintrc(-1));
 
@@ -285,9 +283,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_execveat")
-
-#endif
