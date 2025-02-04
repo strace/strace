@@ -17,6 +17,29 @@
 
 #include "secontext.h"
 
+static const char *errstr;
+
+static long
+k_execveat(const unsigned int dirfd,
+	   const void *const pathname,
+	   const void *const argv,
+	   const void *const envp,
+	   const unsigned int flags)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+
+	const kernel_ulong_t arg1 = fill | dirfd;
+	const kernel_ulong_t arg2 = (uintptr_t) pathname;
+	const kernel_ulong_t arg3 = (uintptr_t) argv;
+	const kernel_ulong_t arg4 = (uintptr_t) envp;
+	const kernel_ulong_t arg5 = fill | flags;
+	const long rc = syscall(__NR_execveat,
+				arg1, arg2, arg3, arg4, arg5, bad);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
 static void
 tests_with_existing_file(void)
 {
@@ -40,22 +63,22 @@ tests_with_existing_file(void)
 	 * Tests with AT_FDCWD.
 	 */
 
-	long rc = syscall(__NR_execveat, -100, sample, argv, NULL, 0);
+	k_execveat(-100, sample, argv, NULL, 0);
 	printf("%s%s(AT_FDCWD, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
 	       my_secontext, "execveat",
 	       sample, sample_secontext,
 	       argv[0],
-	       sprintrc(rc));
+	       errstr);
 
 	if (unlink(sample))
 		perror_msg_and_fail("unlink");
 
-	rc = syscall(__NR_execveat, -100, sample, argv, NULL, 0);
+	k_execveat(-100, sample, argv, NULL, 0);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"], NULL, 0) = %s\n",
 	       my_secontext, "execveat",
 	       sample,
 	       argv[0],
-	       sprintrc(rc));
+	       errstr);
 
 	/*
 	 * Tests with dirfd.
@@ -67,36 +90,36 @@ tests_with_existing_file(void)
 	char *sample_realpath = xasprintf("%s/%s", cwd, sample);
 
 	/* no file */
-	rc = syscall(__NR_execveat, cwd_fd, sample, argv, NULL, 0);
+	k_execveat(cwd_fd, sample, argv, NULL, 0);
 	printf("%s%s(%d%s, \"%s\", [\"%s\"], NULL, 0) = %s\n",
 	       my_secontext, "execveat",
 	       cwd_fd, cwd_secontext,
 	       sample,
 	       argv[0],
-	       sprintrc(rc));
+	       errstr);
 
 	if (open(sample, O_RDONLY | O_CREAT, 0400) < 0)
 		perror_msg_and_fail("open");
 
-	rc = syscall(__NR_execveat, cwd_fd, sample, argv, NULL, 0);
+	k_execveat(cwd_fd, sample, argv, NULL, 0);
 	printf("%s%s(%d%s, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
 	       my_secontext, "execveat",
 	       cwd_fd, cwd_secontext,
 	       sample, sample_secontext,
 	       argv[0],
-	       sprintrc(rc));
+	       errstr);
 
 	/* cwd_fd ignored when path is absolute */
 	if (chdir("../.."))
 		perror_msg_and_fail("chdir");
 
-	rc = syscall(__NR_execveat, cwd_fd, sample_realpath, argv, NULL, 0);
+	k_execveat(cwd_fd, sample_realpath, argv, NULL, 0);
 	printf("%s%s(%d%s, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
 	       my_secontext, "execveat",
 	       cwd_fd, cwd_secontext,
 	       sample_realpath, sample_secontext,
 	       argv[0],
-	       sprintrc(rc));
+	       errstr);
 
 	if (fchdir(cwd_fd))
 		perror_msg_and_fail("fchdir");
@@ -133,7 +156,7 @@ main(void)
 	const char ** const tail_envp = tail_memdup(envp, sizeof(envp));
 	char *my_secontext = SECONTEXT_PID_MY();
 
-	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
+	k_execveat(-100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\""
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
 #if VERBOSE
@@ -157,7 +180,7 @@ main(void)
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
 	(void) q_envp;	/* workaround for clang bug #33068 */
 
-	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
+	k_execveat(-100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
 #if VERBOSE
 	       ", [\"%s\", \"%s\"]"
@@ -174,7 +197,7 @@ main(void)
 #endif
 	       sprintrc(-1));
 
-	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
+	k_execveat(-100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"]"
 #if VERBOSE
 	       ", [\"%s\"]"
@@ -195,7 +218,7 @@ main(void)
 	char **const efault = empty + 1;
 	*empty = NULL;
 
-	syscall(__NR_execveat, -100, FILENAME, empty, empty, 0x1100);
+	k_execveat(-100, FILENAME, empty, empty, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", []"
 #if VERBOSE
 	       ", []"
@@ -227,7 +250,7 @@ main(void)
 	}
 	a[i] = b[i] = NULL;
 
-	syscall(__NR_execveat, -100, FILENAME, a, b, 0x1100);
+	k_execveat(-100, FILENAME, a, b, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%.*s\"...",
 	       my_secontext, "execveat",
 	       Q_FILENAME, DEFAULT_STRLEN, a[0]);
@@ -249,7 +272,7 @@ main(void)
 	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       sprintrc(-1));
 
-	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
+	k_execveat(-100, FILENAME, a + 1, b + 1, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", [\"%s\"",
 	       my_secontext, "execveat",
 	       Q_FILENAME, a[1]);
@@ -266,13 +289,13 @@ main(void)
 	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       sprintrc(-1));
 
-	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
+	k_execveat(-100, FILENAME, NULL, efault, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", NULL, %p"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, efault, sprintrc(-1));
 
-	syscall(__NR_execveat, -100, FILENAME, efault, NULL, 0x1100);
+	k_execveat(-100, FILENAME, efault, NULL, 0x1100);
 	printf("%s%s(AT_FDCWD, \"%s\", %p, NULL"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       my_secontext, "execveat",
