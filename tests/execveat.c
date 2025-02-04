@@ -289,15 +289,15 @@ main(void)
 	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
 	       sprintrc(-1));
 
-	k_execveat(-100, FILENAME, NULL, efault, 0x1100);
+	k_execveat(-100, FILENAME, NULL, efault, 0x11100);
 	printf("%s%s(AT_FDCWD, \"%s\", NULL, %p"
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH|AT_EXECVE_CHECK) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, efault, sprintrc(-1));
 
-	k_execveat(-100, FILENAME, efault, NULL, 0x1100);
+	k_execveat(-100, FILENAME, efault, NULL, 0xfffeeeff);
 	printf("%s%s(AT_FDCWD, \"%s\", %p, NULL"
-	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = %s\n",
+	       ", 0xfffeeeff /* AT_??? */) = %s\n",
 	       my_secontext, "execveat",
 	       Q_FILENAME, efault, sprintrc(-1));
 

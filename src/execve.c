@@ -13,6 +13,8 @@
  */
 
 #include "defs.h"
+#include <linux/fcntl.h>
+#include "xlat/execveat_flags.h"
 
 static void
 printargv(struct tcb *const tcp, kernel_ulong_t addr)
@@ -127,7 +129,7 @@ SYS_FUNC(execveat)
 	tprint_arg_next();
 
 	/* flags */
-	printflags(at_flags, tcp->u_arg[4], "AT_???");
+	printflags(execveat_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
 }
