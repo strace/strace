@@ -88,6 +88,7 @@ DECL_NLA(s16);
 DECL_NLA(s32);
 DECL_NLA(s64);
 DECL_NLA(be16);
+DECL_NLA(be32);
 DECL_NLA(be64);
 DECL_NLA(xval);
 DECL_NLA(flags);

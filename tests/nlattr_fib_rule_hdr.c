@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <inttypes.h>
+#include <arpa/inet.h>
 #include "test_nlattr.h"
 #include <linux/fib_rules.h>
 #include <linux/in.h>
@@ -91,6 +92,15 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U(range, end);
 			   printf("}"));
+	const unsigned int flow_label = 0xedabedaf;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_FLOWLABEL, pattern, flow_label,
+			   printf("htonl(%u)", ntohl(flow_label)));
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_FLOWLABEL_MASK, pattern, flow_label,
+			   printf("htonl(%u)", ntohl(flow_label)));
 #if defined HAVE_BE64TOH || defined be64toh
 	const uint64_t tun_id = 0xabcdcdbeedabadef;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

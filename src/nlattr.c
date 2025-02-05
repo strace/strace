@@ -412,6 +412,21 @@ DECL_NLA(be16)
 	return true;
 }
 
+DECL_NLA(be32)
+{
+	unsigned int num;
+
+	if (len < sizeof(num))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &num)) {
+		tprints_arg_begin("htonl");
+		PRINT_VAL_U(ntohl(num));
+		tprint_arg_end();
+	}
+
+	return true;
+}
+
 DECL_NLA(be64)
 {
 #if defined HAVE_BE64TOH || defined be64toh

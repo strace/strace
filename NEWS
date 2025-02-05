@@ -2,6 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of FRA_FLOWLABEL and FRA_FLOWLABEL_MASK netlink
+    attributes.
   * Updated lists of AT_*, AUDIT_*, ETHTOOL_*, and FAN_* constants.
 
 Noteworthy changes in release 6.13 (2025-01-23)
