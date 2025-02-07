@@ -378,8 +378,12 @@ such as busybox or kmod.
 .BR "\-\-detach\-on" = \fIsyscall\fR
 If specified syscall is reached, detach from traced process.
 Currently, only
+.B execve
+keyword is supported, which includes
 .BR execve (2)
-syscall is supported.  This option is useful if you want to trace
+and
+.BR execveat (2)
+syscalls.  This option is useful if you want to trace
 multi-threaded process and therefore require
 .BR \-f ,
 but don't want to trace its (potentially very complex) children.
