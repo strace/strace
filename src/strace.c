@@ -3927,11 +3927,11 @@ next_event_get_tcp:
 	}
 
 next_event_exit:
+	clear_regs(tcp);
+
 	/* Is this the very first time we see this tracee stopped? */
 	if (tcp->flags & TCB_STARTUP)
 		startup_tcb(tcp);
-
-	clear_regs(tcp);
 
 	/* Set current output file */
 	set_current_tcp(tcp);
