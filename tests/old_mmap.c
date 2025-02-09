@@ -38,7 +38,9 @@ main(void)
 {
 	long rc = syscall(__NR_mmap, 0);
 	const bool implemented = rc != -1 || errno != ENOSYS;
-# ifndef PATH_TRACING
+# ifdef PATH_TRACING
+	skip_if_unavailable("/proc/self/fd/");
+# else
 	printf("mmap(NULL) = %s\n", sprintrc(rc));
 # endif
 
