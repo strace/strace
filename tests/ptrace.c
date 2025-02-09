@@ -41,6 +41,10 @@
 # define NULL_FD_STR ""
 #endif
 
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
+
 static const char null_path[] = "/dev/null";
 
 #if SIZEOF_LONG > 4
@@ -1693,6 +1697,8 @@ main(void)
 	const unsigned long bad_data =
 		(unsigned long) 0xdeadcafefffff00dULL;
 	const int pid = getpid();
+
+	SKIP_IF_PROC_IS_UNAVAILABLE;
 
 	int null_fd = open(null_path, O_RDONLY);
 	if (null_fd < 0)
