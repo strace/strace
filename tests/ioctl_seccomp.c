@@ -40,6 +40,9 @@
 #ifndef PRINT_PATHS
 # define PRINT_PATHS 0
 #endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
 #if INJECT_RETVAL
 # define INJ_STR " (INJECTED)"
@@ -89,6 +92,7 @@ main(int argc, char **argv)
 		(kernel_ulong_t) 0xdeadbeefbadc0dedULL;
 	long rc;
 
+	SKIP_IF_PROC_IS_UNAVAILABLE;
 	PIDNS_TEST_INIT;
 
 	/*
