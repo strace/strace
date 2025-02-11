@@ -976,6 +976,7 @@ renameat
 renameat2
 request_key	-a33 -s12
 riscv_flush_icache	-a34
+riscv_hwprobe	-v
 rmdir	-a22
 rt_sigpending	-a20
 rt_sigprocmask
