@@ -248,7 +248,11 @@ test_rtnl_addr(const int fd)
 		{ ARG_STR(RTM_NEWADDR) },
 		{ ARG_STR(RTM_DELADDR) },
 		{ ARG_STR(RTM_GETADDR) },
+		{ ARG_STR(RTM_NEWMULTICAST) },
+		{ ARG_STR(RTM_DELMULTICAST) },
 		{ ARG_STR(RTM_GETMULTICAST) },
+		{ ARG_STR(RTM_NEWANYCAST) },
+		{ ARG_STR(RTM_DELANYCAST) },
 		{ ARG_STR(RTM_GETANYCAST) },
 	};
 	const struct ifaddrmsg msg = {
@@ -272,11 +276,7 @@ test_rtnl_addr(const int fd)
 	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWADDR + 3);
-	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST - 2);
-	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST - 1);
 	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST + 1);
-	test_rtnl_unknown_msg(fd, RTM_GETANYCAST - 2);
-	test_rtnl_unknown_msg(fd, RTM_GETANYCAST - 1);
 	test_rtnl_unknown_msg(fd, RTM_GETANYCAST + 1);
 }
 

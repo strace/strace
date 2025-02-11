@@ -3,7 +3,9 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of FRA_FLOWLABEL and FRA_FLOWLABEL_MASK netlink
-    attributes.
+    attributes of RTM_{NEW,DEL,GET}RULE NETLINK_ROUTE messages.
+  * Implemented decoding of RTM_{NEW,DEL}MULTICAST and RTM_{NEW,DEL}ANYCAST
+    NETLINK_ROUTE messages.
   * Updated lists of AT_*, AUDIT_*, ETHTOOL_*, FAN_*, IORING_*, IPPROTO_*,
     KEY_*, NL80211_*, and RWF_* constants.
 
