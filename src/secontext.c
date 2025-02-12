@@ -185,20 +185,42 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 * We need to fully resolve the path, because selabel_lookup() doesn't
 	 * resolve anything.  Using realpath() is the only solution here to make
 	 * sure the path is canonicalized.
+	 * There are two cases:
+	 * - if the inode is a symlink, resolve only the dirname, because we
+	 *   want to get the expected context of the symlink itself, not the
+	 *   target context
+	 * - otherwise resolve everything because we will get the same result
 	 */
 
-	char *resolved = realpath(fname, NULL);
-	if (!resolved)
+	strace_stat_t st;
+	if (lstat_file(fname, &st) < 0)
 		return 0;
 
-	strace_stat_t st;
-	if (stat_file(resolved, &st) < 0)
-		goto out;
+	char buf[PATH_MAX];
 
-	get_expected_filecontext(resolved, expected, st.st_mode);
+	if (S_ISLNK(st.st_mode)) {
+		/* Split fname into dir_name and base_name */
+		char dir_name[PATH_MAX];
+		strcpy(dir_name, fname);
+		char *s = strrchr(dir_name, '/');
+		*s = '\0';
 
-out:
-	free(resolved);
+		if (!realpath(dir_name, buf))
+			return 0;
+
+		char *base_name = fname + (s - dir_name + 1);
+		size_t base_len = strlen(base_name);
+		size_t buf_len = strlen(buf);
+
+		if (buf_len + 1 + base_len >= sizeof(buf))
+			return 0;
+		buf[buf_len] = '/';
+		memcpy(buf + buf_len + 1, base_name, base_len + 1);
+	} else if (!realpath(fname, buf)) {
+		return 0;
+	}
+
+	get_expected_filecontext(buf, expected, st.st_mode);
 
 	return 0;
 }

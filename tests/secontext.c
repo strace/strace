@@ -11,12 +11,16 @@
 
 # include <assert.h>
 # include <errno.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/stat.h>
 # include <unistd.h>
 # include <selinux/selinux.h>
 # include <selinux/label.h>
+
+# include <libgen.h>
+# undef basename
 
 # include "xmalloc.h"
 
@@ -95,17 +99,31 @@ raw_expected_secontext_full_file(const char *filename)
 			perror_msg_and_skip("selabel_open");
 	}
 
-	char *resolved = realpath(filename, NULL);
-	if (!resolved)
-		perror_msg_and_fail("realpath: %s", filename);
-
 	struct stat statbuf;
-	if (stat(resolved, &statbuf) < 0)
-		perror_msg_and_fail("stat: %s", resolved);
+	if (lstat(filename, &statbuf) < 0)
+		perror_msg_and_fail("lstat: %s", filename);
 
-	if (selabel_lookup(hdl, &secontext, resolved, statbuf.st_mode) < 0)
-		perror_msg_and_skip("selabel_lookup: %s", resolved);
-	free(resolved);
+	char *fname;
+
+	if (S_ISLNK(statbuf.st_mode)) {
+		char *b = basename(filename);
+		char *copy = xstrdup(filename);
+		char *d = dirname(copy);
+		char *resolved = realpath(d, NULL);
+		if (!resolved)
+			perror_msg_and_fail("realpath: %s", filename);
+		free(copy);
+		fname = xasprintf("%s/%s", resolved, b);
+		free(resolved);
+	} else {
+		fname = realpath(filename, NULL);
+		if (!fname)
+			perror_msg_and_fail("realpath: %s", filename);
+	}
+
+	if (selabel_lookup(hdl, &secontext, fname, statbuf.st_mode) < 0)
+		perror_msg_and_skip("selabel_lookup: %s", fname);
+	free(fname);
 
 	char *full_secontext = xstrdup(secontext);
 	freecon(secontext);
