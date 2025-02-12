@@ -146,6 +146,45 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 }
 
 /*
+ * Translates pathname from PATH to BUF, replacing WHAT with WITH.
+ * Returns -1 on failure, 1 if substitutions were made, 0 otherwise.
+ */
+static int
+translate_path(const char *const path, char *const buf, const size_t buf_size,
+	       const char *const what, const char *const with)
+{
+	const size_t what_len = strlen(what);
+	const size_t with_len = strlen(with);
+	const char *from = path;
+	const char *find = path;
+	char *to = buf;
+	int substituted = 0;
+	size_t copy_len;
+
+	for (const char *s; (s = strstr(find, what)); find = s + what_len) {
+		if (s[what_len] == '/' || s[what_len] == '\0') {
+			copy_len = s - from;
+			if (copy_len >= buf_size - (to - buf))
+				return -1;
+			memcpy(to, from, copy_len);
+			to += copy_len;
+			if (with_len >= buf_size - (to - buf))
+				return -1;
+			memcpy(to, with, with_len);
+			to += with_len;
+			from = s + what_len;
+			substituted = 1;
+		}
+	}
+
+	copy_len = strlen(from) + 1;
+	if (copy_len > buf_size - (to - buf))
+		return -1;
+	memcpy(to, from, copy_len);
+	return substituted;
+}
+
+/*
  * Retrieves the SELinux context of the given path.
  * Memory must be freed.
  * Returns 0 on success, -1 on failure.
@@ -161,23 +200,55 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	if (!proc_pid)
 		return -1;
 
-	int rc = -1;
+	char proc_pid_str[sizeof("/proc/%u") + sizeof(int) * 3];
+	xsprintf(proc_pid_str, "/proc/%u", proc_pid);
+
+	/*
+	 * The path may contain .../proc/self/... or .../proc/self<eos>.
+	 * We need to replace 'self' with the target PID, or else we would
+	 * resolve the path with 'self' being strace itself.
+	 * We replace all the occurrences of /proc/self[/] because we cannot
+	 * know how many there are (e.g. /proc/self/root/proc/self/root/foo).
+	 * In some corner cases, it's impossible to guess so keep it as is
+	 * if we don't find any occurrence of /proc/self.
+	 * Finally there may be breakage if the pathname contains /proc/self
+	 * but has nothing to do with /proc, but it's impossible to tell and
+	 * unlikely to happen.
+	 * Note that /proc/self is a symlink, hence the context of the symlink
+	 * should be returned, but it's not possible to do so because we
+	 * resolve the symlink, which ends up checking the context of
+	 * /proc/<pid> which is a directory.
+	 */
+
+	char buf[PATH_MAX];
 	char fname[PATH_MAX];
-
-	if (path[0] == '/')
-		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
-			       proc_pid, path);
-	else if (tcp->last_dirfd == AT_FDCWD)
-		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
-			       proc_pid, path);
-	else if (tcp->last_dirfd >= 0 )
-		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
-			       proc_pid, tcp->last_dirfd, path);
-
-	if ((unsigned int) rc >= sizeof(fname))
+	int rc;
+	int substituted =
+		translate_path(path, buf, sizeof(buf), "/proc/self", proc_pid_str);
+	if (substituted < 0)
 		return -1;
 
-	rc = lgetfilecon(fname, secontext);
+	for (const char *try_path = buf;; try_path = path) {
+		if (try_path[0] == '/')
+			rc = snprintf(fname, sizeof(fname), "%s/root%s",
+				      proc_pid_str, try_path);
+		else if (tcp->last_dirfd == AT_FDCWD)
+			rc = snprintf(fname, sizeof(fname), "%s/cwd/%s",
+				      proc_pid_str, try_path);
+		else if (tcp->last_dirfd >= 0 )
+			rc = snprintf(fname, sizeof(fname), "%s/fd/%u/%s",
+				      proc_pid_str, tcp->last_dirfd, try_path);
+		else
+			return -1;
+
+		if ((unsigned int) rc >= sizeof(fname))
+			return -1;
+
+		rc = lgetfilecon(fname, secontext);
+		if (rc < 0 && errno == ENOENT && try_path == buf && substituted)
+			continue;
+		break;
+	}
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -195,8 +266,6 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	strace_stat_t st;
 	if (lstat_file(fname, &st) < 0)
 		return 0;
-
-	char buf[PATH_MAX];
 
 	if (S_ISLNK(st.st_mode)) {
 		/* Split fname into dir_name and base_name */

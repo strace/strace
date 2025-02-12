@@ -13,7 +13,10 @@
 
 # include <asm/fcntl.h>
 # include <stdio.h>
+# include <string.h>
 # include <unistd.h>
+# include <limits.h>
+# include <sys/stat.h>
 
 # include "secontext.h"
 
@@ -25,6 +28,9 @@
 # endif
 
 static const char sample[] = "openat.sample";
+# ifdef TEST_SECONTEXT
+static const char self_fd0[] = "/proc/self/fd/0";
+# endif
 
 static void
 test_mode_flag(unsigned int mode_val, const char *mode_str,
@@ -160,6 +166,156 @@ main(void)
 		if (unlink(sample))
 			perror_msg_and_fail("unlink");
 	}
+
+# ifdef TEST_SECONTEXT
+
+	char buf[PATH_MAX];
+	ssize_t n = readlink(self_fd0, buf, sizeof(buf) - 1);
+	if (!((size_t) n >= sizeof(buf) - 1)) {
+		buf[n] = '\0';
+		char *self_fd0_secontext = SECONTEXT_FILE(self_fd0);
+		char *target_secontext = SECONTEXT_FILE(buf);
+
+		fd = syscall(__NR_openat, cwd_fd, self_fd0, O_RDONLY);
+		printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+		       my_secontext, "openat",
+		       cwd_fd, cwd_secontext,
+		       self_fd0, self_fd0_secontext,
+		       sprintrc(fd), target_secontext);
+		if (fd != -1)
+			close(fd);
+	}
+
+	const char *proc_self_paths[] = {
+		"/proc/self", "/proc/self/root/proc/self"
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(proc_self_paths); i++) {
+		/*
+		 * /proc/self substitution is special: /proc/self is a
+		 * symlink, which has context "proc_t", but strace
+		 * substitutes /proc/self by /proc/<pid>, which is a
+		 * directory, hence has context of the process itself.
+		 *
+		 * Additionally the SECONTEXT_PID_MY() appends a space,
+		 * instead of prepending it, so fix this here
+		 */
+		char *secontext = SECONTEXT_PID_MY();
+		if (strlen(secontext) > 0) {
+			memmove(secontext + 1, secontext, strlen(secontext) - 1);
+			secontext[0] = ' ';
+		}
+
+		fd = syscall(__NR_openat, cwd_fd, proc_self_paths[i], O_RDONLY);
+		printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+		       my_secontext, "openat",
+		       cwd_fd, cwd_secontext,
+		       proc_self_paths[i], secontext,
+		       sprintrc(fd), secontext);
+		if (fd != -1)
+			close(fd);
+	}
+
+	const char *proc_root_paths[] = {
+		"/proc/self/root", "/proc/self/root/proc/self/root"
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(proc_root_paths); i++) {
+		n = readlink(proc_root_paths[i], buf, sizeof(buf) - 1);
+		if (!((size_t) n >= sizeof(buf) - 1)) {
+			buf[n] = '\0';
+			char *secontext = SECONTEXT_FILE(proc_root_paths[i]);
+			char *target_secontext = SECONTEXT_FILE(buf);
+
+			fd = syscall(__NR_openat, cwd_fd, proc_root_paths[i], O_RDONLY);
+			printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+			       my_secontext, "openat",
+			       cwd_fd, cwd_secontext,
+			       proc_root_paths[i], secontext,
+			       sprintrc(fd), target_secontext);
+			if (fd != -1)
+				close(fd);
+		}
+	}
+
+	/* Check "fake" /proc/self */
+
+	if (mkdir("./proc", 0700) || mkdir("./proc/self", 0700))
+		perror_msg_and_fail("mkdir");
+
+	snprintf(buf, sizeof(buf), "./proc/self/%s", sample);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY|O_CREAT, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("openat");
+	close(fd);
+
+	sample_secontext = SECONTEXT_FILE(buf);
+
+	/*
+	 * File context in openat() is not displayed because file doesn't exist
+	 * yet, but is displayed in return value since the file got created.
+	 */
+	printf("%s%s(%d%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf,
+	       sprintrc(fd), sample_secontext);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY);
+	printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf, sample_secontext,
+	       sprintrc(fd), sample_secontext);
+	if (fd != -1) {
+		close(fd);
+		if (unlink(buf))
+			perror_msg_and_fail("unlink");
+	}
+
+	if (rmdir("./proc/self"))
+		perror_msg_and_fail("rmdir");
+
+	/* Check non-matching /proc/self */
+
+	if (mkdir("./proc/selfish", 0700))
+		perror_msg_and_fail("mkdir");
+
+	snprintf(buf, sizeof(buf), "./proc/selfish/%s", sample);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY|O_CREAT, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("openat");
+	close(fd);
+
+	sample_secontext = SECONTEXT_FILE(buf);
+
+	/*
+	 * File context in openat() is not displayed because file doesn't exist
+	 * yet, but is displayed in return value since the file got created.
+	 */
+	printf("%s%s(%d%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf,
+	       sprintrc(fd), sample_secontext);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY);
+	printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf, sample_secontext,
+	       sprintrc(fd), sample_secontext);
+	if (fd != -1) {
+		close(fd);
+		if (unlink(buf))
+			perror_msg_and_fail("unlink");
+	}
+
+	if (rmdir("./proc/selfish") || rmdir("./proc"))
+		perror_msg_and_fail("rmdir");
+# endif
 
 	leave_and_remove_subdir();
 
