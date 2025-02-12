@@ -177,7 +177,7 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
 
-	rc = getfilecon(fname, secontext);
+	rc = lgetfilecon(fname, secontext);
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 

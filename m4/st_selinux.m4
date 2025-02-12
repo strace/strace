@@ -35,7 +35,7 @@ AS_IF([test "x$with_libselinux" != xno],
 	     [saved_LDFLAGS="$LDFLAGS"
 	      LDFLAGS="$LDFLAGS $libselinux_LDFLAGS"
 	      missing=
-	      for func in getpidcon getfilecon selabel_open selabel_lookup; do
+	      for func in getpidcon getfilecon lgetfilecon selabel_open selabel_lookup; do
 		AC_CHECK_LIB([selinux], [$func], [:],
 			     [missing="$missing $func"])
 	      done

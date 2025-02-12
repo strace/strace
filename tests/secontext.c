@@ -133,7 +133,7 @@ raw_secontext_full_file(const char *filename)
 	char *full_secontext = NULL;
 	char *secontext;
 
-	if (getfilecon(filename, &secontext) >= 0) {
+	if (lgetfilecon(filename, &secontext) >= 0) {
 		full_secontext = strip_trailing_newlines(xstrdup(secontext));
 		freecon(secontext);
 	}
