@@ -739,11 +739,11 @@ open--secontext_full_mismatch	-a30 -P open.sample --secontext=full,mismatch --tr
 open--secontext_mismatch		-a30 -P open.sample --secontext=mismatch --trace=open
 open_tree -a30 -y
 open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
-openat	-a36 -P $NAME.sample
-openat--secontext	-a36 -P openat.sample -P $PWD/openat.sample --secontext -e trace=openat
-openat--secontext_full	-a36 -P openat.sample -P $PWD/openat.sample --secontext=full -e trace=openat
-openat--secontext_full_mismatch	-a36 -P openat.sample -P $PWD/openat.sample --secontext=full,mismatch -e trace=openat
-openat--secontext_mismatch	-a36 -P openat.sample -P $PWD/openat.sample --secontext=mismatch -e trace=openat
+openat	-a36 -P openat.sample -P /proc/self/fd/0 -P ./proc/self/openat.sample
+openat--secontext	-a36 -P openat.sample -P /proc/self/fd/0 -P ./proc/self/openat.sample --secontext -e trace=openat
+openat--secontext_full	-a36 -P openat.sample -P /proc/self/fd/0 -P ./proc/self/openat.sample --secontext=full -e trace=openat
+openat--secontext_full_mismatch	-a36 -P openat.sample -P /proc/self/fd/0 -P ./proc/self/openat.sample --secontext=full,mismatch -e trace=openat
+openat--secontext_mismatch	-a36 -P openat.sample -P /proc/self/fd/0 -P ./proc/self/openat.sample --secontext=mismatch -e trace=openat
 openat2	-a35
 openat2-Xabbrev	--trace=openat2 -a35 -Xabbrev
 openat2-Xraw	--trace=openat2 -a32 -Xraw

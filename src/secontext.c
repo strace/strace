@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -20,6 +21,8 @@
 #include "secontext.h"
 #include "xmalloc.h"
 #include "xstring.h"
+
+static char unknown_expected_context[] = "??";
 
 /**
  * @param secontext Pointer to security context string.
@@ -116,10 +119,14 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	if (!proc_pid)
 		return -1;
 
-	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
-	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
+	int rc;
+	char buf[PATH_MAX + 1];
 
-	int rc = getfilecon(linkpath, secontext);
+	rc = snprintf(buf, sizeof(buf), "/proc/%u/fd/%u", proc_pid, fd);
+	if ((unsigned int) rc >= sizeof(buf))
+		return -1;
+
+	rc = getfilecon(buf, secontext);
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -127,7 +134,6 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	 * We need to resolve the path, because selabel_lookup() doesn't
 	 * resolve anything.
 	 */
-	char buf[PATH_MAX + 1];
 	ssize_t n = get_proc_pid_fd_path(proc_pid, fd, buf, sizeof(buf), NULL);
 	if ((size_t) n >= (sizeof(buf) - 1))
 		return 0;
@@ -137,10 +143,11 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	 * may be reused by a different file with different context.
 	 */
 	strace_stat_t st;
-	if (stat_file(linkpath, &st))
+	if (stat_file(buf, &st) < 0)
 		return 0;
 
-	get_expected_filecontext(buf, expected, st.st_mode);
+	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
+		*expected = unknown_expected_context;
 
 	return 0;
 }
@@ -161,23 +168,67 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	if (!proc_pid)
 		return -1;
 
-	int rc = -1;
-	char fname[PATH_MAX];
+	/*
+	 * The path may contain .../proc/self/... or .../proc/self<eos>.
+	 * We need to replace 'self' by the target PID, or else we would
+	 * resolve the path with 'self' being strace itself.
+	 * In some corner cases, it's impossible to guess so keep it as is if
+	 * we don't find any occurrence of /proc/self.
+	 * Finally there may be breakage if the pathname contains /proc/self
+	 * but has nothing to do with /proc.
+	 */
 
-	if (path[0] == '/')
+	int rc;
+	char fname[PATH_MAX];
+	char buf[PATH_MAX + 1];
+	size_t l = strlcpy(fname, path, sizeof(fname));
+	if (l >= sizeof(fname) - 1)
+		return -1;
+	int proc_self_substituted = 0;
+
+	for (;;) {
+		char *s = strstr(fname, "/proc/self/");
+		if (s == NULL) {
+			/* Corner case: check if the path ends with /proc/self */
+			s = fname + strlen(fname) - sizeof("/proc/self") + 1;
+			if (strcmp("/proc/self", s))
+				s = NULL;
+		}
+		if (s == NULL)
+			break;
+		*s = '\0';
+		rc = snprintf(buf, sizeof(buf), "%s/proc/%u%s",
+			fname, proc_pid, s + sizeof("/proc/self") - 1);
+		if ((unsigned int) rc >= sizeof(buf))
+			return -1;
+		strcpy(fname, buf);
+		proc_self_substituted = 1;
+	}
+
+	strcpy(buf, fname);
+
+retry:
+	if (buf[0] == '/')
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
-			       proc_pid, path);
+			       proc_pid, buf);
 	else if (tcp->last_dirfd == AT_FDCWD)
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
-			       proc_pid, path);
+			       proc_pid, buf);
 	else if (tcp->last_dirfd >= 0 )
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
-			       proc_pid, tcp->last_dirfd, path);
+			       proc_pid, tcp->last_dirfd, buf);
+	else
+		return -1;
 
 	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
 
-	rc = getfilecon(fname, secontext);
+	rc = lgetfilecon(fname, secontext);
+	if ((rc < 0) && (errno == ENOENT) && proc_self_substituted) {
+		proc_self_substituted = 0;
+		strcpy(buf, path);
+		goto retry;
+	}
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -185,20 +236,42 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 * We need to fully resolve the path, because selabel_lookup() doesn't
 	 * resolve anything.  Using realpath() is the only solution here to make
 	 * sure the path is canonicalized.
+	 * There are two cases:
+	 * - if the inode is a symlink, resolve only the dirname, because we we
+	 *   want to get the expected context of the symlink itself, not the
+	 *   target context
+	 * - otherwise resolve everything because we will get same result
 	 */
 
-	char *resolved = realpath(fname, NULL);
-	if (!resolved)
+	strace_stat_t st;
+	if (lstat_file(fname, &st) < 0)
 		return 0;
 
-	strace_stat_t st;
-	if (stat_file(resolved, &st) < 0)
-		goto out;
+	if (S_ISLNK(st.st_mode)) {
+		strcpy(buf, fname);
+		char *d = dirname(buf);
 
-	get_expected_filecontext(resolved, expected, st.st_mode);
+		char *resolved = realpath(d, NULL);
+		if (!resolved)
+			return 0;
 
-out:
-	free(resolved);
+		/* This breaks fname but we don't care anymore */
+		char *b = basename(fname);
+
+		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, b);
+		free(resolved);
+		if ((unsigned int) rc >= sizeof(buf))
+			return 0;
+	} else {
+		char *resolved = realpath(fname, NULL);
+		if (!resolved)
+			return 0;
+		strcpy(buf, resolved);
+		free(resolved);
+	}
+
+	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
+		*expected = unknown_expected_context;
 
 	return 0;
 }
@@ -231,7 +304,8 @@ print_context(char *secontext, char *expected)
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 
-	freecon(expected);
+	if (expected != unknown_expected_context)
+		freecon(expected);
 freecon_secontext:
 	freecon(secontext);
 }
