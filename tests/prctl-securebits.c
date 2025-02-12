@@ -66,11 +66,11 @@ main(int argc, char *argv[])
 #endif /* INJECT_RETVAL */
 
 	static const kernel_ulong_t bits1 =
-		(kernel_ulong_t) 0xdeadc0defacebeefULL;
+		(kernel_ulong_t) 0xdeadc0defacebfffULL;
 	static const kernel_ulong_t bits2 =
-		(kernel_ulong_t) 0xbadc0ded00000000ULL;
+		(kernel_ulong_t) 0xbadc0dedfffff000ULL;
 	static const kernel_ulong_t bits3 =
-		(kernel_ulong_t) 0xffULL;
+		(kernel_ulong_t) 0xfffULL;
 
 	prctl(PR_SET_SECUREBITS, 0);
 	printf("prctl(" XLAT_KNOWN(0x1c, "PR_SET_SECUREBITS") ", 0) = %s"
@@ -78,13 +78,16 @@ main(int argc, char *argv[])
 
 	prctl(PR_SET_SECUREBITS, bits1);
 	printf("prctl(" XLAT_KNOWN(0x1c, "PR_SET_SECUREBITS") ", "
-	       NABBR("%#llx") VERB(" /* ") NRAW("SECBIT_NOROOT|"
-	       "SECBIT_NOROOT_LOCKED|SECBIT_NO_SETUID_FIXUP|"
-	       "SECBIT_NO_SETUID_FIXUP_LOCKED|SECBIT_KEEP_CAPS_LOCKED|"
-	       "SECBIT_NO_CAP_AMBIENT_RAISE|SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED|"
-	       "%#llx") VERB(" */") ") = %s" INJ_STR "\n",
+	       NABBR("%#llx") VERB(" /* ")
+	       NRAW("SECBIT_NOROOT|SECBIT_NOROOT_LOCKED"
+	       "|SECBIT_NO_SETUID_FIXUP|SECBIT_NO_SETUID_FIXUP_LOCKED"
+	       "|SECBIT_KEEP_CAPS|SECBIT_KEEP_CAPS_LOCKED"
+	       "|SECBIT_NO_CAP_AMBIENT_RAISE|SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED"
+	       "|SECBIT_EXEC_RESTRICT_FILE|SECBIT_EXEC_RESTRICT_FILE_LOCKED"
+	       "|SECBIT_EXEC_DENY_INTERACTIVE|SECBIT_EXEC_DENY_INTERACTIVE_LOCKED"
+	       "|%#llx") VERB(" */") ") = %s" INJ_STR "\n",
 	       XLAT_SEL((unsigned long long) bits1,
-	       (unsigned long long) bits1 & ~0xffULL), errstr);
+	       (unsigned long long) bits1 & ~0xfffULL), errstr);
 
 	if (bits2) {
 		prctl(PR_SET_SECUREBITS, bits2);
@@ -95,17 +98,19 @@ main(int argc, char *argv[])
 
 	prctl(PR_SET_SECUREBITS, bits3);
 	printf("prctl(" XLAT_KNOWN(0x1c, "PR_SET_SECUREBITS") ", "
-	       XLAT_KNOWN(0xff, "SECBIT_NOROOT|SECBIT_NOROOT_LOCKED|"
-	       "SECBIT_NO_SETUID_FIXUP|SECBIT_NO_SETUID_FIXUP_LOCKED|"
-	       "SECBIT_KEEP_CAPS|SECBIT_KEEP_CAPS_LOCKED|"
-	       "SECBIT_NO_CAP_AMBIENT_RAISE|SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED")
+	       XLAT_KNOWN(0xfff, "SECBIT_NOROOT|SECBIT_NOROOT_LOCKED"
+	       "|SECBIT_NO_SETUID_FIXUP|SECBIT_NO_SETUID_FIXUP_LOCKED"
+	       "|SECBIT_KEEP_CAPS|SECBIT_KEEP_CAPS_LOCKED"
+	       "|SECBIT_NO_CAP_AMBIENT_RAISE|SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED"
+	       "|SECBIT_EXEC_RESTRICT_FILE|SECBIT_EXEC_RESTRICT_FILE_LOCKED"
+	       "|SECBIT_EXEC_DENY_INTERACTIVE|SECBIT_EXEC_DENY_INTERACTIVE_LOCKED")
 	       ") = %s" INJ_STR "\n", errstr);
 
 	long rc = prctl(PR_GET_SECUREBITS, bits1);
 	printf("prctl(" XLAT_KNOWN(0x1b, "PR_GET_SECUREBITS") ") = ");
 	if (rc > 0) {
 		printf("%#lx", rc);
-		if ((rc & 0xff) && !XLAT_RAW) {
+		if ((rc & 0xfff) && !XLAT_RAW) {
 			printf(" (");
 			printflags(secbits, rc, NULL);
 			printf(")");
