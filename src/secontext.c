@@ -21,6 +21,8 @@
 #include "xmalloc.h"
 #include "xstring.h"
 
+static const char unknown_expected_context[] = "??";
+
 /**
  * @param secontext Pointer to security context string.
  * @param result    Stores pointer to the beginning of the part to print.
@@ -62,7 +64,7 @@ parse_secontext(char *secontext, char **result)
 }
 
 static int
-get_expected_filecontext(const char *path, char **secontext, int mode)
+selabel_open_lookup(const char *path, char **secontext, int mode)
 {
 	static struct selabel_handle *hdl;
 
@@ -81,6 +83,16 @@ get_expected_filecontext(const char *path, char **secontext, int mode)
 	}
 
 	return selabel_lookup(hdl, secontext, path, mode);
+}
+
+static void
+get_expected_filecontext(const char *path, char **expected, int mode)
+{
+	errno = 0;
+	if (selabel_open_lookup(path, expected, mode) < 0
+	    && errno != ENOENT) {
+		*expected = (char *) unknown_expected_context;
+	}
 }
 
 /*
@@ -322,7 +334,8 @@ print_context(char *secontext, char *expected)
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 
-	freecon(expected);
+	if (expected != unknown_expected_context)
+		freecon(expected);
 freecon_secontext:
 	freecon(secontext);
 }

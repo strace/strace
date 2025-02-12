@@ -27,6 +27,8 @@
 # define TEST_SECONTEXT
 # include "secontext.h"
 
+static char unknown_expected_context[] = "??";
+
 ATTRIBUTE_FORMAT((printf, 2, 0)) ATTRIBUTE_MALLOC
 static char *
 secontext_format(char *context, const char *fmt)
@@ -90,7 +92,7 @@ static char *
 raw_expected_secontext_full_file(const char *filename)
 {
 	int saved_errno = errno;
-	char *secontext;
+	char *secontext = NULL;
 
 	static struct selabel_handle *hdl;
 	if (!hdl) {
@@ -121,12 +123,15 @@ raw_expected_secontext_full_file(const char *filename)
 			perror_msg_and_fail("realpath: %s", filename);
 	}
 
-	if (selabel_lookup(hdl, &secontext, fname, statbuf.st_mode) < 0)
-		perror_msg_and_skip("selabel_lookup: %s", fname);
+	if (selabel_lookup(hdl, &secontext, fname, statbuf.st_mode) < 0
+	    && errno != ENOENT) {
+		secontext = unknown_expected_context;
+	}
 	free(fname);
 
 	char *full_secontext = xstrdup(secontext);
-	freecon(secontext);
+	if (secontext != unknown_expected_context)
+		freecon(secontext);
 	errno = saved_errno;
 	return full_secontext;
 }
