@@ -22,7 +22,7 @@
 #include "xmalloc.h"
 #include "xstring.h"
 
-static char unknown_expected_context[] = "??";
+static const char unknown_expected_context[] = "??";
 
 /**
  * @param secontext Pointer to security context string.
@@ -119,14 +119,10 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	if (!proc_pid)
 		return -1;
 
-	int rc;
-	char buf[PATH_MAX + 1];
+	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
+	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
 
-	rc = snprintf(buf, sizeof(buf), "/proc/%u/fd/%u", proc_pid, fd);
-	if ((unsigned int) rc >= sizeof(buf))
-		return -1;
-
-	rc = getfilecon(buf, secontext);
+	int rc = getfilecon(linkpath, secontext);
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -134,6 +130,7 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	 * We need to resolve the path, because selabel_lookup() doesn't
 	 * resolve anything.
 	 */
+	char buf[PATH_MAX + 1];
 	ssize_t n = get_proc_pid_fd_path(proc_pid, fd, buf, sizeof(buf), NULL);
 	if ((size_t) n >= (sizeof(buf) - 1))
 		return 0;
@@ -147,7 +144,7 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 		return 0;
 
 	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
-		*expected = unknown_expected_context;
+		*expected = (char *) unknown_expected_context;
 
 	return 0;
 }
@@ -175,17 +172,23 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 * In some corner cases, it's impossible to guess so keep it as is if
 	 * we don't find any occurrence of /proc/self.
 	 * Finally there may be breakage if the pathname contains /proc/self
-	 * but has nothing to do with /proc.
+	 * but has nothing to do with /proc, but it's impossible to tell and
+	 * unlikely to happen.
 	 */
 
 	int rc;
-	char fname[PATH_MAX];
+	char fname[PATH_MAX + 1];
 	char buf[PATH_MAX + 1];
-	size_t l = strlcpy(fname, path, sizeof(fname));
-	if (l >= sizeof(fname) - 1)
+
+	if (strlen(path) >= sizeof(fname))
 		return -1;
+	strcpy(fname, path);
 	int proc_self_substituted = 0;
 
+	/*
+	 * We replace all the occurrences of /proc/self[/] because we cannot
+	 * know how many there are (e.g. /proc/self/root/proc/self/root/foo).
+	 */
 	for (;;) {
 		char *s = strstr(fname, "/proc/self/");
 		if (s == NULL) {
@@ -271,7 +274,7 @@ retry:
 	}
 
 	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
-		*expected = unknown_expected_context;
+		*expected = (char *) unknown_expected_context;
 
 	return 0;
 }
