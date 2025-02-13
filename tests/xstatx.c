@@ -326,6 +326,10 @@ print_stat(const STRUCT_STAT *st)
 		printf(", ");
 		PRINT_FIELD_U(*st, stx_atomic_write_segments_max);
 	}
+	if (st->stx_mask & STATX_DIO_READ_ALIGN) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_dio_read_offset_align);
+	}
 	printf("}");
 }
 
@@ -514,13 +518,14 @@ main(void)
 	TEST_SYSCALL_STATX_FLAGS_STR = old_flags_str;
 
 	SET_MASK_INVOKE(0, "0");
-	SET_MASK_INVOKE(0xfffe0000U, "0xfffe0000 /* STATX_??? */");
+	SET_MASK_INVOKE(0xfffc0000U, "0xfffc0000 /* STATX_??? */");
 
 	SET_MASK_INVOKE(0xfffffffbU,
 		"STATX_TYPE|STATX_MODE|STATX_UID|STATX_GID|STATX_ATIME|"
 		"STATX_MTIME|STATX_CTIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|"
 		"STATX_BTIME|STATX_MNT_ID|STATX_DIOALIGN|STATX_MNT_ID_UNIQUE|"
-		"STATX_SUBVOL|STATX_WRITE_ATOMIC|0xfffe0000");
+		"STATX_SUBVOL|STATX_WRITE_ATOMIC|STATX_DIO_READ_ALIGN|"
+		"0xfffc0000");
 
 	SET_MASK_INVOKE(STATX_UID, "STATX_UID");
 

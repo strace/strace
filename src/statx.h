@@ -51,9 +51,10 @@ typedef struct {
 	uint64_t stx_subvol; /* Subvolume identifier */
 	uint32_t stx_atomic_write_unit_min; /* Min atomic write unit in bytes */
 	uint32_t stx_atomic_write_unit_max; /* Max atomic write unit in bytes */
-	uint32_t stx_atomic_write_segments_max; /* Max atomic write segment count */
 
-	uint32_t reserved1[1];
+	uint32_t stx_atomic_write_segments_max; /* Max atomic write segment count */
+	uint32_t stx_dio_read_offset_align; /* File offset alignment for direct I/O reads */
+
 	uint64_t reserved2[9]; /* Spare space for future expansion */
 } struct_statx;
 

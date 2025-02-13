@@ -164,6 +164,10 @@ SYS_FUNC(statx)
 				tprint_struct_next();
 				PRINT_FIELD_U(stx, stx_atomic_write_segments_max);
 			}
+			if (stx.stx_mask & STATX_DIO_READ_ALIGN) {
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_dio_read_offset_align);
+			}
 		} else {
 			tprint_struct_next();
 			tprint_more_data_follows();
