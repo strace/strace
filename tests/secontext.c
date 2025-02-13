@@ -11,7 +11,6 @@
 
 # include <assert.h>
 # include <errno.h>
-# include <libgen.h>
 # include <limits.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -20,6 +19,9 @@
 # include <unistd.h>
 # include <selinux/selinux.h>
 # include <selinux/label.h>
+
+# include <libgen.h>
+# undef basename
 
 # include "xmalloc.h"
 

@@ -9,12 +9,16 @@
 
 #include <stdlib.h>
 #include <fcntl.h>
-#include <libgen.h>
 #include <limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <selinux/selinux.h>
 #include <selinux/label.h>
+
+/* Required for dirname() */
+#include <libgen.h>
+/* Used to use basename() from <string.h>, see <libgen.h> */
+#undef basename
 
 #include "largefile_wrappers.h"
 #include "number_set.h"
@@ -258,7 +262,6 @@ retry:
 		if (!resolved)
 			return 0;
 
-		/* This breaks fname but we don't care anymore */
 		char *b = basename(fname);
 
 		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, b);
