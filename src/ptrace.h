@@ -173,12 +173,7 @@
 #  define PTRACE_GET_SYSCALL_USER_DISPATCH_CONFIG	0x4211
 # endif
 
-# if defined HAVE_STRUCT_PTRACE_SYSCALL_INFO
-typedef struct ptrace_syscall_info struct_ptrace_syscall_info;
-# elif defined HAVE_STRUCT___PTRACE_SYSCALL_INFO
-typedef struct __ptrace_syscall_info struct_ptrace_syscall_info;
-# else
-struct ptrace_syscall_info {
+struct strace_ptrace_syscall_info {
 	uint8_t op;
 	uint8_t pad[3];
 	uint32_t arch;
@@ -200,8 +195,7 @@ struct ptrace_syscall_info {
 		} seccomp;
 	};
 };
-typedef struct ptrace_syscall_info struct_ptrace_syscall_info;
-# endif
+typedef struct strace_ptrace_syscall_info struct_ptrace_syscall_info;
 
 # if !HAVE_DECL_PTRACE_PEEKUSER
 #  define PTRACE_PEEKUSER PTRACE_PEEKUSR
