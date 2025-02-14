@@ -21,6 +21,8 @@
 #include "xmalloc.h"
 #include "xstring.h"
 
+static const char unknown_expected_context[] = "??";
+
 /**
  * @param secontext Pointer to security context string.
  * @param result    Stores pointer to the beginning of the part to print.
@@ -137,10 +139,11 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 	 * may be reused by a different file with different context.
 	 */
 	strace_stat_t st;
-	if (stat_file(linkpath, &st))
+	if (stat_file(buf, &st) < 0)
 		return 0;
 
-	get_expected_filecontext(buf, expected, st.st_mode);
+	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
+		*expected = (char *) unknown_expected_context;
 
 	return 0;
 }
@@ -161,23 +164,73 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	if (!proc_pid)
 		return -1;
 
-	int rc = -1;
-	char fname[PATH_MAX];
+	/*
+	 * The path may contain .../proc/self/... or .../proc/self<eos>.
+	 * We need to replace 'self' by the target PID, or else we would
+	 * resolve the path with 'self' being strace itself.
+	 * In some corner cases, it's impossible to guess so keep it as is if
+	 * we don't find any occurrence of /proc/self.
+	 * Finally there may be breakage if the pathname contains /proc/self
+	 * but has nothing to do with /proc, but it's impossible to tell and
+	 * unlikely to happen.
+	 */
 
-	if (path[0] == '/')
+	int rc;
+	char fname[PATH_MAX + 1];
+	char buf[PATH_MAX + 1];
+
+	if (strlen(path) >= sizeof(fname))
+		return -1;
+	strcpy(fname, path);
+	int proc_self_substituted = 0;
+
+	/*
+	 * We replace all the occurrences of /proc/self[/] because we cannot
+	 * know how many there are (e.g. /proc/self/root/proc/self/root/foo).
+	 */
+	for (;;) {
+		char *s = strstr(fname, "/proc/self/");
+		if (s == NULL) {
+			/* Corner case: check if the path ends with /proc/self */
+			s = fname + strlen(fname) - sizeof("/proc/self") + 1;
+			if (strcmp("/proc/self", s))
+				s = NULL;
+		}
+		if (s == NULL)
+			break;
+		*s = '\0';
+		rc = snprintf(buf, sizeof(buf), "%s/proc/%u%s",
+			fname, proc_pid, s + sizeof("/proc/self") - 1);
+		if ((unsigned int) rc >= sizeof(buf))
+			return -1;
+		strcpy(fname, buf);
+		proc_self_substituted = 1;
+	}
+
+	strcpy(buf, fname);
+
+retry:
+	if (buf[0] == '/')
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
-			       proc_pid, path);
+			       proc_pid, buf);
 	else if (tcp->last_dirfd == AT_FDCWD)
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
-			       proc_pid, path);
+			       proc_pid, buf);
 	else if (tcp->last_dirfd >= 0 )
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
-			       proc_pid, tcp->last_dirfd, path);
+			       proc_pid, tcp->last_dirfd, buf);
+	else
+		return -1;
 
 	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
 
-	rc = getfilecon(fname, secontext);
+	rc = lgetfilecon(fname, secontext);
+	if ((rc < 0) && (errno == ENOENT) && proc_self_substituted) {
+		proc_self_substituted = 0;
+		strcpy(buf, path);
+		goto retry;
+	}
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -185,20 +238,49 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 * We need to fully resolve the path, because selabel_lookup() doesn't
 	 * resolve anything.  Using realpath() is the only solution here to make
 	 * sure the path is canonicalized.
+	 * There are two cases:
+	 * - if the inode is a symlink, resolve only the dirname, because we we
+	 *   want to get the expected context of the symlink itself, not the
+	 *   target context
+	 * - otherwise resolve everything because we will get same result
 	 */
 
-	char *resolved = realpath(fname, NULL);
-	if (!resolved)
+	strace_stat_t st;
+	if (lstat_file(fname, &st) < 0)
 		return 0;
 
-	strace_stat_t st;
-	if (stat_file(resolved, &st) < 0)
-		goto out;
+	if (S_ISLNK(st.st_mode)) {
+		strcpy(buf, fname);
+		/* Split buf into dirname and basename */
+		char *dirname = buf;
+		char *b;
+		for (b = buf + strlen(buf) - 1; *b != '/'; b--)
+			assert(b > buf); /* we have an absolute path hence at least one / */
+		assert(b > buf + 6); /* we have a dirname (starting with /proc/) */
+		*b = '\0';
+		char *basename = xstrdup(b + 1);
 
-	get_expected_filecontext(resolved, expected, st.st_mode);
+		char *resolved = realpath(dirname, NULL);
+		if (!resolved) {
+			free(basename);
+			return 0;
+		}
 
-out:
-	free(resolved);
+		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, basename);
+		free(resolved);
+		free(basename);
+		if ((unsigned int) rc >= sizeof(buf))
+			return 0;
+	} else {
+		char *resolved = realpath(fname, NULL);
+		if (!resolved)
+			return 0;
+		strcpy(buf, resolved);
+		free(resolved);
+	}
+
+	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
+		*expected = (char *) unknown_expected_context;
 
 	return 0;
 }
@@ -231,7 +313,8 @@ print_context(char *secontext, char *expected)
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 
-	freecon(expected);
+	if (expected != unknown_expected_context)
+		freecon(expected);
 freecon_secontext:
 	freecon(secontext);
 }

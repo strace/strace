@@ -11,6 +11,8 @@
 
 # include <assert.h>
 # include <errno.h>
+# include <limits.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <sys/stat.h>
@@ -18,10 +20,15 @@
 # include <selinux/selinux.h>
 # include <selinux/label.h>
 
+# include <libgen.h>
+# undef basename
+
 # include "xmalloc.h"
 
 # define TEST_SECONTEXT
 # include "secontext.h"
+
+static char unknown_expected_context[] = "??";
 
 ATTRIBUTE_FORMAT((printf, 2, 0)) ATTRIBUTE_MALLOC
 static char *
@@ -86,7 +93,7 @@ static char *
 raw_expected_secontext_full_file(const char *filename)
 {
 	int saved_errno = errno;
-	char *secontext;
+	char *secontext = NULL;
 
 	static struct selabel_handle *hdl;
 	if (!hdl) {
@@ -95,20 +102,37 @@ raw_expected_secontext_full_file(const char *filename)
 			perror_msg_and_skip("selabel_open");
 	}
 
-	char *resolved = realpath(filename, NULL);
-	if (!resolved)
-		perror_msg_and_fail("realpath: %s", filename);
-
 	struct stat statbuf;
-	if (stat(resolved, &statbuf) < 0)
-		perror_msg_and_fail("stat: %s", resolved);
+	if (lstat(filename, &statbuf) < 0)
+		perror_msg_and_fail("stat: %s", filename);
 
-	if (selabel_lookup(hdl, &secontext, resolved, statbuf.st_mode) < 0)
-		perror_msg_and_skip("selabel_lookup: %s", resolved);
-	free(resolved);
+	char buf[PATH_MAX + 1];
+
+	if (S_ISLNK(statbuf.st_mode)) {
+		char bufb[PATH_MAX + 1];
+		strcpy(buf, filename);
+		strcpy(bufb, filename);
+		char *d = dirname(buf);
+		char *resolved = realpath(d, NULL);
+		if (!resolved)
+			perror_msg_and_fail("realpath: %s", filename);
+		char *b = basename(bufb);
+		snprintf(buf, sizeof(buf), "%s/%s", resolved, b);
+		free(resolved);
+	} else {
+		char *resolved = realpath(filename, NULL);
+		if (!resolved)
+			perror_msg_and_fail("realpath: %s", filename);
+		strcpy(buf, resolved);
+		free(resolved);
+	}
+
+	if ((selabel_lookup(hdl, &secontext, buf, statbuf.st_mode) < 0) && (errno != ENOENT))
+		secontext = unknown_expected_context;
 
 	char *full_secontext = xstrdup(secontext);
-	freecon(secontext);
+	if (secontext != unknown_expected_context)
+		freecon(secontext);
 	errno = saved_errno;
 	return full_secontext;
 }
@@ -133,7 +157,7 @@ raw_secontext_full_file(const char *filename)
 	char *full_secontext = NULL;
 	char *secontext;
 
-	if (getfilecon(filename, &secontext) >= 0) {
+	if (lgetfilecon(filename, &secontext) >= 0) {
 		full_secontext = strip_trailing_newlines(xstrdup(secontext));
 		freecon(secontext);
 	}
