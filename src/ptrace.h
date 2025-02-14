@@ -163,6 +163,9 @@
 #  define PTRACE_SYSCALL_INFO_EXIT	2
 #  define PTRACE_SYSCALL_INFO_SECCOMP	3
 # endif
+# ifndef PTRACE_SET_SYSCALL_INFO
+#  define PTRACE_SET_SYSCALL_INFO	0x4212
+# endif
 # ifndef PTRACE_GET_RSEQ_CONFIGURATION
 #  define PTRACE_GET_RSEQ_CONFIGURATION	0x420f
 # endif
@@ -175,7 +178,8 @@
 
 struct strace_ptrace_syscall_info {
 	uint8_t op;
-	uint8_t pad[3];
+	uint8_t reserved;
+	uint16_t flags;
 	uint32_t arch;
 	uint64_t instruction_pointer;
 	uint64_t stack_pointer;
@@ -192,6 +196,7 @@ struct strace_ptrace_syscall_info {
 			uint64_t nr;
 			uint64_t args[6];
 			uint32_t ret_data;
+			uint32_t reserved2;
 		} seccomp;
 	};
 };

@@ -42,6 +42,7 @@ PTRACE_GET_SYSCALL_INFO		0x420e
 PTRACE_GET_RSEQ_CONFIGURATION	0x420f
 PTRACE_SET_SYSCALL_USER_DISPATCH_CONFIG	0x4210
 PTRACE_GET_SYSCALL_USER_DISPATCH_CONFIG	0x4211
+PTRACE_SET_SYSCALL_INFO		0x4212
 
 /* arch-specific */
 #if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
