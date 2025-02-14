@@ -15,11 +15,6 @@
 #include <selinux/selinux.h>
 #include <selinux/label.h>
 
-/* Required for dirname() */
-#include <libgen.h>
-/* Used to use basename() from <string.h>, see <libgen.h> */
-#undef basename
-
 #include "largefile_wrappers.h"
 #include "number_set.h"
 #include "secontext.h"
@@ -256,16 +251,24 @@ retry:
 
 	if (S_ISLNK(st.st_mode)) {
 		strcpy(buf, fname);
-		char *d = dirname(buf);
+		/* Split buf into dirname and basename */
+		char *dirname = buf;
+		char *b;
+		for (b = buf + strlen(buf) - 1; *b != '/'; b--)
+			assert(b > buf); /* we have an absolute path hence at least one / */
+		assert(b > buf + 6); /* we have a dirname (starting with /proc/) */
+		*b = '\0';
+		char *basename = xstrdup(b + 1);
 
-		char *resolved = realpath(d, NULL);
-		if (!resolved)
+		char *resolved = realpath(dirname, NULL);
+		if (!resolved) {
+			free(basename);
 			return 0;
+		}
 
-		char *b = basename(fname);
-
-		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, b);
+		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, basename);
 		free(resolved);
+		free(basename);
 		if ((unsigned int) rc >= sizeof(buf))
 			return 0;
 	} else {
