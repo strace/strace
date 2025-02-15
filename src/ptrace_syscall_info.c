@@ -323,12 +323,12 @@ print_psi_exit(const typeof_field(struct_ptrace_syscall_info, exit) *const p,
 
 void
 print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
-			  kernel_ulong_t user_len)
+			  kernel_ulong_t user_len,
+			  kernel_ulong_t kernel_len)
 {
-	struct_ptrace_syscall_info info;
-	kernel_ulong_t kernel_len = tcp->u_rval;
+	struct_ptrace_syscall_info info = { 0 };
 	kernel_ulong_t ret_len = MIN(user_len, kernel_len);
-	kernel_ulong_t fetch_size = MIN(ret_len, expected_seccomp_size);
+	kernel_ulong_t fetch_size = MIN(ret_len, sizeof(info));
 
 	if (!fetch_size || !tfetch_mem(tcp, addr, fetch_size, &info)) {
 		printaddr(addr);
@@ -338,6 +338,21 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(info, op, ptrace_syscall_info_op,
 			 "PTRACE_SYSCALL_INFO_???");
+
+	if (fetch_size <= offsetof(struct_ptrace_syscall_info, reserved))
+		goto printed;
+	if (info.reserved) {
+		tprint_struct_next();
+		PRINT_FIELD_X(info, reserved);
+	}
+
+	if (fetch_size <= offsetof(struct_ptrace_syscall_info, flags))
+		goto printed;
+	if (info.flags) {
+		tprint_struct_next();
+		PRINT_FIELD_X(info, flags);
+	}
+
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info, arch))
 		goto printed;
 	tprint_struct_next();

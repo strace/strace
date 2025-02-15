@@ -335,6 +335,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_SECCOMP_GET_FILTER:
 	case PTRACE_SECCOMP_GET_METADATA:
 	case PTRACE_GET_SYSCALL_INFO:
+	case PTRACE_SET_SYSCALL_INFO:
 		PRINT_VAL_U(addr);
 		break;
 	case PTRACE_PEEKSIGINFO:
@@ -421,6 +422,9 @@ decode_ptrace_entering(struct tcb *const tcp)
 		break;
 	case PTRACE_SECCOMP_GET_METADATA:
 		return decode_seccomp_metadata(tcp, data, addr);
+	case PTRACE_SET_SYSCALL_INFO:
+		print_ptrace_syscall_info(tcp, data, addr, addr);
+		break;
 #ifndef IA64
 	case PTRACE_PEEKDATA:
 	case PTRACE_PEEKTEXT:
@@ -482,7 +486,7 @@ decode_ptrace_exiting(struct tcb *const tcp)
 	case PTRACE_SECCOMP_GET_METADATA:
 		return decode_seccomp_metadata(tcp, data, tcp->u_rval);
 	case PTRACE_GET_SYSCALL_INFO:
-		print_ptrace_syscall_info(tcp, data, addr);
+		print_ptrace_syscall_info(tcp, data, addr, tcp->u_rval);
 		break;
 #ifdef PTRACE_GETREGS
 	case PTRACE_GETREGS:
