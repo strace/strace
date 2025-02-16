@@ -932,6 +932,10 @@ ptrace-y		-a23 -s64 -y -e signal=none -e trace=ptrace
 ptrace-y-Xabbrev	-a23 -s64 -y -e signal=none -e trace=ptrace -Xabbrev
 ptrace-y-Xraw		-a10 -s64 -y -e signal=none -e trace=ptrace -Xraw
 ptrace-y-Xverbose	-a23 -s64 -y -e signal=none -e trace=ptrace -Xverbose
+ptrace_set_syscall_info			--trace=ptrace
+ptrace_set_syscall_info-Xabbrev		--trace=ptrace -Xabbrev
+ptrace_set_syscall_info-Xraw		-a28 --trace=ptrace -Xraw
+ptrace_set_syscall_info-Xverbose	--trace=ptrace -Xverbose
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 ptrace_syscall_info-Xabbrev	-a35 -e signal=none -e trace=ptrace -Xabbrev
 ptrace_syscall_info-Xraw	-a26 -e signal=none -e trace=ptrace -Xraw

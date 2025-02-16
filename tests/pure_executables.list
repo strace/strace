@@ -663,6 +663,10 @@ ptrace-y
 ptrace-y-Xabbrev
 ptrace-y-Xraw
 ptrace-y-Xverbose
+ptrace_set_syscall_info
+ptrace_set_syscall_info-Xabbrev
+ptrace_set_syscall_info-Xraw
+ptrace_set_syscall_info-Xverbose
 ptrace_syscall_info
 ptrace_syscall_info-Xabbrev
 ptrace_syscall_info-Xraw
