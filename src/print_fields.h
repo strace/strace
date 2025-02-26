@@ -713,7 +713,9 @@ tprint_sysret_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		const char *nr_prefix_ = NULL;				\
-		const char *name = syscall_name_arch((where_).field_,	\
+		const unsigned long long ull_nr =			\
+			zero_extend_signed_to_ull((where_).field_);	\
+		const char *name = syscall_name_arch(ull_nr,		\
 					(audit_arch_), &nr_prefix_);	\
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV	\
 		    || !nr_prefix_)					\

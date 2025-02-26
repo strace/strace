@@ -611,7 +611,7 @@ extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
  * @return       String literal corresponding to the syscall number in case
  *               the latter is valid;  NULL otherwise.
  */
-extern const char *syscall_name_arch(kernel_ulong_t nr, unsigned int arch,
+extern const char *syscall_name_arch(unsigned long long nr, unsigned int arch,
 				     const char **prefix);
 /**
  * Convert a syscall name to the corresponding (shuffled) syscall number.
