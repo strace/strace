@@ -500,10 +500,11 @@ main(int argc, char *argv[])
 		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=NULL"
-		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+		       ", exit_signal=" XLAT_FMT_U
 		       ", stack=0xface1e55beeff00d"
 		       ", stack_size=0xcaffeedefacedca7}",
-		       flag_str, pid_fields[i].field_name);
+		       flag_str, pid_fields[i].field_name,
+		       XLAT_ARGS(SIGCHLD));
 #if RETVAL_INJECTED
 		if (pid_fields[i].deref_exiting)
 			printf(" => {%s=NULL}", pid_fields[i].field_name);
@@ -514,11 +515,12 @@ main(int argc, char *argv[])
 		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=%p"
-		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+		       ", exit_signal=" XLAT_FMT_U
 		       ", stack=0xface1e55beeff00d"
 		       ", stack_size=0xcaffeedefacedca7}",
 		       flag_str, pid_fields[i].field_name,
-		       pid_fields[i].ptr + 1);
+		       pid_fields[i].ptr + 1,
+		       XLAT_ARGS(SIGCHLD));
 #if RETVAL_INJECTED
 		if (pid_fields[i].deref_exiting)
 			printf(" => {%s=%p}",
@@ -530,11 +532,12 @@ main(int argc, char *argv[])
 		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=%p"
-		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+		       ", exit_signal=" XLAT_FMT_U
 		       ", stack=0xface1e55beeff00d"
 		       ", stack_size=0xcaffeedefacedca7}",
 		       flag_str, pid_fields[i].field_name,
-		       pid_fields[i].ptr);
+		       pid_fields[i].ptr,
+		       XLAT_ARGS(SIGCHLD));
 #if RETVAL_INJECTED
 		if (pid_fields[i].deref_exiting)
 			printf(" => {%s=[%d]}",
@@ -547,25 +550,25 @@ main(int argc, char *argv[])
 	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
-	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+	       ", exit_signal=" XLAT_FMT_U
 	       ", stack=0xface1e55beeff00d"
 	       ", stack_size=0xcaffeedefacedca7, tls=NULL}, 64) = %s" INJ_STR,
-	       sprintrc(rc));
+	       XLAT_ARGS(SIGCHLD), sprintrc(rc));
 
 	arg->tls = (uintptr_t) (tls + 1);
 	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
-	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+	       ", exit_signal=" XLAT_FMT_U
 	       ", stack=0xface1e55beeff00d"
 	       ", stack_size=0xcaffeedefacedca7, tls=%p}, 64) = %s" INJ_STR,
-	       tls + 1, sprintrc(rc));
+	       XLAT_ARGS(SIGCHLD), tls + 1, sprintrc(rc));
 
 	arg->tls = (uintptr_t) tls;
 	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
-	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
+	       ", exit_signal=" XLAT_FMT_U
 	       ", stack=0xface1e55beeff00d, stack_size=0xcaffeedefacedca7, tls="
 #if defined HAVE_STRUCT_USER_DESC && defined __i386__
 	       "{entry_number=2206368128, base_addr=0x87868584"
@@ -575,6 +578,7 @@ main(int argc, char *argv[])
 	       "%p"
 #endif
 	       "}, 64) = %s" INJ_STR,
+	       XLAT_ARGS(SIGCHLD),
 #if !defined HAVE_STRUCT_USER_DESC || !defined __i386__
 	       tls,
 #endif
