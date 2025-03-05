@@ -73,6 +73,8 @@ Noteworthy changes in release 6.10 (2024-07-21)
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, LANDLOCK_*, PR_*, STATX_*,
     TCP_*, TEE_*, V4L2_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 6.10.
+  * Added -e namespace=new option for printing the namespaces that the tracee
+    enters.
 
 * Bug fixes
   * Worked around a bug introduced in Linux 6.5 that affected system call

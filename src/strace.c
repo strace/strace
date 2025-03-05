@@ -377,6 +377,8 @@ Output format:\n\
      messages:   attach, exit, path-resolution, personality, thread-execve\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
+  -e namespace=new, --namespace=new\n\
+                 print namespace IDs that the tracee enters\n\
   -e decode-fds=SET, --decode-fds=SET\n\
                  what kinds of file descriptor information details to decode\n\
      details:    dev (device major/minor for block/char device files),\n\
@@ -2281,6 +2283,7 @@ init(int argc, char *argv[])
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";
 	static const char secontext_qual[] = "!full,mismatch";
+	static const char namespace_qual[] = "new";
 
 	int c, i;
 	int optF = 0, zflags = 0;
@@ -2381,6 +2384,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_FAULT,
 		GETOPT_QUAL_INJECT,
 		GETOPT_QUAL_KVM,
+		GETOPT_QUAL_NAMESPACE,
 		GETOPT_QUAL_QUIET,
 		GETOPT_QUAL_DECODE_FD,
 		GETOPT_QUAL_DECODE_PID,
@@ -2447,6 +2451,7 @@ init(int argc, char *argv[])
 		{ "fault",	required_argument, 0, GETOPT_QUAL_FAULT },
 		{ "inject",	required_argument, 0, GETOPT_QUAL_INJECT },
 		{ "kvm",	required_argument, 0, GETOPT_QUAL_KVM },
+		{ "namespace",  optional_argument, 0, GETOPT_QUAL_NAMESPACE },
 		{ "quiet",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "silent",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
@@ -2770,6 +2775,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_QUAL_KVM:
 			qualify_kvm(optarg);
+			break;
+		case GETOPT_QUAL_NAMESPACE:
+			qualify_namespace(optarg ?: namespace_qual);
 			break;
 		case GETOPT_QUAL_QUIET:
 			qualify_quiet(optarg ?: qflag_qual);
