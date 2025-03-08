@@ -1885,51 +1885,26 @@ startup_child(char **argv, char **env)
 static void
 test_ptrace_seize(void)
 {
-	int pid;
-
-	/* Need fork for test. NOMMU has no forks */
-	if (NOMMU_SYSTEM) {
-		post_attach_sigstop = 0; /* this sets use_seize to 1 */
-		return;
-	}
-
-	pid = fork();
-	if (pid < 0)
-		perror_func_msg_and_die("fork");
-
-	if (pid == 0) {
-		pause();
-		_exit(0);
-	}
-
-	/* PTRACE_SEIZE, unlike ATTACH, doesn't force tracee to trap.  After
-	 * attaching tracee continues to run unless a trap condition occurs.
-	 * PTRACE_SEIZE doesn't affect signal or group stop state.
+	/* ptracing oneself has never been supported. */
+	if (ptrace(PTRACE_SEIZE, getpid(), 0, 0) == 0)
+		error_func_msg_and_die("seized myself by the tail!");
+	/*
+	 * Before Linux kernel commit v3.1-rc1~308^2~28, PTRACE_SEIZE was
+	 * an unrecognized operation and therefore used to fail with ESRCH.
+	 *
+	 * Starting with v3.1-rc1~308^2~28 and up to v3.4-rc1~109^2~20,
+	 * PTRACE_SEIZE used to require PTRACE_SEIZE_DEVEL flag.
+	 * Without that flag, PTRACE_SEIZE used to fail with EIO.
+	 *
+	 * Since v3.4-rc1~109^2~20, PTRACE_SEIZE of oneself fails with EPERM.
+	 *
+	 * Like any ptrace operation, PTRACE_SEIZE could also be filtered out
+	 * by a syscall filter, but that is beyond the scope of this check.
 	 */
-	if (ptrace(PTRACE_SEIZE, pid, 0, 0) == 0) {
+	if (errno == EPERM)
 		post_attach_sigstop = 0; /* this sets use_seize to 1 */
-	} else {
+	else
 		debug_msg("PTRACE_SEIZE doesn't work");
-	}
-
-	kill(pid, SIGKILL);
-
-	while (1) {
-		int status, tracee_pid;
-
-		errno = 0;
-		tracee_pid = waitpid(pid, &status, 0);
-		if (tracee_pid <= 0) {
-			if (errno == EINTR)
-				continue;
-			perror_func_msg_and_die("unexpected wait result %d",
-						tracee_pid);
-		}
-		if (WIFSIGNALED(status))
-			return;
-
-		error_func_msg_and_die("unexpected wait status %#x", status);
-	}
 }
 
 static unsigned int
