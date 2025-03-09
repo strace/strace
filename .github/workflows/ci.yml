@@ -238,7 +238,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-kheaders:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: gcc-10
       KHEADERS: torvalds/linux
@@ -254,7 +254,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-dw:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: gcc-10
       STACKTRACE: libdw
@@ -269,7 +269,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-unwind:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: gcc-10
       STACKTRACE: libunwind
@@ -284,9 +284,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-kheaders:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc
+      CC: gcc-9
       KHEADERS: torvalds/linux
       STACKTRACE: no
       TARGET: x86_64
@@ -300,9 +300,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-dw:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc
+      CC: gcc-9
       STACKTRACE: libdw
       TARGET: x86_64
     steps:
@@ -315,9 +315,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-unwind:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc
+      CC: gcc-9
       STACKTRACE: libunwind
       TARGET: x86_64
     steps:
@@ -793,7 +793,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86-kheaders:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: gcc-10
       KHEADERS: torvalds/linux
@@ -809,7 +809,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86-nostacktrace:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: gcc-10
       STACKTRACE: no
@@ -824,9 +824,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86-kheaders:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc
+      CC: gcc-9
       KHEADERS: torvalds/linux
       STACKTRACE: no
       TARGET: x86
@@ -840,9 +840,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86-nostacktrace:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
-      CC: gcc
+      CC: gcc-9
       STACKTRACE: no
       TARGET: x86
     steps:
@@ -1010,7 +1010,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   musl-x86_64-nostacktrace:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       CC: musl-gcc
       STACKTRACE: no
