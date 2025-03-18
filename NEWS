@@ -212,6 +212,7 @@ Noteworthy changes in release 6.2 (2023-02-26)
     from tty and snd subsystems.
   * Implemented decoding of IFLA_BRPORT_MAB and IFLA_DEVLINK_PORT
     netlink attributes.
+  * Implemented decoding of some KFD ioctl commands.
   * Updated lists of ALG_*, BPF_*, IFLA_*, KEY_*, KVM_*, LANDLOCK_*,
     MEMBARRIER_*, NFT_*, NTF_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 6.2.

@@ -376,6 +376,8 @@ ioctl_kd-success-s1024
 ioctl_kd-success-s1024-Xabbrev
 ioctl_kd-success-s1024-Xraw
 ioctl_kd-success-s1024-Xverbose
+ioctl_kfd
+ioctl_kfd-success
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu

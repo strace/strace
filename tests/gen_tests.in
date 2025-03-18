@@ -397,6 +397,8 @@ ioctl_kd-success-s1024		+ioctl-success.sh -a20 -s1024
 ioctl_kd-success-s1024-Xabbrev	+ioctl-success.sh -a20 -s1024 -Xabbrev
 ioctl_kd-success-s1024-Xraw	+ioctl-success.sh -a18 -s1024 -Xraw
 ioctl_kd-success-s1024-Xverbose	+ioctl-success.sh -a20 -s1024 -Xverbose
+ioctl_kfd	+ioctl-success.sh -a30
+ioctl_kfd-success	+ioctl-success.sh -a30
 ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_kvm_run-v	+ioctl.test -v -a36 -y
 ioctl_kvm_run_auxstr_vcpu	+ioctl.test -a36 -y -e kvm=vcpu

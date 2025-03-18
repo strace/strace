@@ -258,6 +258,7 @@ ioctl_kd
 ioctl_kd-Xabbrev
 ioctl_kd-Xraw
 ioctl_kd-Xverbose
+ioctl_kfd
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
