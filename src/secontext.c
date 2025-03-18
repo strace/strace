@@ -193,7 +193,7 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 		char *s = strstr(fname_ptr, "/proc/self");
 		if (s == NULL)
 			break;
-		switch (s[sizeof("/proc/self")]) {
+		switch (s[sizeof("/proc/self")-1]) {
 		case '\0':
 			/* path ends with /proc/self */
 			rc = snprintf(buf, sizeof(buf), "/proc/%u", proc_pid);
