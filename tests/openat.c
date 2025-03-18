@@ -13,6 +13,7 @@
 
 # include <asm/fcntl.h>
 # include <stdio.h>
+# include <string.h>
 # include <unistd.h>
 # include <limits.h>
 # include <sys/stat.h>
@@ -28,6 +29,7 @@
 
 static const char sample[] = "openat.sample";
 static const char self_fd0[] = "/proc/self/fd/0";
+static const char self[] = "/proc/self";
 
 static void
 test_mode_flag(unsigned int mode_val, const char *mode_str,
@@ -179,6 +181,30 @@ main(void)
 			close(fd);
 	}
 
+	if (readlink(self, buf, sizeof(buf) - 1) > 0) {
+		char *self_secontext = SECONTEXT_FILE(self);
+		/*
+		 * When opening /proc/self symlink, we get the context of
+		 * ourselves, but the tooling appends a space, instead of
+		 * prepending it, so fix this
+		 */
+		char *target_secontext = SECONTEXT_PID_MY();
+		if (strlen(target_secontext) > 0) {
+			char *c;
+			for (c = target_secontext + strlen(target_secontext) - 1; c > target_secontext; c--)
+				*c = *(c - 1);
+			*c = ' ';
+		}
+
+		fd = syscall(__NR_openat, cwd_fd, self, O_RDONLY);
+		printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+		       my_secontext, "openat",
+		       cwd_fd, cwd_secontext,
+		       self, self_secontext,
+		       sprintrc(fd), target_secontext);
+		if (fd != -1)
+			close(fd);
+	}
 	/* Check "fake" /proc/self */
 
 	if (mkdir("./proc", 0700) || mkdir("./proc/self", 0700))
@@ -216,6 +242,44 @@ main(void)
 	}
 
 	rmdir("./proc/self");
+
+	/* Check non-matching /proc/self */
+
+	if (mkdir("./proc/selfish", 0700))
+		perror_msg_and_fail("mkdir");
+
+	snprintf(buf, sizeof(buf), "./proc/selfish/%s", sample);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY|O_CREAT, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("openat");
+	close(fd);
+
+	sample_secontext = SECONTEXT_FILE(buf);
+
+	/*
+	 * File context in openat() is not displayed because file doesn't exist
+	 * yet, but is displayed in return value since the file got created.
+	 */
+	printf("%s%s(%d%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf,
+	       sprintrc(fd), sample_secontext);
+
+	fd = syscall(__NR_openat, cwd_fd, buf, O_RDONLY);
+	printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       buf, sample_secontext,
+	       sprintrc(fd), sample_secontext);
+	if (fd != -1) {
+		close(fd);
+		if (unlink(buf))
+			perror_msg_and_fail("unlink");
+	}
+
+	rmdir("./proc/selfish");
 	rmdir("./proc");
 
 	leave_and_remove_subdir();

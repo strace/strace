@@ -176,49 +176,63 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 */
 
 	int rc;
-	char fname[PATH_MAX + 1];
+	char fname[PATH_MAX + 1], *fname_ptr;
 	char buf[PATH_MAX + 1];
 
 	if (strlen(path) >= sizeof(fname))
 		return -1;
 	strcpy(fname, path);
-	int proc_self_substituted = 0;
+	bool proc_self_substituted = false;
 
 	/*
 	 * We replace all the occurrences of /proc/self[/] because we cannot
 	 * know how many there are (e.g. /proc/self/root/proc/self/root/foo).
 	 */
+	fname_ptr = fname;
 	for (;;) {
-		char *s = strstr(fname, "/proc/self/");
-		if (s == NULL) {
-			/* Corner case: check if the path ends with /proc/self */
-			s = fname + strlen(fname) - sizeof("/proc/self") + 1;
-			if (strcmp("/proc/self", s))
-				s = NULL;
-		}
+		char *s = strstr(fname_ptr, "/proc/self");
 		if (s == NULL)
 			break;
-		*s = '\0';
-		rc = snprintf(buf, sizeof(buf), "%s/proc/%u%s",
-			fname, proc_pid, s + sizeof("/proc/self") - 1);
-		if ((unsigned int) rc >= sizeof(buf))
-			return -1;
-		strcpy(fname, buf);
-		proc_self_substituted = 1;
+		switch (s[sizeof("/proc/self")]) {
+		case '\0':
+			/* path ends with /proc/self */
+			rc = snprintf(buf, sizeof(buf), "/proc/%u", proc_pid);
+			if ((unsigned int) rc >= sizeof(fname) - (s - fname))
+				return -1;
+			strcpy(s, buf);
+			proc_self_substituted = true;
+			goto done_proc_self;
+		case '/':
+			rc = snprintf(buf, sizeof(buf), "/proc/%u/%s",
+				proc_pid, s + sizeof("/proc/self/"));
+			if ((unsigned int) rc >= sizeof(fname) - (s - fname))
+				return -1;
+			strcpy(s, buf);
+			proc_self_substituted = true;
+			fname_ptr = s + sizeof("/proc");
+			break;
+		default:
+			fname_ptr = s + sizeof("/proc/self");
+			break;
+		}
 	}
 
+done_proc_self:
 	strcpy(buf, fname);
 
+	const char *try_path;
+	try_path = buf;
+
 retry:
-	if (buf[0] == '/')
+	if (try_path[0] == '/')
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
-			       proc_pid, buf);
+			       proc_pid, try_path);
 	else if (tcp->last_dirfd == AT_FDCWD)
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
-			       proc_pid, buf);
+			       proc_pid, try_path);
 	else if (tcp->last_dirfd >= 0 )
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
-			       proc_pid, tcp->last_dirfd, buf);
+			       proc_pid, tcp->last_dirfd, try_path);
 	else
 		return -1;
 
@@ -227,8 +241,8 @@ retry:
 
 	rc = lgetfilecon(fname, secontext);
 	if ((rc < 0) && (errno == ENOENT) && proc_self_substituted) {
-		proc_self_substituted = 0;
-		strcpy(buf, path);
+		proc_self_substituted = false;
+		try_path = path;
 		goto retry;
 	}
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
@@ -253,30 +267,23 @@ retry:
 		strcpy(buf, fname);
 		/* Split buf into dirname and basename */
 		char *dirname = buf;
-		char *b;
-		for (b = buf + strlen(buf) - 1; *b != '/'; b--)
-			assert(b > buf); /* we have an absolute path hence at least one / */
+		char *b = strrchr(buf, '/');
 		assert(b > buf + 6); /* we have a dirname (starting with /proc/) */
 		*b = '\0';
-		char *basename = xstrdup(b + 1);
+		char *basename = fname + (b + 1 - buf);
 
 		char *resolved = realpath(dirname, NULL);
-		if (!resolved) {
-			free(basename);
+		if (!resolved)
 			return 0;
-		}
 
 		rc = snprintf(buf, sizeof(buf), "%s/%s", resolved, basename);
 		free(resolved);
-		free(basename);
 		if ((unsigned int) rc >= sizeof(buf))
 			return 0;
 	} else {
-		char *resolved = realpath(fname, NULL);
+		char *resolved = realpath(fname, buf);
 		if (!resolved)
 			return 0;
-		strcpy(buf, resolved);
-		free(resolved);
 	}
 
 	if ((get_expected_filecontext(buf, expected, st.st_mode) < 0) && (errno != ENOENT))
