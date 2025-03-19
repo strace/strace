@@ -173,6 +173,11 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	 * Finally there may be breakage if the pathname contains /proc/self
 	 * but has nothing to do with /proc, but it's impossible to tell and
 	 * unlikely to happen.
+	 *
+	 * Note that /proc/self is a symlink, hence the context of the symlink
+	 * should be returned, but it's not possible to do so because we
+	 * resolve the symlink, which ends up checking the context of
+	 * /proc/<pid> which is a directory.
 	 */
 
 	int rc;
@@ -193,7 +198,7 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 		char *s = strstr(fname_ptr, "/proc/self");
 		if (s == NULL)
 			break;
-		switch (s[sizeof("/proc/self")-1]) {
+		switch (s[strlen("/proc/self")]) {
 		case '\0':
 			/* path ends with /proc/self */
 			rc = snprintf(buf, sizeof(buf), "/proc/%u", proc_pid);
@@ -204,15 +209,15 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 			goto done_proc_self;
 		case '/':
 			rc = snprintf(buf, sizeof(buf), "/proc/%u/%s",
-				proc_pid, s + sizeof("/proc/self/"));
+				proc_pid, s + strlen("/proc/self/"));
 			if ((unsigned int) rc >= sizeof(fname) - (s - fname))
 				return -1;
 			strcpy(s, buf);
 			proc_self_substituted = true;
-			fname_ptr = s + sizeof("/proc");
+			fname_ptr = s + strlen("/proc/1");
 			break;
 		default:
-			fname_ptr = s + sizeof("/proc/self");
+			fname_ptr = s + strlen("/proc/selfX");
 			break;
 		}
 	}

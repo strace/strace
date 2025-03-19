@@ -28,8 +28,9 @@
 # endif
 
 static const char sample[] = "openat.sample";
+# ifdef TEST_SECONTEXT
 static const char self_fd0[] = "/proc/self/fd/0";
-static const char self[] = "/proc/self";
+# endif
 
 static void
 test_mode_flag(unsigned int mode_val, const char *mode_str,
@@ -166,8 +167,12 @@ main(void)
 			perror_msg_and_fail("unlink");
 	}
 
+# ifdef TEST_SECONTEXT
+
 	char buf[PATH_MAX];
-	if (readlink(self_fd0, buf, sizeof(buf) - 1) > 0) {
+	ssize_t n = readlink(self_fd0, buf, sizeof(buf) - 1);
+	if ((n > 0) && ((size_t) n < sizeof(buf) - 1)) {
+		buf[n] = '\0';
 		char *self_fd0_secontext = SECONTEXT_FILE(self_fd0);
 		char *target_secontext = SECONTEXT_FILE(buf);
 
@@ -181,30 +186,60 @@ main(void)
 			close(fd);
 	}
 
-	if (readlink(self, buf, sizeof(buf) - 1) > 0) {
-		char *self_secontext = SECONTEXT_FILE(self);
+	const char *proc_self_paths[] = {
+		"/proc/self", "/proc/self/root/proc/self"
+	};
+
+	for (unsigned int i = 0; i < sizeof(proc_self_paths)/sizeof(*proc_self_paths); i++) {
 		/*
-		 * When opening /proc/self symlink, we get the context of
-		 * ourselves, but the tooling appends a space, instead of
-		 * prepending it, so fix this
+		 * /proc/self substitution is special: /proc/self is a
+		 * symlink, which has context "proc_t", but strace
+		 * substitutes /proc/self by /proc/<pid>, which is a
+		 * directory, hence has context of the process itself.
+		 *
+		 * Additionally the SECONTEXT_PID_MY() appends a space,
+		 * instead of prepending it, so fix this here
 		 */
-		char *target_secontext = SECONTEXT_PID_MY();
-		if (strlen(target_secontext) > 0) {
+		char *secontext = SECONTEXT_PID_MY();
+		if (strlen(secontext) > 0) {
 			char *c;
-			for (c = target_secontext + strlen(target_secontext) - 1; c > target_secontext; c--)
+			for (c = secontext + strlen(secontext) - 1; c > secontext; c--)
 				*c = *(c - 1);
 			*c = ' ';
 		}
 
-		fd = syscall(__NR_openat, cwd_fd, self, O_RDONLY);
+		fd = syscall(__NR_openat, cwd_fd, proc_self_paths[i], O_RDONLY);
 		printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
 		       my_secontext, "openat",
 		       cwd_fd, cwd_secontext,
-		       self, self_secontext,
-		       sprintrc(fd), target_secontext);
+		       proc_self_paths[i], secontext,
+		       sprintrc(fd), secontext);
 		if (fd != -1)
 			close(fd);
 	}
+
+	const char *proc_root_paths[] = {
+		"/proc/self/root", "/proc/self/root/proc/self/root"
+	};
+
+	for (unsigned int i = 0; i < sizeof(proc_root_paths)/sizeof(*proc_root_paths); i++) {
+		n = readlink(proc_root_paths[i], buf, sizeof(buf) - 1);
+		if ((n > 0) && ((size_t) n < sizeof(buf) - 1)) {
+			buf[n] = '\0';
+			char *secontext = SECONTEXT_FILE(proc_root_paths[i]);
+			char *target_secontext = SECONTEXT_FILE(buf);
+
+			fd = syscall(__NR_openat, cwd_fd, proc_root_paths[i], O_RDONLY);
+			printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+			       my_secontext, "openat",
+			       cwd_fd, cwd_secontext,
+			       proc_root_paths[i], secontext,
+			       sprintrc(fd), target_secontext);
+			if (fd != -1)
+				close(fd);
+		}
+	}
+
 	/* Check "fake" /proc/self */
 
 	if (mkdir("./proc", 0700) || mkdir("./proc/self", 0700))
@@ -281,6 +316,8 @@ main(void)
 
 	rmdir("./proc/selfish");
 	rmdir("./proc");
+
+# endif
 
 	leave_and_remove_subdir();
 
