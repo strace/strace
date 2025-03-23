@@ -133,9 +133,9 @@ main(void)
 		pid = do_clone(child, child_stack, child_stack_size,
 			       CLONE_PIDFD|SIGCHLD, 0, ptid);
 		char *fname = xasprintf("/proc/self/fd/%d", *ptid);
-		int rc = readlink(fname, buf, sizeof(buf) - 1);
+		ssize_t rc = readlink(fname, buf, sizeof(buf) - 1);
 		if ((unsigned int) rc >= sizeof(buf))
-			perror_msg_and_fail("readlink");
+			perror_msg_and_fail("readlink: %s", fname);
 		buf[rc] = '\0';
 		printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s"
 		       ", parent_tid=[%u<%s>]) = %d\n",
