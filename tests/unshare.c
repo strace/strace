@@ -16,9 +16,9 @@
 #include <unistd.h>
 
 #ifdef PRINT_NAMESPACE
-#define LINE_END ""
+# define LINE_END ""
 #else
-#define LINE_END "\n"
+# define LINE_END "\n"
 #endif
 
 int
