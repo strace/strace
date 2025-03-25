@@ -3,6 +3,7 @@
  * macro for some architectures (where such a constant defined).
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2021-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
