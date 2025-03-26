@@ -12,6 +12,7 @@
 #include "defs.h"
 #include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
+#include "xlat/kd_ioctl_cmds.h"
 
 #if defined(SPARC) || defined(SPARC64)
 /*
@@ -428,7 +429,12 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 	case 'I':
 		return inotify_ioctl(tcp, code, arg);
 	case 'K':
-		return kd_ioctl(tcp, code, arg);
+		/* FIXME: this is ugly, and wont work forever */
+		if (_IOC_NR(code) >= _IOC_NR(KIOCSOUND)) {
+			return kd_ioctl(tcp, code, arg);
+		} else {
+			return kfd_ioctl(tcp, code, arg);
+		}
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
 	case 'M':
