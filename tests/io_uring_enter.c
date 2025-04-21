@@ -70,8 +70,9 @@ main(void)
 	       "|IORING_ENTER_REGISTERED_RING"
 	       "|IORING_ENTER_ABS_TIMER"
 	       "|IORING_ENTER_EXT_ARG_REG"
+	       "|IORING_ENTER_NO_IOWAIT"
 	       "|%#x, %s, %u) = %s\n",
-	       fd, path, to_submit, min_complete, -1U - 127U,
+	       fd, path, to_submit, min_complete, -1U - 255U,
 	       "~[HUP KILL STOP]", size, errstr);
 
 	puts("+++ exited with 0 +++");
