@@ -120,29 +120,36 @@ main(void)
 	printf("landlock_create_ruleset(NULL, 0"
 	       ", LANDLOCK_CREATE_RULESET_VERSION) = %s" INJ_STR, errstr);
 
+	/* Get errata bitmask */
+	rc = sys_landlock_create_ruleset(NULL, 0, 2);
+	printf("landlock_create_ruleset(NULL, 0"
+	       ", LANDLOCK_CREATE_RULESET_ERRATA) = %s" INJ_STR, errstr);
+
 	/* ilp32 check */
 	rc = syscall(__NR_landlock_create_ruleset,
 		     (kernel_ulong_t) 0xffFFffFF00000000,
 		     (kernel_ulong_t) 0xdefeededdeadface,
-		     (kernel_ulong_t) 0xbadc0dedbadfaced);
+		     (kernel_ulong_t) 0xbadc0dedbadacedf);
 	printf("landlock_create_ruleset("
 #if SIZEOF_KERNEL_LONG_T > 4
 	       "%#llx"
 #else
 	       "NULL"
 #endif
-	       ", %llu, LANDLOCK_CREATE_RULESET_VERSION|%#x) = %s" INJ_STR,
+	       ", %llu"
+	       ", LANDLOCK_CREATE_RULESET_VERSION"
+	         "|LANDLOCK_CREATE_RULESET_ERRATA|%#x) = %s" INJ_STR,
 #if SIZEOF_KERNEL_LONG_T > 4
 	       (unsigned long long) (kernel_ulong_t) 0xffFFffFF00000000,
 #endif
 	       (unsigned long long) (kernel_ulong_t) 0xdefeededdeadface,
-	       0xbadfacec, sprintrc(rc));
+	       0xbadacedc, sprintrc(rc));
 
 	/* Bogus addr, size, flags */
 	rc = sys_landlock_create_ruleset(attr + 1, bogus_size,
-					 0xbadcaffe);
+					 0xbadafffc);
 	printf("landlock_create_ruleset(%p, %llu"
-	       ", 0xbadcaffe /* LANDLOCK_CREATE_RULESET_??? */) = %s"
+	       ", 0xbadafffc /* LANDLOCK_CREATE_RULESET_??? */) = %s"
 	       INJ_FD_STR,
 	       attr + 1, (unsigned long long) bogus_size, errstr);
 

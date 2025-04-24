@@ -65,7 +65,9 @@ SYS_FUNC(landlock_create_ruleset)
 	kernel_ulong_t attr = tcp->u_arg[0];
 	kernel_ulong_t size = tcp->u_arg[1];
 	unsigned int flags = tcp->u_arg[2];
-	int fd_flag = flags & LANDLOCK_CREATE_RULESET_VERSION ? 0 : RVAL_FD;
+	const unsigned int landlock_nofd_flags =
+		LANDLOCK_CREATE_RULESET_VERSION | LANDLOCK_CREATE_RULESET_ERRATA;
+	unsigned int fd_flag = flags & landlock_nofd_flags ? 0 : RVAL_FD;
 
 	/* attr */
 	print_landlock_ruleset_attr(tcp, attr, size);
