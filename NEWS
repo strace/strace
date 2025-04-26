@@ -2,7 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of BTRFS_*, COUNTER_*, IORING_*, and LANDLOCK_* constants.
+  * Updated lists of BTRFS_*, COUNTER_*, IORING_*, LANDLOCK_*, RTPROT_*,
+    and TCP_* constants.
 
 Noteworthy changes in release 6.14 (2025-03-25)
 ===============================================
