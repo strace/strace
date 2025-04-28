@@ -499,7 +499,6 @@ main(void)
 		const char *str;
 	} unsupp_cmds[] = {
 		{ ARG_STR(VIDIOC_OVERLAY) },
-		{ ARG_STR(VIDIOC_EXPBUF) },
 		{ ARG_STR(VIDIOC_G_AUDIO) },
 		{ ARG_STR(VIDIOC_S_AUDIO) },
 		{ ARG_STR(VIDIOC_QUERYMENU) },
@@ -1333,6 +1332,27 @@ main(void)
 #endif
 	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
+
+	ioctl(-1, VIDIOC_EXPBUF, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_EXPBUF));
+
+	struct v4l2_exportbuffer *const p_v4l2_expbuf =
+	       page_end - sizeof(*p_v4l2_expbuf);
+	ioctl(-1, VIDIOC_EXPBUF, p_v4l2_expbuf);
+	printf("ioctl(-1, %s, {"
+	       "type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") ", "
+	       "index=%u, "
+	       "plane=%u, "
+	       "flags="
+	       NABBR("0xcfcecdcc") VERB(" /* ")
+	       NRAW("O_RDONLY|O_CREAT|O_EXCL|O_NOCTTY|O_APPEND|O_NONBLOCK|O_DIRECT|O_LARGEFILE|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|__O_TMPFILE|0xcf80000c")
+	       VERB(" */")
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_EXPBUF),
+	       p_v4l2_expbuf->type,
+	       p_v4l2_expbuf->index,
+	       p_v4l2_expbuf->plane);
 
 	puts("+++ exited with 0 +++");
 	return 0;
