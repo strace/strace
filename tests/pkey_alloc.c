@@ -35,7 +35,7 @@ main(void)
 				"0xdec0de8" },
 		{ 0x7, "PKEY_DISABLE_ACCESS|PKEY_DISABLE_WRITE|"
 				"PKEY_DISABLE_EXECUTE" },
-		{ ARG_STR(0) },
+		{ 0, "PKEY_UNRESTRICTED" },
 		{ 0xbadc0de8, "0xbadc0de8 /* PKEY_??? */" },
 	};
 
