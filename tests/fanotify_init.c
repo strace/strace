@@ -41,15 +41,15 @@ main(void)
 		{ F8ILL_KULONG_MASK, "FAN_CLASS_NOTIF" },
 		{ (kernel_ulong_t) 0xffffffff0000000cULL,
 			"0xc /* FAN_CLASS_??? */" },
-		{ (kernel_ulong_t) 0xdec0deddefacc004ULL,
-			"FAN_CLASS_CONTENT|0xefacc000 /* FAN_??? */" },
+		{ (kernel_ulong_t) 0xdec0deddefac8004ULL,
+			"FAN_CLASS_CONTENT|0xefac8000 /* FAN_??? */" },
 		{ (kernel_ulong_t) 0xffffffffffffffffULL,
 			"0xc /* FAN_CLASS_??? */|FAN_CLOEXEC|FAN_NONBLOCK|"
 			"FAN_UNLIMITED_QUEUE|FAN_UNLIMITED_MARKS|"
 			"FAN_ENABLE_AUDIT|FAN_REPORT_PIDFD|FAN_REPORT_TID|"
 			"FAN_REPORT_FID|FAN_REPORT_DIR_FID|FAN_REPORT_NAME|"
 			"FAN_REPORT_TARGET_FID|FAN_REPORT_FD_ERROR|"
-			"0xffffc000" },
+			"FAN_REPORT_MNT|0xffff8000" },
 	};
 	static const struct strval event_f_flags[] = {
 		{ F8ILL_KULONG_MASK, "O_RDONLY" },
