@@ -97,6 +97,9 @@ static const nla_decoder_t fib_rule_hdr_nla_decoders[] = {
 	[FRA_DSCP]			= decode_nla_u8,
 	[FRA_FLOWLABEL]			= decode_nla_be32,
 	[FRA_FLOWLABEL_MASK]		= decode_nla_be32,
+	[FRA_SPORT_MASK]		= decode_nla_x16,
+	[FRA_DPORT_MASK]		= decode_nla_x16,
+	[FRA_DSCP_MASK]			= decode_nla_x8,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
