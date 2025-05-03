@@ -1663,6 +1663,8 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_DEVLINK_PORT]	= decode_nla_u32,
 	[IFLA_GSO_IPV4_MAX_SIZE]	= decode_nla_u32,
 	[IFLA_GRO_IPV4_MAX_SIZE]	= decode_nla_u32,
+	[IFLA_MAX_PACING_OFFLOAD_HORIZON]	= decode_nla_u64,
+	[IFLA_NETNS_IMMUTABLE]	= decode_nla_u8,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
