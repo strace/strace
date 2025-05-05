@@ -22,32 +22,45 @@
 #endif
 
 #define VALID_STATMOUNT		0xff
-#define VALID_STATMOUNT_STR	\
+#define VALID_STATMOUNT_STR							\
 	"STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC|STATMOUNT_PROPAGATE_FROM"	\
 	"|STATMOUNT_MNT_ROOT|STATMOUNT_MNT_POINT|STATMOUNT_FS_TYPE"		\
-	"|STATMOUNT_MNT_NS_ID|STATMOUNT_MNT_OPTS"
+	"|STATMOUNT_MNT_NS_ID|STATMOUNT_MNT_OPTS"				\
+	/* End of VALID_STATMOUNT_STR */
 #define INVALID_STATMOUNT	0xffffffffffffff00
 #define INVALID_STATMOUNT_STR	STRINGIFY_VAL(INVALID_STATMOUNT)
+#define ALL_STATMOUNT	((uint64_t) 0xffffffffffffffffULL)
 #define ALL_STATMOUNT_STR	VALID_STATMOUNT_STR "|" INVALID_STATMOUNT_STR
 
+#define VALID_SB_MAGIC	0x9fa0
+#define VALID_SB_MAGIC_STR	"PROC_SUPER_MAGIC"
+#define INVALID_SB_MAGIC	0xfacefeeddeadbeef
+#define INVALID_SB_MAGIC_STR	STRINGIFY_VAL(INVALID_SB_MAGIC)
+
+#define VALID_SB_FLAGS	0x2000091
+#define VALID_SB_FLAGS_STR	\
+	"MS_RDONLY|MS_SYNCHRONOUS|MS_DIRSYNC|MS_LAZYTIME"
+#define INVALID_SB_FLAGS	0xfdffff6e
+#define INVALID_SB_FLAGS_STR	STRINGIFY_VAL(INVALID_SB_FLAGS)
+#define ALL_SB_FLAGS		0xffffffff
+#define ALL_SB_FLAGS_STR	VALID_SB_FLAGS_STR "|" INVALID_SB_FLAGS_STR
+
+#define VALID_MOUNT_ATTR	0x3000ff
 #define VALID_MOUNT_ATTR_STR	\
 	"MOUNT_ATTR_RDONLY|MOUNT_ATTR_NOSUID|MOUNT_ATTR_NODEV"		\
 	"|MOUNT_ATTR_NOEXEC|MOUNT_ATTR__ATIME|MOUNT_ATTR_NODIRATIME"	\
 	"|MOUNT_ATTR_IDMAP|MOUNT_ATTR_NOSYMFOLLOW"
 #define INVALID_MOUNT_ATTR	0xffffffffffcfff00
 #define INVALID_MOUNT_ATTR_STR	STRINGIFY_VAL(INVALID_MOUNT_ATTR)
+#define ALL_MOUNT_ATTR	0xffffffffffffffff
 #define ALL_MOUNT_ATTR_STR	VALID_MOUNT_ATTR_STR "|" INVALID_MOUNT_ATTR_STR
 
-#define VALID_SB_FLAGS_STR	\
-	"MS_RDONLY|MS_SYNCHRONOUS|MS_DIRSYNC|MS_LAZYTIME"
-#define INVALID_SB_FLAGS	0xfdffff6e
-#define INVALID_SB_FLAGS_STR	STRINGIFY_VAL(INVALID_SB_FLAGS)
-#define ALL_SB_FLAGS_STR	VALID_SB_FLAGS_STR "|" INVALID_SB_FLAGS_STR
-
+#define VALID_MNT_PROPAGATION	0x1e0000
 #define VALID_MNT_PROPAGATION_STR	\
 	"MS_UNBINDABLE|MS_PRIVATE|MS_SLAVE|MS_SHARED"
 #define INVALID_MNT_PROPAGATION		0xffffffffffe1ffff
 #define INVALID_MNT_PROPAGATION_STR	STRINGIFY_VAL(INVALID_MNT_PROPAGATION)
+#define ALL_MNT_PROPAGATION	0xffffffffffffffff
 #define ALL_MNT_PROPAGATION_STR		\
 	VALID_MNT_PROPAGATION_STR "|" INVALID_MNT_PROPAGATION_STR
 
@@ -69,52 +82,33 @@ k_statmount(const void *req, const void *buf,
 	return rc;
 }
 
-int
-main(void)
+static void
+test_req(void)
 {
-	k_statmount(0, 0, 0, 0);
-	printf("statmount(NULL, NULL, 0, 0) = %s" INJ_STR, errstr);
-
 	struct mnt_id_req *const req = midtail_alloc(sizeof(*req), 8);
 	fill_memory(req, sizeof(*req));
 	const void *const bad_req = req + 1;
 
-#define STR_0 "dummy"
-#define STR_1 "procfs"
-#define STR_2 "/root"
-#define STR_3 "/relative"
-#define STR_4 "verbose"
-	static const char str[] =
-		STR_0 "\0"
-		STR_1 "\0"
-		STR_2 "\0"
-		STR_3 "\0"
-		STR_4;
+	k_statmount(bad_req, 0, bad, -1U);
+	printf("statmount(%p, NULL, %ju, %#x) = %s" INJ_STR,
+	       bad_req, (uintmax_t) bad, -1U, errstr);
 
-	struct statmount *const stm = midtail_alloc(sizeof(*stm), sizeof(str));
-	fill_memory(stm, sizeof(*stm));
-	const void *const bad_stm = (void *) stm + 1;
-
-	k_statmount(bad_req, bad_stm, bad, -1U);
-	printf("statmount(%p, %p, %ju, %#x) = %s" INJ_STR,
-	       bad_req, bad_stm, (uintmax_t) bad, -1U, errstr);
-
-	TAIL_ALLOC_OBJECT_CONST_PTR(typeof(req->size), size);
-	const void *const bad_size = (void *) size + 1;
+	TAIL_ALLOC_OBJECT_CONST_PTR(typeof(req->size), req_size);
+	const void *const bad_size = (void *) req_size + 1;
 
 	k_statmount(bad_size, 0, 0, 0);
 	printf("statmount(%p, NULL, 0, 0) = %s" INJ_STR, bad_size, errstr);
 
-	*size = MNT_ID_REQ_SIZE_VER0 - 1;
+	*req_size = MNT_ID_REQ_SIZE_VER0 - 1;
 
-	k_statmount(size, 0, 0, 0);
-	printf("statmount({size=%u}, NULL, 0, 0) = %s" INJ_STR, *size, errstr);
+	k_statmount(req_size, 0, 0, 0);
+	printf("statmount({size=%u}, NULL, 0, 0) = %s" INJ_STR, *req_size, errstr);
 
-	*size = MNT_ID_REQ_SIZE_VER0;
+	*req_size = MNT_ID_REQ_SIZE_VER0;
 
-	k_statmount(size, 0, 0, 0);
+	k_statmount(req_size, 0, 0, 0);
 	printf("statmount({size=%u, ???}, NULL, 0, 0) = %s" INJ_STR,
-	       *size, errstr);
+	       *req_size, errstr);
 
 	req->size = MNT_ID_REQ_SIZE_VER0;
 	req->param = INVALID_STATMOUNT;
@@ -136,7 +130,7 @@ main(void)
 	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->size = sizeof(*req);
-	req->param = (uint64_t) -1ULL;
+	req->param = ALL_STATMOUNT;
 
 	k_statmount(req, 0, 0, 0);
 	printf("statmount({size=%u, mnt_id=%#jx, param=%s, mnt_ns_id=%#jx}"
@@ -164,13 +158,23 @@ main(void)
 	       req->size, (uintmax_t) req->mnt_id, (uintmax_t) req->mnt_ns_id,
 	       sizeof(*req), sizeof(*req) + 7,
 	       "\\x80\\x81\\x82\\x83\\x84\\x85\\x86\\x87", errstr);
+}
+
+static void
+test_stm_bad(void)
+{
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct statmount, stm);
+	const void *const bad_stm = (void *) stm + 1;
+
+	k_statmount(0, bad_stm, bad, -1U);
+	printf("statmount(NULL, %p, %ju, %#x) = %s" INJ_STR,
+	       bad_stm, (uintmax_t) bad, -1U, errstr);
 
 	k_statmount(0, stm, sizeof(stm->size) - 1, 0);
 	printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
 	       stm, (unsigned int) sizeof(stm->size) - 1, errstr);
 
 	stm->size = sizeof(*stm);
-
 	k_statmount(0, bad_stm, stm->size, 0);
 	printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
 	       bad_stm, stm->size, errstr);
@@ -181,156 +185,263 @@ main(void)
 	else
 		printf("statmount(NULL, {size=%u, mask=0}, %u, 0) = %s" INJ_STR,
 		       stm->size, (unsigned int) sizeof(stm->size), errstr);
+}
 
-	stm->size = 0xfacefeed;
-	stm->mask = (uint64_t) -1ULL;
-	stm->sb_magic = 0x9fa0;
-	stm->sb_flags = -1U;
-	stm->mnt_attr = (uint64_t) -1ULL;
-	stm->mnt_propagation = (uint64_t) -1ULL;
+struct stm_ops_t {
+	uint64_t val;
+	const char *str;
+	struct statmount stm;
+	const char *exp;
+};
+#define STM_ARG_STR(arg_) .val = (arg_), .str = #arg_
 
-	if (k_statmount(0, stm, sizeof(*stm), 0) < 0)
-		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
-		       stm, (unsigned int) sizeof(*stm), errstr);
-	else
-		printf("statmount(NULL, {size=%u, mnt_opts=%#x, mask=%s"
-		       ", sb_dev_major=%u, sb_dev_minor=%u, sb_magic=%s"
-		       ", sb_flags=%s, fs_type=%#x, mnt_id=%#jx"
-		       ", mnt_parent_id=%#jx, mnt_id_old=%#x"
-		       ", mnt_parent_id_old=%#x, mnt_attr=%s"
-		       ", mnt_propagation=%s, mnt_peer_group=%#jx"
-		       ", mnt_master=%#jx, propagate_from=%#jx"
-		       ", mnt_root=%#x, mnt_point=%#x, mnt_ns_id=%#jx}"
-		       ", %u, 0) = %s" INJ_STR,
-		       stm->size,
-		       stm->mnt_opts,
-		       ALL_STATMOUNT_STR,
-		       stm->sb_dev_major,
-		       stm->sb_dev_minor,
-		       "PROC_SUPER_MAGIC",
-		       ALL_SB_FLAGS_STR,
-		       stm->fs_type,
-		       (uintmax_t) stm->mnt_id,
-		       (uintmax_t) stm->mnt_parent_id,
-		       stm->mnt_id_old,
-		       stm->mnt_parent_id_old,
-		       ALL_MOUNT_ATTR_STR,
-		       ALL_MNT_PROPAGATION_STR,
-		       (uintmax_t) stm->mnt_peer_group,
-		       (uintmax_t) stm->mnt_master,
-		       (uintmax_t) stm->propagate_from,
-		       stm->mnt_root,
-		       stm->mnt_point,
-		       (uintmax_t) stm->mnt_ns_id,
-		       (unsigned int) sizeof(*stm), errstr);
+static void
+test_stm_all_ops(void)
+{
+	static const struct stm_ops_t all_ops[] = {
+		{
+			STM_ARG_STR(0)
+		}, {
+			STM_ARG_STR(STATMOUNT_SB_BASIC),
+			.stm = {
+				.sb_dev_major = 2475856272,
+				.sb_dev_minor = 2543228308,
+				.sb_magic = VALID_SB_MAGIC,
+				.sb_flags = INVALID_SB_FLAGS,
+			},
+			.exp = ", sb_dev_major=2475856272"
+			       ", sb_dev_minor=2543228308"
+			       ", sb_magic=" VALID_SB_MAGIC_STR
+			       ", sb_flags=" INVALID_SB_FLAGS_STR " /* MS_??? */",
+		}, {
+			STM_ARG_STR(STATMOUNT_SB_BASIC),
+			.stm = {
+				.size = 0xfacefeed,
+				.sb_dev_major = 2475856272,
+				.sb_dev_minor = 2543228308,
+				.sb_magic = INVALID_SB_MAGIC,
+				.sb_flags = VALID_SB_FLAGS,
+			},
+			.exp = ", sb_dev_major=2475856272"
+			       ", sb_dev_minor=2543228308"
+			       ", sb_magic=" INVALID_SB_MAGIC_STR
+			       ", sb_flags=" VALID_SB_FLAGS_STR,
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_BASIC),
+			.stm = {
+				.mnt_id = 0xafaeadacabaaa9a8,
+				.mnt_parent_id = 0xb7b6b5b4b3b2b1b0,
+				.mnt_id_old = 0xbbbab9b8,
+				.mnt_parent_id_old = 0xbfbebdbc,
+				.mnt_attr = VALID_MOUNT_ATTR,
+				.mnt_propagation = INVALID_MNT_PROPAGATION,
+				.mnt_peer_group = 0xd7d6d5d4d3d2d1d0,
+				.mnt_master = 0xdfdedddcdbdad9d8,
+			},
+			.exp = ", mnt_id=0xafaeadacabaaa9a8"
+			       ", mnt_parent_id=0xb7b6b5b4b3b2b1b0"
+			       ", mnt_id_old=0xbbbab9b8"
+			       ", mnt_parent_id_old=0xbfbebdbc"
+			       ", mnt_attr=" VALID_MOUNT_ATTR_STR
+			       ", mnt_propagation=" INVALID_MNT_PROPAGATION_STR " /* MS_??? */"
+			       ", mnt_peer_group=0xd7d6d5d4d3d2d1d0"
+			       ", mnt_master=0xdfdedddcdbdad9d8",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_BASIC),
+			.stm = {
+				.size = 0xfacefeed,
+				.mnt_id = 0xafaeadacabaaa9a8,
+				.mnt_parent_id = 0xb7b6b5b4b3b2b1b0,
+				.mnt_id_old = 0xbbbab9b8,
+				.mnt_parent_id_old = 0xbfbebdbc,
+				.mnt_attr = INVALID_MOUNT_ATTR,
+				.mnt_propagation = VALID_MNT_PROPAGATION,
+				.mnt_peer_group = 0xd7d6d5d4d3d2d1d0,
+				.mnt_master = 0xdfdedddcdbdad9d8,
+			},
+			.exp = ", mnt_id=0xafaeadacabaaa9a8"
+			       ", mnt_parent_id=0xb7b6b5b4b3b2b1b0"
+			       ", mnt_id_old=0xbbbab9b8"
+			       ", mnt_parent_id_old=0xbfbebdbc"
+			       ", mnt_attr=" INVALID_MOUNT_ATTR_STR " /* MOUNT_ATTR_??? */"
+			       ", mnt_propagation=" VALID_MNT_PROPAGATION_STR
+			       ", mnt_peer_group=0xd7d6d5d4d3d2d1d0"
+			       ", mnt_master=0xdfdedddcdbdad9d8",
+		}, {
+			STM_ARG_STR(STATMOUNT_PROPAGATE_FROM),
+			.stm = { .propagate_from = 0xe7e6e5e4e3e2e1e0 },
+			.exp = ", propagate_from=0xe7e6e5e4e3e2e1e0",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_ROOT),
+			.stm = { .mnt_root = 0xebeae9e8 },
+			.exp = ", mnt_root=0xebeae9e8",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_POINT),
+			.stm = { .mnt_point = 0xefeeedec },
+			.exp = ", mnt_point=0xefeeedec",
+		}, {
+			STM_ARG_STR(STATMOUNT_FS_TYPE),
+			.stm = { .fs_type = 0xa7a6a5a4 },
+			.exp = ", fs_type=0xa7a6a5a4",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_NS_ID),
+			.stm = { .mnt_ns_id = 0xf7f6f5f4f3f2f1f0 },
+			.exp = ", mnt_ns_id=0xf7f6f5f4f3f2f1f0",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_OPTS),
+			.stm = { .mnt_opts = 0x87868584 },
+			.exp = ", mnt_opts=0x87868584",
+		}, {
+			STM_ARG_STR(STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC),
+			.stm = {
+				.sb_dev_major = 2475856272,
+				.sb_dev_minor = 2543228308,
+				.sb_magic = VALID_SB_MAGIC,
+				.sb_flags = ALL_SB_FLAGS,
+				.mnt_id = 0xafaeadacabaaa9a8,
+				.mnt_parent_id = 0xb7b6b5b4b3b2b1b0,
+				.mnt_id_old = 0xbbbab9b8,
+				.mnt_parent_id_old = 0xbfbebdbc,
+				.mnt_attr = ALL_MOUNT_ATTR,
+				.mnt_propagation = ALL_MNT_PROPAGATION,
+				.mnt_peer_group = 0xd7d6d5d4d3d2d1d0,
+				.mnt_master = 0xdfdedddcdbdad9d8,
+			},
+			.exp = ", sb_dev_major=2475856272"
+			       ", sb_dev_minor=2543228308"
+			       ", sb_magic=" VALID_SB_MAGIC_STR
+			       ", sb_flags=" ALL_SB_FLAGS_STR
+			       ", mnt_id=0xafaeadacabaaa9a8"
+			       ", mnt_parent_id=0xb7b6b5b4b3b2b1b0"
+			       ", mnt_id_old=0xbbbab9b8"
+			       ", mnt_parent_id_old=0xbfbebdbc"
+			       ", mnt_attr=" ALL_MOUNT_ATTR_STR
+			       ", mnt_propagation=" ALL_MNT_PROPAGATION_STR
+			       ", mnt_peer_group=0xd7d6d5d4d3d2d1d0"
+			       ", mnt_master=0xdfdedddcdbdad9d8",
+		}, {
+			.val = INVALID_STATMOUNT,
+			.str = INVALID_STATMOUNT_STR " /* STATMOUNT_??? */"
+		}
+	};
 
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct statmount, stm);
 
-	*size = sizeof(*stm) + sizeof(str);
-	stm->size = *size;
-	stm->mask = INVALID_STATMOUNT;
+	for (unsigned int i = 0; i < ARRAY_SIZE(all_ops); ++i) {
+		*stm = all_ops[i].stm;
+		if (!stm->size)
+			stm->size = sizeof(*stm);
+		stm->mask = all_ops[i].val;
+		if (k_statmount(0, stm, stm->size, 0) < 0) {
+			printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+			       stm, stm->size, errstr);
+		} else {
+			printf("statmount(NULL, {size=%u", stm->size);
 
-	if (k_statmount(0, stm, stm->size, 0) < 0)
-		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
-		       stm, stm->size, errstr);
-	else {
-		printf("statmount(NULL, {size=%u, mask=%s}, %u, 0) = %s"
-		       INJ_STR,
-		       stm->size,
-		       INVALID_STATMOUNT_STR " /* STATMOUNT_??? */",
-		       stm->size, errstr);
+			if (all_ops[i].exp && stm->mask == STATMOUNT_MNT_OPTS)
+				printf("%s", all_ops[i].exp);
+
+			printf(", mask=%s", all_ops[i].str);
+
+			if (all_ops[i].exp && stm->mask != STATMOUNT_MNT_OPTS)
+				printf("%s", all_ops[i].exp);
+
+			printf("}, %u, 0) = %s" INJ_STR, stm->size, errstr);
+		}
+	}
+}
+
+static void
+test_stm_str_ops(void)
+{
+#define STR_0 "dummy"
+#define STR_1 "bar"
+
+	static const struct stm_ops_t str_ops[] = {
+		{
+			STM_ARG_STR(STATMOUNT_MNT_ROOT),
+			.stm = { .mnt_root = sizeof(STR_0) },
+			.exp = ", mnt_root=\"" STR_1 "\"",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_POINT),
+			.stm = { .mnt_point = sizeof(STR_0) },
+			.exp = ", mnt_point=\"" STR_1 "\"",
+		}, {
+			STM_ARG_STR(STATMOUNT_FS_TYPE),
+			.stm = { .fs_type = sizeof(STR_0) },
+			.exp = ", fs_type=\"" STR_1 "\"",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_OPTS),
+			.stm = { .mnt_opts = sizeof(STR_0) },
+			.exp = ", mnt_opts=\"" STR_1 "\"",
+		}
+	};
+
+	static const char str[] = STR_0 "\0" STR_1;
+	struct statmount *const stm = midtail_alloc(sizeof(*stm), sizeof(str));
+	const unsigned int stm_alloc_size = sizeof(*stm) + sizeof(str);
+	const unsigned int buf_size = stm_alloc_size + 1;
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(str_ops); ++i) {
+		*stm = str_ops[i].stm;
+		stm->size = stm_alloc_size;
+		stm->mask = str_ops[i].val;
+
+		char *p = (char *) stm - sizeof(str);
+		memmove(p, stm, sizeof(*stm));
+		memcpy(p + sizeof(*stm), str, sizeof(str));
+
+		if (k_statmount(0, p, buf_size, 0) < 0) {
+			printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+			       p, buf_size, errstr);
+		} else {
+			printf("statmount(NULL, {size=%u", stm_alloc_size);
+
+			if (str_ops[i].exp && str_ops[i].val == STATMOUNT_MNT_OPTS)
+				printf("%s", str_ops[i].exp);
+
+			printf(", mask=%s", str_ops[i].str);
+
+			if (str_ops[i].exp && str_ops[i].val != STATMOUNT_MNT_OPTS)
+				printf("%s", str_ops[i].exp);
+
+			printf("}, %u, 0) = %s" INJ_STR, buf_size, errstr);
+		}
+
+		p[stm_alloc_size - 1] = '!';
+
+		if (k_statmount(0, p, buf_size, 0) < 0) {
+			printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+			       p, buf_size, errstr);
+		} else {
+			printf("statmount(NULL, {size=%u", stm_alloc_size);
+
+			if (str_ops[i].exp && str_ops[i].val == STATMOUNT_MNT_OPTS)
+				printf("%s...", str_ops[i].exp);
+
+			printf(", mask=%s", str_ops[i].str);
+
+			if (str_ops[i].exp && str_ops[i].val != STATMOUNT_MNT_OPTS)
+				printf("%s...", str_ops[i].exp);
+
+			printf("}, %u, 0) = %s" INJ_STR, buf_size, errstr);
+		}
 	}
 
-	stm->mask = VALID_STATMOUNT;
-	stm->sb_flags = INVALID_SB_FLAGS;
-	stm->mnt_attr = INVALID_MOUNT_ATTR;
-	stm->mnt_propagation = INVALID_MNT_PROPAGATION;
-	stm->fs_type = sizeof(STR_0);
-	stm->mnt_root = sizeof(STR_0) + sizeof(STR_1);
-	stm->mnt_point = sizeof(STR_0) + sizeof(STR_1) + sizeof(STR_2);
+#undef STR_1
+#undef STR_0
+}
 
-	if (k_statmount(0, stm, stm->size, 0) < 0)
-		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
-		       stm, stm->size, errstr);
-	else {
-		printf("statmount(NULL, {size=%u, mnt_opts=%#x, mask=%s"
-		       ", sb_dev_major=%u, sb_dev_minor=%u, sb_magic=%s"
-		       ", sb_flags=%s, fs_type=%#x, mnt_id=%#jx"
-		       ", mnt_parent_id=%#jx, mnt_id_old=%#x"
-		       ", mnt_parent_id_old=%#x, mnt_attr=%s"
-		       ", mnt_propagation=%s, mnt_peer_group=%#jx"
-		       ", mnt_master=%#jx, propagate_from=%#jx"
-		       ", mnt_root=%#x, mnt_point=%#x, mnt_ns_id=%#jx}"
-		       ", %u, 0) = %s" INJ_STR,
-		       stm->size,
-		       stm->mnt_opts,
-		       VALID_STATMOUNT_STR,
-		       stm->sb_dev_major,
-		       stm->sb_dev_minor,
-		       "PROC_SUPER_MAGIC",
-		       INVALID_SB_FLAGS_STR " /* MS_??? */",
-		       stm->fs_type,
-		       (uintmax_t) stm->mnt_id,
-		       (uintmax_t) stm->mnt_parent_id,
-		       stm->mnt_id_old,
-		       stm->mnt_parent_id_old,
-		       INVALID_MOUNT_ATTR_STR " /* MOUNT_ATTR_??? */",
-		       INVALID_MNT_PROPAGATION_STR " /* MS_??? */",
-		       (uintmax_t) stm->mnt_peer_group,
-		       (uintmax_t) stm->mnt_master,
-		       (uintmax_t) stm->propagate_from,
-		       stm->mnt_root,
-		       stm->mnt_point,
-		       (uintmax_t) stm->mnt_ns_id,
-		       stm->size, errstr);
-	}
+int
+main(void)
+{
+	k_statmount(0, 0, 0, 0);
+	printf("statmount(NULL, NULL, 0, 0) = %s" INJ_STR, errstr);
 
-	stm->mnt_opts =
-		sizeof(STR_0) + sizeof(STR_1) + sizeof(STR_2) + sizeof(STR_3);
-	stm->sb_flags = 0x2000091;
-	stm->mnt_attr = 0x3000ff;
-	stm->mnt_propagation = 0x1e0000;
-
-	p = (char *) stm - sizeof(str);
-	memmove(p, stm, sizeof(*stm));
-	memcpy(p + sizeof(*stm), str, sizeof(str) - 1);
-
-	if (k_statmount(0, p, *size + 1, 0) < 0)
-		printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
-		       p, *size + 1, errstr);
-	else {
-		memmove(stm, p, sizeof(*stm));
-		printf("statmount(NULL, {size=%u, mnt_opts=\"%s\"..., mask=%s"
-		       ", sb_dev_major=%u, sb_dev_minor=%u, sb_magic=%s"
-		       ", sb_flags=%s, fs_type=\"%s\", mnt_id=%#jx"
-		       ", mnt_parent_id=%#jx, mnt_id_old=%#x"
-		       ", mnt_parent_id_old=%#x, mnt_attr=%s"
-		       ", mnt_propagation=%s, mnt_peer_group=%#jx"
-		       ", mnt_master=%#jx, propagate_from=%#jx"
-		       ", mnt_root=\"%s\", mnt_point=\"%s\", mnt_ns_id=%#jx}"
-		       ", %u, 0) = %s"
-		       INJ_STR,
-		       stm->size,
-		       STR_4,
-		       VALID_STATMOUNT_STR,
-		       stm->sb_dev_major,
-		       stm->sb_dev_minor,
-		       "PROC_SUPER_MAGIC",
-		       VALID_SB_FLAGS_STR,
-		       STR_1,
-		       (uintmax_t) stm->mnt_id,
-		       (uintmax_t) stm->mnt_parent_id,
-		       stm->mnt_id_old,
-		       stm->mnt_parent_id_old,
-		       VALID_MOUNT_ATTR_STR,
-		       VALID_MNT_PROPAGATION_STR,
-		       (uintmax_t) stm->mnt_peer_group,
-		       (uintmax_t) stm->mnt_master,
-		       (uintmax_t) stm->propagate_from,
-		       STR_2,
-		       STR_3,
-		       (uintmax_t) stm->mnt_ns_id,
-		       stm->size + 1, errstr);
-	}
+	test_req();
+	test_stm_bad();
+	test_stm_all_ops();
+	test_stm_str_ops();
 
 	puts("+++ exited with 0 +++");
 	return 0;
