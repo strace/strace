@@ -21,13 +21,14 @@
 # define INJ_STR "\n"
 #endif
 
-#define VALID_STATMOUNT		0xff
+#define VALID_STATMOUNT		0x3ff
 #define VALID_STATMOUNT_STR							\
 	"STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC|STATMOUNT_PROPAGATE_FROM"	\
 	"|STATMOUNT_MNT_ROOT|STATMOUNT_MNT_POINT|STATMOUNT_FS_TYPE"		\
-	"|STATMOUNT_MNT_NS_ID|STATMOUNT_MNT_OPTS"				\
+	"|STATMOUNT_MNT_NS_ID|STATMOUNT_MNT_OPTS|STATMOUNT_FS_SUBTYPE"		\
+	"|STATMOUNT_SB_SOURCE"							\
 	/* End of VALID_STATMOUNT_STR */
-#define INVALID_STATMOUNT	0xffffffffffffff00
+#define INVALID_STATMOUNT	0xfffffffffffffc00
 #define INVALID_STATMOUNT_STR	STRINGIFY_VAL(INVALID_STATMOUNT)
 #define ALL_STATMOUNT	((uint64_t) 0xffffffffffffffffULL)
 #define ALL_STATMOUNT_STR	VALID_STATMOUNT_STR "|" INVALID_STATMOUNT_STR
@@ -292,6 +293,14 @@ test_stm_all_ops(void)
 			.stm = { .mnt_opts = 0x87868584 },
 			.exp = ", mnt_opts=0x87868584",
 		}, {
+			STM_ARG_STR(STATMOUNT_FS_SUBTYPE),
+			.stm = { .fs_subtype = 0xfbfaf9f8 },
+			.exp = ", fs_subtype=0xfbfaf9f8",
+		}, {
+			STM_ARG_STR(STATMOUNT_SB_SOURCE),
+			.stm = { .sb_source = 0xfffefdfc },
+			.exp = ", sb_source=0xfffefdfc",
+		}, {
 			STM_ARG_STR(STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC),
 			.stm = {
 				.sb_dev_major = 2475856272,
@@ -374,6 +383,14 @@ test_stm_str_ops(void)
 			STM_ARG_STR(STATMOUNT_MNT_OPTS),
 			.stm = { .mnt_opts = sizeof(STR_0) },
 			.exp = ", mnt_opts=\"" STR_1 "\"",
+		}, {
+			STM_ARG_STR(STATMOUNT_FS_SUBTYPE),
+			.stm = { .fs_subtype = sizeof(STR_0) },
+			.exp = ", fs_subtype=\"" STR_1 "\"",
+		}, {
+			STM_ARG_STR(STATMOUNT_SB_SOURCE),
+			.stm = { .sb_source = sizeof(STR_0) },
+			.exp = ", sb_source=\"" STR_1 "\"",
 		}
 	};
 

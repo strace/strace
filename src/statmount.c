@@ -171,6 +171,16 @@ print_statmount(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_X(st, mnt_ns_id);
 	}
 
+	if (st.mask & STATMOUNT_FS_SUBTYPE) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, fs_subtype, str_buf, str_size);
+	}
+
+	if (st.mask & STATMOUNT_SB_SOURCE) {
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_OFFSET(st, sb_source, str_buf, str_size);
+	}
+
 	tprint_struct_end();
 }
 
