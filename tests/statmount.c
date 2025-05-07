@@ -21,14 +21,15 @@
 # define INJ_STR "\n"
 #endif
 
-#define VALID_STATMOUNT		0x3ff
+#define VALID_STATMOUNT		0x7fff
 #define VALID_STATMOUNT_STR							\
 	"STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC|STATMOUNT_PROPAGATE_FROM"	\
 	"|STATMOUNT_MNT_ROOT|STATMOUNT_MNT_POINT|STATMOUNT_FS_TYPE"		\
 	"|STATMOUNT_MNT_NS_ID|STATMOUNT_MNT_OPTS|STATMOUNT_FS_SUBTYPE"		\
-	"|STATMOUNT_SB_SOURCE"							\
+	"|STATMOUNT_SB_SOURCE|STATMOUNT_OPT_ARRAY|STATMOUNT_OPT_SEC_ARRAY"	\
+	"|STATMOUNT_SUPPORTED_MASK|STATMOUNT_MNT_UIDMAP|STATMOUNT_MNT_GIDMAP"	\
 	/* End of VALID_STATMOUNT_STR */
-#define INVALID_STATMOUNT	0xfffffffffffffc00
+#define INVALID_STATMOUNT	0xffffffffffff8000
 #define INVALID_STATMOUNT_STR	STRINGIFY_VAL(INVALID_STATMOUNT)
 #define ALL_STATMOUNT	((uint64_t) 0xffffffffffffffffULL)
 #define ALL_STATMOUNT_STR	VALID_STATMOUNT_STR "|" INVALID_STATMOUNT_STR
@@ -191,8 +192,8 @@ test_stm_bad(void)
 struct stm_ops_t {
 	uint64_t val;
 	const char *str;
-	struct statmount stm;
 	const char *exp;
+	struct statmount stm;
 };
 #define STM_ARG_STR(arg_) .val = (arg_), .str = #arg_
 
@@ -300,6 +301,48 @@ test_stm_all_ops(void)
 			STM_ARG_STR(STATMOUNT_SB_SOURCE),
 			.stm = { .sb_source = 0xfffefdfc },
 			.exp = ", sb_source=0xfffefdfc",
+		}, {
+			STM_ARG_STR(STATMOUNT_OPT_ARRAY),
+			.stm = {
+				.opt_num = 2206368128,
+				.opt_array = 0x87868584,
+			},
+			.exp = ", opt_num=2206368128, opt_array=0x87868584",
+		}, {
+			STM_ARG_STR(STATMOUNT_OPT_SEC_ARRAY),
+			.stm = {
+				.opt_sec_num = 2341112200,
+				.opt_sec_array = 0x8f8e8d8c,
+			},
+			.exp = ", opt_sec_num=2341112200"
+			       ", opt_sec_array=0x8f8e8d8c"
+		}, {
+			STM_ARG_STR(STATMOUNT_SUPPORTED_MASK),
+			.stm = { .supported_mask = VALID_STATMOUNT },
+			.exp = ", supported_mask=" VALID_STATMOUNT_STR
+		}, {
+			STM_ARG_STR(STATMOUNT_SUPPORTED_MASK),
+			.stm = {
+				.size = 0xfacefeed,
+				.supported_mask = ALL_STATMOUNT
+			},
+			.exp = ", supported_mask=" ALL_STATMOUNT_STR
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_UIDMAP),
+			.stm = {
+				.mnt_uidmap_num = 2610600344,
+				.mnt_uidmap = 0x9f9e9d9c,
+			},
+			.exp = ", mnt_uidmap_num=2610600344"
+			       ", mnt_uidmap=0x9f9e9d9c"
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_GIDMAP),
+			.stm = {
+				.mnt_gidmap_num = 2745344416,
+				.mnt_gidmap = 0xa7a6a5a4,
+			},
+			.exp = ", mnt_gidmap_num=2745344416"
+			       ", mnt_gidmap=0xa7a6a5a4"
 		}, {
 			STM_ARG_STR(STATMOUNT_SB_BASIC|STATMOUNT_MNT_BASIC),
 			.stm = {
@@ -449,6 +492,156 @@ test_stm_str_ops(void)
 #undef STR_0
 }
 
+static void
+test_stm_array_ops(void)
+{
+#define STR_0	"A\0B\0C\0D\0E\0F\0G\0H\0I\0J\0K\0L\0M\0N\0O\0P\0" \
+		"Q\0R\0S\0T\0U\0V\0W\0X\0Y\0Z\0a\0b\0c\0d\0e"
+#define STR_1	"first"
+#define STR_2	"second"
+
+	static const struct {
+		uint64_t val;
+		const char *str;
+		const char *exp;
+		const char *exp2;
+		struct statmount stm;
+	} array_ops[] = {
+		{
+			STM_ARG_STR(STATMOUNT_OPT_ARRAY),
+			.stm = {
+				.opt_num = 2,
+				.opt_array = sizeof(STR_0),
+			},
+			.exp  = ", opt_num=2"
+				", opt_array=[\"" STR_1 "\", \"" STR_2 "\"]",
+			.exp2 =	", opt_num=2"
+				", opt_array=[\"" STR_1 "\", \"" STR_2 "\"...]",
+		}, {
+			STM_ARG_STR(STATMOUNT_OPT_ARRAY),
+			.stm = {
+				.opt_num = 3,
+				.opt_array = sizeof(STR_0),
+			},
+			.exp  = ", opt_num=3"
+				", opt_array=[\"" STR_1 "\", \"" STR_2 "\", ???]",
+			.exp2 =	", opt_num=3"
+				", opt_array=[\"" STR_1 "\", \"" STR_2 "\"..., ???]",
+		}, {
+			STM_ARG_STR(STATMOUNT_OPT_SEC_ARRAY),
+			.stm = {
+				.opt_sec_num = 2,
+				.opt_sec_array = sizeof(STR_0),
+			},
+			.exp  = ", opt_sec_num=2"
+				", opt_sec_array=[\"" STR_1 "\", \"" STR_2 "\"]",
+			.exp2 = ", opt_sec_num=2"
+				", opt_sec_array=[\"" STR_1 "\", \"" STR_2 "\"...]",
+		}, {
+			STM_ARG_STR(STATMOUNT_OPT_SEC_ARRAY),
+			.stm = {
+				.opt_sec_num = 0,
+				.opt_sec_array = sizeof(STR_0),
+			},
+			.exp  = ", opt_sec_num=0"
+				", opt_sec_array=[]",
+			.exp2 = ", opt_sec_num=0"
+				", opt_sec_array=[]",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_UIDMAP),
+			.stm = {
+				.mnt_uidmap_num = 2,
+				.mnt_uidmap = sizeof(STR_0),
+			},
+			.exp  =	", mnt_uidmap_num=2"
+				", mnt_uidmap=[\"" STR_1 "\", \"" STR_2 "\"]",
+			.exp2 =	", mnt_uidmap_num=2"
+				", mnt_uidmap=[\"" STR_1 "\", \"" STR_2 "\"...]",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_UIDMAP),
+			.stm = {
+				.mnt_uidmap_num = 33,
+				.mnt_uidmap = 0,
+			},
+			.exp  =	", mnt_uidmap_num=33"
+				", mnt_uidmap="
+				"[\"A\", \"B\", \"C\", \"D\""
+				", \"E\", \"F\", \"G\", \"H\""
+				", \"I\", \"J\", \"K\", \"L\""
+				", \"M\", \"N\", \"O\", \"P\""
+				", \"Q\", \"R\", \"S\", \"T\""
+				", \"U\", \"V\", \"W\", \"X\""
+				", \"Y\", \"Z\", \"a\", \"b\""
+				", \"c\", \"d\", \"e\", \"" STR_1 "\", ...]",
+			.exp2 =	", mnt_uidmap_num=33"
+				", mnt_uidmap="
+				"[\"A\", \"B\", \"C\", \"D\""
+				", \"E\", \"F\", \"G\", \"H\""
+				", \"I\", \"J\", \"K\", \"L\""
+				", \"M\", \"N\", \"O\", \"P\""
+				", \"Q\", \"R\", \"S\", \"T\""
+				", \"U\", \"V\", \"W\", \"X\""
+				", \"Y\", \"Z\", \"a\", \"b\""
+				", \"c\", \"d\", \"e\", \"" STR_1 "\", ...]",
+		}, {
+			STM_ARG_STR(STATMOUNT_MNT_GIDMAP),
+			.stm = {
+				.mnt_gidmap_num = 2,
+				.mnt_gidmap = sizeof(STR_0),
+			},
+			.exp  =	", mnt_gidmap_num=2"
+				", mnt_gidmap=[\"" STR_1 "\", \"" STR_2 "\"]",
+			.exp2 =	", mnt_gidmap_num=2"
+				", mnt_gidmap=[\"" STR_1 "\", \"" STR_2 "\"...]",
+		}
+	};
+
+	static const char str[] = STR_0 "\0" STR_1 "\0" STR_2;
+	struct statmount *const stm = midtail_alloc(sizeof(*stm), sizeof(str));
+	const unsigned int stm_alloc_size = sizeof(*stm) + sizeof(str);
+	const unsigned int buf_size = stm_alloc_size + 1;
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(array_ops); ++i) {
+		*stm = array_ops[i].stm;
+		stm->size = stm_alloc_size;
+		stm->mask = array_ops[i].val;
+
+		char *p = (char *) stm - sizeof(str);
+		memmove(p, stm, sizeof(*stm));
+		memcpy(p + sizeof(*stm), str, sizeof(str));
+
+		if (k_statmount(0, p, buf_size, 0) < 0) {
+			printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+			       p, buf_size, errstr);
+		} else {
+			printf("statmount(NULL, {size=%u, mask=%s%s}, %u, 0)"
+			       " = %s" INJ_STR,
+			       stm_alloc_size, array_ops[i].str,
+			       array_ops[i].exp, buf_size, errstr);
+		}
+
+		if (!array_ops[i].exp2)
+			continue;
+
+		p[stm_alloc_size - 1] = '!';
+
+		if (k_statmount(0, p, buf_size, 0) < 0) {
+			printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
+			       p, buf_size, errstr);
+		} else {
+			printf("statmount(NULL, {size=%u, mask=%s%s}, %u, 0)"
+			       " = %s" INJ_STR,
+			       stm_alloc_size, array_ops[i].str,
+			       array_ops[i].exp2, buf_size, errstr);
+		}
+
+	}
+
+#undef STR_2
+#undef STR_1
+#undef STR_0
+}
+
 int
 main(void)
 {
@@ -459,6 +652,7 @@ main(void)
 	test_stm_bad();
 	test_stm_all_ops();
 	test_stm_str_ops();
+	test_stm_array_ops();
 
 	puts("+++ exited with 0 +++");
 	return 0;

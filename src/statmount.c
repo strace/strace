@@ -11,15 +11,63 @@
 #include "xlat/statmount_sb_flags.h"
 #include "xlat/statmount_mnt_propagation.h"
 
-#define PRINT_FIELD_CSTRING_OFFSET(where_, field_, str_buf_, str_size_)	\
+#define PRINT_FIELD_CSTRING_OFFSET(where_, field_, str_buf_, str_size_)		\
 	do {									\
 		tprints_field_name(#field_);					\
-		if ((where_).field_< (str_size_))				\
+		if ((where_).field_ < (str_size_))				\
 			print_quoted_cstring((str_buf_) + (where_).field_,	\
 					     (str_size_) - (where_).field_);	\
 		else								\
 			PRINT_VAL_X((where_).field_);				\
 	} while (0)
+
+#define PRINT_FIELD_CSTRING_SEQUENCE(tcp_, where_, field_, num_,		\
+				     str_buf_, str_size_)			\
+	do {									\
+		tprints_field_name(#field_);					\
+		if ((where_).field_ < (str_size_))				\
+			print_quoted_cstring_sequence((tcp_),			\
+				(str_buf_) + (where_).field_, (where_).num_,	\
+				(str_size_) - (where_).field_);			\
+		else								\
+			PRINT_VAL_X((where_).field_);				\
+	} while (0)
+
+static void
+print_quoted_cstring_sequence(struct tcb *const tcp, const char *str,
+			      unsigned int nelem, unsigned int size)
+{
+	unsigned int i;
+
+	tprint_array_begin();
+
+	for (i = 0; i < nelem && size > 0; ++i) {
+		if (i)
+			tprint_array_next();
+
+		if (sequence_truncation_needed(tcp, i + 1)) {
+			tprint_more_data_follows();
+			tprint_array_end();
+			return;
+		}
+
+		print_quoted_cstring(str, size);
+
+		unsigned int len = strnlen(str, size);
+		if (len < size)
+			++len;
+		str += len;
+		size -= len;
+	}
+
+	if (i < nelem) {
+		if (i)
+			tprint_array_next();
+		tprint_unavailable();
+	}
+
+	tprint_array_end();
+}
 
 static void
 print_mnt_id_req(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -179,6 +227,48 @@ print_statmount(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (st.mask & STATMOUNT_SB_SOURCE) {
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING_OFFSET(st, sb_source, str_buf, str_size);
+	}
+
+	if (st.mask & STATMOUNT_OPT_ARRAY) {
+		tprint_struct_next();
+		PRINT_FIELD_U(st, opt_num);
+
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SEQUENCE(tcp, st, opt_array, opt_num,
+					     str_buf, str_size);
+	}
+
+	if (st.mask & STATMOUNT_OPT_SEC_ARRAY) {
+		tprint_struct_next();
+		PRINT_FIELD_U(st, opt_sec_num);
+
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SEQUENCE(tcp, st, opt_sec_array, opt_sec_num,
+					     str_buf, str_size);
+	}
+
+	if (st.mask & STATMOUNT_SUPPORTED_MASK) {
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(st, supported_mask, statmount_mask,
+				  "STATMOUNT_???");
+	}
+
+	if (st.mask & STATMOUNT_MNT_UIDMAP) {
+		tprint_struct_next();
+		PRINT_FIELD_U(st, mnt_uidmap_num);
+
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SEQUENCE(tcp, st, mnt_uidmap, mnt_uidmap_num,
+					     str_buf, str_size);
+	}
+
+	if (st.mask & STATMOUNT_MNT_GIDMAP) {
+		tprint_struct_next();
+		PRINT_FIELD_U(st, mnt_gidmap_num);
+
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SEQUENCE(tcp, st, mnt_gidmap, mnt_gidmap_num,
+					     str_buf, str_size);
 	}
 
 	tprint_struct_end();
