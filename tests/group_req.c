@@ -45,10 +45,18 @@ main(void)
 		perror_msg_and_skip("lo");
 
 	greq4->gr_group.ss_family = AF_INET;
-	inet_pton(AF_INET, multi4addr, &greq4->gr_group.ss_family + 2);
+	union {
+		struct sockaddr_in *s;
+		typeof(greq4->gr_group) *g;
+	} ug4 = { .g = &greq4->gr_group };
+	inet_pton(AF_INET, multi4addr, &ug4.s->sin_addr);
 
 	greq6->gr_group.ss_family = AF_INET6;
-	inet_pton(AF_INET6, multi6addr, &greq6->gr_group.ss_family + 4);
+	union {
+		struct sockaddr_in6 *s;
+		typeof(greq6->gr_group) *g;
+	} ug6 = { .g = &greq6->gr_group };
+	inet_pton(AF_INET6, multi6addr, &ug6.s->sin6_addr);
 
 	(void) close(0);
 	if (socket(AF_INET, SOCK_DGRAM, 0))
