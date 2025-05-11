@@ -79,9 +79,9 @@ main(void)
 #ifndef PATH_TRACING
 	printf("open_tree(-1, \"\", %s|%#x) = %s\n",
 	       "OPEN_TREE_CLONE|OPEN_TREE_CLOEXEC"
-	       "|AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
-	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE",
-	       -1U & ~0x9f01 & ~O_CLOEXEC,
+	       "|AT_SYMLINK_NOFOLLOW|AT_NO_AUTOMOUNT"
+	       "|AT_EMPTY_PATH|AT_RECURSIVE",
+	       -1U & ~0x9901 & ~O_CLOEXEC,
 	       errstr);
 #endif
 
