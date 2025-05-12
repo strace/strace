@@ -53,26 +53,53 @@ print_mount_attr(struct tcb *const tcp,
 	tprint_struct_end();
 }
 
+static void
+decode_dfd_file_flags(struct tcb *const tcp,
+		      const int dirfd,
+		      const kernel_ulong_t fname,
+		      const struct xlat *const x,
+		      const unsigned int flags,
+		      const char *const dflt)
+{
+	print_dirfd(tcp, dirfd);
+	tprint_arg_next();
+
+	printpath(tcp, fname);
+	tprint_arg_next();
+
+	printflags(x, flags, dflt);
+
+}
+
+static void
+decode_dfd_file_flags_attr(struct tcb *const tcp,
+			   const int dirfd,
+			   const kernel_ulong_t fname,
+			   const struct xlat *const x,
+			   const unsigned int flags,
+			   const char *const dflt,
+			   const kernel_ulong_t attr,
+			   const kernel_ulong_t attr_size)
+{
+	decode_dfd_file_flags(tcp, dirfd, fname, x, flags, dflt);
+	tprint_arg_next();
+
+	print_mount_attr(tcp, attr, attr_size);
+	tprint_arg_next();
+
+	PRINT_VAL_U(attr_size);
+}
+
 SYS_FUNC(mount_setattr)
 {
-	/* dirfd */
-	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
-
-	/* pathname */
-	printpath(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
-
-	/* flags */
-	printflags(mount_setattr_flags, tcp->u_arg[2], "AT_???");
-	tprint_arg_next();
-
-	/* uattr */
-	print_mount_attr(tcp, tcp->u_arg[3], tcp->u_arg[4]);
-	tprint_arg_next();
-
-	/* usize */
-	PRINT_VAL_U(tcp->u_arg[4]);
+	decode_dfd_file_flags_attr(tcp,
+				   tcp->u_arg[0],
+				   tcp->u_arg[1],
+				   mount_setattr_flags,
+				   tcp->u_arg[2],
+				   "AT_???",
+				   tcp->u_arg[3],
+				   tcp->u_arg[4]);
 
 	return RVAL_DECODED | RVAL_FD;
 }
