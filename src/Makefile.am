@@ -251,7 +251,6 @@ libstrace_a_SOURCES =	\
 	number_set.h	\
 	oldstat.c	\
 	open.c		\
-	open_tree.c	\
 	or1k_atomic.c	\
 	pathtrace.c	\
 	perf.c		\

@@ -6,11 +6,13 @@
  */
 
 #include "defs.h"
+#include "kernel_fcntl.h"
 #include <linux/fcntl.h>
 #include <linux/mount.h>
 #include "xlat/mount_setattr_flags.h"
 #include "xlat/mount_attr_attr.h"
 #include "xlat/mount_attr_propagation.h"
+#include "xlat/open_tree_flags.h"
 
 static void
 print_mount_attr(struct tcb *const tcp,
@@ -100,6 +102,18 @@ SYS_FUNC(mount_setattr)
 				   "AT_???",
 				   tcp->u_arg[3],
 				   tcp->u_arg[4]);
+
+	return RVAL_DECODED | RVAL_FD;
+}
+
+SYS_FUNC(open_tree)
+{
+	decode_dfd_file_flags(tcp,
+			      tcp->u_arg[0],
+			      tcp->u_arg[1],
+			      open_tree_flags,
+			      tcp->u_arg[2],
+			      "OPEN_TREE_???");
 
 	return RVAL_DECODED | RVAL_FD;
 }
