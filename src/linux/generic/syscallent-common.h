@@ -51,3 +51,4 @@
 [BASE_NR + 464] = { 6,	TD|TF,		SEN(getxattrat),		"getxattrat"	},
 [BASE_NR + 465] = { 5,	TD|TF,		SEN(listxattrat),		"listxattrat"	},
 [BASE_NR + 466] = { 4,	TD|TF,		SEN(removexattrat),		"removexattrat"	},
+[BASE_NR + 467] = { 5,	TD|TF,		SEN(open_tree_attr),		"open_tree_attr"},

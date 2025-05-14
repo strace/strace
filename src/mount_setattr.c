@@ -117,3 +117,17 @@ SYS_FUNC(open_tree)
 
 	return RVAL_DECODED | RVAL_FD;
 }
+
+SYS_FUNC(open_tree_attr)
+{
+	decode_dfd_file_flags_attr(tcp,
+				   tcp->u_arg[0],
+				   tcp->u_arg[1],
+				   open_tree_flags,
+				   tcp->u_arg[2],
+				   "OPEN_TREE_???",
+				   tcp->u_arg[3],
+				   tcp->u_arg[4]);
+
+	return RVAL_DECODED | RVAL_FD;
+}

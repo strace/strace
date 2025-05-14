@@ -287,6 +287,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set,
 	case SEN_name_to_handle_at:
 	case SEN_newfstatat:
 	case SEN_open_tree:
+	case SEN_open_tree_attr:
 	case SEN_openat:
 	case SEN_openat2:
 	case SEN_readlinkat:
