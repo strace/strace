@@ -734,6 +734,8 @@ oldstat
 open
 open_tree
 open_tree-P
+open_tree_attr
+open_tree_attr-P
 openat
 openat2
 openat2-Xabbrev

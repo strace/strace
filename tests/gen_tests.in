@@ -740,6 +740,8 @@ open--secontext_full_mismatch	-a30 -P open.sample --secontext=full,mismatch --tr
 open--secontext_mismatch		-a30 -P open.sample --secontext=mismatch --trace=open
 open_tree -a30 -y
 open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
+open_tree_attr -y 9>>/dev/full
+open_tree_attr-P --decode-fds --trace-path=/dev/full -e trace=open_tree_attr 9>>/dev/full
 openat	-a36 -P $NAME.sample
 openat--secontext	-a36 -P openat.sample -P $PWD/openat.sample --secontext -e trace=openat
 openat--secontext_full	-a36 -P openat.sample -P $PWD/openat.sample --secontext=full -e trace=openat
