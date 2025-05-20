@@ -6,6 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated decoding of statmount syscall.
   * Updated lists of AUDIT_*, BPF_*, BTRFS_*, COUNTER_*, FAN_*, FRA_*, IFLA_*,
     IORING_*, KVM_*, LANDLOCK_*, PKEY_*, RTPROT_*, TCP_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 6.15.
 
 Noteworthy changes in release 6.14 (2025-03-25)
 ===============================================
