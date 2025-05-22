@@ -27,6 +27,7 @@
 #include <linux/mctp.h>
 #include <linux/nfc.h>
 #include <linux/qrtr.h>
+#include <linux/tipc.h>
 #include <linux/vm_sockets.h>
 #include <linux/x25.h>
 
@@ -34,6 +35,9 @@
 #include "xlat/arp_hardware_types.h"
 #include "xlat/ethernet_protocols.h"
 #include "xlat/af_packet_types.h"
+
+#include "xlat/af_tipc_scope.h"
+#include "xlat/af_tipc_types.h"
 
 #include "xlat/bdaddr_types.h"
 #include "xlat/bluetooth_l2_cid.h"
@@ -581,6 +585,76 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_tipc(struct tcb *tcp, const void *const buf,
+			  const int len)
+{
+	const struct sockaddr_tipc *const sa = buf;
+
+	PRINT_FIELD_XVAL(*sa, addrtype, af_tipc_types, "TIPC_ADDR_???");
+	tprint_struct_next();
+	tprints_field_name("scope");
+
+	signed char scope = sa->scope;
+
+	if (scope < 0) {
+		tprints_string("-");
+		scope = -scope;
+	}
+
+	printxval(af_tipc_scope, scope, "TIPC_???_SCOPE");
+	tprint_struct_next();
+	tprints_field_name("addr");
+
+	const void *const addr_buf = buf + offsetof(struct sockaddr_tipc, addr);
+	const int addr_len = sizeof(struct sockaddr_tipc) - offsetof(struct sockaddr_tipc, addr);
+
+	switch (sa->addrtype) {
+	case TIPC_SERVICE_RANGE:
+		tprint_union_begin();
+		tprints_field_name("nameseq");
+		tprint_struct_begin();
+		PRINT_FIELD_U(sa->addr.nameseq, type);
+		tprint_struct_next();
+		PRINT_FIELD_U(sa->addr.nameseq, lower);
+		tprint_struct_next();
+		PRINT_FIELD_U(sa->addr.nameseq, upper);
+		tprint_struct_end();
+		break;
+
+	case TIPC_SERVICE_ADDR:
+		tprint_union_begin();
+		tprints_field_name("name");
+		tprint_struct_begin();
+		tprints_field_name("name");
+		tprint_struct_begin();
+		PRINT_FIELD_U(sa->addr.name.name, type);
+		tprint_struct_next();
+		PRINT_FIELD_U(sa->addr.name.name, instance);
+		tprint_struct_end();
+		tprint_struct_next();
+		PRINT_FIELD_X(sa->addr.name, domain);
+		tprint_struct_end();
+		break;
+
+	case TIPC_SOCKET_ADDR:
+		tprint_union_begin();
+		tprints_field_name("id");
+		tprint_struct_begin();
+		PRINT_FIELD_U(sa->addr.id, ref);
+		tprint_struct_next();
+		PRINT_FIELD_X(sa->addr.id, node);
+		tprint_struct_end();
+		break;
+
+	default:
+		print_quoted_string(addr_buf, addr_len, 0);
+		return;
+	}
+
+	tprint_union_end();
+}
+
+static void
 print_sockaddr_data_raw(const void *const buf, const int addrlen)
 {
 	const char *const data = buf + SIZEOF_SA_FAMILY;
@@ -1037,6 +1111,7 @@ static const struct {
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
 	[AF_NETLINK] = { print_sockaddr_data_nl, sizeof(struct sockaddr_nl) },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
+	[AF_TIPC] = { print_sockaddr_data_tipc, sizeof(struct sockaddr_tipc) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
 	[AF_RXRPC] = { print_sockaddr_data_rxrpc, sizeof(struct sockaddr_rxrpc) },
 	[AF_IEEE802154] = { print_sockaddr_data_ieee802154, sizeof(struct sockaddr_ieee802154) },

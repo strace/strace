@@ -1,0 +1,5 @@
+#unconditional
+#value_indexed
+TIPC_SERVICE_RANGE
+TIPC_SERVICE_ADDR
+TIPC_SOCKET_ADDR
