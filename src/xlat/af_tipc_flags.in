@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+TIPC_GROUP_LOOPBACK
+TIPC_GROUP_MEMBER_EVTS

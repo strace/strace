@@ -43,6 +43,7 @@
 #include <linux/if_packet.h>
 #include <linux/icmp.h>
 #include <linux/tcp.h>
+#include <linux/tipc.h>
 #include <linux/vm_sockets.h>
 
 #include "xlat/socktypes.h"
@@ -922,6 +923,53 @@ print_tcp_ao_add_key(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	tprint_struct_end();
 }
 
+#include "xlat/af_tipc_importance.h"
+
+static void
+print_tipc_importance(struct tcb *const tcp, const kernel_ulong_t addr, int len)
+{
+	unsigned int importance;
+
+	if (len < (int) sizeof(importance)) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &importance))
+		return;
+
+	tprint_indirect_begin();
+	printxval(af_tipc_importance, importance, "TIPC_???_IMPORTANCE");
+	tprint_indirect_end();
+}
+
+#include "xlat/af_tipc_flags.h"
+#include "xlat/af_tipc_scope.h"
+
+static void
+print_tipc_group_join(struct tcb *const tcp, const kernel_ulong_t addr, int len)
+{
+	struct tipc_group_req group = {};
+
+	if (len < (int) sizeof(group)) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &group))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(group, type);
+	tprint_struct_next();
+	PRINT_FIELD_U(group, instance);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(group, scope, af_tipc_scope, "TIPC_???_SCOPE");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(group, flags, af_tipc_flags, "TIPC_GROUP_???");
+	tprint_struct_end();
+}
+
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
@@ -1059,6 +1107,20 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 				    tfetch_mem, print_uint_array_member, 0);
 			break;
 			}
+		default:
+			printnum_int(tcp, addr, "%d");
+			break;
+		}
+		return;
+
+	case SOL_TIPC:
+		switch(name) {
+		case TIPC_IMPORTANCE:
+			print_tipc_importance(tcp, addr, rlen);
+			break;
+		case TIPC_GROUP_JOIN:
+			print_tipc_group_join(tcp, addr, rlen);
+			break;
 		default:
 			printnum_int(tcp, addr, "%d");
 			break;
@@ -1383,6 +1445,20 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 		}
 		break;
+
+	case SOL_TIPC:
+		switch(name) {
+		case TIPC_IMPORTANCE:
+			print_tipc_importance(tcp, addr, len);
+			break;
+		case TIPC_GROUP_JOIN:
+			print_tipc_group_join(tcp, addr, len);
+			break;
+		default:
+			printnum_int(tcp, addr, "%d");
+			break;
+		}
+		return;
 	}
 
 	/* default arg printing */
