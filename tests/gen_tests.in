@@ -1110,6 +1110,22 @@ sockopt-sol_socket-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etr
 sockopt-sol_socket-success-Xraw		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a32
 sockopt-sol_socket-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
 sockopt-timestamp	-e trace=recvmsg
+sol_tipc-group_join -etrace=getsockopt,setsockopt
+sol_tipc-group_join-Xabbrev	-etrace=getsockopt,setsockopt -Xabbrev
+sol_tipc-group_join-Xraw	-etrace=getsockopt,setsockopt -Xraw -a32
+sol_tipc-group_join-Xverbose	-etrace=getsockopt,setsockopt -Xverbose
+sol_tipc-group_join-success	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt
+sol_tipc-group_join-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xabbrev
+sol_tipc-group_join-success-Xraw	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a32
+sol_tipc-group_join-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
+sol_tipc-importance	-e trace=getsockopt,setsockopt
+sol_tipc-importance-Xabbrev	-etrace=getsockopt,setsockopt -Xabbrev
+sol_tipc-importance-Xraw	-etrace=getsockopt,setsockopt -Xraw -a32
+sol_tipc-importance-Xverbose	-etrace=getsockopt,setsockopt -Xverbose
+sol_tipc-importance-success	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt
+sol_tipc-importance-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xabbrev
+sol_tipc-importance-success-Xraw	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a32
+sol_tipc-importance-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
 splice
 stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full

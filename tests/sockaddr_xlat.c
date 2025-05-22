@@ -16,6 +16,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
 #include <linux/mctp.h>
+#include <linux/tipc.h>
 
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
@@ -338,6 +339,83 @@ check_in6(void)
 	validate_in6(&in6, "12:34:56:78:90:ab:cd:ef");
 	validate_in6(&in6, "::");
 	validate_in6(&in6, "::1");
+}
+
+static void
+check_tipc(void)
+{
+	static const struct {
+		struct sockaddr_tipc sa;
+		const char *str;
+	} tipc_vecs[] = {
+		{ { AF_TIPC },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=0" NRAW(" /* TIPC_ADDR_??? */")
+		  ", scope=0" NRAW(" /* TIPC_???_SCOPE */")
+		  ", addr=\"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\"}" },
+		{ { AF_TIPC, .addrtype = 0x1, .scope = 0x2,
+		    .addr = { .nameseq = { .type = 42, .lower = 2, .upper = 20 } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x1, "TIPC_SERVICE_RANGE")
+		  ", scope=" XLAT_KNOWN(0x2, "TIPC_CLUSTER_SCOPE")
+		  ", addr={nameseq={type=42, lower=2, upper=20}}}" },
+		{ { AF_TIPC, .addrtype = 0x1, .scope = -0x2,
+		    .addr = { .nameseq = { .type = 42, .lower = 2, .upper = 20 } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x1, "TIPC_SERVICE_RANGE")
+		  ", scope=-" XLAT_KNOWN(0x2, "TIPC_CLUSTER_SCOPE")
+		  ", addr={nameseq={type=42, lower=2, upper=20}}}" },
+		{ { AF_TIPC, .addrtype = 0x3, .scope = 0x3,
+		    .addr = { .id = { .ref = 10, .node = 0xfeedbabe } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x3, "TIPC_SOCKET_ADDR")
+		  ", scope=" XLAT_KNOWN(0x3, "TIPC_NODE_SCOPE")
+		  ", addr={id={ref=10, node=0xfeedbabe}}}" },
+		{ { AF_TIPC, .addrtype = 0x3, .scope = -0x3,
+		    .addr = { .id = { .ref = 10, .node = 0xfeedbabe } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x3, "TIPC_SOCKET_ADDR")
+		  ", scope=-" XLAT_KNOWN(0x3, "TIPC_NODE_SCOPE")
+		  ", addr={id={ref=10, node=0xfeedbabe}}}" },
+		{ { AF_TIPC, .addrtype = 0x2, .scope = 0x3,
+		    .addr = { .name = { .name = { .type = 42, .instance = 2 }, .domain = 0 } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x2, "TIPC_SERVICE_ADDR")
+		  ", scope=" XLAT_KNOWN(0x3, "TIPC_NODE_SCOPE")
+		  ", addr={name={name={type=42, instance=2}, domain=0}}}" },
+		{ { AF_TIPC, .addrtype = 0x2, .scope = -0x3,
+		    .addr = { .name = { .name = { .type = 42, .instance = 2 }, .domain = 0xfeedbabe } } },
+		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+		  ", addrtype=" XLAT_KNOWN(0x2, "TIPC_SERVICE_ADDR")
+		  ", scope=-" XLAT_KNOWN(0x3, "TIPC_NODE_SCOPE")
+		  ", addr={name={name={type=42, instance=2}, domain=0xfeedbabe}}}" }
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_tipc, sa_tipc);
+	int rc;
+
+	fill_memory(sa_tipc, sizeof(*sa_tipc));
+	sa_tipc->family = AF_TIPC;
+
+	rc = connect(-1, (void *) sa_tipc, sizeof(*sa_tipc) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_tipc, sizeof(*sa_tipc) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_tipc, sizeof(*sa_tipc) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_tipc + sizeof(sa_tipc->family),
+			    sizeof(*sa_tipc) - sizeof(sa_tipc->family) - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_tipc) - 1, errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(tipc_vecs); i++) {
+		*sa_tipc = tipc_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_tipc, sizeof(*sa_tipc));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       tipc_vecs[i].str, sizeof(*sa_tipc), sprintrc(rc));
+	}
 }
 
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
@@ -1257,6 +1335,7 @@ main(void)
 	check_ll();
 	check_in();
 	check_in6();
+	check_tipc();
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	check_sco();
 	check_rc();

@@ -407,6 +407,22 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	sockopt-sol_socket-success-Xabbrev \
 	sockopt-sol_socket-success-Xraw \
 	sockopt-sol_socket-success-Xverbose \
+	sol_tipc-group_join \
+	sol_tipc-group_join-Xabbrev \
+	sol_tipc-group_join-Xraw \
+	sol_tipc-group_join-Xverbose \
+	sol_tipc-group_join-success \
+	sol_tipc-group_join-success-Xabbrev \
+	sol_tipc-group_join-success-Xraw \
+	sol_tipc-group_join-success-Xverbose \
+	sol_tipc-importance \
+	sol_tipc-importance-Xabbrev \
+	sol_tipc-importance-Xraw \
+	sol_tipc-importance-Xverbose \
+	sol_tipc-importance-success \
+	sol_tipc-importance-success-Xabbrev \
+	sol_tipc-importance-success-Xraw \
+	sol_tipc-importance-success-Xverbose \
 	stack-fcall \
 	stack-fcall-attach \
 	stack-fcall-mangled \
