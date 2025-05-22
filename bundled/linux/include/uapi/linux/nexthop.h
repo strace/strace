@@ -20,7 +20,7 @@ struct nexthop_grp {
 	__u16	resvd2;
 };
 
-static inline __u16 nexthop_grp_weight(const struct nexthop_grp *entry)
+static __inline__ __u16 nexthop_grp_weight(const struct nexthop_grp *entry)
 {
 	return ((entry->weight_high << 8) | entry->weight) + 1;
 }

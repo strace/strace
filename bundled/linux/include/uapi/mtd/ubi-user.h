@@ -443,7 +443,7 @@ struct ubi_ecinfo_req {
 	__s32 read_length;
 	__s8  padding[16];
 	__s32 erase_counters[];
-}  __packed;
+}  __attribute__((packed));
 
 /**
  * struct ubi_leb_change_req - a data structure used in atomic LEB change

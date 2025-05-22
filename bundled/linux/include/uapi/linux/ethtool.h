@@ -120,14 +120,14 @@ struct ethtool_cmd {
 	__u32	reserved[2];
 };
 
-static inline void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
+static __inline__ void ethtool_cmd_speed_set(struct ethtool_cmd *ep,
 					 __u32 speed)
 {
 	ep->speed = (__u16)(speed & 0xFFFF);
 	ep->speed_hi = (__u16)(speed >> 16);
 }
 
-static inline __u32 ethtool_cmd_speed(const struct ethtool_cmd *ep)
+static __inline__ __u32 ethtool_cmd_speed(const struct ethtool_cmd *ep)
 {
 	return (ep->speed_hi << 16) | ep->speed;
 }
@@ -1411,12 +1411,12 @@ struct ethtool_rx_flow_spec {
 #define ETHTOOL_RX_FLOW_SPEC_RING	0x00000000FFFFFFFFLL
 #define ETHTOOL_RX_FLOW_SPEC_RING_VF	0x000000FF00000000LL
 #define ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF 32
-static inline __u64 ethtool_get_flow_spec_ring(__u64 ring_cookie)
+static __inline__ __u64 ethtool_get_flow_spec_ring(__u64 ring_cookie)
 {
 	return ETHTOOL_RX_FLOW_SPEC_RING & ring_cookie;
 }
 
-static inline __u64 ethtool_get_flow_spec_ring_vf(__u64 ring_cookie)
+static __inline__ __u64 ethtool_get_flow_spec_ring_vf(__u64 ring_cookie)
 {
 	return (ETHTOOL_RX_FLOW_SPEC_RING_VF & ring_cookie) >>
 				ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF;
@@ -2191,7 +2191,7 @@ enum ethtool_link_mode_bit_indices {
 
 #define SPEED_UNKNOWN		-1
 
-static inline int ethtool_validate_speed(__u32 speed)
+static __inline__ int ethtool_validate_speed(__u32 speed)
 {
 	return speed <= INT_MAX || speed == (__u32)SPEED_UNKNOWN;
 }
@@ -2201,7 +2201,7 @@ static inline int ethtool_validate_speed(__u32 speed)
 #define DUPLEX_FULL		0x01
 #define DUPLEX_UNKNOWN		0xff
 
-static inline int ethtool_validate_duplex(__u8 duplex)
+static __inline__ int ethtool_validate_duplex(__u8 duplex)
 {
 	switch (duplex) {
 	case DUPLEX_HALF:

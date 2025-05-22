@@ -330,13 +330,13 @@ typedef int __bitwise __kernel_rwf_t;
 #define RWF_APPEND	((__kernel_rwf_t)0x00000010)
 
 /* per-IO negation of O_APPEND */
-#define RWF_NOAPPEND	((__force __kernel_rwf_t)0x00000020)
+#define RWF_NOAPPEND	((__kernel_rwf_t)0x00000020)
 
 /* Atomic Write */
-#define RWF_ATOMIC	((__force __kernel_rwf_t)0x00000040)
+#define RWF_ATOMIC	((__kernel_rwf_t)0x00000040)
 
 /* buffered IO that drops the cache after reading or writing data */
-#define RWF_DONTCACHE	((__force __kernel_rwf_t)0x00000080)
+#define RWF_DONTCACHE	((__kernel_rwf_t)0x00000080)
 
 /* mask of flags supported by the kernel */
 #define RWF_SUPPORTED	(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT |\

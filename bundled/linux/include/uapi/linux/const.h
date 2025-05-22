@@ -30,9 +30,9 @@
 
 #if !defined(__ASSEMBLY__)
 /*
- * Missing asm support
+ * Missing __asm__ support
  *
- * __BIT128() would not work in the asm code, as it shifts an
+ * __BIT128() would not work in the __asm__ code, as it shifts an
  * 'unsigned __int128' data type as direct representation of
  * 128 bit constants is not supported in the gcc compiler, as
  * they get silently truncated.
@@ -40,7 +40,7 @@
  * TODO: Please revisit this implementation when gcc compiler
  * starts representing 128 bit constants directly like long
  * and unsigned long etc. Subsequently drop the comment for
- * GENMASK_U128() which would then start supporting asm code.
+ * GENMASK_U128() which would then start supporting __asm__ code.
  */
 #define _BIT128(x)	((unsigned __int128)(1) << (x))
 #endif
