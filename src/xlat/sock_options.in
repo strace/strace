@@ -489,19 +489,19 @@ SO_TIMESTAMPING_NEW	65
 #endif
 
 #if defined __sparc__
-SO_RCVTIMEO_NEW		68
+SO_RCVTIMEO_NEW	68
 #elif defined __hppa__
-SO_RCVTIMEO_NEW		16448
+SO_RCVTIMEO_NEW	16448
 #else
-SO_RCVTIMEO_NEW		66
+SO_RCVTIMEO_NEW	66
 #endif
 
 #if defined __sparc__
-SO_SNDTIMEO_NEW		69
+SO_SNDTIMEO_NEW	69
 #elif defined __hppa__
-SO_SNDTIMEO_NEW		16449
+SO_SNDTIMEO_NEW	16449
 #else
-SO_SNDTIMEO_NEW		67
+SO_SNDTIMEO_NEW	67
 #endif
 
 #if defined __sparc__
@@ -529,57 +529,65 @@ SO_BUSY_POLL_BUDGET	70
 #endif
 
 #if defined __sparc__
-SO_NETNS_COOKIE		80
+SO_NETNS_COOKIE	80
 #elif defined __hppa__
-SO_NETNS_COOKIE		16453
+SO_NETNS_COOKIE	16453
 #else
-SO_NETNS_COOKIE		71
+SO_NETNS_COOKIE	71
 #endif
 
 #if defined __sparc__
-SO_BUF_LOCK		81
+SO_BUF_LOCK	81
 #elif defined __hppa__
-SO_BUF_LOCK		16454
+SO_BUF_LOCK	16454
 #else
-SO_BUF_LOCK		72
+SO_BUF_LOCK	72
 #endif
 
 #if defined __sparc__
-SO_RESERVE_MEM		82
+SO_RESERVE_MEM	82
 #elif defined __hppa__
-SO_RESERVE_MEM		16455
+SO_RESERVE_MEM	16455
 #else
-SO_RESERVE_MEM		73
+SO_RESERVE_MEM	73
 #endif
 
 #if defined __sparc__
-SO_TXREHASH		83
+SO_TXREHASH	83
 #elif defined __hppa__
-SO_TXREHASH		16456
+SO_TXREHASH	16456
 #else
-SO_TXREHASH		74
+SO_TXREHASH	74
 #endif
 
 #if defined __sparc__
-SO_RCVMARK		84
+SO_RCVMARK	84
 #elif defined __hppa__
-SO_RCVMARK		16457
+SO_RCVMARK	16457
 #else
-SO_RCVMARK		75
+SO_RCVMARK	75
 #endif
 
 #if defined __sparc__
-SO_PASSPIDFD		85
+SO_PASSPIDFD	85
 #elif defined __hppa__
-SO_PASSPIDFD		16458
+SO_PASSPIDFD	16458
 #else
-SO_PASSPIDFD		76
+SO_PASSPIDFD	76
 #endif
 
 #if defined __sparc__
-SO_PEERPIDFD		86
+SO_PEERPIDFD	86
 #elif defined __hppa__
-SO_PEERPIDFD		16459
+SO_PEERPIDFD	16459
 #else
-SO_PEERPIDFD		77
+SO_PEERPIDFD	77
+#endif
+
+#if defined __sparc__
+SO_RCVPRIORITY	91
+#elif defined __hppa__
+SO_RCVPRIORITY	16461
+#else
+SO_RCVPRIORITY	82
 #endif
