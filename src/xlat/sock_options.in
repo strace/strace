@@ -591,3 +591,11 @@ SO_RCVPRIORITY	16461
 #else
 SO_RCVPRIORITY	82
 #endif
+
+#if defined __sparc__
+SO_PASSRIGHTS	92
+#elif defined __hppa__
+SO_PASSRIGHTS	16465
+#else
+SO_PASSRIGHTS	83
+#endif
