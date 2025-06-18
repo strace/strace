@@ -1,3 +1,4 @@
 #unconditional
 FUTEX2_NUMA		0x04
+FUTEX2_MPOL		0x08
 FUTEX2_PRIVATE		0x80

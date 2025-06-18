@@ -65,8 +65,8 @@ main(void)
 	printf("futex_waitv([{val=%#llx, uaddr=NULL, flags=%s|%#x"
 	       ", __reserved=%#x}], 1, 0, NULL, CLOCK_MONOTONIC) = %s\n",
 	       (unsigned long long) waiter->val,
-	       "FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_PRIVATE",
-	       waiter->flags & ~(FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_PRIVATE),
+	       "FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_MPOL|FUTEX2_PRIVATE",
+	       waiter->flags & ~(FUTEX2_SIZE_U64|FUTEX2_NUMA|FUTEX2_MPOL|FUTEX2_PRIVATE),
 	       waiter->__reserved, errstr);
 
 	waiter->val = 0xdeadbeeffacefeedULL;
