@@ -3,7 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of SO_RCVPRIORITY and SO_PASSRIGHTS socket options.
-  * Updated lists of FUTEX2_* and IORING_* constants.
+  * Updated lists of FUTEX2_*, IORING_*, and MDB_* constants.
 
 Noteworthy changes in release 6.15 (2025-05-26)
 ===============================================
