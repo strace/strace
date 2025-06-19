@@ -330,6 +330,10 @@ print_stat(const STRUCT_STAT *st)
 		printf(", ");
 		PRINT_FIELD_U(*st, stx_dio_read_offset_align);
 	}
+	if (st->stx_attributes & STATX_ATTR_WRITE_ATOMIC) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_atomic_write_unit_max_opt);
+	}
 	printf("}");
 }
 

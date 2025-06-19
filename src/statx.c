@@ -168,6 +168,10 @@ SYS_FUNC(statx)
 				tprint_struct_next();
 				PRINT_FIELD_U(stx, stx_dio_read_offset_align);
 			}
+			if (stx.stx_attributes & STATX_ATTR_WRITE_ATOMIC) {
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_atomic_write_unit_max_opt);
+			}
 		} else {
 			tprint_struct_next();
 			tprint_more_data_follows();
