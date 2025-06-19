@@ -962,7 +962,7 @@ printeventfd(pid_t pid_of_fd, int fd, const char *path)
 		}
 	};
 
-	scan_fdinfo_lines(pid_of_fd, fd, fdinfo_lines, ARRAY_SIZE(fdinfo_lines));
+	scan_fdinfo_lines(pid_of_fd, fd, ARRSZ_PAIR(fdinfo_lines));
 
 	if (efd_counter) {
 		tprint_associated_info_begin();
