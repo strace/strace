@@ -4,7 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented decoding of SO_RCVPRIORITY and SO_PASSRIGHTS socket options.
   * Updated lists of BR_*, FUTEX2_*, IORING_*, KVM_*, MDB_*, NETDEV_*, NFT_*,
-    and SW_* constants.
+    PR_*, and SW_* constants.
 
 Noteworthy changes in release 6.15 (2025-05-26)
 ===============================================

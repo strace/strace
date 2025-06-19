@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 		{ 68, "PR_GET_MEMORY_MERGE" },
 	};
 	static const unsigned int options_unknown[] = {
-		0, 17, 18, 48, 49, 74, 75, 76,
+		0, 17, 18, 48, 49, 79, 80, 81,
 		0x41555855, /* "AUXV" - 1 */
 		0x41555857, /* "AUXV" + 1 */
 		0x53564d40, /* "SVMA" - 1 */
