@@ -41,7 +41,7 @@
 #include "xlat/nf_hook_msg_types.h"
 #include "xlat/nf_ipset_msg_types.h"
 #include "xlat/nf_nft_compat_msg_types.h"
-#include "xlat/nf_nftables_msg_types.h"
+#include "xlat/nf_tables_msg_types.h"
 #include "xlat/nf_osf_msg_types.h"
 #include "xlat/nf_queue_msg_types.h"
 #include "xlat/nf_ulog_msg_types.h"
@@ -151,7 +151,7 @@ static const struct {
 		nf_cthelper_msg_types,
 		"NFNL_MSG_CTHELPER_???"
 	},
-	[NFNL_SUBSYS_NFTABLES] = { nf_nftables_msg_types, "NFT_MSG_???" },
+	[NFNL_SUBSYS_NFTABLES] = { nf_tables_msg_types, "NFT_MSG_???" },
 	[NFNL_SUBSYS_NFT_COMPAT] = {
 		nf_nft_compat_msg_types,
 		"NFNL_MSG_COMPAT_???"
