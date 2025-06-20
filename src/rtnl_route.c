@@ -221,7 +221,9 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_TTL_PROPAGATE]	= decode_nla_u8,
 	[RTA_IP_PROTO]		= decode_nla_u8,
 	[RTA_SPORT]		= decode_nla_u16,
-	[RTA_DPORT]		= decode_nla_u16
+	[RTA_DPORT]		= decode_nla_u16,
+	[RTA_NH_ID]		= decode_nla_u32,
+	[RTA_FLOWLABEL]		= decode_nla_be32,
 };
 
 /*

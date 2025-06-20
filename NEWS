@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of SO_RCVPRIORITY and SO_PASSRIGHTS socket options.
+  * Implemented decoding of RTA_NH_ID and RTA_FLOWLABEL netlink attributes.
   * Updated decoding of statx syscall.
   * Updated lists of BR_*, FUTEX2_*, IORING_*, KVM_*, MDB_*, NETDEV_*, NFT_*,
     PR_*, RXRPC_*, SW_*, and V4L2_* constants.
