@@ -488,6 +488,39 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+static int
+print_v4l2_exportbuffer(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct v4l2_exportbuffer expbuf;
+
+	if (entering(tcp)) {
+		tprint_arg_next();
+		if (umove_or_printaddr(tcp, arg, &expbuf))
+			return RVAL_IOCTL_DECODED;
+
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(expbuf, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(expbuf, index);
+		tprint_struct_next();
+		PRINT_FIELD_U(expbuf, plane);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(expbuf, flags, tprint_open_modes);
+
+		return 0;
+	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &expbuf)) {
+		tprint_struct_end_value_changed_struct_begin();
+		PRINT_FIELD_FD(expbuf, fd, tcp);
+	}
+
+	tprint_struct_end();
+
+	return RVAL_IOCTL_DECODED;
+}
+
 #include "xlat/v4l2_buf_flags.h"
 #include "xlat/v4l2_buf_flags_ts_type.h"
 #include "xlat/v4l2_buf_flags_ts_src.h"
@@ -1527,6 +1560,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_REQBUFS: /* RW */
 		return print_v4l2_requestbuffers(tcp, arg);
+
+	case VIDIOC_EXPBUF: /* RW */
+		return print_v4l2_exportbuffer(tcp, arg);
 
 	case VIDIOC_QUERYBUF: /* RW */
 	case VIDIOC_QBUF: /* RW */
