@@ -720,8 +720,8 @@ test_nla_ops_family(const int fd)
 
 	static const struct strval32 thermal_cmds[] = {
 		{ ARG_STR(THERMAL_GENL_CMD_TZ_GET_ID) },
-		{ ARG_STR(THERMAL_GENL_CMD_CDEV_GET) },
-		{ THERMAL_GENL_CMD_CDEV_GET + 1, "THERMAL_GENL_CMD_???" },
+		{ ARG_STR(THERMAL_GENL_CMD_THRESHOLD_FLUSH) },
+		{ THERMAL_GENL_CMD_THRESHOLD_FLUSH + 1, "THERMAL_GENL_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(THERMAL_GENL_FAMILY_NAME, thermal_cmds);
 }
