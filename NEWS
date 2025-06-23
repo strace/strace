@@ -5,8 +5,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of SO_RCVPRIORITY and SO_PASSRIGHTS socket options.
   * Implemented decoding of RTA_NH_ID and RTA_FLOWLABEL netlink attributes.
   * Updated decoding of statx syscall.
-  * Updated lists of BR_*, FUTEX2_*, IORING_*, KVM_*, MDB_*, NETDEV_*, NFT_*,
-    PR_*, RXRPC_*, SW_*, THERMAL_*, and V4L2_* constants.
+  * Updated lists of BR_*, CRYPTOCFGA_*, FUTEX2_*, IORING_*, KVM_*, MDB_*,
+    NETDEV_*, NFT_*, PR_*, RXRPC_*, SW_*, THERMAL_*, and V4L2_* constants.
 
 Noteworthy changes in release 6.15 (2025-05-26)
 ===============================================
