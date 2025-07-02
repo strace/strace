@@ -16,14 +16,17 @@
 SYS_FUNC(riscv_flush_icache)
 {
 	/* uintptr_t start */
+	print_syscall_param("start");
 	printaddr(tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* uintptr_t end */
+	print_syscall_param("end");
 	printaddr(tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* uintptr_t flags */
+	print_syscall_param("flags");
 	printflags64(riscv_flush_icache_flags, tcp->u_arg[2],
 		     "SYS_RISCV_FLUSH_ICACHE_???");
 

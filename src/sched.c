@@ -20,6 +20,7 @@ SYS_FUNC(sched_getscheduler)
 {
 	if (entering(tcp)) {
 		/* pid */
+		print_syscall_param("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = xlookup(schedulers, (kernel_ulong_t) tcp->u_rval);
@@ -31,14 +32,17 @@ SYS_FUNC(sched_getscheduler)
 SYS_FUNC(sched_setscheduler)
 {
 	/* pid */
+	print_syscall_param("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 	tprint_arg_next();
 
 	/* policy */
+	print_syscall_param("policy");
 	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
 	tprint_arg_next();
 
 	/* param */
+	print_syscall_param("param");
 	printnum_int(tcp, tcp->u_arg[2], "%d");
 
 	return RVAL_DECODED;
@@ -48,10 +52,12 @@ SYS_FUNC(sched_getparam)
 {
 	if (entering(tcp)) {
 		/* pid */
+		print_syscall_param("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 		tprint_arg_next();
 	} else {
 		/* param */
+		print_syscall_param("param");
 		printnum_int(tcp, tcp->u_arg[1], "%d");
 	}
 	return 0;
@@ -60,10 +66,12 @@ SYS_FUNC(sched_getparam)
 SYS_FUNC(sched_setparam)
 {
 	/* pid */
+	print_syscall_param("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 	tprint_arg_next();
 
 	/* param */
+	print_syscall_param("param");
 	printnum_int(tcp, tcp->u_arg[1], "%d");
 
 	return RVAL_DECODED;
@@ -72,6 +80,7 @@ SYS_FUNC(sched_setparam)
 SYS_FUNC(sched_get_priority_min)
 {
 	/* policy */
+	print_syscall_param("policy");
 	printxval(schedulers, tcp->u_arg[0], "SCHED_???");
 
 	return RVAL_DECODED;
@@ -83,10 +92,12 @@ do_sched_rr_get_interval(struct tcb *const tcp,
 {
 	if (entering(tcp)) {
 		/* pid */
+		print_syscall_param("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 		tprint_arg_next();
 	} else {
 		/* tp */
+		print_syscall_param("tp");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
@@ -187,10 +198,12 @@ SYS_FUNC(sched_setattr)
 {
 	if (entering(tcp)) {
 		/* pid */
+		print_syscall_param("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 		tprint_arg_next();
 
 		/* attr */
+		print_syscall_param("attr");
 		print_sched_attr(tcp, tcp->u_arg[1], 0);
 	} else {
 		struct sched_attr attr;
@@ -205,6 +218,7 @@ SYS_FUNC(sched_setattr)
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 	}
 
@@ -215,12 +229,14 @@ SYS_FUNC(sched_getattr)
 {
 	if (entering(tcp)) {
 		/* pid */
+		print_syscall_param("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 		tprint_arg_next();
 	} else {
 		const unsigned int size = tcp->u_arg[2];
 
 		/* attr */
+		print_syscall_param("attr");
 		if (size)
 			print_sched_attr(tcp, tcp->u_arg[1], size);
 		else
@@ -228,6 +244,7 @@ SYS_FUNC(sched_getattr)
 		tprint_arg_next();
 
 		/* size */
+		print_syscall_param("size");
 #ifdef AARCH64
 		/*
 		 * Due to a subtle gcc bug that leads to miscompiled aarch64
@@ -248,6 +265,7 @@ SYS_FUNC(sched_getattr)
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		PRINT_VAL_U((unsigned int) tcp->u_arg[3]);
 	}
 

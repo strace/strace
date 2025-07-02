@@ -503,14 +503,17 @@ dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ulong_t addr,
 SYS_FUNC(sendmsg)
 {
 	/* sockfd */
+	print_syscall_param("sockfd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* msg */
+	print_syscall_param("msg");
 	decode_msghdr(tcp, 0, tcp->u_arg[1], -1);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;
@@ -522,9 +525,11 @@ SYS_FUNC(recvmsg)
 
 	if (entering(tcp)) {
 		/* sockfd */
+		print_syscall_param("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
+		print_syscall_param("msg");
 		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
 			set_tcb_priv_ulong(tcp, msg_namelen);
 			return 0;
@@ -548,6 +553,7 @@ SYS_FUNC(recvmsg)
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;

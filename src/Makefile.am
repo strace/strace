@@ -280,6 +280,7 @@ libstrace_a_SOURCES =	\
 	print_statfs.c	\
 	print_struct_stat.c \
 	print_syscall_number.c \
+	print_syscall_param.c \
 	print_time.c	\
 	print_timespec.h \
 	print_timespec32.c \

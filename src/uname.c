@@ -20,6 +20,7 @@ SYS_FUNC(uname)
 	if (entering(tcp))
 		return 0;
 
+	print_syscall_param("buf");
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &uname)) {
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(uname, sysname);

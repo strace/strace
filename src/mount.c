@@ -38,14 +38,17 @@ SYS_FUNC(mount)
 		ignore_type = ignore_data = true;
 
 	/* source */
+	print_syscall_param("source");
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* target */
+	print_syscall_param("target");
 	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* filesystemtype */
+	print_syscall_param("filesystemtype");
 	if (ignore_type)
 		printaddr(tcp->u_arg[2]);
 	else
@@ -53,6 +56,7 @@ SYS_FUNC(mount)
 	tprint_arg_next();
 
 	/* mountflags */
+	print_syscall_param("mountflags");
 	tprint_flags_begin();
 	if (old_magic) {
 		print_xlat(MS_MGC_VAL);
@@ -65,6 +69,7 @@ SYS_FUNC(mount)
 	tprint_arg_next();
 
 	/* data */
+	print_syscall_param("data");
 	if (ignore_data)
 		printaddr(tcp->u_arg[4]);
 	else

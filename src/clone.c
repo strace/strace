@@ -407,8 +407,10 @@ out:
 SYS_FUNC(setns)
 {
 	if (entering(tcp)) {
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
+		print_syscall_param("nstype");
 		printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
 		return show_namespace ? 0 : RVAL_DECODED;
 	}
@@ -426,6 +428,7 @@ SYS_FUNC(setns)
 SYS_FUNC(unshare)
 {
 	if (entering(tcp)) {
+		print_syscall_param("flags");
 		printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
 		return show_namespace ? 0 : RVAL_DECODED;
 	}

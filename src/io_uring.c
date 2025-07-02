@@ -89,10 +89,12 @@ SYS_FUNC(io_uring_setup)
 
 	if (entering(tcp)) {
 		/* entries */
+		print_syscall_param("entries");
 		PRINT_VAL_U(entries);
 		tprint_arg_next();
 
 		/* params */
+		print_syscall_param("params");
 		if (umove_or_printaddr(tcp, params_addr, &params))
 			return RVAL_DECODED | RVAL_FD;
 
@@ -147,26 +149,32 @@ SYS_FUNC(io_uring_enter)
 	const kernel_ulong_t sigset_size = tcp->u_arg[5];
 
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, fd);
 	tprint_arg_next();
 
 	/* to_submit */
+	print_syscall_param("to_submit");
 	PRINT_VAL_U(to_submit);
 	tprint_arg_next();
 
 	/* min_complete */
+	print_syscall_param("min_complete");
 	PRINT_VAL_U(min_complete);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(uring_enter_flags, flags, "IORING_ENTER_???");
 	tprint_arg_next();
 
 	/* sigset */
+	print_syscall_param("sigset");
 	print_sigset_addr_len(tcp, sigset_addr, sigset_size);
 	tprint_arg_next();
 
 	/* sigsetsize */
+	print_syscall_param("sigsetsize");
 	PRINT_VAL_U(sigset_size);
 
 	return RVAL_DECODED;
@@ -893,6 +901,7 @@ SYS_FUNC(io_uring_register)
 
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		if (opcode_flags)
 			PRINT_VAL_U(fd);
 		else
@@ -900,11 +909,13 @@ SYS_FUNC(io_uring_register)
 		tprint_arg_next();
 
 		/* opcode */
+		print_syscall_param("opcode");
 		print_io_uring_register_opcode(tcp, opcode, opcode_flags);
 		tprint_arg_next();
 	}
 
 	/* arg */
+	print_syscall_param("arg");
 	switch (opcode) {
 	case IORING_REGISTER_BUFFERS:
 		tprint_iov(tcp, nargs, arg, iov_decode_addr);
@@ -986,6 +997,7 @@ SYS_FUNC(io_uring_register)
 	if (rc || exiting(tcp)) {
 		tprint_arg_next();
 		/* nr_args */
+		print_syscall_param("nr_args");
 		PRINT_VAL_U(nargs);
 	}
 

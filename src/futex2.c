@@ -94,14 +94,23 @@ SYS_FUNC(futex_waitv)
 	const kernel_ulong_t timeout = tcp->u_arg[3];
 	const unsigned int clockid = tcp->u_arg[4];
 
+	print_syscall_param("waiters");
 	print_waiter_array(tcp, waiters, nr_futexes);
 	tprint_arg_next();
+
+	print_syscall_param("nr_futexes");
 	PRINT_VAL_U(nr_futexes);
 	tprint_arg_next();
+
+	print_syscall_param("flags");
 	PRINT_VAL_X(flags);
 	tprint_arg_next();
+
+	print_syscall_param("timeout");
 	print_timespec64(tcp, timeout);
 	tprint_arg_next();
+
+	print_syscall_param("clockid");
 	printxval(clocknames, clockid, "CLOCK_???");
 
 	return RVAL_DECODED;
@@ -115,18 +124,22 @@ SYS_FUNC(futex_wake)
 	const unsigned int flags = tcp->u_arg[3];
 
 	/* uaddr */
+	print_syscall_param("uaddr");
 	printaddr(uaddr);
 	tprint_arg_next();
 
 	/* mask */
+	print_syscall_param("mask");
 	printxval64(futexbitset, mask, NULL);
 	tprint_arg_next();
 
 	/* nr */
+	print_syscall_param("nr");
 	PRINT_VAL_D(nr);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	print_futex2_flags(flags);
 
 	return RVAL_DECODED;
@@ -142,26 +155,32 @@ SYS_FUNC(futex_wait)
 	const unsigned int clockid = tcp->u_arg[5];
 
 	/* uaddr */
+	print_syscall_param("uaddr");
 	printaddr(uaddr);
 	tprint_arg_next();
 
 	/* val */
+	print_syscall_param("val");
 	PRINT_VAL_U(val);
 	tprint_arg_next();
 
 	/* mask */
+	print_syscall_param("mask");
 	printxval64(futexbitset, mask, NULL);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	print_futex2_flags(flags);
 	tprint_arg_next();
 
 	/* timeout */
+	print_syscall_param("timeout");
 	print_timespec64(tcp, timeout);
 	tprint_arg_next();
 
 	/* clockid */
+	print_syscall_param("clockid");
 	printxval(clocknames, clockid, "CLOCK_???");
 
 	return RVAL_DECODED;
@@ -175,18 +194,22 @@ SYS_FUNC(futex_requeue)
 	const int nr_requeue = tcp->u_arg[3];
 
 	/* waiters */
+	print_syscall_param("waiters");
 	print_waiter_array(tcp, waiters, 2);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	PRINT_VAL_X(flags);
 	tprint_arg_next();
 
 	/* nr_wake */
+	print_syscall_param("nr_wake");
 	PRINT_VAL_D(nr_wake);
 	tprint_arg_next();
 
 	/* nr_requeue */
+	print_syscall_param("nr_requeue");
 	PRINT_VAL_D(nr_requeue);
 
 	return RVAL_DECODED;

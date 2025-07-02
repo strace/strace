@@ -15,6 +15,7 @@ SYS_FUNC(ipc)
 	unsigned int version = call >> 16;
 	call &= 0xffff;
 
+	print_syscall_param("call");
 	tprint_flags_begin();
 	if (version) {
 		tprint_shift_begin();

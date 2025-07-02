@@ -11,14 +11,17 @@ SYS_FUNC(getcpu)
 {
 	if (exiting(tcp)) {
 		/* cpu */
+		print_syscall_param("cpu");
 		printnum_int(tcp, tcp->u_arg[0], "%u");
 		tprint_arg_next();
 
 		/* node */
+		print_syscall_param("node");
 		printnum_int(tcp, tcp->u_arg[1], "%u");
 		tprint_arg_next();
 
 		/* tcache */
+		print_syscall_param("tcache");
 		printaddr(tcp->u_arg[2]);
 	}
 	return 0;

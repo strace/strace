@@ -70,18 +70,22 @@ SYS_FUNC(listmount)
 	uint64_t elem;
 
 	if (entering(tcp)) {
+		print_syscall_param("req");
 		print_mnt_id_req(tcp, req);
 		tprint_arg_next();
 		return 0;
 	}
 
+	print_syscall_param("mnt_ids");
 	print_array(tcp, mnt_ids, MIN(nr_mnt_ids, (kernel_ulong_t) tcp->u_rval),
 		    &elem, sizeof(elem), tfetch_mem, print_xint_array_member, 0);
 	tprint_arg_next();
 
+	print_syscall_param("nr_mnt_ids");
 	PRINT_VAL_U(nr_mnt_ids);
 	tprint_arg_next();
 
+	print_syscall_param("flags");
 	printflags(listmount_flags, flags, "LISTMOUNT_???");
 
 	return 0;

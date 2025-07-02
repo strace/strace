@@ -12,14 +12,17 @@
 SYS_FUNC(map_shadow_stack)
 {
 	/* addr */
+	print_syscall_param("addr");
 	printaddr(tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(shadow_stack_flags, tcp->u_arg[2], "SHADOW_STACK_???");
 
 	return RVAL_DECODED;

@@ -44,10 +44,12 @@ SYS_FUNC(oldstat)
 {
 	if (entering(tcp)) {
 		/* pathname */
+		print_syscall_param("pathname");
 		printpath(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* statbuf */
+		print_syscall_param("statbuf");
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -57,10 +59,12 @@ SYS_FUNC(oldfstat)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* statbuf */
+		print_syscall_param("statbuf");
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;

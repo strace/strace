@@ -70,14 +70,17 @@ SYS_FUNC(landlock_create_ruleset)
 	unsigned int fd_flag = flags & landlock_nofd_flags ? 0 : RVAL_FD;
 
 	/* attr */
+	print_syscall_param("attr");
 	print_landlock_ruleset_attr(tcp, attr, size);
 	tprint_arg_next();
 
 	/* size */
+	print_syscall_param("size");
 	PRINT_VAL_U(size);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(landlock_create_ruleset_flags, flags,
 		   "LANDLOCK_CREATE_RULESET_???");
 
@@ -121,14 +124,17 @@ SYS_FUNC(landlock_add_rule)
 	unsigned int rule_type = tcp->u_arg[1];
 
 	/* ruleset_fd */
+	print_syscall_param("ruleset_fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* rule_type */
+	print_syscall_param("rule_type");
 	printxval(landlock_rule_types, rule_type, "LANDLOCK_RULE_???");
 	tprint_arg_next();
 
 	/* rule_attr */
+	print_syscall_param("rule_attr");
 	switch (rule_type) {
 	case LANDLOCK_RULE_PATH_BENEATH:
 		print_landlock_path_beneath_attr(tcp, tcp->u_arg[2]);
@@ -144,6 +150,7 @@ SYS_FUNC(landlock_add_rule)
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	PRINT_VAL_X((unsigned int) tcp->u_arg[3]);
 
 	return RVAL_DECODED;
@@ -152,10 +159,12 @@ SYS_FUNC(landlock_add_rule)
 SYS_FUNC(landlock_restrict_self)
 {
 	/* ruleset_fd */
+	print_syscall_param("ruleset_fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	PRINT_VAL_X((unsigned int) tcp->u_arg[1]);
 
 	return RVAL_DECODED;

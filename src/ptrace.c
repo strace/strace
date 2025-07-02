@@ -294,6 +294,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 #endif /* HAVE_COMPAT_PTRACE_MACROS */
 
 	/* request */
+	print_syscall_param("op");
 	printxval64(ptrace_cmds, request, "PTRACE_???");
 
 	if (request == PTRACE_TRACEME) {
@@ -303,6 +304,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 
 	/* pid */
 	tprint_arg_next();
+	print_syscall_param("pid");
 	printpid(tcp, pid, PT_TGID);
 
 	switch (request) {
@@ -316,6 +318,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 
 	/* addr */
 	tprint_arg_next();
+	print_syscall_param("addr");
 	switch (request) {
 	case PTRACE_PEEKUSER:
 #ifdef IA64
@@ -384,6 +387,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 
 	/* data */
 	tprint_arg_next();
+	print_syscall_param("data");
 	switch (request) {
 	case PTRACE_CONT:
 	case PTRACE_DETACH:

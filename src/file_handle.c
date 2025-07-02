@@ -42,22 +42,27 @@ SYS_FUNC(name_to_handle_at)
 
 	if (entering(tcp)) {
 		/* dirfd */
+		print_syscall_param("dirfd");
 		print_dirfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* pathname */
+		print_syscall_param("pathname");
 		printpath(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* handle */
+		print_syscall_param("handle");
 		if (umove_or_printaddr(tcp, addr, &h)) {
 			tprint_arg_next();
 
 			/* mount_id */
+			print_syscall_param("mount_id");
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
 
 			/* flags */
+			print_syscall_param("flags");
 			printflags(name_to_handle_at_flags, tcp->u_arg[4],
 				   "AT_???");
 
@@ -90,10 +95,12 @@ SYS_FUNC(name_to_handle_at)
 		tprint_arg_next();
 
 		/* mount_id */
+		print_syscall_param("mount_id");
 		printnum_int(tcp, tcp->u_arg[3], "%d");
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		printflags(name_to_handle_at_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
@@ -105,10 +112,12 @@ SYS_FUNC(open_by_handle_at)
 	const kernel_ulong_t addr = tcp->u_arg[1];
 
 	/* mount_fd */
+	print_syscall_param("mount_fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* handle */
+	print_syscall_param("handle");
 	if (!umove_or_printaddr(tcp, addr, &h)) {
 		tprint_struct_begin();
 		PRINT_FIELD_U(h, handle_bytes);
@@ -122,6 +131,7 @@ SYS_FUNC(open_by_handle_at)
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	tprint_open_modes(tcp->u_arg[2]);
 
 	return RVAL_DECODED | RVAL_FD;

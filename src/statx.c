@@ -31,14 +31,17 @@ SYS_FUNC(statx)
 {
 	if (entering(tcp)) {
 		/* dirfd */
+		print_syscall_param("dirfd");
 		print_dirfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* pathname */
+		print_syscall_param("pathname");
 		printpath(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		unsigned int flags = tcp->u_arg[2];
 		tprint_flags_begin();
 		printflags_in(at_statx_sync_types, flags & AT_STATX_SYNC_TYPE,
@@ -52,10 +55,12 @@ SYS_FUNC(statx)
 		tprint_arg_next();
 
 		/* mask */
+		print_syscall_param("mask");
 		printflags(statx_masks, tcp->u_arg[3], "STATX_???");
 		tprint_arg_next();
 	} else {
 		/* statxbuf */
+		print_syscall_param("statxbuf");
 		struct_statx stx;
 		if (umove_or_printaddr(tcp, tcp->u_arg[4], &stx))
 			return 0;

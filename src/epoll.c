@@ -15,6 +15,7 @@
 SYS_FUNC(epoll_create)
 {
 	/* size */
+	print_syscall_param("size");
 	int size = tcp->u_arg[0];
 	PRINT_VAL_D(size);
 
@@ -26,6 +27,7 @@ SYS_FUNC(epoll_create)
 SYS_FUNC(epoll_create1)
 {
 	/* flags */
+	print_syscall_param("flags");
 	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -52,19 +54,23 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(epoll_ctl)
 {
 	/* epfd */
+	print_syscall_param("epfd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* op */
+	print_syscall_param("op");
 	const unsigned int op = tcp->u_arg[1];
 	printxval(epollctls, op, "EPOLL_CTL_???");
 	tprint_arg_next();
 
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* event */
+	print_syscall_param("event");
 	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == op)
 		printaddr(tcp->u_arg[3]);
@@ -79,21 +85,25 @@ epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	if (entering(tcp)) {
 		/* epfd */
+		print_syscall_param("epfd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* events */
+		print_syscall_param("events");
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    tfetch_mem, print_epoll_event, 0);
 		tprint_arg_next();
 
 		/* maxevents */
+		print_syscall_param("maxevents");
 		int maxevents = tcp->u_arg[2];
 		PRINT_VAL_D(maxevents);
 		tprint_arg_next();
 
 		/* timeout */
+		print_syscall_param("timeout");
 		print_timeout(tcp, tcp->u_arg[3]);
 	}
 }
@@ -120,10 +130,12 @@ epoll_pwait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 		tprint_arg_next();
 		/* sigmask */
 		/* NB: kernel requires arg[5] == NSIG_BYTES */
+		print_syscall_param("sigmask");
 		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		tprint_arg_next();
 
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[5]);
 	}
 	return 0;

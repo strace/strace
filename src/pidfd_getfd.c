@@ -17,10 +17,12 @@ SYS_FUNC(pidfd_getfd)
 	unsigned int flags = (unsigned int) tcp->u_arg[2];
 
 	/* pidfd */
+	print_syscall_param("pidfd");
 	printfd(tcp, pidfd);
 	tprint_arg_next();
 
 	/* targetfd */
+	print_syscall_param("targetfd");
 	pid_t target_pid = pidfd_get_pid(tcp->pid, pidfd);
 	if (target_pid > 0)
 		printfd_pid(tcp, target_pid, targetfd);
@@ -29,6 +31,7 @@ SYS_FUNC(pidfd_getfd)
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	PRINT_VAL_X(flags);
 
 	return RVAL_DECODED | RVAL_FD;

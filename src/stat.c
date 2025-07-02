@@ -22,10 +22,12 @@ SYS_FUNC(stat)
 {
 	if (entering(tcp)) {
 		/* pathname */
+		print_syscall_param("pathname");
 		printpath(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* statbuf */
+		print_syscall_param("statbuf");
 		decode_struct_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -35,10 +37,12 @@ SYS_FUNC(fstat)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* statbuf */
+		print_syscall_param("statbuf");
 		decode_struct_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -48,18 +52,22 @@ SYS_FUNC(newfstatat)
 {
 	if (entering(tcp)) {
 		/* dirfd */
+		print_syscall_param("dirfd");
 		print_dirfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* pathname */
+		print_syscall_param("pathname");
 		printpath(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
 	} else {
 		/* statbuf */
+		print_syscall_param("statbuf");
 		decode_struct_stat(tcp, tcp->u_arg[2]);
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
 	return 0;

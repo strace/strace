@@ -134,19 +134,23 @@ SYS_FUNC(semctl)
 
 	if (entering(tcp)) {
 		/* semid */
+		print_syscall_param("semid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* semnum */
+		print_syscall_param("semnum");
 		PRINT_VAL_D((int) tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* cmd */
+		print_syscall_param("cmd");
 		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 		tprint_arg_next();
 
 		if (indirect_addr) {
 			semun_ptr_t ptr;
+			print_syscall_param("arg");
 			if (umove_or_printaddr(tcp, tcp->u_arg[3], &ptr))
 				return RVAL_DECODED;
 			addr = ptr;
@@ -155,6 +159,7 @@ SYS_FUNC(semctl)
 		}
 		switch (cmd) {
 		case IPC_SET:
+			print_syscall_param("arg");
 			print_semid_ds(tcp, addr, cmd, indirect_addr);
 			return RVAL_DECODED;
 
@@ -168,6 +173,7 @@ SYS_FUNC(semctl)
 			break;
 
 		default:
+			print_syscall_param("arg");
 			if (indirect_addr)
 				tprint_indirect_begin();
 			printaddr(addr);
@@ -181,11 +187,13 @@ SYS_FUNC(semctl)
 		case IPC_STAT:
 		case SEM_STAT:
 		case SEM_STAT_ANY:
+			print_syscall_param("arg");
 			print_semid_ds(tcp, addr, cmd, indirect_addr);
 			break;
 
 		case IPC_INFO:
 		case SEM_INFO:
+			print_syscall_param("arg");
 			print_seminfo(tcp, addr, cmd, indirect_addr);
 			break;
 		}

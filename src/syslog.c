@@ -18,6 +18,7 @@ SYS_FUNC(syslog)
 
 	if (entering(tcp)) {
 		/* type */
+		print_syscall_param("type");
 		printxval_ex(syslog_action_type, type, "SYSLOG_ACTION_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 	}
@@ -44,10 +45,12 @@ SYS_FUNC(syslog)
 		tprint_arg_next();
 
 		/* bufp */
+		print_syscall_param("bufp");
 		printaddr64(tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* len */
+		print_syscall_param("len");
 		printxval_ex(syslog_console_levels, len, "LOGLEVEL_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 		return RVAL_DECODED;
@@ -68,6 +71,7 @@ SYS_FUNC(syslog)
 	tprint_arg_next();
 
 	/* bufp */
+	print_syscall_param("bufp");
 	if (syserror(tcp))
 		printaddr64(tcp->u_arg[1]);
 	else
@@ -75,6 +79,7 @@ SYS_FUNC(syslog)
 	tprint_arg_next();
 
 	/* len */
+	print_syscall_param("len");
 	PRINT_VAL_D(len);
 
 	return 0;

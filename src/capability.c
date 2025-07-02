@@ -129,11 +129,13 @@ SYS_FUNC(capget)
 
 	if (entering(tcp)) {
 		/* hdrp */
+		print_syscall_param("hdrp");
 		h = get_cap_header(tcp, tcp->u_arg[0]);
 		print_cap_header(tcp, tcp->u_arg[0], h);
 		tprint_arg_next();
 	} else {
 		/* datap */
+		print_syscall_param("datap");
 		h = syserror(tcp) ? NULL : get_cap_header(tcp, tcp->u_arg[0]);
 		print_cap_data(tcp, tcp->u_arg[1], h);
 	}
@@ -143,12 +145,14 @@ SYS_FUNC(capget)
 SYS_FUNC(capset)
 {
 	/* hdrp */
+	print_syscall_param("hdrp");
 	const struct user_cap_header_struct *const h =
 		get_cap_header(tcp, tcp->u_arg[0]);
 	print_cap_header(tcp, tcp->u_arg[0], h);
 	tprint_arg_next();
 
 	/* datap */
+	print_syscall_param("datap");
 	print_cap_data(tcp, tcp->u_arg[1], h);
 
 	return RVAL_DECODED;

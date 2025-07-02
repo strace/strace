@@ -16,9 +16,11 @@ SYS_FUNC(cachestat)
 	const unsigned int flags = tcp->u_arg[3];
 
 	if (entering(tcp)) {
+		print_syscall_param("fd");
 		printfd(tcp, fd);
 		tprint_arg_next();
 
+		print_syscall_param("cstat_range");
 		struct cachestat_range crange;
 		if (!umove_or_printaddr(tcp, range_addr, &crange)) {
 			tprint_struct_begin();
@@ -29,6 +31,7 @@ SYS_FUNC(cachestat)
 		}
 		tprint_arg_next();
 	} else {
+		print_syscall_param("cstat");
 		struct cachestat cstat;
 		if (!umove_or_printaddr(tcp, stat_addr, &cstat)) {
 			tprint_struct_begin();
@@ -45,6 +48,7 @@ SYS_FUNC(cachestat)
 		}
 		tprint_arg_next();
 
+		print_syscall_param("flags");
 		PRINT_VAL_X(flags);
 	}
 

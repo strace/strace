@@ -63,12 +63,15 @@ decode_dfd_file_flags(struct tcb *const tcp,
 		      const unsigned int flags,
 		      const char *const dflt)
 {
+	print_syscall_param("dirfd");
 	print_dirfd(tcp, dirfd);
 	tprint_arg_next();
 
+	print_syscall_param("pathname");
 	printpath(tcp, fname);
 	tprint_arg_next();
 
+	print_syscall_param("flags");
 	printflags(x, flags, dflt);
 
 }
@@ -86,9 +89,11 @@ decode_dfd_file_flags_attr(struct tcb *const tcp,
 	decode_dfd_file_flags(tcp, dirfd, fname, x, flags, dflt);
 	tprint_arg_next();
 
+	print_syscall_param("attr");
 	print_mount_attr(tcp, attr, attr_size);
 	tprint_arg_next();
 
+	print_syscall_param("size");
 	PRINT_VAL_U(attr_size);
 }
 
