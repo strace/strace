@@ -103,7 +103,6 @@
 /* printargs_d does the right thing */
 # define sys_iopl		printargs_d
 # define sys_nice		printargs_d
-# define sys_pkey_free		printargs_d
 # define sys_setpgrp		printargs_d
 # define sys_timer_delete	printargs_d
 # define sys_timer_getoverrun	printargs_d
