@@ -150,19 +150,20 @@ SYS_FUNC(sendmmsg)
 {
 	if (entering(tcp)) {
 		/* sockfd */
+		tprints_arg_name("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 
 		if (!verbose(tcp)) {
 			/* msgvec */
-			tprint_arg_next();
+			tprints_arg_next_name("msgvec");
 			printaddr(tcp->u_arg[1]);
 
 			/* vlen */
-			tprint_arg_next();
+			tprints_arg_next_name("vlen");
 			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
-			tprint_arg_next();
+			tprints_arg_next_name("flags");
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			return RVAL_DECODED;
 		}
@@ -170,18 +171,18 @@ SYS_FUNC(sendmmsg)
 		const unsigned int msg_len_vlen =
 			syserror(tcp) ? 0 : tcp->u_rval;
 		/* msgvec */
-		tprint_arg_next();
+		tprints_arg_next_name("msgvec");
 		temporarily_clear_syserror(tcp);
 		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			       msg_len_vlen, false);
 		restore_cleared_syserror(tcp);
 
 		/* vlen */
-		tprint_arg_next();
+		tprints_arg_next_name("vlen");
 		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 		/* flags */
-		tprint_arg_next();
+		tprints_arg_next_name("flags");
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
@@ -193,6 +194,7 @@ do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 {
 	if (entering(tcp)) {
 		/* sockfd */
+		tprints_arg_name("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 
 		if (verbose(tcp)) {
@@ -200,39 +202,39 @@ do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 					     sprint_ts(tcp, tcp->u_arg[4]));
 		} else {
 			/* msgvec */
-			tprint_arg_next();
+			tprints_arg_next_name("msgvec");
 			printaddr(tcp->u_arg[1]);
 
 			/* vlen */
-			tprint_arg_next();
+			tprints_arg_next_name("vlen");
 			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
-			tprint_arg_next();
+			tprints_arg_next_name("flags");
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
 			/* timeout */
-			tprint_arg_next();
+			tprints_arg_next_name("timeout");
 			print_ts(tcp, tcp->u_arg[4]);
 		}
 		return 0;
 	} else {
 		if (verbose(tcp)) {
 			/* msgvec */
-			tprint_arg_next();
+			tprints_arg_next_name("msgvec");
 			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval,
 				       tcp->u_rval, true);
 
 			/* vlen */
-			tprint_arg_next();
+			tprints_arg_next_name("vlen");
 			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
-			tprint_arg_next();
+			tprints_arg_next_name("flags");
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
 			/* timeout on entrance */
-			tprint_arg_next();
+			tprints_arg_next_name("timeout");
 			tprints_string(*(const char **) get_tcb_priv_data(tcp));
 		}
 		if (syserror(tcp))

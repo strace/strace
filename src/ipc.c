@@ -9,12 +9,21 @@
 #include "defs.h"
 #include "xlat/ipccalls.h"
 
+static const char *ipc_arg_name[] = {
+	"first",
+	"second",
+	"third",
+	"ptr",
+	"fifth"
+};
+
 SYS_FUNC(ipc)
 {
 	unsigned int call = tcp->u_arg[0];
 	unsigned int version = call >> 16;
 	call &= 0xffff;
 
+	tprints_arg_name("call");
 	tprint_flags_begin();
 	if (version) {
 		tprint_shift_begin();
@@ -28,7 +37,7 @@ SYS_FUNC(ipc)
 	tprint_flags_end();
 
 	for (unsigned int i = 1; i < n_args(tcp); ++i) {
-		tprint_arg_next();
+		tprints_arg_next_name(ipc_arg_name[i - 1]);
 		PRINT_VAL_X(tcp->u_arg[i]);
 	}
 

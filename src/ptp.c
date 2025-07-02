@@ -85,7 +85,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp))
 			return 0;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
@@ -119,7 +119,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_EXTTS_REQUEST, 16);
 		CHECK_IOCTL_SIZE(PTP_EXTTS_REQUEST2, 16);
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &extts))
 			break;
 
@@ -140,7 +140,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_PEROUT_REQUEST, 56);
 		CHECK_IOCTL_SIZE(PTP_PEROUT_REQUEST2, 56);
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &perout))
 			break;
 
@@ -173,7 +173,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	case PTP_ENABLE_PPS:
 	case PTP_ENABLE_PPS2:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_X(arg);
 		break;
 
@@ -185,7 +185,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET2, 832);
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &sysoff))
 				break;
 
@@ -224,7 +224,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_PIN_SETFUNC2, 96);
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 
 			if (umove_or_printaddr(tcp, arg, &pinfunc))
 				break;
@@ -281,7 +281,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp))
 			return 0;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &sysoff))
 			break;
 
@@ -306,7 +306,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_EXTENDED2, 1216);
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &sysoff))
 				break;
 

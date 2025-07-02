@@ -16,10 +16,11 @@
 SYS_FUNC(sram_alloc)
 {
 	/* size */
+	tprints_arg_name("size");
 	PRINT_VAL_U(tcp->u_arg[0]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags64(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
 
 	return RVAL_DECODED | RVAL_HEX;

@@ -129,31 +129,31 @@ seccomp_ioctl(struct tcb *const tcp, const unsigned int code,
 	switch (code) {
 	case SECCOMP_IOCTL_NOTIF_RECV:
 		if (entering(tcp))
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 
 		return print_struct_seccomp_notif(tcp, arg);
 
 	case SECCOMP_IOCTL_NOTIF_SEND:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		print_struct_seccomp_notif_resp(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR:
 	case SECCOMP_IOCTL_NOTIF_ID_VALID:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%#" PRIx64);
 
 		return RVAL_IOCTL_DECODED;
 
 	case SECCOMP_IOCTL_NOTIF_ADDFD:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		print_struct_seccomp_notif_addfd(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case SECCOMP_IOCTL_NOTIF_SET_FLAGS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printflags64(seccomp_ioctl_notif_flags, arg, "SECCOMP_USER_NOTIF_???");
 
 		return RVAL_IOCTL_DECODED;

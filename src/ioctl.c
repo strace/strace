@@ -351,7 +351,7 @@ ioctl_decode_unknown_type(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (print_before)
 			ret = printstr_ex(tcp, arg, _IOC_SIZE(code),
 			                  QUOTE_FORCE_HEX);
@@ -512,6 +512,7 @@ SYS_FUNC(ioctl)
 		char path[PATH_MAX + 1];
 		bool deleted;
 
+		tprints_arg_name("fd");
 		if (ioctl_command_overlaps(tcp->u_arg[1]) &&
 		    getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
 				  &deleted) >= 0) {
@@ -521,7 +522,7 @@ SYS_FUNC(ioctl)
 		} else
 			printfd(tcp, tcp->u_arg[0]);
 
-		tprint_arg_next();
+		tprints_arg_next_name("op");
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)
 			PRINT_VAL_X((unsigned int) tcp->u_arg[1]);
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
@@ -555,7 +556,7 @@ SYS_FUNC(ioctl)
 		ret &= ~RVAL_IOCTL_DECODED;
 		ret |= RVAL_DECODED;
 	} else if (ret & RVAL_DECODED) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_X(tcp->u_arg[2]);
 	}
 

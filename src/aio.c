@@ -22,11 +22,12 @@ SYS_FUNC(io_setup)
 {
 	if (entering(tcp)) {
 		/* nr_events */
+		tprints_arg_name("nr_events");
 		unsigned int nr_events = tcp->u_arg[0];
 		PRINT_VAL_U(nr_events);
 	} else {
 		/* ctx_idp */
-		tprint_arg_next();
+		tprints_arg_next_name("ctx_idp");
 		printnum_ptr(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -35,6 +36,7 @@ SYS_FUNC(io_setup)
 SYS_FUNC(io_destroy)
 {
 	/* ctx_id */
+	tprints_arg_name("ctx_id");
 	printaddr(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
@@ -208,16 +210,17 @@ SYS_FUNC(io_submit)
 	kernel_ulong_t iocbp;
 
 	/* ctx_id */
+	tprints_arg_name("ctx_id");
 	printaddr(tcp->u_arg[0]);
 
 	/* nr */
-	tprint_arg_next();
+	tprints_arg_next_name("nr");
 	const kernel_long_t nr =
 		truncate_klong_to_current_wordsize(tcp->u_arg[1]);
 	PRINT_VAL_D(nr);
 
 	/* iocbpp */
-	tprint_arg_next();
+	tprints_arg_next_name("iocbpp");
 	if (nr < 0)
 		printaddr(addr);
 	else
@@ -249,10 +252,11 @@ SYS_FUNC(io_cancel)
 {
 	if (entering(tcp)) {
 		/* ctx_id */
+		tprints_arg_name("ctx_id");
 		printaddr(tcp->u_arg[0]);
 
 		/* iocb */
-		tprint_arg_next();
+		tprints_arg_next_name("iocb");
 		struct iocb cb;
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &cb)) {
 			tprint_struct_begin();
@@ -261,7 +265,7 @@ SYS_FUNC(io_cancel)
 		}
 	} else {
 		/* result */
-		tprint_arg_next();
+		tprints_arg_next_name("result");
 		struct io_event event;
 		if (!umove_or_printaddr(tcp, tcp->u_arg[2], &event))
 			print_io_event(tcp, &event, sizeof(event), 0);
@@ -277,20 +281,21 @@ print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 		kernel_long_t nr;
 
 		/* ctx_id */
+		tprints_arg_name("ctx_id");
 		printaddr(tcp->u_arg[0]);
 
 		/* min_nr */
-		tprint_arg_next();
+		tprints_arg_next_name("min_nr");
 		nr = truncate_klong_to_current_wordsize(tcp->u_arg[1]);
 		PRINT_VAL_D(nr);
 
 		/* nr */
-		tprint_arg_next();
+		tprints_arg_next_name("nr");
 		nr = truncate_klong_to_current_wordsize(tcp->u_arg[2]);
 		PRINT_VAL_D(nr);
 	} else {
 		/* events */
-		tprint_arg_next();
+		tprints_arg_next_name("events");
 		struct io_event buf;
 		print_array(tcp, tcp->u_arg[3], tcp->u_rval, &buf, sizeof(buf),
 			    tfetch_mem, print_io_event, 0);
@@ -303,12 +308,12 @@ print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 		temporarily_clear_syserror(tcp);
 
 		/* timeout */
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, tcp->u_arg[4]);
 
 		if (has_sig) {
 			/* sig */
-			tprint_arg_next();
+			tprints_arg_next_name("sig");
 			print_kernel_sigset(tcp, tcp->u_arg[5]);
 		}
 

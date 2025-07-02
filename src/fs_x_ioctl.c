@@ -57,19 +57,19 @@ fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case FITRIM:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_fstrim_range(tcp, arg);
 		break;
 
 	case FS_IOC_FSGETXATTR:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		decode_fsxattr(tcp, arg, true);
 		break;
 
 	case FS_IOC_FSSETXATTR:
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		decode_fsxattr(tcp, arg, false);
 		break;
 

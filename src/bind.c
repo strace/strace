@@ -14,15 +14,16 @@
 SYS_FUNC(bind)
 {
 	/* sockfd */
+	tprints_arg_name("sockfd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* addr */
-	tprint_arg_next();
+	tprints_arg_next_name("addr");
 	const int addrlen = tcp->u_arg[2];
 	decode_sockaddr(tcp, tcp->u_arg[1], addrlen);
 
 	/* addrlen */
-	tprint_arg_next();
+	tprints_arg_next_name("addrlen");
 	PRINT_VAL_D(addrlen);
 
 	return RVAL_DECODED;

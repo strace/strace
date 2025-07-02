@@ -12,6 +12,7 @@ SYS_FUNC(getrandom)
 {
 	if (exiting(tcp)) {
 		/* buf */
+		tprints_arg_name("buf");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[0]);
 		else
@@ -19,11 +20,11 @@ SYS_FUNC(getrandom)
 				    QUOTE_FORCE_HEX);
 
 		/* buflen */
-		tprint_arg_next();
+		tprints_arg_next_name("buflen");
 		PRINT_VAL_U(tcp->u_arg[1]);
 
 		/* flags */
-		tprint_arg_next();
+		tprints_arg_next_name("flags");
 		printflags(getrandom_flags, tcp->u_arg[2], "GRND_???");
 	}
 	return 0;

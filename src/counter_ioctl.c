@@ -57,7 +57,7 @@ counter_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case COUNTER_ADD_WATCH_IOCTL:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		print_struct_counter_watch(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 

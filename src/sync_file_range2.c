@@ -15,19 +15,20 @@
 SYS_FUNC(sync_file_range2)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(sync_file_range_flags, tcp->u_arg[1],
 		   "SYNC_FILE_RANGE_???");
 
 	/* offset */
-	tprint_arg_next();
+	tprints_arg_next_name("offset");
 	unsigned int argn = print_arg_lld(tcp, 2);
 
 	/* nbytes */
-	tprint_arg_next();
+	tprints_arg_next_name("nbytes");
 	print_arg_lld(tcp, argn);
 
 	return RVAL_DECODED;

@@ -10,26 +10,27 @@
 SYS_FUNC(copy_file_range)
 {
 	/* int fd_in */
+	tprints_arg_name("fd_in");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* loff_t *off_in */
-	tprint_arg_next();
+	tprints_arg_next_name("off_in");
 	printnum_int64(tcp, tcp->u_arg[1], "%" PRId64);
 
 	/* int fd_out */
-	tprint_arg_next();
+	tprints_arg_next_name("fd_out");
 	printfd(tcp, tcp->u_arg[2]);
 
 	/* loff_t *off_out */
-	tprint_arg_next();
+	tprints_arg_next_name("off_out");
 	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
 
 	/* size_t len */
-	tprint_arg_next();
+	tprints_arg_next_name("len");
 	PRINT_VAL_U(tcp->u_arg[4]);
 
 	/* unsigned int flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	unsigned int flags = tcp->u_arg[5];
 	PRINT_VAL_U(flags);
 

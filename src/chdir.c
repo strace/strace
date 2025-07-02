@@ -9,6 +9,7 @@
 
 SYS_FUNC(chdir)
 {
+	tprints_arg_name("path");
 	printpath(tcp, tcp->u_arg[0]);
 
 	return RVAL_DECODED;

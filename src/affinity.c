@@ -96,16 +96,17 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 SYS_FUNC(sched_setaffinity)
 {
 	/* pid */
+	tprints_arg_name("pid");
 	const int pid = tcp->u_arg[0];
 	printpid(tcp, pid, PT_TGID);
 
 	/* cpusetsize */
-	tprint_arg_next();
+	tprints_arg_next_name("cpusetsize");
 	const unsigned int len = tcp->u_arg[1];
 	PRINT_VAL_U(len);
 
 	/* mask */
-	tprint_arg_next();
+	tprints_arg_next_name("mask");
 	print_affinitylist(tcp, tcp->u_arg[2], len);
 
 	return RVAL_DECODED;
@@ -115,16 +116,17 @@ SYS_FUNC(sched_getaffinity)
 {
 	if (entering(tcp)) {
 		/* pid */
+		tprints_arg_name("pid");
 		const int pid = tcp->u_arg[0];
 		printpid(tcp, pid, PT_TGID);
 
 		/* cpusetsize */
-		tprint_arg_next();
+		tprints_arg_next_name("cpusetsize");
 		const unsigned int len = tcp->u_arg[1];
 		PRINT_VAL_U(len);
 	} else {
 		/* mask */
-		tprint_arg_next();
+		tprints_arg_next_name("mask");
 		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}
 	return 0;

@@ -310,7 +310,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 # ifdef TCSETSF2
 	case TCSETSF2:
 # endif
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_termios2(tcp, arg);
 		break;
 #endif /* HAVE_STRUCT_TERMIOS2 */
@@ -325,7 +325,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TCSETSW:
 	case TCSETSF:
 	case TIOCSLCKTRMIOS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_termios(tcp, arg);
 		break;
 
@@ -337,7 +337,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TCSETA:
 	case TCSETAW:
 	case TCSETAF:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_termio(tcp, arg);
 		break;
 
@@ -347,7 +347,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSWINSZ:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_winsize(tcp, arg);
 		break;
 
@@ -358,24 +358,24 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSSIZE:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_ttysize(tcp, arg);
 		break;
 #endif
 
 	/* ioctls with a direct decodable arg */
 	case TCXONC:
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		printxval64(tcxonc_options, arg, "TC???");
 		break;
 	case TCFLSH:
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		printxval64(tcflsh_options, arg, "TC???");
 		break;
 	case TCSBRK:
 	case TCSBRKP:
 	case TIOCSCTTY:
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		PRINT_VAL_D((int) arg);
 		break;
 
@@ -387,7 +387,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TIOCMBIS:
 	case TIOCMBIC:
 	case TIOCMSET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_modem_flags(tcp, arg);
 		break;
 
@@ -410,18 +410,24 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSPGRP:
 	case TIOCSETD:
+	case TIOCSSOFTCAR:
 	case FIONBIO:
 	case FIOASYNC:
+		tprints_arg_next_name("argp");
+		printnum_int(tcp, arg, "%d");
+		break;
 	case TIOCPKT:
-	case TIOCSSOFTCAR:
+		tprints_arg_next_name("mode");
+		printnum_int(tcp, arg, "%d");
+		break;
 	case TIOCSPTLCK:
-		tprint_arg_next();
+		tprints_arg_next_name("lock");
 		printnum_int(tcp, arg, "%d");
 		break;
 
 	/* ioctls with an indirect parameter displayed as a char */
 	case TIOCSTI:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printstrn(tcp, arg, 1);
 		break;
 

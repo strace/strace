@@ -277,16 +277,17 @@ decode_ptrace_entering(struct tcb *const tcp)
 		case COMPAT_PTRACE_SETVFPREGS:
 		case COMPAT_PTRACE_GETHBPREGS:
 		case COMPAT_PTRACE_SETHBPREGS:
+			tprints_arg_name("op");
 			printxvals_ex(request, "COMPAT_PTRACE_???",
 				      xlat_verbose(xlat_verbosity)
 					== XLAT_STYLE_RAW ? XLAT_STYLE_RAW
 							  : XLAT_STYLE_VERBOSE,
 				      compat_ptrace_cmds, NULL);
-			tprint_arg_next();
+			tprints_arg_next_name("pid");
 			printpid(tcp, pid, PT_TGID);
-			tprint_arg_next();
+			tprints_arg_next_name("addr");
 			printaddr(addr);
-			tprint_arg_next();
+			tprints_arg_next_name("data");
 			printaddr(data);
 			return RVAL_DECODED;
 		}
@@ -294,6 +295,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 #endif /* HAVE_COMPAT_PTRACE_MACROS */
 
 	/* request */
+	tprints_arg_name("op");
 	printxval64(ptrace_cmds, request, "PTRACE_???");
 
 	if (request == PTRACE_TRACEME) {
@@ -302,7 +304,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 	}
 
 	/* pid */
-	tprint_arg_next();
+	tprints_arg_next_name("pid");
 	printpid(tcp, pid, PT_TGID);
 
 	switch (request) {
@@ -315,7 +317,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 	}
 
 	/* addr */
-	tprint_arg_next();
+	tprints_arg_next_name("addr");
 	switch (request) {
 	case PTRACE_PEEKUSER:
 #ifdef IA64
@@ -383,7 +385,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 	}
 
 	/* data */
-	tprint_arg_next();
+	tprints_arg_next_name("data");
 	switch (request) {
 	case PTRACE_CONT:
 	case PTRACE_DETACH:

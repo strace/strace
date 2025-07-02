@@ -11,10 +11,11 @@
 SYS_FUNC(umount2)
 {
 	/* target */
+	tprints_arg_name("target");
 	printpath(tcp, tcp->u_arg[0]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 
 	return RVAL_DECODED;

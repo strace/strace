@@ -23,10 +23,11 @@
 SYS_FUNC(msgget)
 {
 	/* key */
+	tprints_arg_name("key");
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 
 	/* msgflg */
-	tprint_arg_next();
+	tprints_arg_next_name("msgflg");
 	tprint_flags_begin();
 	if (printflags_in(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprint_flags_or();
@@ -40,21 +41,22 @@ tprint_msgsnd(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const unsigned int flags)
 {
 	/* msgp */
-	tprint_arg_next();
+	tprints_arg_next_name("msgp");
 	tprint_msgbuf(tcp, addr, count);
 
 	/* msgsz */
-	tprint_arg_next();
+	tprints_arg_next_name("msgsz");
 	PRINT_VAL_U(count);
 
 	/* msgflg */
-	tprint_arg_next();
+	tprints_arg_next_name("msgflg");
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
 SYS_FUNC(msgsnd)
 {
 	/* msqid */
+	tprints_arg_name("msqid");
 	PRINT_VAL_D((int) tcp->u_arg[0]);
 
 	if (indirect_ipccall(tcp)) {
@@ -72,15 +74,15 @@ tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const kernel_ulong_t msgtyp)
 {
 	/* msgp */
-	tprint_arg_next();
+	tprints_arg_next_name("msgp");
 	tprint_msgbuf(tcp, addr, count);
 
 	/* msgsz */
-	tprint_arg_next();
+	tprints_arg_next_name("msgsz");
 	PRINT_VAL_U(count);
 
 	/* msgtyp */
-	tprint_arg_next();
+	tprints_arg_next_name("msgtyp");
 	PRINT_VAL_D(truncate_klong_to_current_klongsize(msgtyp));
 }
 
@@ -106,6 +108,7 @@ SYS_FUNC(msgrcv)
 {
 	if (entering(tcp)) {
 		/* msqid */
+		tprints_arg_name("msqid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 	} else {
 		if (indirect_ipccall(tcp)) {
@@ -129,14 +132,14 @@ SYS_FUNC(msgrcv)
 				}
 			}
 			/* msgflg */
-			tprint_arg_next();
+			tprints_arg_next_name("msgflg");
 			printflags(ipc_msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
 			tprint_msgrcv(tcp, tcp->u_arg[1],
 				tcp->u_arg[2], tcp->u_arg[3]);
 
 			/* msgflg */
-			tprint_arg_next();
+			tprints_arg_next_name("msgflg");
 			printflags(ipc_msg_flags, tcp->u_arg[4], "MSG_???");
 		}
 	}

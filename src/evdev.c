@@ -408,10 +408,10 @@ evdev_ioctl(struct tcb *const tcp,
 	case _IOC_READ:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		return evdev_read_ioctl(tcp, code, arg);
 	case _IOC_WRITE:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		return evdev_write_ioctl(tcp, code, arg) | RVAL_DECODED;
 	default:
 		return RVAL_DECODED;

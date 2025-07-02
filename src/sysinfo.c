@@ -26,6 +26,7 @@ SYS_FUNC(sysinfo)
 	if (entering(tcp))
 		return 0;
 
+	tprints_arg_name("info");
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &si)) {
 		tprint_struct_begin();
 		PRINT_FIELD_U(si, uptime);

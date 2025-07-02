@@ -20,10 +20,11 @@ SYS_FUNC(utime)
 	utimbuf_t u;
 
 	/* filename */
+	tprints_arg_name("filename");
 	printpath(tcp, tcp->u_arg[0]);
 
 	/* times */
-	tprint_arg_next();
+	tprints_arg_next_name("times");
 	if (!umove_or_printaddr(tcp, tcp->u_arg[1], &u)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(u, actime);

@@ -25,7 +25,7 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint32_t info;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		if (umove_or_printaddr(tcp, arg, &info))
 			return RVAL_IOCTL_DECODED;
@@ -64,7 +64,7 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 perf_ioctl_modify_attributes(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!fetch_perf_event_attr(tcp, arg))
 		print_perf_event_attr(tcp, arg);
 
@@ -79,32 +79,32 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 	case PERF_EVENT_IOC_ENABLE:
 	case PERF_EVENT_IOC_DISABLE:
 	case PERF_EVENT_IOC_RESET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printflags(perf_ioctl_flags, arg, "PERF_IOC_FLAG_???");
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_REFRESH:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_D((int) arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_PERIOD:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%" PRIu64);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_SET_OUTPUT:
 	case PERF_EVENT_IOC_SET_BPF:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printfd(tcp, (int) arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_PAUSE_OUTPUT:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_U(arg);
 
 		return RVAL_IOCTL_DECODED;
@@ -114,7 +114,7 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 	 * due to the pointer size.
 	 */
 	case PERF_EVENT_IOC_SET_FILTER:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printstr_ex(tcp, arg, get_pagesize(), QUOTE_0_TERMINATED);
 
 		return RVAL_IOCTL_DECODED;
@@ -123,7 +123,7 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%" PRIu64);
 
 		return RVAL_IOCTL_DECODED;

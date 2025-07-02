@@ -19,10 +19,11 @@ SYS_FUNC(ustat)
 {
 	if (entering(tcp)) {
 		/* dev */
+		tprints_arg_name("dev");
 		print_dev_t((unsigned int) tcp->u_arg[0]);
 	} else {
 		/* ubuf */
-		tprint_arg_next();
+		tprints_arg_next_name("ubuf");
 #ifdef HAVE_USTAT_H
 		struct_ustat ust;
 

@@ -68,7 +68,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	bool rc;
 
 	if (entering(tcp))
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -122,12 +122,12 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case FICLONE:	/* W */
-		tprint_arg_next();
+		tprints_arg_next_name("src_fd");
 		PRINT_VAL_D((int) arg);
 		break;
 
 	case FICLONERANGE:	/* W */
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		decode_file_clone_range(tcp, arg);
 		break;
 
@@ -140,7 +140,7 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 
 	case FS_IOC_SETFSLABEL:	/* W */
-		tprint_arg_next();
+		tprints_arg_next_name("label");
 		decode_fslabel(tcp, arg);
 		break;
 

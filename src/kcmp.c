@@ -25,24 +25,25 @@ SYS_FUNC(kcmp)
 	kernel_ulong_t idx2 = tcp->u_arg[4];
 
 	/* pid1 */
+	tprints_arg_name("pid1");
 	printpid(tcp, pid1, PT_TGID);
 
 	/* pid2 */
-	tprint_arg_next();
+	tprints_arg_next_name("pid2");
 	printpid(tcp, pid2, PT_TGID);
 
 	/* type */
-	tprint_arg_next();
+	tprints_arg_next_name("type");
 	printxval(kcmp_types, type, "KCMP_???");
 
 	switch (type) {
 		case KCMP_FILE:
 			/* idx1 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx1");
 			printfd_pid_tracee_ns(tcp, pid1, idx1);
 
 			/* idx2 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx2");
 			printfd_pid_tracee_ns(tcp, pid2, idx2);
 
 			break;
@@ -51,11 +52,11 @@ SYS_FUNC(kcmp)
 			struct kcmp_epoll_slot slot;
 
 			/* idx1 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx1");
 			printfd_pid_tracee_ns(tcp, pid1, idx1);
 
 			/* idx2 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx2");
 			if (umove_or_printaddr(tcp, idx2, &slot))
 				break;
 
@@ -79,11 +80,11 @@ SYS_FUNC(kcmp)
 			break;
 		default:
 			/* idx1 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx1");
 			PRINT_VAL_X(idx1);
 
 			/* idx2 */
-			tprint_arg_next();
+			tprints_arg_next_name("idx2");
 			PRINT_VAL_X(idx2);
 	}
 

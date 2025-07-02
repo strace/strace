@@ -11,16 +11,17 @@ static int
 dup_123(struct tcb *const tcp, const int newfd_arg, const int flags_arg)
 {
 	/* oldfd */
+	tprints_arg_name("oldfd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	if (newfd_arg > 0) {
 		/* newfd */
-		tprint_arg_next();
+		tprints_arg_next_name("newfd");
 		printfd(tcp, tcp->u_arg[newfd_arg]);
 
 		if (flags_arg > 0) {
 			/* flags */
-			tprint_arg_next();
+			tprints_arg_next_name("flags");
 			printflags(open_mode_flags, tcp->u_arg[flags_arg],
 				   "O_???");
 		}

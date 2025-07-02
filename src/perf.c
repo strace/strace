@@ -468,6 +468,7 @@ SYS_FUNC(perf_event_open)
 	 */
 	if (entering(tcp)) {
 		/* attr */
+		tprints_arg_name("attr");
 		if (!fetch_perf_event_attr(tcp, tcp->u_arg[0]))
 			return 0;
 	} else {
@@ -476,19 +477,19 @@ SYS_FUNC(perf_event_open)
 	}
 
 	/* pid */
-	tprint_arg_next();
+	tprints_arg_next_name("pid");
 	PRINT_VAL_D((int) tcp->u_arg[1]);
 
 	/* cpu */
-	tprint_arg_next();
+	tprints_arg_next_name("cpu");
 	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	/* group_fd */
-	tprint_arg_next();
+	tprints_arg_next_name("group_fd");
 	printfd(tcp, tcp->u_arg[3]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags64(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
 
 	return RVAL_DECODED | RVAL_FD;

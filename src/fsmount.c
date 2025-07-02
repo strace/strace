@@ -13,14 +13,15 @@
 SYS_FUNC(fsmount)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(fsmount_flags, tcp->u_arg[1], "FSMOUNT_???");
 
 	/* attr_flags */
-	tprint_arg_next();
+	tprints_arg_next_name("attr_flags");
 	printflags(fsmount_attr_flags, tcp->u_arg[2], "MOUNT_ATTR_???");
 
 	return RVAL_DECODED | RVAL_FD;

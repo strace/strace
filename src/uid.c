@@ -57,6 +57,7 @@ SYS_FUNC(getuid)
 SYS_FUNC(setfsuid)
 {
 	/* fsuid */
+	tprints_arg_name("fsuid");
 	printuid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
@@ -65,6 +66,7 @@ SYS_FUNC(setfsuid)
 SYS_FUNC(setuid)
 {
 	/* uid */
+	tprints_arg_name("uid");
 	printuid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
@@ -88,14 +90,15 @@ SYS_FUNC(getresuid)
 		return 0;
 
 	/* ruid */
+	tprints_arg_name("ruid");
 	get_print_uid(tcp, tcp->u_arg[0]);
 
 	/* euid */
-	tprint_arg_next();
+	tprints_arg_next_name("euid");
 	get_print_uid(tcp, tcp->u_arg[1]);
 
 	/* suid */
-	tprint_arg_next();
+	tprints_arg_next_name("suid");
 	get_print_uid(tcp, tcp->u_arg[2]);
 
 	return 0;
@@ -104,10 +107,11 @@ SYS_FUNC(getresuid)
 SYS_FUNC(setreuid)
 {
 	/* ruid */
+	tprints_arg_name("ruid");
 	printuid(tcp->u_arg[0]);
 
 	/* euid */
-	tprint_arg_next();
+	tprints_arg_next_name("euid");
 	printuid(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -116,14 +120,15 @@ SYS_FUNC(setreuid)
 SYS_FUNC(setresuid)
 {
 	/* ruid */
+	tprints_arg_name("ruid");
 	printuid(tcp->u_arg[0]);
 
 	/* euid */
-	tprint_arg_next();
+	tprints_arg_next_name("euid");
 	printuid(tcp->u_arg[1]);
 
 	/* suid */
-	tprint_arg_next();
+	tprints_arg_next_name("suid");
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -132,14 +137,15 @@ SYS_FUNC(setresuid)
 SYS_FUNC(chown)
 {
 	/* pathname */
+	tprints_arg_name("pathname");
 	printpath(tcp, tcp->u_arg[0]);
 
 	/* owner */
-	tprint_arg_next();
+	tprints_arg_next_name("owner");
 	printuid(tcp->u_arg[1]);
 
 	/* group */
-	tprint_arg_next();
+	tprints_arg_next_name("group");
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -148,14 +154,15 @@ SYS_FUNC(chown)
 SYS_FUNC(fchown)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* owner */
-	tprint_arg_next();
+	tprints_arg_next_name("owner");
 	printuid(tcp->u_arg[1]);
 
 	/* group */
-	tprint_arg_next();
+	tprints_arg_next_name("group");
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -196,11 +203,12 @@ print_groups(struct tcb *const tcp, const unsigned int len,
 SYS_FUNC(setgroups)
 {
 	/* size */
+	tprints_arg_name("size");
 	const int len = tcp->u_arg[0];
 	PRINT_VAL_D(len);
 
 	/* list */
-	tprint_arg_next();
+	tprints_arg_next_name("list");
 	print_groups(tcp, len, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -209,11 +217,12 @@ SYS_FUNC(getgroups)
 {
 	if (entering(tcp)) {
 		/* size */
+		tprints_arg_name("size");
 		int size = tcp->u_arg[0];
 		PRINT_VAL_D(size);
 	} else {
 		/* list */
-		tprint_arg_next();
+		tprints_arg_next_name("list");
 		print_groups(tcp, tcp->u_rval, tcp->u_arg[1]);
 	}
 	return 0;

@@ -46,7 +46,7 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &id)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(id, host_no);
@@ -78,7 +78,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp)) {
 			uint32_t iid;
 
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &iid)) {
 				break;
 			} else {
@@ -104,7 +104,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	/* takes a value by pointer */
 	case SG_SCSI_RESET: {
 		unsigned int val;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (!umove_or_printaddr(tcp, arg, &val)) {
 			tprint_indirect_begin();
 			tprint_flags_begin();
@@ -132,7 +132,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SG_SET_KEEP_ORPHAN:
 	case SG_SET_RESERVED_SIZE:
 	case SG_SET_TIMEOUT:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%d");
 		break;
 
@@ -150,13 +150,13 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SG_GET_VERSION_NUM:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%d");
 		break;
 
 	/* takes an integer by value */
 	case SG_SET_TRANSFORM:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_X((unsigned int) arg);
 		break;
 

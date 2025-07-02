@@ -122,6 +122,7 @@ xgetdents(struct tcb *const tcp, const unsigned int header_size,
 {
 	if (entering(tcp)) {
 		/* fd */
+		tprints_arg_name("fd");
 		printfd(tcp, tcp->u_arg[0]);
 #ifdef ENABLE_SECONTEXT
 		tcp->last_dirfd = (int) tcp->u_arg[0];
@@ -131,7 +132,7 @@ xgetdents(struct tcb *const tcp, const unsigned int header_size,
 
 	const unsigned int count = tcp->u_arg[2];
 
-	tprint_arg_next();
+	tprints_arg_next_name("dirp");
 	if (syserror(tcp) || !verbose(tcp) ||
 	    (kernel_ulong_t) tcp->u_rval > count /* kernel gone bananas? */) {
 		printaddr(tcp->u_arg[1]);
@@ -140,7 +141,7 @@ xgetdents(struct tcb *const tcp, const unsigned int header_size,
 			     decode_dentry_head, decode_dentry_tail);
 	}
 
-	tprint_arg_next();
+	tprints_arg_next_name("count");
 	PRINT_VAL_U(count);
 	return 0;
 }

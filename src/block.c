@@ -64,7 +64,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	/* take arg as a value, not as a pointer */
 	case BLKRASET:
 	case BLKFRASET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_U(arg);
 		break;
 
@@ -73,7 +73,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKROTATIONAL:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_short(tcp, arg, "%hu");
 		break;
 
@@ -88,7 +88,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	/* take a signed int */
 	case BLKROSET:
 	case BLKBSZSET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%d");
 		break;
 
@@ -101,7 +101,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKGETNRZONES:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%u");
 		break;
 
@@ -110,7 +110,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKFRAGET:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_slong(tcp, arg);
 		break;
 
@@ -118,7 +118,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKGETSIZE:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_ulong(tcp, arg);
 		break;
 
@@ -127,7 +127,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKGETDISKSEQ:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
 
@@ -135,7 +135,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKDISCARD:
 	case BLKSECDISCARD:
 	case BLKZEROOUT:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printpair_int64(tcp, arg, "%" PRIu64);
 		break;
 
@@ -143,7 +143,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKPG: {
 		struct_blkpg_ioctl_arg blkpg;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (!umove_or_printaddr(tcp, arg, &blkpg))
 			print_blkpg_req(tcp, &blkpg);
 		break;
@@ -153,7 +153,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		if (entering(tcp)) {
 			struct_blk_user_trace_setup buts;
 
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &buts))
 				break;
 			tprint_struct_begin();

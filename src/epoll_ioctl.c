@@ -18,7 +18,7 @@ print_struct_epoll_params(struct tcb *const tcp, const kernel_ulong_t addr)
 	CHECK_TYPE_SIZE(struct epoll_params, 8);
 	struct epoll_params ep;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, addr, &ep))
 		return;
 

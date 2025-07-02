@@ -40,77 +40,78 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	const char *comment;
 
 	/* uaddr */
+	tprints_arg_name("uaddr");
 	printaddr(uaddr);
 
 	/* futex_op */
-	tprint_arg_next();
+	tprints_arg_next_name("futex_op");
 	printxval(futexops, op, "FUTEX_???");
 
 	switch (cmd) {
 	case FUTEX_WAIT:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, timeout);
 		break;
 	case FUTEX_LOCK_PI:
 	case FUTEX_LOCK_PI2:
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, timeout);
 		break;
 	case FUTEX_WAIT_BITSET:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, timeout);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val3");
 		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_WAKE_BITSET:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val3");
 		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_REQUEUE:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val2");
 		PRINT_VAL_U(val2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("uaddr2");
 		printaddr(uaddr2);
 		break;
 	case FUTEX_CMP_REQUEUE:
 	case FUTEX_CMP_REQUEUE_PI:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val2");
 		PRINT_VAL_U(val2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("uaddr2");
 		printaddr(uaddr2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val3");
 		PRINT_VAL_U(val3);
 		break;
 	case FUTEX_WAKE_OP:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val2");
 		PRINT_VAL_U(val2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("uaddr2");
 		printaddr(uaddr2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val3");
 		tprint_flags_begin();
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
 			tprint_shift_begin();
@@ -146,34 +147,34 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprint_flags_end();
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, timeout);
 
-		tprint_arg_next();
+		tprints_arg_next_name("uaddr2");
 		printaddr(uaddr2);
 		break;
 	case FUTEX_FD:
 	case FUTEX_WAKE:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 		break;
 	case FUTEX_UNLOCK_PI:
 	case FUTEX_TRYLOCK_PI:
 		break;
 	default:
-		tprint_arg_next();
+		tprints_arg_next_name("val");
 		PRINT_VAL_U(val);
 
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		printaddr(timeout);
 
-		tprint_arg_next();
+		tprints_arg_next_name("uaddr2");
 		printaddr(uaddr2);
 
-		tprint_arg_next();
+		tprints_arg_next_name("val3");
 		PRINT_VAL_X(val3);
 		break;
 	}

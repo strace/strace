@@ -14,10 +14,11 @@
 SYS_FUNC(listen)
 {
 	/* sockfd */
+	tprints_arg_name("sockfd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* backlog */
-	tprint_arg_next();
+	tprints_arg_next_name("backlog");
 	PRINT_VAL_D((int) tcp->u_arg[1]);
 
 	return RVAL_DECODED;

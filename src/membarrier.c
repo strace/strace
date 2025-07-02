@@ -19,15 +19,16 @@ SYS_FUNC(membarrier)
 		int cpu_id = tcp->u_arg[2];
 
 		/* cmd */
+		tprints_arg_name("cmd");
 		printxval(membarrier_cmds, cmd, "MEMBARRIER_CMD_???");
 
 		/* flags */
-		tprint_arg_next();
+		tprints_arg_next_name("flags");
 		printflags(membarrier_flags, flags, "MEMBARRIER_CMD_FLAG_???");
 
 		if (flags & MEMBARRIER_CMD_FLAG_CPU) {
 			/* cpu_id */
-			tprint_arg_next();
+			tprints_arg_next_name("cpu_id");
 			PRINT_VAL_D(cpu_id);
 		}
 

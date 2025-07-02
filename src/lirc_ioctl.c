@@ -45,7 +45,7 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 	}
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &value))
 		return RVAL_IOCTL_DECODED;
 

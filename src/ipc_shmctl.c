@@ -138,13 +138,14 @@ SYS_FUNC(shmctl)
 
 	if (entering(tcp)) {
 		/* shmid */
+		tprints_arg_name("shmid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 
 		/* cmd */
-		tprint_arg_next();
+		tprints_arg_next_name("op");
 		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
 
-		tprint_arg_next();
+		tprints_arg_next_name("buf");
 		switch (cmd) {
 		case IPC_SET:
 			/* buf */

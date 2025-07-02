@@ -12,18 +12,19 @@ SYS_FUNC(sendfile64)
 {
 	if (entering(tcp)) {
 		/* out_fd */
+		tprints_arg_name("out_fd");
 		printfd(tcp, tcp->u_arg[0]);
 
 		/* in_fd */
-		tprint_arg_next();
+		tprints_arg_next_name("in_fd");
 		printfd(tcp, tcp->u_arg[1]);
 
 		/* offset */
-		tprint_arg_next();
+		tprints_arg_next_name("offset");
 		if (!printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64)) {
 
 			/* count */
-			tprint_arg_next();
+			tprints_arg_next_name("count");
 			PRINT_VAL_U(tcp->u_arg[3]);
 			return RVAL_DECODED;
 		}
@@ -32,11 +33,12 @@ SYS_FUNC(sendfile64)
 			tprint_value_changed();
 
 			/* offset */
+			tprints_arg_name("offset");
 			printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
 		}
 
 		/* count */
-		tprint_arg_next();
+		tprints_arg_next_name("count");
 		PRINT_VAL_U(tcp->u_arg[3]);
 	}
 
@@ -47,19 +49,20 @@ SYS_FUNC(sendfile)
 {
 	if (entering(tcp)) {
 		/* out_fd */
+		tprints_arg_name("out_fd");
 		printfd(tcp, tcp->u_arg[0]);
 
 		/* in_fd */
-		tprint_arg_next();
+		tprints_arg_next_name("in_fd");
 		printfd(tcp, tcp->u_arg[1]);
 
 		/* offset */
-		tprint_arg_next();
+		tprints_arg_next_name("offset");
 		if (!printnum_ulong(tcp, tcp->u_arg[2])
 		    || !tcp->u_arg[3]) {
 
 			/* count */
-			tprint_arg_next();
+			tprints_arg_next_name("count");
 			PRINT_VAL_U(tcp->u_arg[3]);
 			return RVAL_DECODED;
 		}
@@ -68,11 +71,12 @@ SYS_FUNC(sendfile)
 			tprint_value_changed();
 
 			/* offset */
+			tprints_arg_name("offset");
 			printnum_ulong(tcp, tcp->u_arg[2]);
 		}
 
 		/* count */
-		tprint_arg_next();
+		tprints_arg_next_name("count");
 		PRINT_VAL_U(tcp->u_arg[3]);
 	}
 

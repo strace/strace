@@ -12,8 +12,15 @@
 #include "defs.h"
 #include "xstring.h"
 
+static const char *fd_set_arg_name[] = {
+	"readfds",
+	"writefds",
+	"exceptfds"
+};
+
 SYS_FUNC(close)
 {
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	return RVAL_DECODED;
@@ -43,6 +50,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	fd_set *fds = NULL;
 
 	if (entering(tcp)) {
+		tprints_arg_name("nfds");
 		PRINT_VAL_D((int) args[0]);
 
 		if (verbose(tcp) && fdsize > 0)
@@ -50,7 +58,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		for (unsigned int i = 0; i < 3; ++i) {
 			kernel_ulong_t addr = args[i + 1];
 
-			tprint_arg_next();
+			tprints_arg_next_name(fd_set_arg_name[i]);
 			if (!fds) {
 				printaddr(addr);
 				continue;
@@ -72,7 +80,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 			tprint_bitset_end();
 		}
 		free(fds);
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_tv_ts(tcp, args[4]);
 	} else {
 		static char outstr[1024];
@@ -153,8 +161,10 @@ SYS_FUNC(oldselect)
 	if (args) {
 		return decode_select(tcp, args, print_timeval, sprint_timeval);
 	} else {
-		if (entering(tcp))
+		if (entering(tcp)) {
+			tprints_arg_name("arg");
 			printaddr(tcp->u_arg[0]);
+		}
 		return RVAL_DECODED;
 	}
 }
@@ -178,7 +188,7 @@ do_pselect6(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 {
 	int rc = decode_select(tcp, tcp->u_arg, print_ts, sprint_ts);
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("sig");
 		print_kernel_sigset(tcp, tcp->u_arg[5]);
 	}
 

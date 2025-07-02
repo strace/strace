@@ -18,6 +18,7 @@ SYS_FUNC(syslog)
 
 	if (entering(tcp)) {
 		/* type */
+		tprints_arg_name("type");
 		printxval_ex(syslog_action_type, type, "SYSLOG_ACTION_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 	}
@@ -43,11 +44,11 @@ SYS_FUNC(syslog)
 	case SYSLOG_ACTION_CONSOLE_LEVEL: /* Uses len */
 
 		/* bufp */
-		tprint_arg_next();
+		tprints_arg_next_name("bufp");
 		printaddr64(tcp->u_arg[1]);
 
 		/* len */
-		tprint_arg_next();
+		tprints_arg_next_name("len");
 		printxval_ex(syslog_console_levels, len, "LOGLEVEL_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 		return RVAL_DECODED;
@@ -55,11 +56,11 @@ SYS_FUNC(syslog)
 	default:
 
 		/* bufp */
-		tprint_arg_next();
+		tprints_arg_next_name("bufp");
 		printaddr64(tcp->u_arg[1]);
 
 		/* len */
-		tprint_arg_next();
+		tprints_arg_next_name("len");
 		PRINT_VAL_D(len);
 		return RVAL_DECODED;
 	}
@@ -67,14 +68,14 @@ SYS_FUNC(syslog)
 	/* syscall exit handler for SYSLOG_ACTION_READ* */
 
 	/* bufp */
-	tprint_arg_next();
+	tprints_arg_next_name("bufp");
 	if (syserror(tcp))
 		printaddr64(tcp->u_arg[1]);
 	else
 		printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
 
 	/* len */
-	tprint_arg_next();
+	tprints_arg_next_name("len");
 	PRINT_VAL_D(len);
 
 	return 0;

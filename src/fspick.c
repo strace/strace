@@ -12,14 +12,15 @@
 SYS_FUNC(fspick)
 {
 	/* dirfd */
+	tprints_arg_name("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 
 	/* pathname */
-	tprint_arg_next();
+	tprints_arg_next_name("pathname");
 	printpath(tcp, tcp->u_arg[1]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(fspick_flags, tcp->u_arg[2], "FSPICK_???");
 
 	return RVAL_DECODED | RVAL_FD;

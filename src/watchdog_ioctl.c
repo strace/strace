@@ -27,7 +27,7 @@ watchdog_ioctl(struct tcb *const tcp, const unsigned int code,
 	case WDIOC_GETSUPPORT:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &ident))
 			break;
 		tprint_struct_begin();
@@ -54,11 +54,11 @@ watchdog_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 	case WDIOC_SETTIMEOUT:
 	case WDIOC_SETPRETIMEOUT:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%d");
 		break;
 	case WDIOC_SETOPTIONS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &options))
 			break;
 		tprint_indirect_begin();

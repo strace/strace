@@ -37,11 +37,12 @@ decode_poll_entering(struct tcb *tcp)
 	struct pollfd fds;
 
 	/* fds */
+	tprints_arg_name("fds");
 	print_array(tcp, addr, nfds, &fds, sizeof(fds),
 		    tfetch_mem, print_pollfd, 0);
 
 	/* nfds */
-	tprint_arg_next();
+	tprints_arg_next_name("nfds");
 	PRINT_VAL_U(nfds);
 }
 
@@ -143,7 +144,7 @@ do_poll(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts)
 		decode_poll_entering(tcp);
 
 		/* timeout */
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		PRINT_VAL_D((int) tcp->u_arg[2]);
 
 		return 0;
@@ -175,16 +176,16 @@ do_ppoll(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 		decode_poll_entering(tcp);
 
 		/* tmo_p */
-		tprint_arg_next();
+		tprints_arg_next_name("tmo_p");
 		print_ts(tcp, tcp->u_arg[2]);
 
 		/* sigmask */
 		/* NB: kernel requires arg[4] == NSIG_BYTES */
-		tprint_arg_next();
+		tprints_arg_next_name("sigmask");
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 
 		/* sigsetsize */
-		tprint_arg_next();
+		tprints_arg_next_name("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[4]);
 
 		return 0;

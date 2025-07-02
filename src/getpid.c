@@ -24,6 +24,7 @@ SYS_FUNC(getpgrp)
 
 SYS_FUNC(getpgid)
 {
+	tprints_arg_name("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 
 	return RVAL_DECODED | RVAL_PGID;
@@ -31,6 +32,7 @@ SYS_FUNC(getpgid)
 
 SYS_FUNC(getsid)
 {
+	tprints_arg_name("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 
 	return RVAL_DECODED | RVAL_SID;
@@ -39,10 +41,11 @@ SYS_FUNC(getsid)
 SYS_FUNC(setpgid)
 {
 	/* pid */
+	tprints_arg_name("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 
 	/* pgid */
-	tprint_arg_next();
+	tprints_arg_next_name("pgid");
 	printpid(tcp, tcp->u_arg[1], PT_PGID);
 
 	return RVAL_DECODED;

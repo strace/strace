@@ -747,7 +747,9 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
 			if (i > arg_offset || syscall->is_ioctl)
-				OUTSI("tprint_arg_next();\n");
+				OUTFI("tprints_arg_next_name(\"%s\");\n", arg.name);
+			else
+				OUTFI("tprints_arg_name(\"%s\");\n", arg.name);
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 			generate_printer(out, syscall, arg.name, arg_val, true,
@@ -774,7 +776,9 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
 			if (cur > arg_offset || syscall->is_ioctl)
-				OUTSI("tprint_arg_next();\n");
+				OUTFI("tprints_arg_next_name(\"%s\");\n", arg.name);
+			else
+				OUTFI("tprints_arg_name(\"%s\");\n", arg.name);
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 			generate_printer(out, syscall, arg.name, arg_val, true,
@@ -807,7 +811,9 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
 			if (cur > arg_offset || syscall->is_ioctl)
-				OUTSI("tprint_arg_next();\n");
+				OUTFI("tprints_arg_next_name(\"%s\");\n", arg.name);
+			else
+				OUTFI("tprints_arg_name(\"%s\");\n", arg.name);
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 

@@ -246,6 +246,7 @@ SYS_FUNC(clone3)
 	int r_extra = 0;
 
 	if (entering(tcp)) {
+		tprints_arg_name("cl_args");
 		if (fetch_size < minsz) {
 			printaddr(addr);
 			goto out;
@@ -386,7 +387,7 @@ SYS_FUNC(clone3)
 	}
 
 out:
-	tprint_arg_next();
+	tprints_arg_next_name("size");
 	PRINT_VAL_U(size);
 
 	return RVAL_DECODED | RVAL_TID | r_extra;
@@ -396,8 +397,9 @@ out:
 SYS_FUNC(setns)
 {
 	if (entering(tcp)) {
+		tprints_arg_name("fd");
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
+		tprints_arg_next_name("nstype");
 		printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
 		return show_namespace ? 0 : RVAL_DECODED;
 	}
@@ -415,6 +417,7 @@ SYS_FUNC(setns)
 SYS_FUNC(unshare)
 {
 	if (entering(tcp)) {
+		tprints_arg_name("flags");
 		printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
 		return show_namespace ? 0 : RVAL_DECODED;
 	}

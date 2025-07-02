@@ -105,13 +105,14 @@ SYS_FUNC(readdir)
 {
 	if (entering(tcp)) {
 		/* fd */
+		tprints_arg_name("fd");
 		printfd(tcp, tcp->u_arg[0]);
 #ifdef ENABLE_SECONTEXT
 		tcp->last_dirfd = (int) tcp->u_arg[0];
 #endif
 	} else {
 		/* dirp */
-		tprint_arg_next();
+		tprints_arg_next_name("dirp");
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);
 		else
@@ -121,7 +122,7 @@ SYS_FUNC(readdir)
 		const unsigned int count = tcp->u_arg[2];
 		/* Not much point in printing this out, it is always 1. */
 		if (count != 1) {
-			tprint_arg_next();
+			tprints_arg_next_name("count");
 			PRINT_VAL_U(count);
 		}
 	}

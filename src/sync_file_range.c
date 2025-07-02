@@ -15,18 +15,19 @@
 SYS_FUNC(sync_file_range)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* offset */
-	tprint_arg_next();
+	tprints_arg_next_name("offset");
 	unsigned int argn = print_arg_lld(tcp, 1);
 
 	/* nbytes */
-	tprint_arg_next();
+	tprints_arg_next_name("nbytes");
 	argn = print_arg_lld(tcp, argn);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(sync_file_range_flags, tcp->u_arg[argn],
 		   "SYNC_FILE_RANGE_???");
 

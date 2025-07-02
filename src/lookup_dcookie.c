@@ -14,17 +14,18 @@ SYS_FUNC(lookup_dcookie)
 		return 0;
 
 	/* cookie */
+	tprints_arg_name("cookie");
 	unsigned int argn = print_arg_llu(tcp, 0);
 
 	/* buffer */
-	tprint_arg_next();
+	tprints_arg_next_name("buffer");
 	if (syserror(tcp))
 		printaddr(tcp->u_arg[argn]);
 	else
 		printstrn(tcp, tcp->u_arg[argn], tcp->u_rval);
 
 	/* len */
-	tprint_arg_next();
+	tprints_arg_next_name("len");
 	PRINT_VAL_U(tcp->u_arg[argn + 1]);
 
 	return 0;

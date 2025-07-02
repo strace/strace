@@ -134,17 +134,18 @@ SYS_FUNC(semctl)
 
 	if (entering(tcp)) {
 		/* semid */
+		tprints_arg_name("semid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 
 		/* semnum */
-		tprint_arg_next();
+		tprints_arg_next_name("semnum");
 		PRINT_VAL_D((int) tcp->u_arg[1]);
 
 		/* cmd */
-		tprint_arg_next();
+		tprints_arg_next_name("op");
 		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 
-		tprint_arg_next();
+		tprints_arg_next_name("arg");
 		if (indirect_addr) {
 			semun_ptr_t ptr;
 			if (umove_or_printaddr(tcp, tcp->u_arg[3], &ptr))

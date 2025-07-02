@@ -18,10 +18,11 @@
 SYS_FUNC(link)
 {
 	/* oldpath */
+	tprints_arg_name("oldpath");
 	printpath(tcp, tcp->u_arg[0]);
 
 	/* newpath */
-	tprint_arg_next();
+	tprints_arg_next_name("newpath");
 	printpath(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -30,22 +31,23 @@ SYS_FUNC(link)
 SYS_FUNC(linkat)
 {
 	/* olddirfd */
+	tprints_arg_name("olddirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 
 	/* oldpath */
-	tprint_arg_next();
+	tprints_arg_next_name("oldpath");
 	printpath(tcp, tcp->u_arg[1]);
 
 	/* newdirfd */
-	tprint_arg_next();
+	tprints_arg_next_name("newdirfd");
 	print_dirfd(tcp, tcp->u_arg[2]);
 
 	/* newpath */
-	tprint_arg_next();
+	tprints_arg_next_name("newpath");
 	printpath(tcp, tcp->u_arg[3]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(at_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
@@ -54,14 +56,15 @@ SYS_FUNC(linkat)
 SYS_FUNC(unlinkat)
 {
 	/* dirfd */
+	tprints_arg_name("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 
 	/* pathname */
-	tprint_arg_next();
+	tprints_arg_next_name("pathname");
 	printpath(tcp, tcp->u_arg[1]);
 
 	/* flags */
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(at_flags, tcp->u_arg[2], "AT_???");
 
 	return RVAL_DECODED;
@@ -70,14 +73,15 @@ SYS_FUNC(unlinkat)
 SYS_FUNC(symlinkat)
 {
 	/* target */
+	tprints_arg_name("target");
 	printpath(tcp, tcp->u_arg[0]);
 
 	/* newdirfd */
-	tprint_arg_next();
+	tprints_arg_next_name("newdirfd");
 	print_dirfd(tcp, tcp->u_arg[1]);
 
 	/* linkpath */
-	tprint_arg_next();
+	tprints_arg_next_name("linkpath");
 	printpath(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;

@@ -22,6 +22,8 @@ SYS_FUNC(times)
 {
 	tms_t tbuf;
 
+	tprints_arg_name("buf");
+
 	if (exiting(tcp) && !umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
 		tprint_struct_begin();
 		PRINT_FIELD_CLOCK_T(tbuf, tms_utime);

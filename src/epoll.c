@@ -15,6 +15,7 @@
 SYS_FUNC(epoll_create)
 {
 	/* size */
+	tprints_arg_name("size");
 	int size = tcp->u_arg[0];
 	PRINT_VAL_D(size);
 
@@ -26,6 +27,7 @@ SYS_FUNC(epoll_create)
 SYS_FUNC(epoll_create1)
 {
 	/* flags */
+	tprints_arg_name("flags");
 	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -52,19 +54,20 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(epoll_ctl)
 {
 	/* epfd */
+	tprints_arg_name("epfd");
 	printfd(tcp, tcp->u_arg[0]);
 
 	/* op */
-	tprint_arg_next();
+	tprints_arg_next_name("op");
 	const unsigned int op = tcp->u_arg[1];
 	printxval(epollctls, op, "EPOLL_CTL_???");
 
 	/* fd */
-	tprint_arg_next();
+	tprints_arg_next_name("fd");
 	printfd(tcp, tcp->u_arg[2]);
 
 	/* event */
-	tprint_arg_next();
+	tprints_arg_next_name("event");
 	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == op)
 		printaddr(tcp->u_arg[3]);
@@ -79,21 +82,22 @@ epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	if (entering(tcp)) {
 		/* epfd */
+		tprints_arg_name("epfd");
 		printfd(tcp, tcp->u_arg[0]);
 	} else {
 		/* events */
-		tprint_arg_next();
+		tprints_arg_next_name("events");
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    tfetch_mem, print_epoll_event, 0);
 
 		/* maxevents */
-		tprint_arg_next();
+		tprints_arg_next_name("maxevents");
 		int maxevents = tcp->u_arg[2];
 		PRINT_VAL_D(maxevents);
 
 		/* timeout */
-		tprint_arg_next();
+		tprints_arg_next_name("timeout");
 		print_timeout(tcp, tcp->u_arg[3]);
 	}
 }
@@ -119,11 +123,11 @@ epoll_pwait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 	if (exiting(tcp)) {
 		/* sigmask */
 		/* NB: kernel requires arg[5] == NSIG_BYTES */
-		tprint_arg_next();
+		tprints_arg_next_name("sigmask");
 		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 
 		/* sigsetsize */
-		tprint_arg_next();
+		tprints_arg_next_name("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[5]);
 	}
 	return 0;
