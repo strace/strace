@@ -141,6 +141,10 @@ tprints_arg_next_name_unconditionally(const char *name)
 static inline void
 tprints_arg_name(const char *name)
 {
+# ifdef IN_STRACE
+	if (Nflag)
+		tprints_arg_name_unconditionally(name);
+# endif
 }
 
 static inline void

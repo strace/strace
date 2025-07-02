@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Added -N/--arg-names option for printing syscall argument names.
   * Implemented setting of system call information using
     PTRACE_SET_SYSCALL_INFO ptrace API introduced in Linux 6.16.
   * Implemented decoding of SO_RCVPRIORITY and SO_PASSRIGHTS socket options.

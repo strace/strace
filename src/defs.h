@@ -518,6 +518,7 @@ extern bool Tflag;
 extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
+extern bool Nflag;
 extern bool count_wallclock;
 extern bool tracing_fds;
 extern long long syscall_limit;
