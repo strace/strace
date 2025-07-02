@@ -109,6 +109,7 @@ libstrace_a_SOURCES =	\
 	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
+	exit.c		\
 	exitkill.c	\
 	exitkill.h	\
 	fadvise.c	\
