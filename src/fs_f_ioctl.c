@@ -113,7 +113,7 @@ fs_f_ioctl(struct tcb *const tcp, const unsigned int code,
 #if SIZEOF_LONG > 4
 	case FS_IOC32_SETFLAGS:
 #endif
-		tprint_arg_next();
+		tprints_arg_next_name("attr");
 		decode_fs_ioc_flags(tcp, arg);
 		break;
 

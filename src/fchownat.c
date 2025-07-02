@@ -10,22 +10,23 @@
 SYS_FUNC(fchownat)
 {
 	/* dirfd */
+	tprints_arg_name("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* pathname */
+	tprints_arg_next_name("pathname");
 	printpath(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
 
 	/* owner */
+	tprints_arg_next_name("owner");
 	printuid(tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* group */
+	tprints_arg_next_name("group");
 	printuid(tcp->u_arg[3]);
-	tprint_arg_next();
 
 	/* flags */
+	tprints_arg_next_name("flags");
 	printflags(at_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;

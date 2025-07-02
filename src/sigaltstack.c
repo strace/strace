@@ -42,10 +42,11 @@ SYS_FUNC(sigaltstack)
 {
 	if (entering(tcp)) {
 		/* ss */
+		tprints_arg_name("ss");
 		print_stack_t(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* old_ss */
+		tprints_arg_next_name("old_ss");
 		print_stack_t(tcp, tcp->u_arg[1]);
 	}
 	return 0;

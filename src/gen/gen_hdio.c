@@ -11,8 +11,8 @@ typedef kernel_ulong_t kernel_size_t;
 static int
 var_leaf_ioctl_HDIO_DRIVE_RESET(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (array *) */
+	tprints_arg_next_name("arg");
 	/* using decoder from defs/common.def:44:1 */
 
 	{
@@ -27,10 +27,10 @@ static int
 var_leaf_ioctl_HDIO_GET_32BIT(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -44,10 +44,10 @@ static int
 var_leaf_ioctl_HDIO_GET_ACOUSTIC(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -61,10 +61,10 @@ static int
 var_leaf_ioctl_HDIO_GET_ADDRESS(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -78,10 +78,10 @@ static int
 var_leaf_ioctl_HDIO_GET_BUSSTATE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -95,10 +95,10 @@ static int
 var_leaf_ioctl_HDIO_GET_DMA(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -112,10 +112,10 @@ static int
 var_leaf_ioctl_HDIO_GET_IDENTITY(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: identity (stringnoz *) */
+	tprints_arg_next_name("identity");
 	/* using decoder from defs/common.def:13:1 */
 
 	if (entering(tcp)) {
@@ -132,10 +132,10 @@ static int
 var_leaf_ioctl_HDIO_GET_KEEPSETTINGS(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: keep_settings (kernel_ulong_t *) */
+	tprints_arg_next_name("keep_settings");
 	kernel_ulong_t tmpvar_keep_settings;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_keep_settings)) {
 		tprint_indirect_begin();
@@ -149,10 +149,10 @@ static int
 var_leaf_ioctl_HDIO_GET_MULTCOUNT(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: multcount (kernel_ulong_t *) */
+	tprints_arg_next_name("multcount");
 	kernel_ulong_t tmpvar_multcount;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_multcount)) {
 		tprint_indirect_begin();
@@ -166,10 +166,10 @@ static int
 var_leaf_ioctl_HDIO_GET_NICE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -183,10 +183,10 @@ static int
 var_leaf_ioctl_HDIO_GET_NOWERR(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -200,10 +200,10 @@ static int
 var_leaf_ioctl_HDIO_GET_UNMASKINTR(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: unmaskintr (kernel_ulong_t *) */
+	tprints_arg_next_name("unmaskintr");
 	kernel_ulong_t tmpvar_unmaskintr;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_unmaskintr)) {
 		tprint_indirect_begin();
@@ -217,10 +217,10 @@ static int
 var_leaf_ioctl_HDIO_GET_WCACHE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: arg (kernel_ulong_t *) */
+	tprints_arg_next_name("arg");
 	kernel_ulong_t tmpvar_arg;
 	if (!umove_or_printaddr(tcp, arg, &tmpvar_arg)) {
 		tprint_indirect_begin();
@@ -234,10 +234,10 @@ static int
 var_leaf_ioctl_HDIO_OBSOLETE_IDENTITY(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 	/* arg: identity (stringnoz *) */
+	tprints_arg_next_name("identity");
 	/* using decoder from defs/common.def:13:1 */
 
 	if (entering(tcp)) {
@@ -253,8 +253,8 @@ var_leaf_ioctl_HDIO_OBSOLETE_IDENTITY(struct tcb *tcp, unsigned int code, kernel
 static int
 var_leaf_ioctl_HDIO_SCAN_HWIF(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (array *) */
+	tprints_arg_next_name("arg");
 	/* using decoder from defs/common.def:44:1 */
 
 	{
@@ -268,8 +268,8 @@ var_leaf_ioctl_HDIO_SCAN_HWIF(struct tcb *tcp, unsigned int code, kernel_ulong_t
 static int
 var_leaf_ioctl_HDIO_SET_32BIT(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -277,8 +277,8 @@ var_leaf_ioctl_HDIO_SET_32BIT(struct tcb *tcp, unsigned int code, kernel_ulong_t
 static int
 var_leaf_ioctl_HDIO_SET_ACOUSTIC(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -286,8 +286,8 @@ var_leaf_ioctl_HDIO_SET_ACOUSTIC(struct tcb *tcp, unsigned int code, kernel_ulon
 static int
 var_leaf_ioctl_HDIO_SET_ADDRESS(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -295,8 +295,8 @@ var_leaf_ioctl_HDIO_SET_ADDRESS(struct tcb *tcp, unsigned int code, kernel_ulong
 static int
 var_leaf_ioctl_HDIO_SET_BUSSTATE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	printxval64(hdio_busstates, zero_extend_signed_to_ull(arg), "BUSSTATE_???");
 
 	return RVAL_IOCTL_DECODED;
@@ -304,8 +304,8 @@ var_leaf_ioctl_HDIO_SET_BUSSTATE(struct tcb *tcp, unsigned int code, kernel_ulon
 static int
 var_leaf_ioctl_HDIO_SET_DMA(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -313,8 +313,8 @@ var_leaf_ioctl_HDIO_SET_DMA(struct tcb *tcp, unsigned int code, kernel_ulong_t a
 static int
 var_leaf_ioctl_HDIO_SET_KEEPSETTINGS(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: keep_settings (kernel_ulong_t) */
+	tprints_arg_next_name("keep_settings");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -322,8 +322,8 @@ var_leaf_ioctl_HDIO_SET_KEEPSETTINGS(struct tcb *tcp, unsigned int code, kernel_
 static int
 var_leaf_ioctl_HDIO_SET_MULTCOUNT(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: multcount (kernel_ulong_t) */
+	tprints_arg_next_name("multcount");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -331,8 +331,8 @@ var_leaf_ioctl_HDIO_SET_MULTCOUNT(struct tcb *tcp, unsigned int code, kernel_ulo
 static int
 var_leaf_ioctl_HDIO_SET_NICE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	printflags64(hdio_ide_nice, zero_extend_signed_to_ull(arg), "IDE_NICE_???");
 
 	return RVAL_IOCTL_DECODED;
@@ -340,8 +340,8 @@ var_leaf_ioctl_HDIO_SET_NICE(struct tcb *tcp, unsigned int code, kernel_ulong_t 
 static int
 var_leaf_ioctl_HDIO_SET_NOWERR(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -349,8 +349,8 @@ var_leaf_ioctl_HDIO_SET_NOWERR(struct tcb *tcp, unsigned int code, kernel_ulong_
 static int
 var_leaf_ioctl_HDIO_SET_PIO_MODE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -358,8 +358,8 @@ var_leaf_ioctl_HDIO_SET_PIO_MODE(struct tcb *tcp, unsigned int code, kernel_ulon
 static int
 var_leaf_ioctl_HDIO_SET_UNMASKINTR(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: unmaskintr (kernel_ulong_t) */
+	tprints_arg_next_name("unmaskintr");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -367,8 +367,8 @@ var_leaf_ioctl_HDIO_SET_UNMASKINTR(struct tcb *tcp, unsigned int code, kernel_ul
 static int
 var_leaf_ioctl_HDIO_SET_WCACHE(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;
@@ -376,8 +376,8 @@ var_leaf_ioctl_HDIO_SET_WCACHE(struct tcb *tcp, unsigned int code, kernel_ulong_
 static int
 var_leaf_ioctl_HDIO_UNREGISTER_HWIF(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
-	tprint_arg_next();
 	/* arg: arg (kernel_ulong_t) */
+	tprints_arg_next_name("arg");
 	PRINT_VAL_U((kernel_ulong_t) arg);
 
 	return RVAL_IOCTL_DECODED;

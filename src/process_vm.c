@@ -13,33 +13,34 @@ SYS_FUNC(process_vm_readv)
 {
 	if (entering(tcp)) {
 		/* arg 1: pid */
+		tprints_arg_name("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 	} else {
 		kernel_ulong_t local_iovcnt = tcp->u_arg[2];
 		kernel_ulong_t remote_iovcnt = tcp->u_arg[4];
 		kernel_ulong_t flags = tcp->u_arg[5];
 
 		/* arg 2: local iov */
+		tprints_arg_next_name("local_iov");
 		tprint_iov_upto(tcp, local_iovcnt, tcp->u_arg[1], tcp->u_rval,
 				syserror(tcp) ? iov_decode_addr
 					      : iov_decode_str,
 				NULL);
-		tprint_arg_next();
 
 		/* arg 3: local iovcnt */
+		tprints_arg_next_name("liovcnt");
 		PRINT_VAL_U(local_iovcnt);
-		tprint_arg_next();
 
 		/* arg 4: remote iov */
+		tprints_arg_next_name("remote_iov");
 		tprint_iov(tcp, remote_iovcnt, tcp->u_arg[3], iov_decode_addr);
-		tprint_arg_next();
 
 		/* arg 5: remote iovcnt */
+		tprints_arg_next_name("riovcnt");
 		PRINT_VAL_U(remote_iovcnt);
-		tprint_arg_next();
 
 		/* arg 6: flags */
+		tprints_arg_next_name("flags");
 		PRINT_VAL_U(flags);
 	}
 	return 0;
@@ -52,26 +53,27 @@ SYS_FUNC(process_vm_writev)
 	kernel_ulong_t flags = tcp->u_arg[5];
 
 	/* arg 1: pid */
+	tprints_arg_name("pid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
-	tprint_arg_next();
 
 	/* arg 2: local iov */
+	tprints_arg_next_name("local_iov");
 	tprint_iov(tcp, local_iovcnt, tcp->u_arg[1], iov_decode_str);
-	tprint_arg_next();
 
 	/* arg 3: local iovcnt */
+	tprints_arg_next_name("liovcnt");
 	PRINT_VAL_U(local_iovcnt);
-	tprint_arg_next();
 
 	/* arg 4: remote iov */
+	tprints_arg_next_name("remote_iov");
 	tprint_iov(tcp, remote_iovcnt, tcp->u_arg[3], iov_decode_addr);
-	tprint_arg_next();
 
 	/* arg 5: remote iovcnt */
+	tprints_arg_next_name("riovcnt");
 	PRINT_VAL_U(remote_iovcnt);
-	tprint_arg_next();
 
 	/* arg 6: flags */
+	tprints_arg_next_name("flags");
 	PRINT_VAL_U(flags);
 
 	return RVAL_DECODED;

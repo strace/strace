@@ -84,6 +84,7 @@ bool Tflag;
 int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
+bool Nflag;
 bool count_wallclock;
 bool tracing_fds;
 long long syscall_limit = -1;
@@ -423,6 +424,8 @@ Output format:\n\
 "\
   -n, --syscall-number\n\
                  print syscall number\n\
+  -N, --arg-names\n\
+		 print syscall argument names\n\
   -o FILE, --output=FILE\n\
                  send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
@@ -2329,7 +2332,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:cCdDe:E:fFhiI:knNo:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2388,6 +2391,7 @@ init(int argc, char *argv[])
 		{ "stack-trace-frame-limit", required_argument, 0, GETOPT_STACK_TRACE_FRAME_LIMIT },
 		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
+		{ "arg-names",		no_argument,	   0, 'N' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
 		{ "attach",		required_argument, 0, 'p' },
@@ -2589,6 +2593,9 @@ init(int argc, char *argv[])
 			break;
 		case 'n':
 			nflag = 1;
+			break;
+		case 'N':
+			Nflag = true;
 			break;
 		case 'o':
 			outfname = optarg;
@@ -2926,6 +2933,9 @@ init(int argc, char *argv[])
 				  "with -c/--summary-only");
 		if (nflag)
 			error_msg("-n/--syscall-number has no effect "
+				  "with -c/--summary-only");
+		if (Nflag)
+			error_msg("-N/--arg-names has no effect "
 				  "with -c/--summary-only");
 		if (rflag)
 			error_msg("-r/--relative-timestamps has no effect "
