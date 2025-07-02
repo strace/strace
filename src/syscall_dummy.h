@@ -94,7 +94,6 @@
 # define sys_printargs		printargs
 # define sys_sched_yield		printargs
 # define sys_setsid		printargs
-# define sys_set_tid_address	printargs
 # define sys_setup		printargs
 # define sys_sync		printargs
 # define sys_syscall		printargs

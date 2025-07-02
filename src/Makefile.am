@@ -343,6 +343,7 @@ libstrace_a_SOURCES =	\
 	seccomp.c	\
 	seccomp_ioctl.c	\
 	sendfile.c	\
+	set_tid_address.c \
 	sg_io_v3.c	\
 	sg_io_v4.c	\
 	shutdown.c	\
