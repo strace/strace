@@ -30,22 +30,23 @@ print_keyring_serial_number(key_serial_t id)
 SYS_FUNC(add_key)
 {
 	/* type */
+	tprints_arg_name("type");
 	printstr(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* description */
+	tprints_arg_next_name("description");
 	printstr(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
 
 	/* payload */
+	tprints_arg_next_name("payload");
 	printstrn(tcp, tcp->u_arg[2], tcp->u_arg[3]);
-	tprint_arg_next();
 
 	/* payload length */
+	tprints_arg_next_name("plen");
 	PRINT_VAL_U(tcp->u_arg[3]);
-	tprint_arg_next();
 
 	/* keyring serial number */
+	tprints_arg_next_name("keyring");
 	print_keyring_serial_number(tcp->u_arg[4]);
 
 	return RVAL_DECODED;
@@ -54,18 +55,19 @@ SYS_FUNC(add_key)
 SYS_FUNC(request_key)
 {
 	/* type */
+	tprints_arg_name("type");
 	printstr(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* description */
+	tprints_arg_next_name("description");
 	printstr(tcp, tcp->u_arg[1]);
-	tprint_arg_next();
 
 	/* callout_info */
+	tprints_arg_next_name("callout_info");
 	printstr(tcp, tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* keyring serial number */
+	tprints_arg_next_name("dest_keyring");
 	print_keyring_serial_number(tcp->u_arg[3]);
 
 	return RVAL_DECODED;
@@ -536,6 +538,7 @@ SYS_FUNC(keyctl)
 	kernel_ulong_t arg5 = tcp->u_arg[4];
 
 	if (entering(tcp)) {
+		tprints_arg_name("operation");
 		printxval(keyctl_commands, cmd, "KEYCTL_???");
 
 		/*

@@ -14,20 +14,21 @@ static int
 do_signalfd(struct tcb *tcp, int flags_arg)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* NB: kernel requires arg[2] == NSIG_BYTES */
 	/* mask */
+	tprints_arg_next_name("mask");
 	print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* sizemask */
+	tprints_arg_next_name("sizemask");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	if (flags_arg >= 0) {
-		tprint_arg_next();
 
 		/* flags */
+		tprints_arg_next_name("flags");
 		printflags(sfd_flags, tcp->u_arg[flags_arg], "SFD_???");
 	}
 

@@ -13,20 +13,20 @@
 SYS_FUNC(mq_open)
 {
 	/* name */
+	tprints_arg_name("name");
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* flags */
+	tprints_arg_next_name("flags");
 	tprint_open_modes(tcp->u_arg[1]);
 
 	if (tcp->u_arg[1] & O_CREAT) {
-		tprint_arg_next();
-
 		/* mode */
+		tprints_arg_next_name("mode");
 		print_numeric_umode_t(tcp->u_arg[2]);
-		tprint_arg_next();
 
 		/* attr */
+		tprints_arg_next_name("attr");
 		printmqattr(tcp, tcp->u_arg[3], false);
 	}
 	return RVAL_DECODED | RVAL_FD;
@@ -36,22 +36,23 @@ static int
 do_mq_timedsend(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	/* mqdes */
+	tprints_arg_name("mqdes");
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* msg_ptr */
+	tprints_arg_next_name("msg_ptr");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* msg_len */
+	tprints_arg_next_name("msg_len");
 	PRINT_VAL_U(tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* msg_prio */
+	tprints_arg_next_name("msg_prio");
 	PRINT_VAL_U((unsigned int) tcp->u_arg[3]);
-	tprint_arg_next();
 
 	/* abs_timeout */
+	tprints_arg_next_name("abs_timeout");
 	print_ts(tcp, tcp->u_arg[4]);
 
 	return RVAL_DECODED;
@@ -74,22 +75,22 @@ do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
 		/* mqdes */
+		tprints_arg_name("mqdes");
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* msg_ptr */
+		tprints_arg_next_name("msg_ptr");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
 			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprint_arg_next();
 
 		/* msg_len */
+		tprints_arg_next_name("msg_len");
 		PRINT_VAL_U(tcp->u_arg[2]);
-		tprint_arg_next();
 
+		tprints_arg_next_name("msg_prio");
 		printnum_int(tcp, tcp->u_arg[3], "%u");
-		tprint_arg_next();
 
 		/*
 		 * Since the timeout parameter is read by the kernel
@@ -98,6 +99,7 @@ do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		 */
 		temporarily_clear_syserror(tcp);
 		/* abs_timeout */
+		tprints_arg_next_name("abs_timeout");
 		print_ts(tcp, tcp->u_arg[4]);
 		restore_cleared_syserror(tcp);
 	}
@@ -119,10 +121,11 @@ SYS_FUNC(mq_timedreceive_time64)
 SYS_FUNC(mq_notify)
 {
 	/* mqdes */
+	tprints_arg_name("mqdes");
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* sevp */
+	tprints_arg_next_name("sevp");
 	print_sigevent(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -131,14 +134,15 @@ SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
 		/* mqdes */
+		tprints_arg_name("mqdes");
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* newattr */
+		tprints_arg_next_name("newattr");
 		printmqattr(tcp, tcp->u_arg[1], true);
-		tprint_arg_next();
 	} else {
 		/* oldattr */
+		tprints_arg_next_name("oldattr");
 		printmqattr(tcp, tcp->u_arg[2], true);
 	}
 	return 0;

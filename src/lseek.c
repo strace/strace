@@ -27,8 +27,8 @@
 SYS_FUNC(lseek)
 {
 	/* fd */
+	tprints_arg_name("fd");
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	kernel_long_t offset;
 
@@ -42,10 +42,11 @@ SYS_FUNC(lseek)
 	}
 
 	/* offset */
+	tprints_arg_next_name("offset");
 	PRINT_VAL_D(offset);
-	tprint_arg_next();
 
 	/* whence */
+	tprints_arg_next_name("whence");
 	printxval(whence_codes, tcp->u_arg[2], "SEEK_???");
 
 	return RVAL_DECODED;
@@ -67,21 +68,22 @@ SYS_FUNC(llseek)
 {
 	if (entering(tcp)) {
 		/* fd */
+		tprints_arg_name("fd");
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		long long offset = ((long long) tcp->u_arg[1] << 32) |
 				   ((long long) tcp->u_arg[2]);
 
 		/* offset */
+		tprints_arg_next_name("offset");
 		PRINT_VAL_D(offset);
-		tprint_arg_next();
 	} else {
 		/* result */
+		tprints_arg_next_name("result");
 		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
-		tprint_arg_next();
 
 		/* whence */
+		tprints_arg_next_name("whence");
 		printxval(whence_codes, tcp->u_arg[4], "SEEK_???");
 	}
 	return 0;

@@ -15,10 +15,10 @@ static int
 print_args_size_flags(struct tcb *const tcp, const kernel_ulong_t p_size,
 		      const uint32_t flags, const bool raw_flags)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("size");
 	printnum_int(tcp, p_size, "%u");
 
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	if (raw_flags)
 		PRINT_VAL_X(flags);
 	else
@@ -135,17 +135,20 @@ SYS_FUNC(lsm_get_self_attr)
 	struct lsm_ctx ctx;
 
 	if (entering(tcp)) {
+		tprints_arg_name("attr");
 		printxval(lsm_attrs, attr, "LSM_ATTR_???");
 		tprint_arg_next();
 
 		if (!tfetch_obj(tcp, p_size, &size) ||
 		    (single && !tfetch_obj(tcp, p_ctx, &ctx))) {
+			tprints_arg_name("ctx");
 			printaddr(p_ctx);
 			return print_args_size_flags(tcp, p_size, flags, false);
 		}
 		set_tcb_priv_ulong(tcp, size);
 
 		if (single) {
+			tprints_arg_name("ctx");
 			tprint_struct_begin();
 			PRINT_FIELD_XVAL(ctx, id, lsm_ids, NULL);
 			tprint_struct_end();
@@ -155,8 +158,10 @@ SYS_FUNC(lsm_get_self_attr)
 	}
 
 	if (!tfetch_obj_ignore_syserror(tcp, p_size, &size)) {
-		if (!single)
+		if (!single) {
+			tprints_arg_name("ctx");
 			printaddr(p_ctx);
+		}
 
 		return print_args_size_flags(tcp, p_size, flags, false);
 	}
@@ -164,9 +169,9 @@ SYS_FUNC(lsm_get_self_attr)
 	if (single)
 		tprint_value_changed();
 	decode_lsm_ctx_sequence(tcp, p_ctx, size);
-	tprint_arg_next();
 
 	const uint32_t saved_size = get_tcb_priv_ulong(tcp);
+	tprints_arg_next_name("size");
 	tprint_indirect_begin();
 	PRINT_VAL_U(saved_size);
 	if (saved_size != size) {
@@ -175,7 +180,7 @@ SYS_FUNC(lsm_get_self_attr)
 	}
 	tprint_indirect_end();
 
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	printflags(lsm_flags, flags, "LSM_FLAG_???");
 
 	return 0;
@@ -190,16 +195,17 @@ SYS_FUNC(lsm_set_self_attr)
 
 	struct lsm_ctx ctx;
 
+	tprints_arg_name("attr");
 	printxval(lsm_attrs, attr, "LSM_ATTR_???");
-	tprint_arg_next();
 
+	tprints_arg_next_name("ctx");
 	if (fetch_lsm_ctx_header(tcp, &ctx, p_ctx, size, false))
 		decode_lsm_ctx(tcp, &ctx, p_ctx, size);
 
-	tprint_arg_next();
+	tprints_arg_next_name("size");
 	PRINT_VAL_U(size);
 
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	PRINT_VAL_X(flags);
 
 	return RVAL_DECODED;
@@ -224,6 +230,7 @@ SYS_FUNC(lsm_list_modules)
 
 	if (entering(tcp)) {
 		if (!tfetch_obj(tcp, p_size, &size)) {
+			tprints_arg_name("ids");
 			printaddr(p_ids);
 			return print_args_size_flags(tcp, p_size, flags, true);
 		}
@@ -234,6 +241,7 @@ SYS_FUNC(lsm_list_modules)
 	}
 
 	if (!tfetch_obj_ignore_syserror(tcp, p_size, &size)) {
+		tprints_arg_name("ids");
 		printaddr(p_ids);
 		return print_args_size_flags(tcp, p_size, flags, true);
 	}
@@ -241,10 +249,11 @@ SYS_FUNC(lsm_list_modules)
 	const uint32_t saved_size = get_tcb_priv_ulong(tcp);
 	uint64_t elem;
 
+	tprints_arg_name("ids");
 	print_array(tcp, p_ids, (kernel_ulong_t) tcp->u_rval, &elem,
 		    sizeof(elem), tfetch_mem, print_lsm_id_array_member, 0);
 
-	tprint_arg_next();
+	tprints_arg_next_name("size");
 	tprint_indirect_begin();
 	PRINT_VAL_U(saved_size);
 	if (saved_size != size) {
@@ -253,7 +262,7 @@ SYS_FUNC(lsm_list_modules)
 	}
 	tprint_indirect_end();
 
-	tprint_arg_next();
+	tprints_arg_next_name("flags");
 	PRINT_VAL_X(flags);
 
 	return 0;

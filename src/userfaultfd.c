@@ -15,6 +15,7 @@
 
 SYS_FUNC(userfaultfd)
 {
+	tprints_arg_name("flags");
 	printflags(uffd_flags, tcp->u_arg[0], "UFFD_???");
 
 	return RVAL_DECODED | RVAL_FD;

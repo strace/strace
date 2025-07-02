@@ -100,14 +100,15 @@ static void
 decode_execve(struct tcb *tcp, const unsigned int index)
 {
 	/* pathname */
+	tprints_arg_name("pathname");
 	printpath(tcp, tcp->u_arg[index + 0]);
-	tprint_arg_next();
 
 	/* argv */
+	tprints_arg_next_name("argv");
 	printargv(tcp, tcp->u_arg[index + 1]);
-	tprint_arg_next();
 
 	/* envp */
+	tprints_arg_next_name("envp");
 	(abbrev(tcp) ? printargc : printargv) (tcp, tcp->u_arg[index + 2]);
 }
 
@@ -121,14 +122,15 @@ SYS_FUNC(execve)
 SYS_FUNC(execveat)
 {
 	/* dirfd */
+	tprints_arg_name("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* pathname, argv, envp */
 	decode_execve(tcp, 1);
-	tprint_arg_next();
 
 	/* flags */
+	tprints_arg_next_name("flags");
 	printflags(execveat_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
@@ -138,10 +140,11 @@ SYS_FUNC(execveat)
 SYS_FUNC(execv)
 {
 	/* pathname */
+	tprints_arg_name("pathname");
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* argv */
+	tprints_arg_next_name("argv");
 	printargv(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;

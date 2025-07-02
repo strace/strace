@@ -13,14 +13,15 @@ SYS_FUNC(sethostname)
 	unsigned int len = tcp->u_arg[1];
 
 	/* name */
+	tprints_arg_name("name");
 	if (len > __NEW_UTS_LEN) {
 		printaddr(tcp->u_arg[0]);
 	} else {
 		printstrn(tcp, tcp->u_arg[0], len);
 	}
-	tprint_arg_next();
 
 	/* len */
+	tprints_arg_next_name("len");
 	PRINT_VAL_U(len);
 
 	return RVAL_DECODED;
@@ -31,13 +32,14 @@ SYS_FUNC(gethostname)
 {
 	if (exiting(tcp)) {
 		/* name */
+		tprints_arg_name("name");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[0]);
 		else
 			printstr(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* len */
+		tprints_arg_next_name("len");
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;
