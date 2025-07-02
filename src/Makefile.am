@@ -62,6 +62,7 @@ libstrace_a_SOURCES =	\
 	access.c	\
 	affinity.c	\
 	aio.c		\
+	alarm.c		\
 	alpha.c		\
 	arch_defs.h	\
 	basic_filters.c	\
