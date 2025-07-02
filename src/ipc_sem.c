@@ -39,20 +39,21 @@ tprint_sembuf_array(struct tcb *const tcp, const kernel_ulong_t addr,
 		    const unsigned int count)
 {
 	/* sops */
+	tprints_arg_next_name("sops");
 	struct sembuf sb;
 	print_array(tcp, addr, count, &sb, sizeof(sb),
 		    tfetch_mem, print_sembuf, 0);
-	tprint_arg_next();
 
 	/* nsops */
+	tprints_arg_next_name("nsops");
 	PRINT_VAL_U(count);
 }
 
 SYS_FUNC(semop)
 {
 	/* semid */
+	tprints_arg_name("semid");
 	PRINT_VAL_D((int) tcp->u_arg[0]);
-	tprint_arg_next();
 
 	if (indirect_ipccall(tcp)) {
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
@@ -66,14 +67,14 @@ static int
 do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	/* semid */
+	tprints_arg_name("semid");
 	PRINT_VAL_D((int) tcp->u_arg[0]);
-	tprint_arg_next();
 
 	if (indirect_ipccall(tcp)) {
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
-		tprint_arg_next();
 
 		/* timeout */
+		tprints_arg_next_name("timeout");
 #if defined(S390) || defined(S390X)
 		print_ts(tcp, tcp->u_arg[2]);
 #else
@@ -81,9 +82,9 @@ do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 #endif
 	} else {
 		tprint_sembuf_array(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprint_arg_next();
 
 		/* timeout */
+		tprints_arg_next_name("timeout");
 		print_ts(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
@@ -104,14 +105,15 @@ SYS_FUNC(semtimedop_time64)
 SYS_FUNC(semget)
 {
 	/* key */
+	tprints_arg_name("key");
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
-	tprint_arg_next();
 
 	/* nsems */
+	tprints_arg_next_name("nsems");
 	PRINT_VAL_D((int) tcp->u_arg[1]);
-	tprint_arg_next();
 
 	/* semflg */
+	tprints_arg_next_name("semflg");
 	tprint_flags_begin();
 	if (printflags_in(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprint_flags_or();

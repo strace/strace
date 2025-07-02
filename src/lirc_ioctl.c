@@ -41,7 +41,7 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (_IOC_DIR(code) == _IOC_READ)
 			return 0;
 	}

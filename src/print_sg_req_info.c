@@ -31,7 +31,7 @@ MPERS_PRINTER_DECL(int, decode_sg_req_info,
 	if (entering(tcp))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &info)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(info, req_state);

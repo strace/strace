@@ -595,7 +595,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 
 	if (entering(tcp))
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 	else
 		tprint_value_changed();
 

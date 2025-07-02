@@ -25,14 +25,13 @@ static int
 print_hdio_getgeo(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		return 0;
 	}
 
 	/* exiting */
 	struct_hd_geometry geo;
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &geo))
 		return RVAL_IOCTL_DECODED;
 
@@ -55,7 +54,7 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 	enum { SECTOR_SIZE = 512 };
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		struct hd_drive_cmd_hdr c;
 		if (umove_or_printaddr(tcp, arg, &c))

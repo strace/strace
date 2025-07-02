@@ -186,19 +186,19 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_ALM_SET:
 	case RTC_SET_TIME:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_rtc_time(tcp, arg);
 		break;
 	case RTC_IRQP_SET:
 	case RTC_EPOCH_SET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_U(arg);
 		break;
 	case RTC_IRQP_READ:
 	case RTC_EPOCH_READ:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_ulong(tcp, arg);
 		break;
 	case RTC_WKALM_RD:
@@ -206,7 +206,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_WKALM_SET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_rtc_wkalrm(tcp, arg);
 		break;
 	case RTC_PLL_GET:
@@ -214,19 +214,19 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_PLL_SET:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_rtc_pll_info(tcp, arg);
 		break;
 	case RTC_VL_READ:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_rtc_vl(tcp, arg);
 		break;
 	case RTC_PARAM_GET:
 	case RTC_PARAM_SET:
 		if (entering(tcp))
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 		else
 			tprint_value_changed();
 		return decode_rtc_param(tcp, arg, code == RTC_PARAM_GET);

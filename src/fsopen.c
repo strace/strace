@@ -12,10 +12,11 @@
 SYS_FUNC(fsopen)
 {
 	/* fsname */
+	tprints_arg_name("fsname");
 	printstr(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* flags */
+	tprints_arg_next_name("flags");
 	printflags(fsopen_flags, tcp->u_arg[1], "FSOPEN_???");
 	return RVAL_DECODED | RVAL_FD;
 }

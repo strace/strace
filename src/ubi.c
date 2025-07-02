@@ -21,7 +21,7 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct ubi_mkvol_req mkvol;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &mkvol))
 			return RVAL_IOCTL_DECODED;
 
@@ -60,7 +60,7 @@ decode_UBI_IOCRSVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_rsvol_req rsvol;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &rsvol)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(rsvol, bytes);
@@ -96,7 +96,7 @@ decode_UBI_IOCRNVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_rnvol_req rnvol;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &rnvol)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(rnvol, count);
@@ -114,7 +114,7 @@ decode_UBI_IOCEBCH(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_leb_change_req leb;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &leb)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(leb, lnum);
@@ -134,7 +134,7 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp)) {
 		struct ubi_attach_req attach;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &attach))
 			return RVAL_IOCTL_DECODED;
 
@@ -167,7 +167,7 @@ decode_UBI_IOCEBMAP(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_map_req map;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &map)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(map, lnum);
@@ -184,7 +184,7 @@ decode_UBI_IOCSETVOLPROP(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_set_vol_prop_req prop;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &prop)) {
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(prop, property,
@@ -213,7 +213,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 #undef case_UBI
 
 	case UBI_IOCVOLUP:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%" PRIi64);
 		break;
 
@@ -224,7 +224,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UBI_IOCRMVOL:
 	case UBI_IOCRPEB:
 	case UBI_IOCSPEB:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%d");
 		break;
 

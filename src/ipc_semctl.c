@@ -134,14 +134,15 @@ SYS_FUNC(semctl)
 
 	if (entering(tcp)) {
 		/* semid */
+		tprints_arg_name("semid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* semnum */
+		tprints_arg_next_name("semnum");
 		PRINT_VAL_D((int) tcp->u_arg[1]);
-		tprint_arg_next();
 
 		/* cmd */
+		tprints_arg_next_name("op");
 		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 		tprint_arg_next();
 
