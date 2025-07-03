@@ -590,3 +590,12 @@ SYS_FUNC(timerfd_gettime64)
 {
 	return do_timerfd_gettime(tcp, print_itimerspec64);
 }
+
+SYS_FUNC(alarm)
+{
+	/* seconds */
+	print_syscall_param("seconds");
+	PRINT_VAL_U((unsigned int) tcp->u_arg[0]);
+
+	return RVAL_DECODED;
+}

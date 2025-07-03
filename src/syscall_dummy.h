@@ -101,9 +101,6 @@
 # define sys_uretprobe		printargs
 # define sys_vhangup		printargs
 
-/* printargs_u does the right thing */
-# define sys_alarm		printargs_u
-
 /* printargs_d does the right thing */
 # define sys_iopl		printargs_d
 # define sys_exit		printargs_d
