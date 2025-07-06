@@ -18,10 +18,12 @@ SYS_FUNC(swapon)
 	flags &= ~SWAP_FLAG_PRIO_MASK;
 
 	/* path */
+	print_syscall_param("path");
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* swapflags */
+	print_syscall_param("swapflags");
 	tprint_flags_begin();
 	if (flags) {
 		printflags_in(swap_flags, flags, "SWAP_FLAG_???");

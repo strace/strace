@@ -282,17 +282,21 @@ SYS_FUNC(statmount)
 	const unsigned int flags = tcp->u_arg[3];
 
 	if (entering(tcp)) {
+		print_syscall_param("req");
 		print_mnt_id_req(tcp, req);
 		tprint_arg_next();
 		return 0;
 	}
 
+	print_syscall_param("buf");
 	print_statmount(tcp, buf, bufsize);
 	tprint_arg_next();
 
+	print_syscall_param("bufsize");
 	PRINT_VAL_U(bufsize);
 	tprint_arg_next();
 
+	print_syscall_param("flags");
 	PRINT_VAL_X(flags);
 
 	return 0;

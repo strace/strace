@@ -17,10 +17,12 @@
 SYS_FUNC(utimes)
 {
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* times */
+	print_syscall_param("times");
 	print_timeval_utimes(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -29,14 +31,17 @@ SYS_FUNC(utimes)
 SYS_FUNC(futimesat)
 {
 	/* dirfd */
+	print_syscall_param("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* times */
+	print_syscall_param("times");
 	print_timeval_utimes(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -46,18 +51,22 @@ static int
 do_utimensat(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	/* dirfd */
+	print_syscall_param("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* times */
+	print_syscall_param("times");
 	print_ts(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(at_flags, tcp->u_arg[3], "AT_???");
 
 	return RVAL_DECODED;
@@ -79,10 +88,12 @@ SYS_FUNC(utimensat_time64)
 SYS_FUNC(osf_utimes)
 {
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* times */
+	print_syscall_param("times");
 	print_timeval32_utimes(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;

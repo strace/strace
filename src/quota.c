@@ -102,13 +102,16 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		break;
 	case Q_QUOTAON:
 		tprint_arg_next();
+		print_syscall_param("id");
 		printxval(quota_formats, id, "QFMT_VFS_???");
 		tprint_arg_next();
+		print_syscall_param("data");
 		printpath(tcp, data);
 		break;
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
 			tprint_arg_next();
+			print_syscall_param("id");
 			printuid(id);
 			tprint_arg_next();
 
@@ -122,10 +125,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprint_arg_next();
+			print_syscall_param("id");
 			printuid(id);
 			tprint_arg_next();
 		}
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		tprint_struct_begin();
@@ -161,12 +166,14 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprint_arg_next();
+			print_syscall_param("id");
 			printuid(id);
 			tprint_arg_next();
 
 			return 0;
 		}
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		tprint_struct_begin();
@@ -204,6 +211,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_XGETNEXTQUOTA:
 		if (entering(tcp)) {
 			tprint_arg_next();
+			print_syscall_param("id");
 			printuid(id);
 			tprint_arg_next();
 
@@ -217,10 +225,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprint_arg_next();
+			print_syscall_param("id");
 			printuid(id);
 			tprint_arg_next();
 		}
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		tprint_struct_begin();
@@ -280,6 +290,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &fmt))
 			break;
 		tprint_indirect_begin();
@@ -302,6 +313,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (entering(tcp))
 			tprint_arg_next();
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		tprint_struct_begin();
@@ -324,6 +336,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 			return 0;
 		}
+		print_syscall_param("data");
 		if (fetch_struct_quotastat(tcp, data, &dq)) {
 			tprint_struct_begin();
 			PRINT_FIELD_D(dq, qs_version);
@@ -367,6 +380,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		tprint_struct_begin();
@@ -410,6 +424,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		tprint_arg_next();
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
 		tprint_indirect_begin();
@@ -423,6 +438,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		tprint_arg_next();
 
+		print_syscall_param("data");
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
 		tprint_indirect_begin();
@@ -432,8 +448,10 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	}
 	default:
 		tprint_arg_next();
+		print_syscall_param("id");
 		printuid(id);
 		tprint_arg_next();
+		print_syscall_param("data");
 		printaddr(data);
 		break;
 	}
@@ -479,10 +497,12 @@ SYS_FUNC(quotactl)
 
 	if (entering(tcp)) {
 		/* cmd */
+		print_syscall_param("op");
 		print_qcmd(qcmd);
 		tprint_arg_next();
 
 		/* special */
+		print_syscall_param("special");
 		printpath(tcp, tcp->u_arg[1]);
 	}
 	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
@@ -497,10 +517,12 @@ SYS_FUNC(quotactl_fd)
 
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, fd);
 		tprint_arg_next();
 
 		/* cmd */
+		print_syscall_param("op");
 		print_qcmd(qcmd);
 	}
 

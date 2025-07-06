@@ -17,10 +17,12 @@
 SYS_FUNC(memfd_create)
 {
 	/* name */
+	print_syscall_param("name");
 	printstr_ex(tcp, tcp->u_arg[0], MFD_NAME_MAX_LEN + 1,
 		    QUOTE_0_TERMINATED);
 	tprint_arg_next();
 
+	print_syscall_param("flags");
 	unsigned int flags = tcp->u_arg[1];
 
 	if (!flags || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)

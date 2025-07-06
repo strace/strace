@@ -14,10 +14,12 @@ SYS_FUNC(lookup_dcookie)
 		return 0;
 
 	/* cookie */
+	print_syscall_param("cookie");
 	unsigned int argn = print_arg_llu(tcp, 0);
 	tprint_arg_next();
 
 	/* buffer */
+	print_syscall_param("buffer");
 	if (syserror(tcp))
 		printaddr(tcp->u_arg[argn]);
 	else
@@ -25,6 +27,7 @@ SYS_FUNC(lookup_dcookie)
 	tprint_arg_next();
 
 	/* len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[argn + 1]);
 
 	return 0;

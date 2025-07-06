@@ -16,6 +16,7 @@ SYS_FUNC(sysctl)
 {
 	struct_sysctl_args info;
 
+	print_syscall_param("args");
 	if (umove_or_printaddr(tcp, tcp->u_arg[0], &info))
 		return RVAL_DECODED;
 

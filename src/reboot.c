@@ -18,14 +18,17 @@ SYS_FUNC(reboot)
 	const unsigned int cmd = tcp->u_arg[2];
 
 	/* magic */
+	print_syscall_param("magic");
 	printxval(bootflags1, magic1, "LINUX_REBOOT_MAGIC_???");
 	tprint_arg_next();
 
 	/* magic2 */
+	print_syscall_param("magic2");
 	printxval(bootflags2, magic2, "LINUX_REBOOT_MAGIC_???");
 	tprint_arg_next();
 
 	/* cmd */
+	print_syscall_param("cmd");
 	printxval(bootflags3, cmd, "LINUX_REBOOT_CMD_???");
 	if (cmd == LINUX_REBOOT_CMD_RESTART2) {
 		tprint_arg_next();
@@ -36,6 +39,7 @@ SYS_FUNC(reboot)
 		 * are copied from the user space.
 		 */
 		/* arg */
+		print_syscall_param("arg");
 		printstr_ex(tcp, tcp->u_arg[3], 255, QUOTE_0_TERMINATED);
 	}
 	return RVAL_DECODED;

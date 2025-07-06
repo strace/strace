@@ -103,6 +103,7 @@ libstrace_a_SOURCES =	\
 	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
+	exit.c		\
 	exitkill.c	\
 	exitkill.h	\
 	fadvise.c	\
@@ -280,6 +281,7 @@ libstrace_a_SOURCES =	\
 	print_statfs.c	\
 	print_struct_stat.c \
 	print_syscall_number.c \
+	print_syscall_param.c \
 	print_time.c	\
 	print_timespec.h \
 	print_timespec32.c \
@@ -336,6 +338,7 @@ libstrace_a_SOURCES =	\
 	seccomp.c	\
 	seccomp_ioctl.c	\
 	sendfile.c	\
+	set_tid_address.c \
 	sg_io_v3.c	\
 	sg_io_v4.c	\
 	shutdown.c	\

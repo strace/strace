@@ -233,8 +233,10 @@ SYS_FUNC(prctl)
 	const kernel_ulong_t arg5 = tcp->u_arg[4];
 	unsigned int i;
 
-	if (entering(tcp))
+	if (entering(tcp)) {
+		print_syscall_param("op");
 		printxval(prctl_options, option, "PR_???");
+	}
 
 	/*
 	 * Grouped options with common decoders first (except for the options
@@ -809,16 +811,20 @@ SYS_FUNC(arch_prctl)
 	const unsigned int option = tcp->u_arg[0];
 	const kernel_ulong_t addr = tcp->u_arg[1];
 
-	if (entering(tcp))
+	if (entering(tcp)) {
+		print_syscall_param("op");
 		printxval(archvals, option, "ARCH_???");
+	}
 
 	switch (option) {
 	case ARCH_GET_GS:
 	case ARCH_GET_FS:
 		if (entering(tcp))
 			tprint_arg_next();
-		else
+		else {
+			print_syscall_param("addr");
 			printnum_kptr(tcp, addr);
+		}
 		return 0;
 
 	case ARCH_GET_CPUID: /* has no arguments */
@@ -831,6 +837,8 @@ SYS_FUNC(arch_prctl)
 			tprint_arg_next();
 		} else {
 			uint64_t val;
+
+			print_syscall_param("addr");
 
 			if (umove_or_printaddr(tcp, addr, &val))
 				return 0;
@@ -851,6 +859,7 @@ SYS_FUNC(arch_prctl)
 		if (entering(tcp)) {
 			/* XFEATURE_* enum is not publicly exposed */
 			tprint_arg_next();
+			print_syscall_param("addr");
 			printxvals_ex(addr, "XFEATURE_???",
 				xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
 				      ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,
@@ -880,6 +889,7 @@ SYS_FUNC(arch_prctl)
 	}
 
 	tprint_arg_next();
+	print_syscall_param("addr");
 	PRINT_VAL_X(addr);
 
 	return RVAL_DECODED;

@@ -11,6 +11,7 @@ SYS_FUNC(getcwd)
 {
 	if (exiting(tcp)) {
 		/* buf */
+		print_syscall_param("buf");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[0]);
 		else
@@ -18,6 +19,7 @@ SYS_FUNC(getcwd)
 		tprint_arg_next();
 
 		/* size */
+		print_syscall_param("size");
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;

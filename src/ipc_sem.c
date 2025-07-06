@@ -39,18 +39,21 @@ tprint_sembuf_array(struct tcb *const tcp, const kernel_ulong_t addr,
 		    const unsigned int count)
 {
 	/* sops */
+	print_syscall_param("sops");
 	struct sembuf sb;
 	print_array(tcp, addr, count, &sb, sizeof(sb),
 		    tfetch_mem, print_sembuf, 0);
 	tprint_arg_next();
 
 	/* nsops */
+	print_syscall_param("nsops");
 	PRINT_VAL_U(count);
 }
 
 SYS_FUNC(semop)
 {
 	/* semid */
+	print_syscall_param("semid");
 	PRINT_VAL_D((int) tcp->u_arg[0]);
 	tprint_arg_next();
 
@@ -66,6 +69,7 @@ static int
 do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	/* semid */
+	print_syscall_param("semid");
 	PRINT_VAL_D((int) tcp->u_arg[0]);
 	tprint_arg_next();
 
@@ -74,6 +78,7 @@ do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprint_arg_next();
 
 		/* timeout */
+		print_syscall_param("timeout");
 #if defined(S390) || defined(S390X)
 		print_ts(tcp, tcp->u_arg[2]);
 #else
@@ -84,6 +89,7 @@ do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprint_arg_next();
 
 		/* timeout */
+		print_syscall_param("timeout");
 		print_ts(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
@@ -104,14 +110,17 @@ SYS_FUNC(semtimedop_time64)
 SYS_FUNC(semget)
 {
 	/* key */
+	print_syscall_param("key");
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 	tprint_arg_next();
 
 	/* nsems */
+	print_syscall_param("nsems");
 	PRINT_VAL_D((int) tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* semflg */
+	print_syscall_param("semflg");
 	tprint_flags_begin();
 	if (printflags_in(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprint_flags_or();

@@ -118,16 +118,19 @@ SYS_FUNC(msgctl)
 
 	if (entering(tcp)) {
 		/* msqid */
+		print_syscall_param("msqid");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* cmd */
+		print_syscall_param("cmd");
 		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
 		tprint_arg_next();
 
 		switch (cmd) {
 		case IPC_SET:
 			/* buf */
+			print_syscall_param("buf");
 			print_msqid_ds(tcp, addr, cmd);
 			return RVAL_DECODED;
 
@@ -141,6 +144,7 @@ SYS_FUNC(msgctl)
 
 		default:
 			/* buf */
+			print_syscall_param("buf");
 			printaddr(addr);
 			return RVAL_DECODED;
 		}
@@ -150,12 +154,14 @@ SYS_FUNC(msgctl)
 		case MSG_STAT:
 		case MSG_STAT_ANY:
 			/* buf */
+			print_syscall_param("buf");
 			print_msqid_ds(tcp, addr, cmd);
 			break;
 
 		case IPC_INFO:
 		case MSG_INFO:
 			/* buf */
+			print_syscall_param("buf");
 			print_msginfo(tcp, addr, cmd);
 			break;
 		}

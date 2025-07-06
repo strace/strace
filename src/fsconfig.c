@@ -17,12 +17,15 @@ SYS_FUNC(fsconfig)
 	const kernel_ulong_t value = tcp->u_arg[3];
 	const int aux = tcp->u_arg[4];
 
+	print_syscall_param("fd");
 	printfd(tcp, fs_fd);
 	tprint_arg_next();
 
+	print_syscall_param("cmd");
 	printxval(fsconfig_cmds, cmd, "FSCONFIG_???");
 	tprint_arg_next();
 
+	print_syscall_param("key");
 	switch (cmd) {
 		case FSCONFIG_SET_FLAG:
 		case FSCONFIG_SET_STRING:
@@ -41,6 +44,7 @@ SYS_FUNC(fsconfig)
 	}
 	tprint_arg_next();
 
+	print_syscall_param("value");
 	switch (cmd) {
 		case FSCONFIG_SET_STRING:
 			printstr_ex(tcp, value, 256, QUOTE_0_TERMINATED);
@@ -66,6 +70,7 @@ SYS_FUNC(fsconfig)
 	}
 	tprint_arg_next();
 
+	print_syscall_param("aux");
 	switch (cmd) {
 		case FSCONFIG_SET_PATH:
 		case FSCONFIG_SET_PATH_EMPTY:

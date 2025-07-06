@@ -1667,11 +1667,13 @@ SYS_FUNC(bpf)
 
 	if (entering(tcp)) {
 		/* cmd */
+		print_syscall_param("cmd");
 		printxval(bpf_commands, cmd, "BPF_???");
 		tprint_arg_next();
 	}
 
 	/* attr */
+	print_syscall_param("attr");
 	if (size > 0
 	    && size <= get_pagesize()
 	    && cmd < ARRAY_SIZE(bpf_cmd_decoders)
@@ -1690,6 +1692,7 @@ SYS_FUNC(bpf)
 	if (exiting(tcp) || (rc & RVAL_DECODED)) {
 		/* size */
 		tprint_arg_next();
+		print_syscall_param("size");
 		PRINT_VAL_U(size);
 	}
 

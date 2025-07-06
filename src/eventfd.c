@@ -14,12 +14,14 @@ static int
 do_eventfd(struct tcb *tcp, int flags_arg)
 {
 	/* initval */
+	print_syscall_param("initval");
 	unsigned int initval = tcp->u_arg[0];
 	PRINT_VAL_U(initval);
 
 	if (flags_arg >= 0) {
 		/* flags */
 		tprint_arg_next();
+		print_syscall_param("flags");
 		printflags(efd_flags, tcp->u_arg[flags_arg], "EFD_???");
 	}
 

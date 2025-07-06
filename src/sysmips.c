@@ -20,6 +20,7 @@
 
 SYS_FUNC(sysmips)
 {
+	print_syscall_param("cmd");
 	printxval64(sysmips_operations, tcp->u_arg[0], "???");
 	tprint_arg_next();
 

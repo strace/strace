@@ -24,10 +24,12 @@ decode_mknod(struct tcb *tcp, int offset)
 	unsigned int dev;
 
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[offset]);
 	tprint_arg_next();
 
 	/* mode */
+	print_syscall_param("mode");
 	print_symbolic_mode_t(mode);
 
 	switch (mode & S_IFMT) {
@@ -37,6 +39,7 @@ decode_mknod(struct tcb *tcp, int offset)
 		tprint_arg_next();
 
 		/* dev */
+		print_syscall_param("dev");
 		print_dev_t(dev);
 		break;
 	}
@@ -52,6 +55,7 @@ SYS_FUNC(mknod)
 SYS_FUNC(mknodat)
 {
 	/* dirfd */
+	print_syscall_param("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 

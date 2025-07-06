@@ -282,6 +282,7 @@ print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(ssetmask)
 {
 	if (entering(tcp)) {
+		print_syscall_param("newmask");
 		tprint_old_sigmask_val((unsigned) tcp->u_arg[0]);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprint_old_sigmask_val("old mask ",
@@ -360,6 +361,7 @@ SYS_FUNC(sigaction)
 {
 	if (entering(tcp)) {
 		int signo = tcp->u_arg[0];
+		print_syscall_param("signum");
 #if defined SPARC || defined SPARC64
 		if (signo < 0) {
 			tprints_string("-");
@@ -371,10 +373,12 @@ SYS_FUNC(sigaction)
 		tprint_arg_next();
 
 		/* act */
+		print_syscall_param("act");
 		decode_old_sigaction(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
 	} else {
 		/* oldact */
+		print_syscall_param("oldact");
 		decode_old_sigaction(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -384,10 +388,12 @@ SYS_FUNC(signal)
 {
 	if (entering(tcp)) {
 		/* signum */
+		print_syscall_param("signum");
 		printsignal(tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* handler */
+		print_syscall_param("handler");
 		print_sa_handler(tcp->u_arg[1]);
 		return 0;
 	} else if (!syserror(tcp)) {
@@ -409,6 +415,7 @@ SYS_FUNC(sgetmask)
 SYS_FUNC(sigsuspend)
 {
 	/* mask */
+	print_syscall_param("mask");
 #ifdef MIPS
 	print_sigset_addr_len(tcp, tcp->u_arg[n_args(tcp) - 1],
 			      current_wordsize);
@@ -435,10 +442,12 @@ SYS_FUNC(osf_sigprocmask)
 {
 	if (entering(tcp)) {
 		/* how */
+		print_syscall_param("how");
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprint_arg_next();
 
 		/* set */
+		print_syscall_param("set");
 		tprintsigmask_val(tcp->u_arg[1]);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprintsigmask_val("old mask ", tcp->u_rval);
@@ -454,14 +463,17 @@ SYS_FUNC(sigprocmask)
 {
 	if (entering(tcp)) {
 		/* how */
+		print_syscall_param("how");
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprint_arg_next();
 
 		/* set */
+		print_syscall_param("set");
 		print_sigset_addr_len(tcp, tcp->u_arg[1], current_wordsize);
 		tprint_arg_next();
 	} else {
 		/* oldset */
+		print_syscall_param("oldset");
 		print_sigset_addr_len(tcp, tcp->u_arg[2], current_wordsize);
 	}
 	return 0;
@@ -471,10 +483,12 @@ SYS_FUNC(sigprocmask)
 SYS_FUNC(kill)
 {
 	/* pid */
+	print_syscall_param("pid");
 	printpid_tgid_pgid(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* signum */
+	print_syscall_param("signum");
 	printsignal(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -483,10 +497,12 @@ SYS_FUNC(kill)
 SYS_FUNC(tkill)
 {
 	/* tid */
+	print_syscall_param("tid");
 	printpid(tcp, tcp->u_arg[0], PT_TID);
 	tprint_arg_next();
 
 	/* signum */
+	print_syscall_param("signum");
 	printsignal(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -495,14 +511,17 @@ SYS_FUNC(tkill)
 SYS_FUNC(tgkill)
 {
 	/* tgid */
+	print_syscall_param("tgid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 	tprint_arg_next();
 
 	/* tid */
+	print_syscall_param("tid");
 	printpid(tcp, tcp->u_arg[1], PT_TID);
 	tprint_arg_next();
 
 	/* signum */
+	print_syscall_param("signum");
 	printsignal(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -512,6 +531,7 @@ SYS_FUNC(sigpending)
 {
 	if (exiting(tcp)) {
 		/* set */
+		print_syscall_param("set");
 		print_sigset_addr_len(tcp, tcp->u_arg[0], current_wordsize);
 	}
 	return 0;
@@ -522,18 +542,22 @@ SYS_FUNC(rt_sigprocmask)
 	/* Note: arg[3] is the length of the sigset. Kernel requires NSIG_BYTES */
 	if (entering(tcp)) {
 		/* how */
+		print_syscall_param("how");
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprint_arg_next();
 
 		/* set */
+		print_syscall_param("set");
 		print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[3]);
 		tprint_arg_next();
 	} else {
 		/* oldset */
+		print_syscall_param("oldset");
 		print_sigset_addr_len(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 		tprint_arg_next();
 
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[3]);
 	}
 	return 0;
@@ -625,33 +649,41 @@ SYS_FUNC(rt_sigaction)
 {
 	if (entering(tcp)) {
 		/* signum */
+		print_syscall_param("signum");
 		printsignal(tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* act */
+		print_syscall_param("act");
 		decode_new_sigaction(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
 	} else {
 		/* oldact */
+		print_syscall_param("oldact");
 		decode_new_sigaction(tcp, tcp->u_arg[2]);
 		tprint_arg_next();
 
 #if defined(SPARC) || defined(SPARC64)
 		/* sa_restorer */
+		print_syscall_param("sa_restorer");
 		PRINT_VAL_X(tcp->u_arg[3]);
 		tprint_arg_next();
 
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[4]);
 #elif defined(ALPHA)
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[3]);
 		tprint_arg_next();
 
 		/* sa_restorer */
+		print_syscall_param("sa_restorer");
 		PRINT_VAL_X(tcp->u_arg[4]);
 #else
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[3]);
 #endif
 	}
@@ -667,11 +699,13 @@ SYS_FUNC(rt_sigpending)
 		 * This allows non-rt sigpending() syscall
 		 * to reuse rt_sigpending() code in kernel.
 		 */
+		print_syscall_param("set");
 		print_sigset_addr_len_limit(tcp, tcp->u_arg[0],
 					    tcp->u_arg[1], 1);
 		tprint_arg_next();
 
 		/* sigsetsize */
+		print_syscall_param("sigsetsize");
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;
@@ -680,10 +714,12 @@ SYS_FUNC(rt_sigpending)
 SYS_FUNC(rt_sigsuspend)
 {
 	/* NB: kernel requires arg[1] == NSIG_BYTES */
+	print_syscall_param("set");
 	print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* sigsetsize */
+	print_syscall_param("sigsetsize");
 	PRINT_VAL_U(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -694,16 +730,19 @@ print_sigqueueinfo(struct tcb *const tcp, const int sig,
 		   const kernel_ulong_t addr)
 {
 	/* signum */
+	print_syscall_param("signum");
 	printsignal(sig);
 	tprint_arg_next();
 
 	/* info */
+	print_syscall_param("info");
 	printsiginfo_at(tcp, addr);
 }
 
 SYS_FUNC(rt_sigqueueinfo)
 {
 	/* tgid */
+	print_syscall_param("tgid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 	tprint_arg_next();
 
@@ -716,10 +755,12 @@ SYS_FUNC(rt_sigqueueinfo)
 SYS_FUNC(rt_tgsigqueueinfo)
 {
 	/* tgid */
+	print_syscall_param("tgid");
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 	tprint_arg_next();
 
 	/* tid */
+	print_syscall_param("tid");
 	printpid(tcp, tcp->u_arg[1], PT_TID);
 	tprint_arg_next();
 
@@ -734,6 +775,7 @@ SYS_FUNC(rt_tgsigqueueinfo)
 SYS_FUNC(pidfd_send_signal)
 {
 	/* int pidfd */
+	print_syscall_param("pidfd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
@@ -742,6 +784,7 @@ SYS_FUNC(pidfd_send_signal)
 	tprint_arg_next();
 
 	/* unsigned int flags */
+	print_syscall_param("flags");
 	printflags(pidfd_send_signal_flags, tcp->u_arg[3], "PIDFD_SIGNAL_???");
 
 	return RVAL_DECODED;
@@ -754,6 +797,7 @@ do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	/* NB: kernel requires arg[3] == NSIG_BYTES */
 	if (entering(tcp)) {
 		/* set */
+		print_syscall_param("set");
 		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[3]);
 		tprint_arg_next();
 
@@ -763,14 +807,17 @@ do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 			 * if we are not going to fetch it on exit,
 			 * decode all parameters on entry.
 			 */
+			print_syscall_param("info");
 			printaddr(tcp->u_arg[1]);
 			tprint_arg_next();
 
 			/* timeout */
+			print_syscall_param("timeout");
 			print_ts(tcp, tcp->u_arg[2]);
 			tprint_arg_next();
 
 			/* sigsetsize */
+			print_syscall_param("sigsetsize");
 			PRINT_VAL_U(tcp->u_arg[3]);
 		} else {
 			char *sts = xstrdup(sprint_ts(tcp, tcp->u_arg[2]));
@@ -779,14 +826,17 @@ do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	} else {
 		if (tcp->u_arg[1] && verbose(tcp)) {
 			/* info */
+			print_syscall_param("info");
 			printsiginfo_at(tcp, tcp->u_arg[1]);
 			tprint_arg_next();
 
 			/* timeout */
+			print_syscall_param("timeout");
 			tprints_string(get_tcb_priv_data(tcp));
 			tprint_arg_next();
 
 			/* sigsetsize */
+			print_syscall_param("sigsetsize");
 			PRINT_VAL_U(tcp->u_arg[3]);
 		}
 

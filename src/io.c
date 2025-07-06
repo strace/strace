@@ -17,10 +17,12 @@ SYS_FUNC(read)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* buf */
+		print_syscall_param("buf");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
@@ -28,6 +30,7 @@ SYS_FUNC(read)
 		tprint_arg_next();
 
 		/* count */
+		print_syscall_param("count");
 		PRINT_VAL_U(tcp->u_arg[2]);
 	}
 	return 0;
@@ -36,14 +39,17 @@ SYS_FUNC(read)
 SYS_FUNC(write)
 {
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* count */
+	print_syscall_param("count");
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -150,10 +156,12 @@ SYS_FUNC(readv)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* iov */
+		print_syscall_param("iov");
 		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], tcp->u_rval,
 				syserror(tcp) ? iov_decode_addr
 					      : iov_decode_str,
@@ -161,6 +169,7 @@ SYS_FUNC(readv)
 		tprint_arg_next();
 
 		/* iovcnt */
+		print_syscall_param("iovcnt");
 		PRINT_VAL_U(tcp->u_arg[2]);
 	}
 	return 0;
@@ -169,14 +178,17 @@ SYS_FUNC(readv)
 SYS_FUNC(writev)
 {
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* iov */
+	print_syscall_param("iov");
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* iovcnt */
+	print_syscall_param("iovcnt");
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -186,10 +198,12 @@ SYS_FUNC(pread)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* buf */
+		print_syscall_param("buf");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
@@ -197,10 +211,12 @@ SYS_FUNC(pread)
 		tprint_arg_next();
 
 		/* count */
+		print_syscall_param("count");
 		PRINT_VAL_U(tcp->u_arg[2]);
 		tprint_arg_next();
 
 		/* offset */
+		print_syscall_param("offset");
 		print_arg_lld(tcp, 3);
 	}
 	return 0;
@@ -209,18 +225,22 @@ SYS_FUNC(pread)
 SYS_FUNC(pwrite)
 {
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* count */
+	print_syscall_param("count");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* offset */
+	print_syscall_param("offset");
 	print_arg_lld(tcp, 3);
 
 	return RVAL_DECODED;
@@ -249,6 +269,7 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 {
 	if (entering(tcp)) {
 		/* fd */
+		print_syscall_param("fd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
@@ -256,6 +277,7 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 			truncate_kulong_to_current_wordsize(tcp->u_arg[2]);
 
 		/* iov */
+		print_syscall_param("iov");
 		tprint_iov_upto(tcp, len, tcp->u_arg[1], tcp->u_rval,
 				syserror(tcp) ? iov_decode_addr
 					      : iov_decode_str,
@@ -263,16 +285,19 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 		tprint_arg_next();
 
 		/* iovcnt */
+		print_syscall_param("iovcnt");
 		PRINT_VAL_U(len);
 		tprint_arg_next();
 
 		/* offset */
+		print_syscall_param("offset");
 		print_lld_from_low_high_val(tcp, 3);
 
 		if (flags_arg >= 0) {
 			tprint_arg_next();
 
 			/* flags */
+			print_syscall_param("flags");
 			printflags(rwf_flags, tcp->u_arg[flags_arg], "RWF_???");
 		}
 	}
@@ -291,24 +316,29 @@ do_pwritev(struct tcb *tcp, const int flags_arg)
 		truncate_kulong_to_current_wordsize(tcp->u_arg[2]);
 
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* iov */
+	print_syscall_param("iov");
 	tprint_iov(tcp, len, tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* iovcnt */
+	print_syscall_param("iovcnt");
 	PRINT_VAL_U(len);
 	tprint_arg_next();
 
 	/* offset */
+	print_syscall_param("offset");
 	print_lld_from_low_high_val(tcp, 3);
 
 	if (flags_arg >= 0) {
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		printflags(rwf_flags, tcp->u_arg[flags_arg], "RWF_???");
 	}
 
@@ -350,18 +380,22 @@ SYS_FUNC(pwritev2)
 SYS_FUNC(tee)
 {
 	/* int fd_in */
+	print_syscall_param("fd_in");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* int fd_out */
+	print_syscall_param("fd_out");
 	printfd(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* size_t len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* unsigned int flags */
+	print_syscall_param("flags");
 	printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
 
 	return RVAL_DECODED;
@@ -370,26 +404,32 @@ SYS_FUNC(tee)
 SYS_FUNC(splice)
 {
 	/* int fd_in */
+	print_syscall_param("fd_in");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* loff_t *off_in */
+	print_syscall_param("off_in");
 	printnum_int64(tcp, tcp->u_arg[1], "%" PRId64);
 	tprint_arg_next();
 
 	/* int fd_out */
+	print_syscall_param("fd_out");
 	printfd(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* loff_t *off_out */
+	print_syscall_param("off_out");
 	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
 	tprint_arg_next();
 
 	/* size_t len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[4]);
 	tprint_arg_next();
 
 	/* unsigned int flags */
+	print_syscall_param("flags");
 	printflags(splice_flags, tcp->u_arg[5], "SPLICE_F_???");
 
 	return RVAL_DECODED;
@@ -398,18 +438,22 @@ SYS_FUNC(splice)
 SYS_FUNC(vmsplice)
 {
 	/* int fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* const struct iovec *iov */
+	print_syscall_param("iov");
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* unsigned long nr_segs */
+	print_syscall_param("nr_segs");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* unsigned int flags */
+	print_syscall_param("flags");
 	printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
 
 	return RVAL_DECODED;

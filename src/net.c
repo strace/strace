@@ -109,14 +109,17 @@ tprint_sock_type(unsigned int flags)
 SYS_FUNC(socket)
 {
 	/* domain */
+	print_syscall_param("domain");
 	printxval(addrfams, tcp->u_arg[0], "AF_???");
 	tprint_arg_next();
 
 	/* type */
+	print_syscall_param("type");
 	tprint_sock_type(tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* protocol */
+	print_syscall_param("protocol");
 	switch (tcp->u_arg[0]) {
 	case AF_INET:
 	case AF_INET6:
@@ -203,6 +206,7 @@ decode_sockname(struct tcb *tcp)
 
 	if (entering(tcp)) {
 		/* sockfd */
+		print_syscall_param("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
@@ -211,10 +215,12 @@ decode_sockname(struct tcb *tcp)
 			return 0;
 		} else {
 			/* addr */
+			print_syscall_param("addr");
 			printaddr(tcp->u_arg[1]);
 			tprint_arg_next();
 
 			/* addrlen */
+			print_syscall_param("addrlen");
 			printaddr(tcp->u_arg[2]);
 
 			return RVAL_DECODED;
@@ -225,19 +231,23 @@ decode_sockname(struct tcb *tcp)
 
 	if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &rlen) < 0) {
 		/* addr */
+		print_syscall_param("addr");
 		printaddr(tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* addrlen */
+		print_syscall_param("addrlen");
 		tprint_indirect_begin();
 		PRINT_VAL_D(ulen);
 		tprint_indirect_end();
 	} else {
 		/* addr */
+		print_syscall_param("addr");
 		decode_sockaddr(tcp, tcp->u_arg[1], ulen > rlen ? rlen : ulen);
 		tprint_arg_next();
 
 		/* addrlen */
+		print_syscall_param("addrlen");
 		tprint_indirect_begin();
 		if (ulen != rlen) {
 			PRINT_VAL_D(ulen);
@@ -262,6 +272,7 @@ SYS_FUNC(accept4)
 	if (rc & RVAL_DECODED) {
 		/* flags */
 		tprint_arg_next();
+		print_syscall_param("flags");
 		printflags(sock_type_flags, tcp->u_arg[3], "SOCK_???");
 	}
 
@@ -271,18 +282,22 @@ SYS_FUNC(accept4)
 SYS_FUNC(send)
 {
 	/* sockfd */
+	print_syscall_param("sockfd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
 	return RVAL_DECODED;
@@ -291,27 +306,33 @@ SYS_FUNC(send)
 SYS_FUNC(sendto)
 {
 	/* sockfd */
+	print_syscall_param("sockfd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* len */
+	print_syscall_param("len");
 	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	tprint_arg_next();
 
 	/* dest_addr */
+	print_syscall_param("dest_addr");
 	const int addrlen = tcp->u_arg[5];
 	decode_sockaddr(tcp, tcp->u_arg[4], addrlen);
 	tprint_arg_next();
 
 	/* addrlen */
+	print_syscall_param("addrlen");
 	PRINT_VAL_D(addrlen);
 
 	return RVAL_DECODED;
@@ -321,10 +342,12 @@ SYS_FUNC(recv)
 {
 	if (entering(tcp)) {
 		/* sockfd */
+		print_syscall_param("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 	} else {
 		/* buf */
+		print_syscall_param("buf");
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
 		} else {
@@ -335,10 +358,12 @@ SYS_FUNC(recv)
 		tprint_arg_next();
 
 		/* len */
+		print_syscall_param("len");
 		PRINT_VAL_U(tcp->u_arg[2]);
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
@@ -350,6 +375,7 @@ SYS_FUNC(recvfrom)
 
 	if (entering(tcp)) {
 		/* sockfd */
+		print_syscall_param("sockfd");
 		printfd(tcp, tcp->u_arg[0]);
 		tprint_arg_next();
 
@@ -358,6 +384,7 @@ SYS_FUNC(recvfrom)
 		}
 	} else {
 		/* buf */
+		print_syscall_param("buf");
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
 		} else {
@@ -368,10 +395,12 @@ SYS_FUNC(recvfrom)
 		tprint_arg_next();
 
 		/* len */
+		print_syscall_param("len");
 		PRINT_VAL_U(tcp->u_arg[2]);
 		tprint_arg_next();
 
 		/* flags */
+		print_syscall_param("flags");
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		tprint_arg_next();
 
@@ -379,20 +408,24 @@ SYS_FUNC(recvfrom)
 
 		if (!fetch_socklen(tcp, &rlen, tcp->u_arg[4], tcp->u_arg[5])) {
 			/* src_addr */
+			print_syscall_param("src_addr");
 			printaddr(tcp->u_arg[4]);
 			tprint_arg_next();
 
 			/* addrlen */
+			print_syscall_param("addrlen");
 			printaddr(tcp->u_arg[5]);
 
 			return 0;
 		}
 		if (syserror(tcp)) {
 			/* src_addr */
+			print_syscall_param("src_addr");
 			printaddr(tcp->u_arg[4]);
 			tprint_arg_next();
 
 			/* addrlen */
+			print_syscall_param("addrlen");
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
 			tprint_indirect_end();
@@ -401,10 +434,12 @@ SYS_FUNC(recvfrom)
 		}
 
 		/* src_addr */
+		print_syscall_param("src_addr");
 		decode_sockaddr(tcp, tcp->u_arg[4], ulen > rlen ? rlen : ulen);
 		tprint_arg_next();
 
 		/* addrlen */
+		print_syscall_param("addrlen");
 		tprint_indirect_begin();
 		if (ulen != rlen) {
 			PRINT_VAL_D(ulen);
@@ -434,9 +469,11 @@ do_pipe(struct tcb *tcp, int flags_arg)
 {
 	if (exiting(tcp)) {
 		/* pipefd */
+		print_syscall_param("pipefd");
 		decode_pair_fd(tcp, tcp->u_arg[0]);
 		if (flags_arg >= 0) {
 			/* flags */
+			print_syscall_param("flags");
 			tprint_arg_next();
 			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 		}
@@ -448,6 +485,7 @@ SYS_FUNC(pipe)
 {
 #if HAVE_ARCH_GETRVAL2
 	if (exiting(tcp) && !syserror(tcp)) {
+		print_syscall_param("fildes");
 		tprint_array_begin();
 		printfd(tcp, tcp->u_rval);
 		tprint_array_next();
@@ -469,18 +507,22 @@ SYS_FUNC(socketpair)
 {
 	if (entering(tcp)) {
 		/* domain */
+		print_syscall_param("domain");
 		printxval(addrfams, tcp->u_arg[0], "AF_???");
 		tprint_arg_next();
 
 		/* type */
+		print_syscall_param("type");
 		tprint_sock_type(tcp->u_arg[1]);
 		tprint_arg_next();
 
 		/* protocol */
+		print_syscall_param("protocol");
 		PRINT_VAL_U(tcp->u_arg[2]);
 		tprint_arg_next();
 	} else {
 		/* sv */
+		print_syscall_param("sv");
 		decode_pair_fd(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -1148,6 +1190,7 @@ SYS_FUNC(getsockopt)
 	int ulen, rlen;
 
 	if (entering(tcp)) {
+		print_syscall_param("sockfd");
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
 					    tcp->u_arg[1], tcp->u_arg[2], true);
 		tprint_arg_next();
@@ -1158,10 +1201,12 @@ SYS_FUNC(getsockopt)
 			return 0;
 		} else {
 			/* optval */
+			print_syscall_param("optval");
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
 
 			/* optlen */
+			print_syscall_param("optlen");
 			printaddr(tcp->u_arg[4]);
 			return RVAL_DECODED;
 		}
@@ -1170,19 +1215,23 @@ SYS_FUNC(getsockopt)
 
 		if (umove(tcp, tcp->u_arg[4], &rlen) < 0) {
 			/* optval */
+			print_syscall_param("optval");
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
 
 			/* optlen */
+			print_syscall_param("optlen");
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
 			tprint_indirect_end();
 		} else if (syserror(tcp)) {
 			/* optval */
+			print_syscall_param("optval");
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
 
 			/* optlen */
+			print_syscall_param("optlen");
 			tprint_indirect_begin();
 			if (ulen != rlen) {
 				PRINT_VAL_D(ulen);
@@ -1192,11 +1241,13 @@ SYS_FUNC(getsockopt)
 			tprint_indirect_end();
 		} else {
 			/* optval */
+			print_syscall_param("optval");
 			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					 tcp->u_arg[3], ulen, rlen);
 			tprint_arg_next();
 
 			/* optlen */
+			print_syscall_param("optlen");
 			tprint_indirect_begin();
 			if (ulen != rlen) {
 				PRINT_VAL_D(ulen);
@@ -1480,16 +1531,19 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 SYS_FUNC(setsockopt)
 {
+	print_syscall_param("sockfd");
 	print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
 				    tcp->u_arg[1], tcp->u_arg[2], false);
 	tprint_arg_next();
 
 	/* optval */
+	print_syscall_param("optval");
 	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			 tcp->u_arg[3], tcp->u_arg[4]);
 	tprint_arg_next();
 
 	/* optlen */
+	print_syscall_param("optlen");
 	PRINT_VAL_D((int) tcp->u_arg[4]);
 
 	return RVAL_DECODED;

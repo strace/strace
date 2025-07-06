@@ -46,14 +46,17 @@ SYS_FUNC(getxgid)
 SYS_FUNC(osf_statfs)
 {
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	printaddr(tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* size */
+	print_syscall_param("size");
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -62,14 +65,17 @@ SYS_FUNC(osf_statfs)
 SYS_FUNC(osf_fstatfs)
 {
 	/* fd */
+	print_syscall_param("fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* buf */
+	print_syscall_param("buf");
 	printaddr(tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* size */
+	print_syscall_param("size");
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;

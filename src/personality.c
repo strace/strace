@@ -17,6 +17,7 @@ SYS_FUNC(personality)
 
 	if (entering(tcp)) {
 		pers = tcp->u_arg[0];
+		print_syscall_param("persona");
 		if (0xffffffff == pers) {
 			PRINT_VAL_X(0xffffffff);
 		} else {

@@ -128,16 +128,19 @@ SYS_FUNC(modify_ldt)
 {
 	if (entering(tcp)) {
 		/* func */
+		print_syscall_param("func");
 		PRINT_VAL_D((int) tcp->u_arg[0]);
 		tprint_arg_next();
 
 		/* ptr */
+		print_syscall_param("ptr");
 		if (tcp->u_arg[2] != sizeof(struct user_desc))
 			printaddr(tcp->u_arg[1]);
 		else
 			print_user_desc(tcp, tcp->u_arg[1], USER_DESC_BOTH);
 		tprint_arg_next();
 
+		print_syscall_param("bytecount");
 		PRINT_VAL_U(tcp->u_arg[2]);
 
 		return 0;
@@ -159,6 +162,7 @@ SYS_FUNC(modify_ldt)
 SYS_FUNC(set_thread_area)
 {
 	if (entering(tcp)) {
+		print_syscall_param("u_info");
 		print_user_desc(tcp, tcp->u_arg[0], USER_DESC_BOTH);
 	} else {
 		struct user_desc desc;
@@ -179,6 +183,7 @@ SYS_FUNC(set_thread_area)
 
 SYS_FUNC(get_thread_area)
 {
+	print_syscall_param("u_info");
 	print_user_desc(tcp, tcp->u_arg[0],
 			entering(tcp) ? USER_DESC_ENTERING : USER_DESC_EXITING);
 	return 0;
@@ -186,9 +191,21 @@ SYS_FUNC(get_thread_area)
 
 #endif /* HAVE_STRUCT_USER_DESC */
 
-#if defined(M68K) || defined(MIPS)
+#if defined(M68K)
 SYS_FUNC(set_thread_area)
 {
+	print_syscall_param("tp");
+	printaddr(tcp->u_arg[0]);
+
+	return RVAL_DECODED;
+
+}
+#endif
+
+#if defined(MIPS)
+SYS_FUNC(set_thread_area)
+{
+	print_syscall_param("addr");
 	printaddr(tcp->u_arg[0]);
 
 	return RVAL_DECODED;

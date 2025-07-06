@@ -12,11 +12,22 @@
 SYS_FUNC(pkey_alloc)
 {
 	/* flags */
+	print_syscall_param("flags");
 	PRINT_VAL_X(tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* access_rights */
+	print_syscall_param("access_rights");
 	printflags64(pkey_access, tcp->u_arg[1], "PKEY_???");
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(pkey_free)
+{
+	/* pkey */
+	print_syscall_param("pkey");
+	PRINT_VAL_D((int) tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }

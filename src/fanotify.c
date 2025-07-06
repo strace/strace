@@ -21,6 +21,7 @@
 SYS_FUNC(fanotify_init)
 {
 	/* flags */
+	print_syscall_param("flags");
 	unsigned int flags = tcp->u_arg[0];
 
 	tprint_flags_begin();
@@ -34,6 +35,7 @@ SYS_FUNC(fanotify_init)
 	tprint_arg_next();
 
 	/* event_f_flags */
+	print_syscall_param("event_f_flags");
 	tprint_open_modes((unsigned) tcp->u_arg[1]);
 
 	return RVAL_DECODED | RVAL_FD;
@@ -45,10 +47,12 @@ SYS_FUNC(fanotify_init)
 SYS_FUNC(fanotify_mark)
 {
 	/* fanotify_fd */
+	print_syscall_param("fanotify_fd");
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(fan_mark_flags, tcp->u_arg[1], "FAN_MARK_???");
 	tprint_arg_next();
 
@@ -56,12 +60,14 @@ SYS_FUNC(fanotify_mark)
 	 * the mask argument is defined as 64-bit,
 	 * but kernel uses the lower 32 bits only.
 	 */
+	print_syscall_param("mask");
 	unsigned long long mask = 0;
 	unsigned int argn = getllval(tcp, &mask, 2);
 	printflags64(fan_event_flags, mask, "FAN_???");
 	tprint_arg_next();
 
 	/* dirfd */
+	print_syscall_param("dirfd");
 	if ((int) tcp->u_arg[argn] == FAN_NOFD)
 		print_xlat_d(FAN_NOFD);
 	else
@@ -69,6 +75,7 @@ SYS_FUNC(fanotify_mark)
 	tprint_arg_next();
 
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[argn + 1]);
 
 	return RVAL_DECODED;

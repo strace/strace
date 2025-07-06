@@ -16,10 +16,12 @@ static void
 decode_access(struct tcb *tcp, int offset)
 {
 	/* pathname */
+	print_syscall_param("pathname");
 	printpath(tcp, tcp->u_arg[offset]);
 	tprint_arg_next();
 
 	/* mode */
+	print_syscall_param("mode");
 	printflags(access_modes, tcp->u_arg[offset + 1], "?_OK");
 }
 
@@ -33,6 +35,7 @@ static void
 decode_faccessat(struct tcb *tcp)
 {
 	/* dirfd */
+	print_syscall_param("dirfd");
 	print_dirfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
 
@@ -52,6 +55,7 @@ SYS_FUNC(faccessat2)
 	tprint_arg_next();
 
 	/* flags */
+	print_syscall_param("flags");
 	printflags(faccessat_flags, tcp->u_arg[3], "AT_???");
 	return RVAL_DECODED;
 }
