@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include "kernel_fcntl.h"
 #include "kernel_v4l2_types.h"
 
 #define cc0(arg) ((unsigned int) (unsigned char) (arg))
@@ -499,7 +500,6 @@ main(void)
 		const char *str;
 	} unsupp_cmds[] = {
 		{ ARG_STR(VIDIOC_OVERLAY) },
-		{ ARG_STR(VIDIOC_EXPBUF) },
 		{ ARG_STR(VIDIOC_G_AUDIO) },
 		{ ARG_STR(VIDIOC_S_AUDIO) },
 		{ ARG_STR(VIDIOC_QUERYMENU) },
@@ -1333,6 +1333,31 @@ main(void)
 #endif
 	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
+
+	ioctl(-1, VIDIOC_EXPBUF, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_EXPBUF));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_exportbuffer, p_v4l2_expbuf);
+
+	p_v4l2_expbuf->type = -1;
+	p_v4l2_expbuf->index = 123;
+	p_v4l2_expbuf->plane = 321;
+	p_v4l2_expbuf->flags = O_RDONLY | O_CLOEXEC;
+
+	ioctl(-1, VIDIOC_EXPBUF, p_v4l2_expbuf);
+	printf("ioctl(-1, %s, {"
+	       "type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") ", "
+	       "index=%u, "
+	       "plane=%u, "
+	       "flags=" NABBR("%#x") VERB(" /* ") NRAW("O_RDONLY|O_CLOEXEC") VERB(" */")
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_EXPBUF),
+	       p_v4l2_expbuf->type,
+	       p_v4l2_expbuf->index,
+	       p_v4l2_expbuf->plane
+	       NABBR(, p_v4l2_expbuf->flags)
+	);
 
 	puts("+++ exited with 0 +++");
 	return 0;
