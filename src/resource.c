@@ -123,10 +123,11 @@ SYS_FUNC(getrlimit)
 {
 	if (entering(tcp)) {
 		/* resource */
+		tprints_arg_name("resource");
 		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-		tprint_arg_next();
 	} else {
 		/* rlim */
+		tprints_arg_next_name("rlim");
 		decode_rlimit(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -135,10 +136,11 @@ SYS_FUNC(getrlimit)
 SYS_FUNC(setrlimit)
 {
 	/* resource */
+	tprints_arg_name("resource");
 	printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-	tprint_arg_next();
 
 	/* rlim */
+	tprints_arg_next_name("rlim");
 	decode_rlimit(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -148,18 +150,19 @@ SYS_FUNC(prlimit64)
 {
 	if (entering(tcp)) {
 		/* pid */
+		tprints_arg_name("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 
 		/* resource */
+		tprints_arg_next_name("resource");
 		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
-		tprint_arg_next();
 
 		/* new_limit */
+		tprints_arg_next_name("new_limit");
 		print_rlimit64(tcp, tcp->u_arg[2]);
-		tprint_arg_next();
 	} else {
 		/* old_limit */
+		tprints_arg_next_name("old_limit");
 		print_rlimit64(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -171,10 +174,11 @@ SYS_FUNC(getrusage)
 {
 	if (entering(tcp)) {
 		/* who */
+		tprints_arg_name("who");
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprint_arg_next();
 	} else {
 		/* usage */
+		tprints_arg_next_name("usage");
 		printrusage(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -185,10 +189,11 @@ SYS_FUNC(osf_getrusage)
 {
 	if (entering(tcp)) {
 		/* who */
+		tprints_arg_name("who");
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprint_arg_next();
 	} else {
 		/* usage */
+		tprints_arg_next_name("usage");
 		printrusage32(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -217,10 +222,11 @@ priority_print_who(struct tcb *tcp, int which, int who)
 SYS_FUNC(getpriority)
 {
 	/* which */
+	tprints_arg_name("which");
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprint_arg_next();
 
 	/* who */
+	tprints_arg_next_name("who");
 	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -229,14 +235,15 @@ SYS_FUNC(getpriority)
 SYS_FUNC(setpriority)
 {
 	/* which */
+	tprints_arg_name("which");
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprint_arg_next();
 
 	/* who */
+	tprints_arg_next_name("who");
 	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-	tprint_arg_next();
 
 	/* prio */
+	tprints_arg_next_name("prio");
 	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;

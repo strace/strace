@@ -520,6 +520,7 @@ extern bool Tflag;
 extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
+extern bool Nflag;
 extern bool count_wallclock;
 extern bool tracing_fds;
 extern long long syscall_limit;
@@ -578,6 +579,9 @@ extern bool get_stack_pointer(struct tcb *, kernel_ulong_t *);
 extern void print_instruction_pointer(struct tcb *);
 
 extern void print_syscall_number(struct tcb *);
+
+extern void tprints_arg_name(const char *);
+extern void tprints_arg_next_name(const char *);
 
 extern void print_syscall_resume(struct tcb *tcp);
 

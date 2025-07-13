@@ -103,6 +103,7 @@ libstrace_a_SOURCES =	\
 	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
+	exit.c		\
 	exitkill.c	\
 	exitkill.h	\
 	fadvise.c	\
@@ -265,6 +266,7 @@ libstrace_a_SOURCES =	\
 	poke.h		\
 	poll.c		\
 	prctl.c		\
+	print_arg_name.c \
 	print_dev_t.c	\
 	print_fields.h	\
 	print_group_req.c \
@@ -336,6 +338,7 @@ libstrace_a_SOURCES =	\
 	seccomp.c	\
 	seccomp_ioctl.c	\
 	sendfile.c	\
+	set_tid_address.c \
 	sg_io_v3.c	\
 	sg_io_v4.c	\
 	shutdown.c	\
