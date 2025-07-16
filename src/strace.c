@@ -175,6 +175,7 @@ static bool open_append;
 
 struct tcb *printing_tcp;
 static struct tcb *current_tcp;
+static unsigned long resume_id;
 
 struct tcb_wait_data {
 	enum trace_event te; /**< Event passed to dispatch_event() */
@@ -843,6 +844,15 @@ line_ended(void)
 	}
 }
 
+static unsigned long
+update_resume_id(struct tcb *tcp)
+{
+	if (!tcp->resume_id)
+		tcp->resume_id = ++resume_id;
+
+	return tcp->resume_id;
+}
+
 static void
 set_current_tcp(const struct tcb *tcp)
 {
@@ -886,7 +896,7 @@ printleader(struct tcb *tcp)
 			 */
 			set_current_tcp(printing_tcp);
 			tprint_space();
-			tprints_string("<unfinished ...>");
+			tprintf_string("<unfinished #%lu ...>", update_resume_id(printing_tcp));
 			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
@@ -1074,6 +1084,7 @@ alloctcb(int pid)
 			memset(tcp, 0, sizeof(*tcp));
 			list_init(&tcp->wait_list);
 			tcp->pid = pid;
+			tcp->resume_id = 0;
 			maybe_load_task_comm(tcp);
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
@@ -3437,7 +3448,8 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		 * Another case is demonstrated by
 		 * tests/maybe_switch_current_tcp.c
 		 */
-		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
+		fprintf(execve_thread->outf, " <pid changed to %d ... (#%lu)>\n",
+			pid, update_resume_id(execve_thread));
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
 	/* Swap output FILEs and memstream (needed for -ff) */
@@ -3596,7 +3608,7 @@ print_event_exit(struct tcb *tcp)
 	    && printing_tcp->curcol != 0 && !printing_tcp->staged_output_data) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
-		tprints_string("<unfinished ...>");
+		tprintf_string("<unfinished #%lu ...>", update_resume_id(printing_tcp));
 		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
@@ -3611,6 +3623,10 @@ print_event_exit(struct tcb *tcp)
 		 * on exiting syscall which is not going to happen.
 		 */
 		tprint_space();
+		/*
+		 * resume_id does not have to be printed here since this
+		 * syscall does not require resumption.
+		 */
 		tprints_string("<unfinished ...>");
 	}
 
