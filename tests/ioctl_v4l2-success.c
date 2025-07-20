@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include "kernel_fcntl.h"
 #include "kernel_v4l2_types.h"
 
 static bool
@@ -611,6 +612,37 @@ main(int argc, char **argv)
 		       XLAT_STR(VIDIOC_REQBUFS),
 		       buf_types[i % ARRAY_SIZE(buf_types)].str,
 		       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
+		       inject_retval);
+	}
+
+
+	/* VIDIOC_EXPBUF */
+	ioctl(-1, VIDIOC_EXPBUF, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_EXPBUF), inject_retval);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_exportbuffer, expb);
+	fill_memory(expb, sizeof(*expb));
+
+	ioctl(-1, VIDIOC_EXPBUF, (char *) expb + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_EXPBUF), (char *) expb + 1, inject_retval);
+
+	for (size_t i = 0; i < ARRAY_SIZE(buf_types); i++) {
+		expb->type = buf_types[i].val;
+		expb->flags = O_RDONLY | O_CLOEXEC;
+
+		ioctl(-1, VIDIOC_EXPBUF, expb);
+		printf("ioctl(-1, %s"
+		       ", {type=%s, index=%u, plane=%u, flags=" NABBR("%#x")
+		       VERB(" /* ") NRAW("O_RDONLY|O_CLOEXEC") VERB(" */")
+		       "} => {fd=%d}) = %ld (INJECTED)\n",
+		       XLAT_STR(VIDIOC_EXPBUF),
+		       buf_types[i].str,
+		       expb->index,
+		       expb->plane,
+		       NABBR(expb->flags,)
+		       expb->fd,
 		       inject_retval);
 	}
 
