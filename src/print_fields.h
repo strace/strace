@@ -35,6 +35,8 @@
 
 # endif /* !IN_STRACE */
 
+/* used to check for the -N/--arg-names option */
+extern bool Nflag;
 
 static inline void
 tprint_struct_begin(void)
@@ -269,6 +271,20 @@ static inline void
 tprints_field_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
+}
+
+static inline void
+tprints_arg_name(const char *name)
+{
+	if (Nflag)
+		STRACE_PRINTF("%s=", name);
+}
+
+static inline void
+tprints_arg_next_name(const char *name)
+{
+	tprint_arg_next();
+	tprints_arg_name(name);
 }
 
 static inline void

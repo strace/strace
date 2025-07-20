@@ -50,7 +50,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 	case NS_GET_OWNER_UID:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("uid");
 		if (!umove_or_printaddr(tcp, arg, &uid)) {
 			tprint_indirect_begin();
 			printuid(uid);

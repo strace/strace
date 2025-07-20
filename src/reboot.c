@@ -18,24 +18,24 @@ SYS_FUNC(reboot)
 	const unsigned int cmd = tcp->u_arg[2];
 
 	/* magic */
+	tprints_arg_name("magic");
 	printxval(bootflags1, magic1, "LINUX_REBOOT_MAGIC_???");
-	tprint_arg_next();
 
 	/* magic2 */
+	tprints_arg_next_name("magic2");
 	printxval(bootflags2, magic2, "LINUX_REBOOT_MAGIC_???");
-	tprint_arg_next();
 
 	/* cmd */
+	tprints_arg_next_name("op");
 	printxval(bootflags3, cmd, "LINUX_REBOOT_CMD_???");
 	if (cmd == LINUX_REBOOT_CMD_RESTART2) {
-		tprint_arg_next();
-
 		/*
 		 * The size of kernel buffer is 256 bytes and
 		 * the last byte is always zero, at most 255 bytes
 		 * are copied from the user space.
 		 */
 		/* arg */
+		tprints_arg_next_name("arg");
 		printstr_ex(tcp, tcp->u_arg[3], 255, QUOTE_0_TERMINATED);
 	}
 	return RVAL_DECODED;

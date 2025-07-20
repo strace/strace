@@ -72,7 +72,7 @@ kiocsound(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	unsigned int freq = arg ? KERNEL_PIT_TICK_RATE / arg : 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	PRINT_VAL_U(arg);
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
 		if (freq)
@@ -91,7 +91,7 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 	unsigned int count = arg & 0xFFFF;
 	unsigned int freq = ticks && count ? KERNEL_PIT_TICK_RATE / count : 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	tprint_flags_begin();
 	if (ticks) {
 		tprint_shift_begin();
@@ -155,12 +155,11 @@ kd_leds(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	print_leds(tcp, arg, get, dflt);
 
 	return RVAL_IOCTL_DECODED;
@@ -172,10 +171,10 @@ kd_get_kb_type(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned char val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -191,7 +190,7 @@ kd_io(struct tcb *const tcp, kernel_ulong_t arg)
 {
 	enum { GPFIRST = 0x3b4, GPLAST = 0x3df };
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	PRINT_VAL_X(arg);
 
 	if (arg >= GPFIRST && arg <= GPLAST
@@ -204,7 +203,7 @@ kd_io(struct tcb *const tcp, kernel_ulong_t arg)
 static int
 kd_set_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	printxval(kd_modes, arg, "KD_???");
 
 	return RVAL_IOCTL_DECODED;
@@ -216,10 +215,10 @@ kd_get_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned int val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -234,12 +233,11 @@ static int
 kd_screen_map(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (entering(tcp) || !syserror(tcp))
 		printstr_ex(tcp, arg, KERNEL_E_TABSZ, QUOTE_FORCE_HEX);
 	else
@@ -276,12 +274,11 @@ kd_uni_screen_map(struct tcb *const tcp, const kernel_ulong_t arg,
 	unsigned short elem;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	print_array(tcp, arg, KERNEL_E_TABSZ, &elem, sizeof(elem),
 		    tfetch_mem, print_scrmap_array_member, 0);
 
@@ -291,7 +288,7 @@ kd_uni_screen_map(struct tcb *const tcp, const kernel_ulong_t arg,
 static int
 kd_set_kbd_mode(struct tcb *const tcp, const unsigned int arg)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	printxval_d(kd_kbd_modes, arg, "K_???");
 
 	return RVAL_IOCTL_DECODED;
@@ -303,10 +300,10 @@ kd_get_kbd_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned int val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
 		return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -344,7 +341,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	const char *str = NULL;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		if (umoven(tcp, arg, offsetofend(struct kbentry, kb_index),
 			   &val)) {
@@ -430,7 +427,7 @@ kd_kbd_str_entry(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct kbsentry val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		if (umove_or_printaddr(tcp, arg, &(val.kb_func)))
 			return RVAL_IOCTL_DECODED;
@@ -480,12 +477,11 @@ kd_diacr(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	struct kbdiacr elem;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &kb_cnt))
 		return RVAL_IOCTL_DECODED;
 
@@ -528,12 +524,11 @@ kd_diacr_uc(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	struct_kbdiacruc elem;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
 
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &kb_cnt))
 		return RVAL_IOCTL_DECODED;
 
@@ -558,7 +553,7 @@ kd_keycode(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	struct kbkeycode val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		if (umove_or_printaddr(tcp, arg, &val))
 			return RVAL_IOCTL_DECODED;
@@ -594,7 +589,7 @@ end:
 static int
 kd_sigaccept(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 
 	if (arg < INT_MAX)
 		printsignal(arg);
@@ -620,7 +615,7 @@ kd_kbdrep(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct kbd_repeat val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 
 		if (umove_or_printaddr(tcp, arg, &val))
 			return RVAL_IOCTL_DECODED;
@@ -645,8 +640,6 @@ static int
 kd_font(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
@@ -656,6 +649,8 @@ kd_font(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	 * height == 32, and charcount == 256, so the total size
 	 * is (width + 7) / 8 * height * charcount == 8192.
 	 */
+
+	tprints_arg_next_name("argp");
 	if (exiting(tcp) && syserror(tcp))
 		printaddr(arg);
 	else
@@ -670,11 +665,11 @@ kd_kbmeta(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	unsigned int val;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	}
+
+	tprints_arg_next_name("argp");
 
 	if (get) {
 		if (umove_or_printaddr(tcp, arg, &val))
@@ -697,7 +692,7 @@ kd_unimapclr(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct unimapinit umi;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 
 	if (umove_or_printaddr(tcp, arg, &umi))
 		return RVAL_IOCTL_DECODED;
@@ -717,18 +712,18 @@ static int
 kd_cmap(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	} else {
 		if (syserror(tcp)) {
+			tprints_arg_next_name("argp");
 			printaddr(arg);
 
 			return RVAL_IOCTL_DECODED;
 		}
 	}
 
+	tprints_arg_next_name("argp");
 	printstr_ex(tcp, arg, 3 * 16, QUOTE_FORCE_HEX);
 
 	return RVAL_IOCTL_DECODED;

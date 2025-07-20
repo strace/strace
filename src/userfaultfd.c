@@ -15,6 +15,7 @@
 
 SYS_FUNC(userfaultfd)
 {
+	tprints_arg_name("flags");
 	printflags(uffd_flags, tcp->u_arg[0], "UFFD_???");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -51,7 +52,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct uffdio_api ua;
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &ua))
 				break;
 			tprint_struct_begin();
@@ -93,7 +94,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct uffdio_copy uc;
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &uc))
 				return RVAL_IOCTL_DECODED;
 			tprint_struct_begin();
@@ -123,7 +124,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct uffdio_register ur;
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &ur))
 				return RVAL_IOCTL_DECODED;
 			tprint_struct_begin();
@@ -153,7 +154,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UFFDIO_WAKE: {
 		struct uffdio_range ura;
 
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (!umove_or_printaddr(tcp, arg, &ura))
 			tprintf_uffdio_range(&ura);
 
@@ -164,7 +165,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct uffdio_zeropage uz;
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &uz))
 				return RVAL_IOCTL_DECODED;
 			tprint_struct_begin();
@@ -209,7 +210,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct uffdio_continue uc;
 
 		if (entering(tcp)) {
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			if (umove_or_printaddr(tcp, arg, &uc))
 				return RVAL_IOCTL_DECODED;
 			tprint_struct_begin();

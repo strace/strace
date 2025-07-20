@@ -94,21 +94,15 @@
 # define sys_printargs		printargs
 # define sys_sched_yield		printargs
 # define sys_setsid		printargs
-# define sys_set_tid_address	printargs
 # define sys_setup		printargs
 # define sys_sync		printargs
 # define sys_syscall		printargs
 # define sys_uretprobe		printargs
 # define sys_vhangup		printargs
 
-/* printargs_u does the right thing */
-# define sys_alarm		printargs_u
-
 /* printargs_d does the right thing */
 # define sys_iopl		printargs_d
-# define sys_exit		printargs_d
 # define sys_nice		printargs_d
-# define sys_pkey_free		printargs_d
 # define sys_setpgrp		printargs_d
 # define sys_timer_delete	printargs_d
 # define sys_timer_getoverrun	printargs_d

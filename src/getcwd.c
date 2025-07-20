@@ -11,13 +11,14 @@ SYS_FUNC(getcwd)
 {
 	if (exiting(tcp)) {
 		/* buf */
+		tprints_arg_name("buf");
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[0]);
 		else
 			printpathn(tcp, tcp->u_arg[0], tcp->u_rval);
-		tprint_arg_next();
 
 		/* size */
+		tprints_arg_next_name("size");
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;

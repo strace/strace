@@ -12,14 +12,15 @@ SYS_FUNC(get_robust_list)
 {
 	if (entering(tcp)) {
 		/* pid */
+		tprints_arg_name("pid");
 		printpid(tcp, tcp->u_arg[0], PT_TID);
-		tprint_arg_next();
 	} else {
 		/* head_ptr */
+		tprints_arg_next_name("head_ptr");
 		printnum_ptr(tcp, tcp->u_arg[1]);
-		tprint_arg_next();
 
 		/* len_ptr */
+		tprints_arg_next_name("len_ptr");
 		printnum_ulong(tcp, tcp->u_arg[2]);
 	}
 	return 0;
