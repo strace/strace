@@ -2,6 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of UDMABUF_CREATE and UDMABUF_CREATE_LIST ioctl
+    commands.
 
 Noteworthy changes in release 6.19 (2026-02-10)
 ===============================================

@@ -465,6 +465,8 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 	case 't':
 		return term_ioctl(tcp, code, arg);
 #endif
+	case 'u':
+		return udmabuf_ioctl(tcp, code, arg);
 	case 0x89:
 		return sock_ioctl(tcp, code, arg);
 	case 0x8a:

@@ -1,0 +1,4 @@
+#unconditional
+#From include/uapi/linux/udmabuf.h
+#Prefix UDMABUF_FLAGS_
+UDMABUF_FLAGS_CLOEXEC
