@@ -403,6 +403,7 @@ libstrace_a_SOURCES =	\
 	truncate.c	\
 	ubi.c		\
 	ucopy.c		\
+	udmabuf.c	\
 	uid.c		\
 	uid16.c		\
 	umask.c		\
