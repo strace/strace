@@ -25,12 +25,12 @@ struct number_set *decode_fd_set;
 struct number_set *decode_pid_set;
 struct number_set *trace_set;
 struct number_set *trace_fd_set;
+struct number_set *inject_set;
 
 bool quiet_set_updated = false;
 bool decode_fd_set_updated = false;
 
 static struct number_set *abbrev_set;
-static struct number_set *inject_set;
 static struct number_set *raw_set;
 static struct number_set *verbose_set;
 

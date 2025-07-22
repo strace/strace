@@ -3042,6 +3042,8 @@ init(int argc, char *argv[])
 
 	debug_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
+	if (inject_set)
+		test_ptrace_set_syscall_info();
 	test_ptrace_get_syscall_info();
 
 	/*

@@ -101,5 +101,6 @@ extern struct number_set *decode_fd_set;
 extern struct number_set *decode_pid_set;
 extern struct number_set *trace_set;
 extern struct number_set *trace_fd_set;
+extern struct number_set *inject_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

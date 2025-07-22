@@ -18,6 +18,7 @@
 #include "xlat/ptrace_syscall_info_op.h"
 
 bool ptrace_get_syscall_info_supported;
+bool ptrace_set_syscall_info_supported;
 
 static const unsigned int expected_exit_size =
 	offsetofend(struct_ptrace_syscall_info, exit.is_error);
@@ -328,6 +329,485 @@ done:
 	return ptrace_stop == ARRAY_SIZE(gsi_entry) + ARRAY_SIZE(gsi_exit) + 1;
 }
 
+static bool
+do_test_ptrace_set_syscall_info(void)
+{
+	const pid_t tracer_pid = getpid();
+	unsigned int ptrace_stop = -1U;
+	pid_t tracee_pid = 0;
+
+	int splin[2] = { -1, -1 };
+	int splout[2] = { -1, -1 };
+
+	if (pipe(splin) ||
+	    pipe(splout) ||
+	    write(splin[1], splin, sizeof(splin)) != sizeof(splin))
+		FAIL;
+
+	const struct {
+		struct si_entry entry[2];
+		struct si_exit exit[2];
+	} si[] = {
+		{ /* change scno, keep non-error rval */
+			{
+				{
+					__NR_gettid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_getppid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 0, tracer_pid },
+				{ 0, tracer_pid }
+			}
+		}, { /* set scno to -1, keep error rval */
+			{
+				{
+					__NR_chdir,
+					{
+						(uintptr_t) ".",
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					-1,
+					{
+						(uintptr_t) ".",
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 1, -ENOSYS },
+				{ 1, -ENOSYS }
+			}
+		}, { /* keep scno, change non-error rval */
+			{
+				{
+					__NR_getppid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_getppid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 0, tracer_pid },
+				{ 0, tracer_pid + 1 }
+			}
+		}, { /* change arg1, keep non-error rval */
+			{
+				{
+					__NR_chdir,
+					{
+						(uintptr_t) "",
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_chdir,
+					{
+						(uintptr_t) ".",
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 0, 0 },
+				{ 0, 0 }
+			}
+		}, { /* set scno to -1, change error rval to non-error */
+			{
+				{
+					__NR_gettid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					-1,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 1, -ENOSYS },
+				{ 0, tracer_pid }
+			}
+		}, { /* change scno, change non-error rval to error */
+			{
+				{
+					__NR_chdir,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_getppid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 0, tracer_pid },
+				{ 1, -EISDIR }
+			}
+		}, { /* change scno and all args, change non-error rval */
+			{
+				{
+					__NR_gettid,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_splice,
+					{
+						splin[0], 0,
+						splout[1], 0,
+						sizeof(splin), 2
+					}
+				}
+			}, {
+				{ 0, sizeof(splin) },
+				{ 0, sizeof(splin) + 1 }
+			}
+		}, { /* change arg1, no exit stop */
+			{
+				{
+					__NR_exit_group,
+					{
+						dummy_syscall_args[0],
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}, {
+					__NR_exit_group,
+					{
+						0,
+						dummy_syscall_args[1],
+						dummy_syscall_args[2],
+						dummy_syscall_args[3],
+						dummy_syscall_args[4],
+						dummy_syscall_args[5]
+					}
+				}
+			}, {
+				{ 0, 0 },
+				{ 0, 0 }
+			}
+		},
+	};
+
+	long rc;
+	unsigned int i;
+	tracee_pid = fork();
+	if (tracee_pid < 0)
+		perror_func_msg_and_die("fork");
+
+	if (tracee_pid == 0) {
+		/* get the pid before PTRACE_TRACEME */
+		tracee_pid = getpid();
+		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
+			/* exit with a nonzero exit status */
+			perror_func_msg_and_die("PTRACE_TRACEME");
+		}
+		kill(tracee_pid, SIGSTOP);
+		for (i = 0; i < ARRAY_SIZE(si); ++i) {
+			rc = syscall(si[i].entry[0].nr,
+				     si[i].entry[0].args[0],
+				     si[i].entry[0].args[1],
+				     si[i].entry[0].args[2],
+				     si[i].entry[0].args[3],
+				     si[i].entry[0].args[4],
+				     si[i].entry[0].args[5]);
+			/*
+			 * Check that the syscall return value matches
+			 * the expectations.
+			 */
+			if (si[i].exit[1].is_error) {
+				if (rc != -1 || errno != -si[i].exit[1].rval)
+					break;
+			} else {
+				if (rc != si[i].exit[1].rval)
+					break;
+			}
+		}
+		/*
+		 * Something went wrong, but in this state tracee
+		 * cannot reliably issue syscalls, so just crash.
+		 */
+		*(volatile unsigned char *) (uintptr_t) i = 42;
+		/* unreachable */
+		_exit(i + 1);
+	}
+
+	for (ptrace_stop = 0; ; ++ptrace_stop) {
+		struct_ptrace_syscall_info info = {
+			.op = 0xff	/* invalid PTRACE_SYSCALL_INFO_* op */
+		};
+		const size_t size = sizeof(info);
+		int status;
+
+		rc = waitpid(tracee_pid, &status, 0);
+		if (rc != tracee_pid) {
+			/* cannot happen */
+			kill_tracee(tracee_pid);
+			perror_func_msg_and_die("ptrace stop #%d:"
+						" unexpected wait result %ld",
+						ptrace_stop, rc);
+		}
+		if (WIFEXITED(status)) {
+			/* the tracee is no more */
+			tracee_pid = 0;
+			if (WEXITSTATUS(status) == 0)
+				break;
+			debug_func_msg("ptrace stop #%d:"
+				       " unexpected exit status %u",
+				       ptrace_stop, WEXITSTATUS(status));
+			FAIL;
+		}
+		if (WIFSIGNALED(status)) {
+			/* the tracee is no more */
+			tracee_pid = 0;
+			debug_func_msg("ptrace stop #%d: unexpected signal %u",
+				       ptrace_stop, WTERMSIG(status));
+			FAIL;
+		}
+		if (!WIFSTOPPED(status)) {
+			/* cannot happen */
+			kill_tracee(tracee_pid);
+			error_func_msg_and_die("ptrace stop #%d:"
+					       " unexpected wait status %#x",
+					       ptrace_stop, status);
+		}
+		if (ptrace_stop >= ARRAY_SIZE(si) * 2) {
+			debug_func_msg("ptrace stop overflow");
+			FAIL;
+		}
+
+		switch (WSTOPSIG(status)) {
+		case SIGSTOP:
+			if (ptrace_stop) {
+				debug_func_msg("ptrace stop #%d:"
+					       " unexpected signal stop",
+					       ptrace_stop);
+				FAIL;
+			}
+			if (ptrace(PTRACE_SETOPTIONS, tracee_pid,
+				   0L, PTRACE_O_TRACESYSGOOD) < 0) {
+				/* cannot happen */
+				kill_tracee(tracee_pid);
+				perror_func_msg_and_die("PTRACE_SETOPTIONS");
+			}
+			rc = ptrace(PTRACE_GET_SYSCALL_INFO, tracee_pid,
+				    (void *) size, &info);
+			if (rc < 0) {
+				debug_func_perror_msg("PTRACE_GET_SYSCALL_INFO");
+				FAIL;
+			}
+			if (!check_psi_none(&info, rc,
+					"PTRACE_GET_SYSCALL_INFO",
+					ptrace_stop))
+				FAIL;
+			break;
+
+		case SIGTRAP | 0x80:
+			if (ptrace_stop == 0) {
+				debug_func_msg("unexpected syscall stop");
+				FAIL;
+			}
+			rc = ptrace(PTRACE_GET_SYSCALL_INFO, tracee_pid,
+				    (void *) size, &info);
+			if (rc < 0) {
+				debug_func_perror_msg("ptrace stop #%d"
+					": PTRACE_GET_SYSCALL_INFO #1",
+					ptrace_stop);
+				FAIL;
+			}
+			if (ptrace_stop & 1) {
+				/* entering syscall */
+				const struct si_entry *exp_entry =
+					&si[ptrace_stop / 2].entry[0];
+				const struct si_entry *set_entry =
+					&si[ptrace_stop / 2].entry[1];
+
+				/* check syscall info before the changes */
+				if (!check_psi_entry(&info, rc, exp_entry,
+						"PTRACE_GET_SYSCALL_INFO #1",
+						ptrace_stop)) {
+					FAIL;
+				}
+
+				/* apply the changes */
+				info.entry.nr = set_entry->nr;
+				for (i = 0; i < ARRAY_SIZE(set_entry->args); ++i)
+					info.entry.args[i] = set_entry->args[i];
+				if (ptrace(PTRACE_SET_SYSCALL_INFO, tracee_pid,
+					   (void *) size, &info)) {
+					debug_func_perror_msg("ptrace stop #%d"
+						": PTRACE_SET_SYSCALL_INFO",
+						ptrace_stop);
+					FAIL;
+				}
+
+				/* check syscall info after the changes */
+				memset(&info, 0, sizeof(info));
+				info.op = 0xff;
+				rc = ptrace(PTRACE_GET_SYSCALL_INFO, tracee_pid,
+					    (void *) size, &info);
+				if (rc < 0) {
+					debug_func_perror_msg("ptrace stop #%d"
+						": PTRACE_GET_SYSCALL_INFO #2",
+						ptrace_stop);
+					FAIL;
+				}
+				if (!check_psi_entry(&info, rc, set_entry,
+						"PTRACE_GET_SYSCALL_INFO #2",
+						ptrace_stop)) {
+					FAIL;
+				}
+			} else {
+				/* exiting syscall */
+				const struct si_exit *exp_exit =
+					&si[ptrace_stop / 2 - 1].exit[0];
+				const struct si_exit *set_exit =
+					&si[ptrace_stop / 2 - 1].exit[1];
+
+				/* check syscall info before the changes */
+				if (!check_psi_exit(&info, rc, exp_exit,
+						"PTRACE_GET_SYSCALL_INFO #1",
+						ptrace_stop)) {
+					FAIL;
+				}
+
+				/* apply the changes */
+				info.exit.is_error = set_exit->is_error;
+				info.exit.rval = set_exit->rval;
+				if (ptrace(PTRACE_SET_SYSCALL_INFO, tracee_pid,
+					   (void *) size, &info)) {
+					debug_func_perror_msg("ptrace stop #%d"
+						": PTRACE_SET_SYSCALL_INFO",
+						ptrace_stop);
+					FAIL;
+				}
+
+				/* check syscall info after the changes */
+				memset(&info, 0, sizeof(info));
+				info.op = 0xff;
+				rc = ptrace(PTRACE_GET_SYSCALL_INFO, tracee_pid,
+					    (void *) size, &info);
+				if (rc < 0) {
+					debug_func_perror_msg("ptrace stop #%d"
+						": PTRACE_GET_SYSCALL_INFO #2",
+						ptrace_stop);
+					FAIL;
+				}
+				if (!check_psi_exit(&info, rc, set_exit,
+						"PTRACE_GET_SYSCALL_INFO #2",
+						ptrace_stop)) {
+					FAIL;
+				}
+			}
+			break;
+
+		default:
+			debug_func_msg("ptrace stop #%d:"
+				       " unexpected stop signal %#x",
+				       ptrace_stop, WSTOPSIG(status));
+			FAIL;
+		}
+
+		if (ptrace(PTRACE_SYSCALL, tracee_pid, 0L, 0L) < 0) {
+			/* cannot happen */
+			kill_tracee(tracee_pid);
+			perror_func_msg_and_die("PTRACE_SYSCALL");
+		}
+	}
+
+done:
+	if (tracee_pid) {
+		kill_tracee(tracee_pid);
+		waitpid(tracee_pid, NULL, 0);
+		ptrace_stop = -1U;
+	}
+	if (splout[1] >= 0)
+		close(splout[1]);
+	if (splout[0] >= 0)
+		close(splout[0]);
+	if (splin[1] >= 0)
+		close(splin[1]);
+	if (splin[0] >= 0)
+		close(splin[0]);
+
+	return ptrace_stop == ARRAY_SIZE(si) * 2;
+}
+
 #endif /* HAVE_FORK */
 
 /*
@@ -338,12 +818,20 @@ bool
 test_ptrace_get_syscall_info(void)
 {
 	/*
+	 * If PTRACE_SET_SYSCALL_INFO is supported,
+	 * then PTRACE_GET_SYSCALL_INFO is also supported.
+	 */
+	if (ptrace_set_syscall_info_supported)
+		ptrace_get_syscall_info_supported = true;
+
+	/*
 	 * NOMMU provides no forks necessary for PTRACE_GET_SYSCALL_INFO test,
 	 * leave the default unchanged.
 	 */
 #ifdef HAVE_FORK
-	ptrace_get_syscall_info_supported =
-		do_test_ptrace_get_syscall_info();
+	if (!ptrace_get_syscall_info_supported)
+		ptrace_get_syscall_info_supported =
+			do_test_ptrace_get_syscall_info();
 #endif /* HAVE_FORK */
 
 	if (ptrace_get_syscall_info_supported)
@@ -352,6 +840,30 @@ test_ptrace_get_syscall_info(void)
 		debug_msg("PTRACE_GET_SYSCALL_INFO does not work");
 
 	return ptrace_get_syscall_info_supported;
+}
+
+/*
+ * Test that PTRACE_SET_SYSCALL_INFO API is supported by the kernel, and
+ * that the semantics implemented in the kernel matches our expectations.
+ */
+bool
+test_ptrace_set_syscall_info(void)
+{
+	/*
+	 * NOMMU provides no forks necessary for PTRACE_SET_SYSCALL_INFO test,
+	 * leave the default unchanged.
+	 */
+#ifdef HAVE_FORK
+	ptrace_set_syscall_info_supported =
+		do_test_ptrace_set_syscall_info();
+#endif /* HAVE_FORK */
+
+	if (ptrace_set_syscall_info_supported)
+		debug_msg("PTRACE_SET_SYSCALL_INFO works");
+	else
+		debug_msg("PTRACE_SET_SYSCALL_INFO does not work");
+
+	return ptrace_set_syscall_info_supported;
 }
 
 static void
