@@ -451,6 +451,7 @@ static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static void get_error(struct tcb *, bool);
+static int set_scno(struct tcb *, kernel_ulong_t);
 static void set_error(struct tcb *, unsigned long);
 static void set_success(struct tcb *, kernel_long_t);
 static int arch_get_scno(struct tcb *);
@@ -506,13 +507,13 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 				(opts->data.flags & INJECT_F_SYSCALL)
 				? (kernel_long_t) shuffle_scno(opts->data.scno)
 				: -1;
-
-			if (!arch_set_scno(tcp, scno)) {
+			int rc = set_scno(tcp, scno);
+			if (rc >= 0) {
 				tcp->flags |= TCB_TAMPERED;
 				if (scno != -1)
 					tcp->flags |= TCB_TAMPERED_NO_FAIL;
 #if ARCH_NEEDS_SET_ERROR_FOR_SCNO_TAMPERING
-				else {
+				else if (rc == 0) {
 					kernel_long_t rval =
 						(opts->data.flags & INJECT_F_RETVAL) ?
 						ENOSYS : retval_get(opts->data.rval_idx);
@@ -1551,6 +1552,26 @@ get_error(struct tcb *tcp, const bool check_errno)
 	}
 }
 
+/*
+ * Returns:
+ * 1: PTRACE_SET_SYSCALL_INFO succeeded
+ * 0: arch_set_scno succeeded
+ * -1: arch_set_scno failed
+ */
+static int
+set_scno(struct tcb *tcp, kernel_ulong_t scno)
+{
+	if (ptrace_set_syscall_info_supported &&
+	    ptrace_syscall_info_is_entry()) {
+		ptrace_sci.entry.nr = scno;
+		const size_t size = sizeof(ptrace_sci);
+		if (ptrace(PTRACE_SET_SYSCALL_INFO, tcp->pid,
+			   (void *) size, &ptrace_sci) == 0)
+			return 1;
+	}
+	return arch_set_scno(tcp, scno);
+}
+
 static void
 set_error(struct tcb *tcp, unsigned long new_error)
 {
@@ -1559,13 +1580,30 @@ set_error(struct tcb *tcp, unsigned long new_error)
 	if (new_error == old_error || new_error > MAX_ERRNO_VALUE)
 		return;
 
+	tcp->u_error = new_error;
+
+	if (ptrace_set_syscall_info_supported &&
+	    ptrace_syscall_info_is_exit()) {
+		typeof(ptrace_sci.exit) saved_exit = ptrace_sci.exit;
+		ptrace_sci.exit.is_error = 1;
+		ptrace_sci.exit.rval = -tcp->u_error;
+		const size_t size = sizeof(ptrace_sci);
+		if (ptrace(PTRACE_SET_SYSCALL_INFO, tcp->pid,
+			   (void *) size, &ptrace_sci) == 0) {
+			tcp->u_rval = -1;
+			return;
+		}
+		ptrace_sci.exit = saved_exit;
+	}
+
 #ifdef ptrace_setregset_or_setregs
 	/* if we are going to invoke set_regs, call get_regs first */
-	if (get_regs(tcp) < 0)
+	if (get_regs(tcp) < 0) {
+		tcp->u_error = old_error;
 		return;
+	}
 #endif
 
-	tcp->u_error = new_error;
 	if (arch_set_error(tcp)) {
 		tcp->u_error = old_error;
 		/* arch_set_error does not update u_rval */
@@ -1583,13 +1621,30 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 {
 	const kernel_long_t old_rval = tcp->u_rval;
 
+	tcp->u_rval = new_rval;
+
+	if (ptrace_set_syscall_info_supported &&
+	    ptrace_syscall_info_is_exit()) {
+		typeof(ptrace_sci.exit) saved_exit = ptrace_sci.exit;
+		ptrace_sci.exit.is_error = 0;
+		ptrace_sci.exit.rval = tcp->u_rval;
+		const size_t size = sizeof(ptrace_sci);
+		if (ptrace(PTRACE_SET_SYSCALL_INFO, tcp->pid,
+			   (void *) size, &ptrace_sci) == 0) {
+			tcp->u_error = 0;
+			return;
+		}
+		ptrace_sci.exit = saved_exit;
+	}
+
 #ifdef ptrace_setregset_or_setregs
 	/* if we are going to invoke set_regs, call get_regs first */
-	if (get_regs(tcp) < 0)
+	if (get_regs(tcp) < 0) {
+		tcp->u_rval = old_rval;
 		return;
+	}
 #endif
 
-	tcp->u_rval = new_rval;
 	if (arch_set_success(tcp)) {
 		tcp->u_rval = old_rval;
 		/* arch_set_success does not update u_error */
