@@ -4,6 +4,7 @@
 /config.h.in
 /disable_ptrace_get_syscall_info
 /disable_ptrace_getregset
+/disable_ptrace_set_syscall_info
 /gnu
 /ioctl_iocdef.[ih]
 /ioctl_redefs[12].h
