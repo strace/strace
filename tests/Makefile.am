@@ -738,6 +738,7 @@ check_SCRIPTS = \
 	PTRACE_SEIZE.sh \
 	arch_prctl.sh \
 	filter_seccomp.sh \
+	init-once.sh \
 	init.sh \
 	ioctl-success.sh \
 	ipc.sh \
