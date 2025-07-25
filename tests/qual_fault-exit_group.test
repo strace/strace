@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Check decoding of fault injected exit_group syscall.
 #
@@ -14,10 +14,10 @@ test_with()
 {
 	> "$LOG" || fail_ "failed to write $LOG"
 
-	$STRACE -o "$LOG" "$@"
-	rc=$?
+	args="$*"
+	$STRACE -o "$LOG" "$@" && rc=0 || rc=$?
 	[ $rc -eq 42 ] ||
-		dump_log_and_fail_with "$STRACE $* failed with code $rc"
+		dump_log_and_fail_with "$STRACE $args failed with code $rc"
 
 	match_diff
 }
