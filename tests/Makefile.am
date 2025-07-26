@@ -652,6 +652,7 @@ MISC_TESTS = \
 	kill-on-exit.test \
 	kill_child.test \
 	legacy_syscall_info.test \
+	legacy_syscall_tampering.test \
 	localtime.test \
 	looping_threads.test \
 	netlink_audit--pidns-translation.test \

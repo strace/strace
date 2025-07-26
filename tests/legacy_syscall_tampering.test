@@ -1,0 +1,29 @@
+#!/bin/sh -efu
+#
+# Check legacy code used for system call tampering when
+# PTRACE_SET_SYSCALL_INFO API was not available yet.
+#
+# Copyright (c) 2017-2025 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+$STRACE -d -enone --fault=chdir / > /dev/null 2> "$LOG" ||:
+grep -x "[^:]*strace: PTRACE_SET_SYSCALL_INFO works" "$LOG" > /dev/null ||
+        skip_ 'PTRACE_SET_SYSCALL_INFO does not work'
+
+helper='../../src/disable_ptrace_set_syscall_info'
+run_prog ../chdir > /dev/null
+$helper $args > /dev/null ||
+	skip_ "$helper does not work"
+
+STRACE="$helper $STRACE"
+$STRACE -d -enone --fault=chdir / > /dev/null 2> "$LOG" ||:
+grep -x "[^:]*strace: PTRACE_SET_SYSCALL_INFO does not work" "$LOG" > /dev/null ||
+	fail_ "$helper does not work properly"
+
+NAME='qual_fault-exit_group'
+. "${srcdir=.}/$NAME.test"
