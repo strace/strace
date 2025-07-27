@@ -247,7 +247,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			}
 
 			if (umove(tcp, arg, &pinfunc) < 0) {
-				tprint_arg_next();
+				tprint_struct_next();
 				tprint_unavailable();
 				tprint_struct_end();
 				break;

@@ -311,7 +311,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(ifr, ifr_name);
-		tprint_arg_next();
+		tprint_struct_next();
 		print_ifreq(tcp, code, arg, &ifr);
 		tprint_struct_end();
 		break;
