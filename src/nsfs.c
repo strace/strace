@@ -50,7 +50,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 	case NS_GET_OWNER_UID:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("uid");
 		if (!umove_or_printaddr(tcp, arg, &uid)) {
 			tprint_indirect_begin();
 			printuid(uid);
@@ -60,23 +60,23 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 	case NS_GET_MNTNS_ID:
 		if (entering(tcp))
 			return 0;
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%#" PRIx64);
 		return RVAL_IOCTL_DECODED;
 	case NS_GET_PID_FROM_PIDNS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printpid(tcp, arg, PT_NONE);
 		return RVAL_IOCTL_DECODED | RVAL_TID;
 	case NS_GET_TGID_FROM_PIDNS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printpid(tcp, arg, PT_NONE);
 		return RVAL_IOCTL_DECODED | RVAL_TGID;
 	case NS_GET_PID_IN_PIDNS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printpid(tcp, arg, PT_TID);
 		return RVAL_IOCTL_DECODED;
 	case NS_GET_TGID_IN_PIDNS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printpid(tcp, arg, PT_TGID);
 		return RVAL_IOCTL_DECODED;
 	}
@@ -91,7 +91,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 		if (_IOC_SIZE(code) >= MNT_NS_INFO_SIZE_VER0) {
 			if (entering(tcp))
 				return 0;
-			tprint_arg_next();
+			tprints_arg_next_name("argp");
 			print_mnt_ns_info(tcp, _IOC_SIZE(code), arg);
 			return rval_ioctl_decoded;
 		}

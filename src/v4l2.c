@@ -118,7 +118,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &caps))
 		return RVAL_IOCTL_DECODED;
 
@@ -152,7 +152,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_fmtdesc f;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 
@@ -425,7 +425,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct_v4l2_format f;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 
@@ -462,7 +462,7 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_requestbuffers reqbufs;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
@@ -494,7 +494,7 @@ print_v4l2_exportbuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_exportbuffer expbuf;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &expbuf))
 			return RVAL_IOCTL_DECODED;
 
@@ -631,7 +631,7 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 	kernel_v4l2_buffer_t b;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
 
@@ -692,7 +692,7 @@ print_v4l2_buffer_time32(struct tcb *const tcp, const unsigned int code,
 	kernel_v4l2_buffer_time32_t b32;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &b32))
 			return RVAL_IOCTL_DECODED;
 
@@ -718,7 +718,7 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct_v4l2_framebuffer b;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &b)) {
 		tprint_struct_begin();
 		PRINT_FIELD_X(b, capability);
@@ -737,7 +737,7 @@ print_v4l2_buf_type(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int type;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &type)) {
 		tprint_indirect_begin();
 		printxval(v4l2_buf_types, type, "V4L2_BUF_TYPE_???");
@@ -798,7 +798,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_streamparm s;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 
@@ -850,7 +850,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_standard s;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 
@@ -885,7 +885,7 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_input i;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &i))
 			return RVAL_IOCTL_DECODED;
 
@@ -991,7 +991,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_control c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1030,7 +1030,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 {
 	struct v4l2_tuner c;
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1091,7 +1091,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_queryctrl c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1152,7 +1152,7 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_query_ext_ctrl c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1222,7 +1222,7 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_cropcap c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1254,7 +1254,7 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_crop c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1308,7 +1308,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct_v4l2_ext_controls c;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -1401,7 +1401,7 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_frmsizeenum s;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 
@@ -1457,7 +1457,7 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_frmivalenum f;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 
@@ -1515,7 +1515,7 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_create_buffers b;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
 
@@ -1598,7 +1598,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int64(tcp, arg, "%#" PRIx64);
 		break;
 
@@ -1627,7 +1627,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printnum_int(tcp, arg, "%u");
 		break;
 

@@ -91,24 +91,25 @@ printwaitn(struct tcb *const tcp,
 {
 	if (entering(tcp)) {
 		/* pid */
+		tprints_arg_name("pid");
 		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		int status;
 
 		/* status */
+		tprints_arg_next_name("status");
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);
 		else if (!umove_or_printaddr(tcp, tcp->u_arg[1], &status))
 			printstatus(status);
-		tprint_arg_next();
 
 		/* options */
+		tprints_arg_next_name("options");
 		printflags(wait4_options, tcp->u_arg[2], "W???");
 		if (print_rusage) {
-			tprint_arg_next();
 
 			/* usage */
+			tprints_arg_next_name("usage");
 			if (tcp->u_rval > 0)
 				print_rusage(tcp, tcp->u_arg[3]);
 			else
@@ -146,9 +147,10 @@ SYS_FUNC(waitid)
 
 	if (entering(tcp)) {
 		/* idtype */
+		tprints_arg_name("idtype");
 		printxval(waitid_types, idtype, "P_???");
-		tprint_arg_next();
 
+		tprints_arg_next_name("id");
 		switch (idtype) {
 		case P_PID:
 			printpid(tcp, id, PT_TGID);
@@ -163,17 +165,17 @@ SYS_FUNC(waitid)
 			PRINT_VAL_D(id);
 			break;
 		}
-		tprint_arg_next();
 	} else {
 		/* siginfo */
+		tprints_arg_next_name("siginfo");
 		printsiginfo_at(tcp, tcp->u_arg[2]);
-		tprint_arg_next();
 
 		/* options */
+		tprints_arg_next_name("options");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
-		tprint_arg_next();
 
 		/* usage */
+		tprints_arg_next_name("usage");
 		printrusage(tcp, tcp->u_arg[4]);
 	}
 	return 0;

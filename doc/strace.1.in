@@ -1050,6 +1050,11 @@ Prints the instruction pointer at the time of the system call.
 .TQ
 .B \-\-syscall\-number
 Prints the system call number.
+.TP
+.B \-N
+.TQ
+.B \-\-arg\-names
+Prints the system call argument names.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ

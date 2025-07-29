@@ -175,7 +175,7 @@ kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint32_t cpuid = arg;
 
 	if (entering(tcp)) {
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_U(cpuid);
 		if (dump_kvm_run_structure)
 			return 0;
@@ -193,7 +193,7 @@ kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg
 {
 	struct kvm_userspace_memory_region u_memory_region;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (umove_or_printaddr(tcp, arg, &u_memory_region))
 		return RVAL_IOCTL_DECODED;
 
@@ -223,7 +223,7 @@ kvm_ioctl_decode_regs(struct tcb *const tcp, const unsigned int code,
 	if (code == KVM_GET_REGS && entering(tcp))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &regs))
 		arch_print_kvm_regs(tcp, arg, &regs);
 
@@ -270,7 +270,7 @@ kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
 			     ))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &cpuid)) {
 		tprint_struct_begin();
 		PRINT_FIELD_U(cpuid, nent);
@@ -306,7 +306,7 @@ kvm_ioctl_decode_sregs(struct tcb *const tcp, const unsigned int code,
 	if (code == KVM_GET_SREGS && entering(tcp))
 		return 0;
 
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	if (!umove_or_printaddr(tcp, arg, &sregs))
 		arch_print_kvm_sregs(tcp, arg, &sregs);
 
@@ -319,7 +319,7 @@ static int
 kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
 				 const kernel_ulong_t arg)
 {
-	tprint_arg_next();
+	tprints_arg_next_name("argp");
 	printxval64(kvm_cap, arg, "KVM_CAP_???");
 	return RVAL_IOCTL_DECODED;
 }

@@ -183,7 +183,7 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_loop_info(tcp, arg);
 		break;
 
@@ -192,12 +192,12 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS64:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_loop_info64(tcp, arg);
 		break;
 
 	case LOOP_CONFIGURE:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		decode_loop_config(tcp, arg);
 		break;
 
@@ -210,20 +210,20 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 
 	case LOOP_SET_FD:
 	case LOOP_CHANGE_FD:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		printfd(tcp, arg);
 		break;
 
 	/* newer loop-control stuff */
 	case LOOP_CTL_ADD:
 	case LOOP_CTL_REMOVE:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_D((int) arg);
 		break;
 
 	case LOOP_SET_DIRECT_IO:
 	case LOOP_SET_BLOCK_SIZE:
-		tprint_arg_next();
+		tprints_arg_next_name("argp");
 		PRINT_VAL_U(arg);
 		break;
 
