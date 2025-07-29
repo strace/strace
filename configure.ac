@@ -28,6 +28,7 @@ AC_CONFIG_SRCDIR([src/strace.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests subdir-objects 1.13])
+AM_EXTRA_RECURSIVE_TARGETS([check-prerequisites])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 

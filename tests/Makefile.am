@@ -927,6 +927,9 @@ clean-local: clean-local-check
 clean-local-check:
 	-rm -rf -- $(TESTS:.test=.dir) $(GEN_TESTS:.gen.test=.dir)
 
+.PHONY: check-prerequisites-local
+check-prerequisites-local: $(check_LIBRARIES) $(check_PROGRAMS)
+
 .PHONY: check-valgrind-local
 check-valgrind-local: $(check_LIBRARIES) $(check_PROGRAMS)
 
