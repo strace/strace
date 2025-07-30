@@ -39,7 +39,7 @@ static void
 tprint_msgsnd(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const unsigned int flags)
 {
-	/* msqid */
+	/* msgp */
 	tprint_msgbuf(tcp, addr, count);
 	tprint_arg_next();
 
@@ -71,7 +71,7 @@ static void
 tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const kernel_ulong_t msgtyp)
 {
-	/* msqid */
+	/* msgp */
 	tprint_msgbuf(tcp, addr, count);
 	tprint_arg_next();
 
