@@ -741,23 +741,18 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 	}
 
 	if (out_ptrs == 0) {
-		if (syscall->is_ioctl) {
-			OUTFI("tprint_arg_next();\n");
-		}
-
 		/* 0 out ptrs: print all args in sysenter */
 		for (size_t i = arg_offset; i < syscall->arg_count; i++) {
 			struct syscall_argument arg = syscall->args[i];
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
+			if (i > arg_offset || syscall->is_ioctl)
+				OUTSI("tprint_arg_next();\n");
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 			generate_printer(out, syscall, arg.name, arg_val, true,
 					 arg.type, indent_level);
 
-			if (i < syscall->arg_count - 1) {
-				OUTSI("tprint_arg_next();\n");
-			}
 			OUTC('\n');
 		}
 	} else if (out_ptrs == 1) {
@@ -770,10 +765,6 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 		OUTSI("if (entering(tcp)) {\n");
 		indent_level++;
 
-		if (syscall->is_ioctl) {
-			OUTFI("tprint_arg_next();\n");
-		}
-
 		for (; cur < syscall->arg_count; ++cur) {
 			struct syscall_argument arg = syscall->args[cur];
 			if (IS_OUT_PTR(arg.type)) {
@@ -782,14 +773,12 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
+			if (cur > arg_offset || syscall->is_ioctl)
+				OUTSI("tprint_arg_next();\n");
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 			generate_printer(out, syscall, arg.name, arg_val, true,
 					 arg.type, indent_level);
-
-			if (cur < syscall->arg_count - 1) {
-				OUTSI("tprint_arg_next();\n\n");
-			}
 		}
 
 		if (cur < syscall->arg_count &&
@@ -817,6 +806,8 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 			struct syscall_argument arg = syscall->args[cur];
 			OUTFI("/* arg: %s (%s) */\n",
 			      arg.name, type_to_ctype(arg.type));
+			if (cur > arg_offset || syscall->is_ioctl)
+				OUTSI("tprint_arg_next();\n");
 			CLEANUP_FREE char *arg_val =
 				get_syscall_arg_value(syscall, arg_index++);
 
@@ -829,9 +820,6 @@ generate_decoder(FILE *out, struct syscall *syscall, bool is_variant,
 			generate_printer(out, syscall, arg.name, arg_val,
 					 false, arg.type, indent_level);
 
-			if (cur < syscall->arg_count - 1) {
-				OUTSI("tprint_arg_next();\n");
-			}
 			OUTC('\n');
 		}
 	} else {

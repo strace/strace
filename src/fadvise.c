@@ -21,18 +21,18 @@ SYS_FUNC(fadvise64)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* offset */
-	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
+	unsigned int argn = print_arg_lld(tcp, 1);
 
 	/* len */
+	tprint_arg_next();
 	kernel_ulong_t len = tcp->u_arg[argn++];
 	PRINT_VAL_U(len);
-	tprint_arg_next();
 
 	/* advice */
+	tprint_arg_next();
 	printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 
 	return RVAL_DECODED;
@@ -42,17 +42,17 @@ SYS_FUNC(fadvise64_64)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* offset */
-	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
+	unsigned int argn = print_arg_lld(tcp, 1);
 
 	/* len */
-	argn = print_arg_lld(tcp, argn);
 	tprint_arg_next();
+	argn = print_arg_lld(tcp, argn);
 
 	/* advice */
+	tprint_arg_next();
 #if defined __ARM_EABI__ || defined AARCH64 || defined POWERPC || defined XTENSA
 	printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");
 #else

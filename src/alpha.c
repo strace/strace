@@ -47,13 +47,13 @@ SYS_FUNC(osf_statfs)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* buf */
-	printaddr(tcp->u_arg[1]);
 	tprint_arg_next();
+	printaddr(tcp->u_arg[1]);
 
 	/* size */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -63,13 +63,13 @@ SYS_FUNC(osf_fstatfs)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* buf */
-	printaddr(tcp->u_arg[1]);
 	tprint_arg_next();
+	printaddr(tcp->u_arg[1]);
 
 	/* size */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;

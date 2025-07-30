@@ -19,9 +19,9 @@ SYS_FUNC(swapon)
 
 	/* path */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* swapflags */
+	tprint_arg_next();
 	tprint_flags_begin();
 	if (flags) {
 		printflags_in(swap_flags, flags, "SWAP_FLAG_???");

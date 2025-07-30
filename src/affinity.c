@@ -98,14 +98,14 @@ SYS_FUNC(sched_setaffinity)
 	/* pid */
 	const int pid = tcp->u_arg[0];
 	printpid(tcp, pid, PT_TGID);
-	tprint_arg_next();
 
 	/* cpusetsize */
+	tprint_arg_next();
 	const unsigned int len = tcp->u_arg[1];
 	PRINT_VAL_U(len);
-	tprint_arg_next();
 
 	/* mask */
+	tprint_arg_next();
 	print_affinitylist(tcp, tcp->u_arg[2], len);
 
 	return RVAL_DECODED;
@@ -117,14 +117,14 @@ SYS_FUNC(sched_getaffinity)
 		/* pid */
 		const int pid = tcp->u_arg[0];
 		printpid(tcp, pid, PT_TGID);
-		tprint_arg_next();
 
 		/* cpusetsize */
+		tprint_arg_next();
 		const unsigned int len = tcp->u_arg[1];
 		PRINT_VAL_U(len);
-		tprint_arg_next();
 	} else {
 		/* mask */
+		tprint_arg_next();
 		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}
 	return 0;

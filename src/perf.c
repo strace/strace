@@ -474,21 +474,21 @@ SYS_FUNC(perf_event_open)
 		/* attr */
 		print_perf_event_attr(tcp, tcp->u_arg[0]);
 	}
-	tprint_arg_next();
 
 	/* pid */
-	PRINT_VAL_D((int) tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_D((int) tcp->u_arg[1]);
 
 	/* cpu */
-	PRINT_VAL_D((int) tcp->u_arg[2]);
 	tprint_arg_next();
+	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	/* group_fd */
-	printfd(tcp, tcp->u_arg[3]);
 	tprint_arg_next();
+	printfd(tcp, tcp->u_arg[3]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags64(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
 
 	return RVAL_DECODED | RVAL_FD;

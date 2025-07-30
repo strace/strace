@@ -11,13 +11,13 @@ SYS_FUNC(readahead)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* offset */
-	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
+	unsigned int argn = print_arg_lld(tcp, 1);
 
 	/* count */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[argn]);
 
 	return RVAL_DECODED;

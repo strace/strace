@@ -21,26 +21,28 @@
 SYS_FUNC(sysmips)
 {
 	printxval64(sysmips_operations, tcp->u_arg[0], "???");
-	tprint_arg_next();
 
 	switch (tcp->u_arg[0]) {
 	case MIPS_ATOMIC_SET:
-		printaddr(tcp->u_arg[1]);
 		tprint_arg_next();
+		printaddr(tcp->u_arg[1]);
 
+		tprint_arg_next();
 		PRINT_VAL_X(tcp->u_arg[2]);
 		return RVAL_DECODED;
 	case MIPS_FIXADE:
+		tprint_arg_next();
 		PRINT_VAL_X(tcp->u_arg[1]);
 		return RVAL_DECODED;
 	}
 
+	tprint_arg_next();
 	PRINT_VAL_X(tcp->u_arg[1]);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(tcp->u_arg[2]);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(tcp->u_arg[3]);
 	return RVAL_DECODED;
 }

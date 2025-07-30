@@ -129,15 +129,15 @@ SYS_FUNC(modify_ldt)
 	if (entering(tcp)) {
 		/* func */
 		PRINT_VAL_D((int) tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* ptr */
+		tprint_arg_next();
 		if (tcp->u_arg[2] != sizeof(struct user_desc))
 			printaddr(tcp->u_arg[1]);
 		else
 			print_user_desc(tcp, tcp->u_arg[1], USER_DESC_BOTH);
-		tprint_arg_next();
 
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[2]);
 
 		return 0;

@@ -154,13 +154,10 @@ kd_leds(struct tcb *const tcp, const unsigned int code,
 		dflt = true;
 	}
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
-
+	tprint_arg_next();
 	print_leds(tcp, arg, get, dflt);
 
 	return RVAL_IOCTL_DECODED;
@@ -171,11 +168,10 @@ kd_get_kb_type(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	unsigned char val;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (entering(tcp))
 		return 0;
-	}
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -215,11 +211,10 @@ kd_get_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	unsigned int val;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (entering(tcp))
 		return 0;
-	}
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -233,13 +228,10 @@ kd_get_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 kd_screen_map(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
-
+	tprint_arg_next();
 	if (entering(tcp) || !syserror(tcp))
 		printstr_ex(tcp, arg, KERNEL_E_TABSZ, QUOTE_FORCE_HEX);
 	else
@@ -275,13 +267,10 @@ kd_uni_screen_map(struct tcb *const tcp, const kernel_ulong_t arg,
 {
 	unsigned short elem;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
-
+	tprint_arg_next();
 	print_array(tcp, arg, KERNEL_E_TABSZ, &elem, sizeof(elem),
 		    tfetch_mem, print_scrmap_array_member, 0);
 
@@ -302,11 +291,10 @@ kd_get_kbd_mode(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	unsigned int val;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (entering(tcp))
 		return 0;
-	}
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &val))
 		return RVAL_IOCTL_DECODED;
 
@@ -479,13 +467,10 @@ kd_diacr(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	unsigned int kb_cnt; /* struct kbdiacrs.kb_cnt */
 	struct kbdiacr elem;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
-
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &kb_cnt))
 		return RVAL_IOCTL_DECODED;
 
@@ -527,13 +512,10 @@ kd_diacr_uc(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 	unsigned int kb_cnt; /* struct kbdiacrs.kb_cnt */
 	struct_kbdiacruc elem;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
-
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &kb_cnt))
 		return RVAL_IOCTL_DECODED;
 
@@ -644,18 +626,16 @@ kd_kbdrep(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 kd_font(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
-	if (entering(tcp)) {
-		tprint_arg_next();
-
-		if (get)
-			return 0;
-	}
+	if (get && entering(tcp))
+		return 0;
 
 	/*
 	 * [GP]IO_FONT are equivalent to KDFONTOP with width == 8,
 	 * height == 32, and charcount == 256, so the total size
 	 * is (width + 7) / 8 * height * charcount == 8192.
 	 */
+
+	tprint_arg_next();
 	if (exiting(tcp) && syserror(tcp))
 		printaddr(arg);
 	else
@@ -669,12 +649,10 @@ kd_kbmeta(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	unsigned int val;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (get && entering(tcp))
+		return 0;
 
-		if (get)
-			return 0;
-	}
+	tprint_arg_next();
 
 	if (get) {
 		if (umove_or_printaddr(tcp, arg, &val))
@@ -717,18 +695,18 @@ static int
 kd_cmap(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	if (entering(tcp)) {
-		tprint_arg_next();
-
 		if (get)
 			return 0;
 	} else {
 		if (syserror(tcp)) {
+			tprint_arg_next();
 			printaddr(arg);
 
 			return RVAL_IOCTL_DECODED;
 		}
 	}
 
+	tprint_arg_next();
 	printstr_ex(tcp, arg, 3 * 16, QUOTE_FORCE_HEX);
 
 	return RVAL_IOCTL_DECODED;

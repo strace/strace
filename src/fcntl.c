@@ -222,9 +222,9 @@ SYS_FUNC(fcntl)
 	if (entering(tcp)) {
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* cmd */
+		tprint_arg_next();
 		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
 	}
 	return print_fcntl(tcp);
@@ -236,9 +236,9 @@ SYS_FUNC(fcntl64)
 	if (entering(tcp)) {
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* cmd */
+		tprint_arg_next();
 		printxval(fcntlcmds, cmd, "F_???");
 	}
 	switch (cmd) {

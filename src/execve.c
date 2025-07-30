@@ -101,13 +101,13 @@ decode_execve(struct tcb *tcp, const unsigned int index)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[index + 0]);
-	tprint_arg_next();
 
 	/* argv */
-	printargv(tcp, tcp->u_arg[index + 1]);
 	tprint_arg_next();
+	printargv(tcp, tcp->u_arg[index + 1]);
 
 	/* envp */
+	tprint_arg_next();
 	(abbrev(tcp) ? printargc : printargv) (tcp, tcp->u_arg[index + 2]);
 }
 
@@ -122,13 +122,13 @@ SYS_FUNC(execveat)
 {
 	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* pathname, argv, envp */
-	decode_execve(tcp, 1);
 	tprint_arg_next();
+	decode_execve(tcp, 1);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(execveat_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
@@ -139,9 +139,9 @@ SYS_FUNC(execv)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* argv */
+	tprint_arg_next();
 	printargv(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;

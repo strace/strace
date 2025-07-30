@@ -111,25 +111,25 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 
 	/* addr */
 	printaddr(addr);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(len);
 	tprint_arg_next();
+	PRINT_VAL_U(len);
 
 	/* prot */
-	printflags64(mmap_prot, prot, "PROT_???");
 	tprint_arg_next();
+	printflags64(mmap_prot, prot, "PROT_???");
 
 	/* flags */
-	print_mmap_flags(flags);
 	tprint_arg_next();
+	print_mmap_flags(flags);
 
 	/* fd */
-	printfd(tcp, fd);
 	tprint_arg_next();
+	printfd(tcp, fd);
 
 	/* offset */
+	tprint_arg_next();
 	PRINT_VAL_X(offset);
 }
 
@@ -219,9 +219,9 @@ SYS_FUNC(munmap)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -232,18 +232,18 @@ do_mprotect(struct tcb *tcp, bool has_pkey)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* prot */
+	tprint_arg_next();
 	printflags64(mmap_prot, tcp->u_arg[2], "PROT_???");
 
 	if (has_pkey) {
-		tprint_arg_next();
 		/* pkey */
+		tprint_arg_next();
 		PRINT_VAL_D((int) tcp->u_arg[3]);
 	}
 
@@ -266,17 +266,17 @@ SYS_FUNC(mremap)
 {
 	/* old_address */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* old_size */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* new_size */
-	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[2]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags64(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 
 	if (tcp->u_arg[3] & (MREMAP_FIXED | MREMAP_DONTUNMAP) &&
@@ -300,13 +300,13 @@ SYS_FUNC(madvise)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* advice */
+	tprint_arg_next();
 	const unsigned int advice = tcp->u_arg[2];
 #if defined HPPA
 	/*
@@ -354,17 +354,17 @@ SYS_FUNC(process_madvise)
 	const unsigned int flags = tcp->u_arg[4];
 
 	printfd(tcp, pidfd);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	tprint_iov(tcp, len, addr, iov_decode_addr);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_U(len);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	printxval(madvise_cmds, advice, "MADV_???");
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(flags);
 
 	return RVAL_DECODED;
@@ -376,8 +376,8 @@ SYS_FUNC(process_mrelease)
 	const unsigned int flags = tcp->u_arg[1];
 
 	printfd(tcp, pidfd);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(flags);
 
 	return RVAL_DECODED;
@@ -398,13 +398,13 @@ SYS_FUNC(msync)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(mctl_sync, tcp->u_arg[2], "MS_???");
 
 	return RVAL_DECODED;
@@ -416,13 +416,13 @@ SYS_FUNC(mlock2)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(mlock_flags, tcp->u_arg[2], "MLOCK_???");
 
 	return RVAL_DECODED;
@@ -442,13 +442,13 @@ SYS_FUNC(mincore)
 	if (entering(tcp)) {
 		/* addr */
 		printaddr(tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* length */
-		PRINT_VAL_U(tcp->u_arg[1]);
 		tprint_arg_next();
+		PRINT_VAL_U(tcp->u_arg[1]);
 	} else {
 		/* vec */
+		tprint_arg_next();
 		const unsigned long page_size = get_pagesize();
 		const unsigned long page_mask = page_size - 1;
 		const kernel_ulong_t len = tcp->u_arg[1];
@@ -472,21 +472,21 @@ SYS_FUNC(remap_file_pages)
 
 	/* addr */
 	printaddr(addr);
-	tprint_arg_next();
 
 	/* size */
-	PRINT_VAL_U(size);
 	tprint_arg_next();
+	PRINT_VAL_U(size);
 
 	/* prot */
-	printflags64(mmap_prot, prot, "PROT_???");
 	tprint_arg_next();
+	printflags64(mmap_prot, prot, "PROT_???");
 
 	/* pgoff */
-	PRINT_VAL_U(pgoff);
 	tprint_arg_next();
+	PRINT_VAL_U(pgoff);
 
 	/* flags */
+	tprint_arg_next();
 	print_mmap_flags(flags);
 
 	return RVAL_DECODED;
@@ -496,13 +496,13 @@ SYS_FUNC(mseal)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* flags, reserved for future use */
+	tprint_arg_next();
 	PRINT_VAL_X(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -526,13 +526,13 @@ SYS_FUNC(subpage_prot)
 
 	/* addr */
 	printaddr(addr);
-	tprint_arg_next();
 
 	/* length */
-	PRINT_VAL_U(len);
 	tprint_arg_next();
+	PRINT_VAL_U(len);
 
 	/* map */
+	tprint_arg_next();
 	unsigned int entry;
 	print_array(tcp, map, nmemb, &entry, sizeof(entry),
 		    tfetch_mem, print_protmap_entry, 0);

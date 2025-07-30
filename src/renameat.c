@@ -12,17 +12,17 @@ decode_renameat(struct tcb *tcp)
 {
 	/* olddirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* oldpath */
-	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printpath(tcp, tcp->u_arg[1]);
 
 	/* newdirfd */
-	print_dirfd(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
+	print_dirfd(tcp, tcp->u_arg[2]);
 
 	/* newpath */
+	tprint_arg_next();
 	printpath(tcp, tcp->u_arg[3]);
 }
 
@@ -39,9 +39,9 @@ SYS_FUNC(renameat)
 SYS_FUNC(renameat2)
 {
 	decode_renameat(tcp);
-	tprint_arg_next();
 
 	/* flags */
+	tprint_arg_next();
 	printflags(rename_flags, tcp->u_arg[4], "RENAME_??");
 
 	return RVAL_DECODED;

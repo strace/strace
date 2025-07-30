@@ -124,9 +124,9 @@ SYS_FUNC(getrlimit)
 	if (entering(tcp)) {
 		/* resource */
 		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-		tprint_arg_next();
 	} else {
 		/* rlim */
+		tprint_arg_next();
 		decode_rlimit(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -136,9 +136,9 @@ SYS_FUNC(setrlimit)
 {
 	/* resource */
 	printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-	tprint_arg_next();
 
 	/* rlim */
+	tprint_arg_next();
 	decode_rlimit(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -149,17 +149,17 @@ SYS_FUNC(prlimit64)
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 
 		/* resource */
-		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
 		tprint_arg_next();
+		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
 
 		/* new_limit */
-		print_rlimit64(tcp, tcp->u_arg[2]);
 		tprint_arg_next();
+		print_rlimit64(tcp, tcp->u_arg[2]);
 	} else {
 		/* old_limit */
+		tprint_arg_next();
 		print_rlimit64(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -172,9 +172,9 @@ SYS_FUNC(getrusage)
 	if (entering(tcp)) {
 		/* who */
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprint_arg_next();
 	} else {
 		/* usage */
+		tprint_arg_next();
 		printrusage(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -186,9 +186,9 @@ SYS_FUNC(osf_getrusage)
 	if (entering(tcp)) {
 		/* who */
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprint_arg_next();
 	} else {
 		/* usage */
+		tprint_arg_next();
 		printrusage32(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -218,9 +218,9 @@ SYS_FUNC(getpriority)
 {
 	/* which */
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprint_arg_next();
 
 	/* who */
+	tprint_arg_next();
 	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -230,13 +230,13 @@ SYS_FUNC(setpriority)
 {
 	/* which */
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprint_arg_next();
 
 	/* who */
-	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 	tprint_arg_next();
+	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	/* prio */
+	tprint_arg_next();
 	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;

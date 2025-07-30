@@ -159,15 +159,15 @@ SYS_FUNC(clone)
 		tprints_arg_name_begin("child_stack");
 		printaddr(tcp->u_arg[ARG_STACK]);
 		tprint_arg_name_end();
-		tprint_arg_next();
 #ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1) {
+			tprint_arg_next();
 			tprints_arg_name_begin("stack_size");
 			PRINT_VAL_X(tcp->u_arg[ARG_STACKSIZE]);
 			tprint_arg_name_end();
-			tprint_arg_next();
 		}
 #endif
+		tprint_arg_next();
 		tprints_arg_name_begin("flags");
 		if (flags) {
 			tprint_flags_begin();

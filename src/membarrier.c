@@ -20,15 +20,14 @@ SYS_FUNC(membarrier)
 
 		/* cmd */
 		printxval(membarrier_cmds, cmd, "MEMBARRIER_CMD_???");
-		tprint_arg_next();
 
 		/* flags */
+		tprint_arg_next();
 		printflags(membarrier_flags, flags, "MEMBARRIER_CMD_FLAG_???");
 
 		if (flags & MEMBARRIER_CMD_FLAG_CPU) {
-			tprint_arg_next();
-
 			/* cpu_id */
+			tprint_arg_next();
 			PRINT_VAL_D(cpu_id);
 		}
 

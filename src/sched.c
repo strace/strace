@@ -32,13 +32,13 @@ SYS_FUNC(sched_setscheduler)
 {
 	/* pid */
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
-	tprint_arg_next();
 
 	/* policy */
-	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
 	tprint_arg_next();
+	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
 
 	/* param */
+	tprint_arg_next();
 	printnum_int(tcp, tcp->u_arg[2], "%d");
 
 	return RVAL_DECODED;
@@ -49,9 +49,9 @@ SYS_FUNC(sched_getparam)
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 	} else {
 		/* param */
+		tprint_arg_next();
 		printnum_int(tcp, tcp->u_arg[1], "%d");
 	}
 	return 0;
@@ -61,9 +61,9 @@ SYS_FUNC(sched_setparam)
 {
 	/* pid */
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
-	tprint_arg_next();
 
 	/* param */
+	tprint_arg_next();
 	printnum_int(tcp, tcp->u_arg[1], "%d");
 
 	return RVAL_DECODED;
@@ -84,9 +84,9 @@ do_sched_rr_get_interval(struct tcb *const tcp,
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 	} else {
 		/* tp */
+		tprint_arg_next();
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
@@ -188,9 +188,9 @@ SYS_FUNC(sched_setattr)
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 
 		/* attr */
+		tprint_arg_next();
 		print_sched_attr(tcp, tcp->u_arg[1], 0);
 	} else {
 		struct sched_attr attr;
@@ -202,9 +202,9 @@ SYS_FUNC(sched_setattr)
 			PRINT_FIELD_U(attr, size);
 			tprint_struct_end();
 		}
-		tprint_arg_next();
 
 		/* flags */
+		tprint_arg_next();
 		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 	}
 
@@ -216,18 +216,18 @@ SYS_FUNC(sched_getattr)
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 	} else {
 		const unsigned int size = tcp->u_arg[2];
 
 		/* attr */
+		tprint_arg_next();
 		if (size)
 			print_sched_attr(tcp, tcp->u_arg[1], size);
 		else
 			printaddr(tcp->u_arg[1]);
-		tprint_arg_next();
 
 		/* size */
+		tprint_arg_next();
 #ifdef AARCH64
 		/*
 		 * Due to a subtle gcc bug that leads to miscompiled aarch64
@@ -245,9 +245,9 @@ SYS_FUNC(sched_getattr)
 		{
 			PRINT_VAL_U(size);
 		}
-		tprint_arg_next();
 
 		/* flags */
+		tprint_arg_next();
 		PRINT_VAL_U((unsigned int) tcp->u_arg[3]);
 	}
 

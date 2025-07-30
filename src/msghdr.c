@@ -504,13 +504,13 @@ SYS_FUNC(sendmsg)
 {
 	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* msg */
-	decode_msghdr(tcp, 0, tcp->u_arg[1], -1);
 	tprint_arg_next();
+	decode_msghdr(tcp, 0, tcp->u_arg[1], -1);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;
@@ -523,18 +523,19 @@ SYS_FUNC(recvmsg)
 	if (entering(tcp)) {
 		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
 			set_tcb_priv_ulong(tcp, msg_namelen);
 			return 0;
 		}
 		/* msg */
+		tprint_arg_next();
 		printaddr(tcp->u_arg[1]);
 	} else {
 		msg_namelen = get_tcb_priv_ulong(tcp);
 
 		/* msg */
+		tprint_arg_next();
 		if (syserror(tcp)) {
 			tprint_struct_begin();
 			tprints_field_name("msg_namelen");
@@ -545,9 +546,9 @@ SYS_FUNC(recvmsg)
 				      tcp->u_rval);
 		}
 	}
-	tprint_arg_next();
 
 	/* flags */
+	tprint_arg_next();
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;

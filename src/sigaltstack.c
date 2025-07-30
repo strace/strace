@@ -43,9 +43,9 @@ SYS_FUNC(sigaltstack)
 	if (entering(tcp)) {
 		/* ss */
 		print_stack_t(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* old_ss */
+		tprint_arg_next();
 		print_stack_t(tcp, tcp->u_arg[1]);
 	}
 	return 0;

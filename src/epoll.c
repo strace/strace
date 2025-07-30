@@ -53,18 +53,18 @@ SYS_FUNC(epoll_ctl)
 {
 	/* epfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* op */
+	tprint_arg_next();
 	const unsigned int op = tcp->u_arg[1];
 	printxval(epollctls, op, "EPOLL_CTL_???");
-	tprint_arg_next();
 
 	/* fd */
-	printfd(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
+	printfd(tcp, tcp->u_arg[2]);
 
 	/* event */
+	tprint_arg_next();
 	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == op)
 		printaddr(tcp->u_arg[3]);
@@ -80,20 +80,20 @@ epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 	if (entering(tcp)) {
 		/* epfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* events */
+		tprint_arg_next();
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    tfetch_mem, print_epoll_event, 0);
-		tprint_arg_next();
 
 		/* maxevents */
+		tprint_arg_next();
 		int maxevents = tcp->u_arg[2];
 		PRINT_VAL_D(maxevents);
-		tprint_arg_next();
 
 		/* timeout */
+		tprint_arg_next();
 		print_timeout(tcp, tcp->u_arg[3]);
 	}
 }
@@ -117,13 +117,13 @@ epoll_pwait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	epoll_wait_common(tcp, print_timeout);
 	if (exiting(tcp)) {
-		tprint_arg_next();
 		/* sigmask */
 		/* NB: kernel requires arg[5] == NSIG_BYTES */
-		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		tprint_arg_next();
+		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 
 		/* sigsetsize */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[5]);
 	}
 	return 0;

@@ -39,20 +39,20 @@ SYS_FUNC(mount)
 
 	/* source */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* target */
-	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printpath(tcp, tcp->u_arg[1]);
 
 	/* filesystemtype */
+	tprint_arg_next();
 	if (ignore_type)
 		printaddr(tcp->u_arg[2]);
 	else
 		printstr(tcp, tcp->u_arg[2]);
-	tprint_arg_next();
 
 	/* mountflags */
+	tprint_arg_next();
 	tprint_flags_begin();
 	if (old_magic) {
 		print_xlat(MS_MGC_VAL);
@@ -62,9 +62,9 @@ SYS_FUNC(mount)
 	if (flags || !old_magic)
 		printflags64_in(mount_flags, flags, "MS_???");
 	tprint_flags_end();
-	tprint_arg_next();
 
 	/* data */
+	tprint_arg_next();
 	if (ignore_data)
 		printaddr(tcp->u_arg[4]);
 	else

@@ -95,12 +95,16 @@ SYS_FUNC(futex_waitv)
 	const unsigned int clockid = tcp->u_arg[4];
 
 	print_waiter_array(tcp, waiters, nr_futexes);
+
 	tprint_arg_next();
 	PRINT_VAL_U(nr_futexes);
+
 	tprint_arg_next();
 	PRINT_VAL_X(flags);
+
 	tprint_arg_next();
 	print_timespec64(tcp, timeout);
+
 	tprint_arg_next();
 	printxval(clocknames, clockid, "CLOCK_???");
 
@@ -116,17 +120,17 @@ SYS_FUNC(futex_wake)
 
 	/* uaddr */
 	printaddr(uaddr);
-	tprint_arg_next();
 
 	/* mask */
-	printxval64(futexbitset, mask, NULL);
 	tprint_arg_next();
+	printxval64(futexbitset, mask, NULL);
 
 	/* nr */
-	PRINT_VAL_D(nr);
 	tprint_arg_next();
+	PRINT_VAL_D(nr);
 
 	/* flags */
+	tprint_arg_next();
 	print_futex2_flags(flags);
 
 	return RVAL_DECODED;
@@ -143,25 +147,25 @@ SYS_FUNC(futex_wait)
 
 	/* uaddr */
 	printaddr(uaddr);
-	tprint_arg_next();
 
 	/* val */
-	PRINT_VAL_U(val);
 	tprint_arg_next();
+	PRINT_VAL_U(val);
 
 	/* mask */
-	printxval64(futexbitset, mask, NULL);
 	tprint_arg_next();
+	printxval64(futexbitset, mask, NULL);
 
 	/* flags */
-	print_futex2_flags(flags);
 	tprint_arg_next();
+	print_futex2_flags(flags);
 
 	/* timeout */
-	print_timespec64(tcp, timeout);
 	tprint_arg_next();
+	print_timespec64(tcp, timeout);
 
 	/* clockid */
+	tprint_arg_next();
 	printxval(clocknames, clockid, "CLOCK_???");
 
 	return RVAL_DECODED;
@@ -176,17 +180,17 @@ SYS_FUNC(futex_requeue)
 
 	/* waiters */
 	print_waiter_array(tcp, waiters, 2);
-	tprint_arg_next();
 
 	/* flags */
-	PRINT_VAL_X(flags);
 	tprint_arg_next();
+	PRINT_VAL_X(flags);
 
 	/* nr_wake */
-	PRINT_VAL_D(nr_wake);
 	tprint_arg_next();
+	PRINT_VAL_D(nr_wake);
 
 	/* nr_requeue */
+	tprint_arg_next();
 	PRINT_VAL_D(nr_requeue);
 
 	return RVAL_DECODED;

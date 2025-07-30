@@ -15,9 +15,9 @@ SYS_FUNC(getcwd)
 			printaddr(tcp->u_arg[0]);
 		else
 			printpathn(tcp, tcp->u_arg[0], tcp->u_rval);
-		tprint_arg_next();
 
 		/* size */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;

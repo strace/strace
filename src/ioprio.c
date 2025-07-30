@@ -71,9 +71,9 @@ SYS_FUNC(ioprio_get)
 	if (entering(tcp)) {
 		/* which */
 		printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
-		tprint_arg_next();
 
 		/* who */
+		tprint_arg_next();
 		ioprio_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 		return 0;
 	} else {
@@ -91,13 +91,13 @@ SYS_FUNC(ioprio_set)
 {
 	/* which */
 	printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
-	tprint_arg_next();
 
 	/* who */
-	ioprio_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 	tprint_arg_next();
+	ioprio_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	/* ioprio */
+	tprint_arg_next();
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		PRINT_VAL_D((int) tcp->u_arg[2]);
 

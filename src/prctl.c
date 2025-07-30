@@ -257,9 +257,9 @@ SYS_FUNC(prctl)
 	case PR_GET_ENDIAN:			/*  19 */
 	case PR_GET_CHILD_SUBREAPER:		/*  37 */
 		if (entering(tcp))
-			tprint_arg_next();
-		else
-			printnum_int(tcp, arg2, "%u");
+			break;
+		tprint_arg_next();
+		printnum_int(tcp, arg2, "%u");
 		break;
 
 	/* Group 3: one uint argument */
@@ -283,9 +283,10 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_GET_PDEATHSIG:			/*   1 */
-		if (entering(tcp)) {
-			tprint_arg_next();
-		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		if (entering(tcp))
+			break;
+		tprint_arg_next();
+		if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprint_indirect_begin();
 			printsignal(i);
 			tprint_indirect_end();
@@ -314,9 +315,10 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_GET_UNALIGN:			/*   5 */
-		if (entering(tcp)) {
-			tprint_arg_next();
-		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		if (entering(tcp))
+			break;
+		tprint_arg_next();
+		if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprint_indirect_begin();
 			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
 			tprint_indirect_end();
@@ -344,15 +346,14 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_GET_NAME:			/*  16 */
-		if (entering(tcp)) {
-			tprint_arg_next();
-		} else {
-			if (syserror(tcp))
-				printaddr(arg2);
-			else
-				printstr_ex(tcp, arg2, TASK_COMM_LEN,
-					    QUOTE_0_TERMINATED);
-		}
+		if (entering(tcp))
+			break;
+		tprint_arg_next();
+		if (syserror(tcp))
+			printaddr(arg2);
+		else
+			printstr_ex(tcp, arg2, TASK_COMM_LEN,
+				    QUOTE_0_TERMINATED);
 		break;
 
 	/* There are no options with numbers 17 and 18 */
@@ -381,9 +382,10 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_GET_TSC:			/*  25 */
-		if (entering(tcp)) {
-			tprint_arg_next();
-		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		if (entering(tcp))
+			break;
+		tprint_arg_next();
+		if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprint_indirect_begin();
 			printxval(pr_tsc, i, "PR_TSC_???");
 			tprint_indirect_end();
@@ -455,9 +457,9 @@ SYS_FUNC(prctl)
 
 	case PR_GET_TID_ADDRESS:		/*  40 */
 		if (entering(tcp))
-			tprint_arg_next();
-		else
-			printnum_kptr(tcp, arg2);
+			break;
+		tprint_arg_next();
+		printnum_kptr(tcp, arg2);
 		break;
 
 	/* PR_SET_THP_DISABLE - group 4		    41 */
@@ -646,16 +648,17 @@ SYS_FUNC(prctl)
 					? XLAT_STYLE_DEFAULT
 					: XLAT_STYLE_VERBOSE);
 
-			tprint_arg_next();
 			switch ((unsigned int) arg2) {
 			case PR_SCHED_CORE_GET:
 				/* arg5 is to be decoded on exiting */
 				return 0;
 			default:
+				tprint_arg_next();
 				printaddr(arg5);
 			}
 		} else {
 			/* PR_SCHED_CORE_GET */
+			tprint_arg_next();
 			if (syserror(tcp))
 				printaddr(arg5);
 			else
@@ -815,10 +818,10 @@ SYS_FUNC(arch_prctl)
 	switch (option) {
 	case ARCH_GET_GS:
 	case ARCH_GET_FS:
-		if (entering(tcp))
+		if (exiting(tcp)) {
 			tprint_arg_next();
-		else
 			printnum_kptr(tcp, addr);
+		}
 		return 0;
 
 	case ARCH_GET_CPUID: /* has no arguments */
@@ -827,11 +830,10 @@ SYS_FUNC(arch_prctl)
 	case ARCH_GET_XCOMP_SUPP:
 	case ARCH_GET_XCOMP_PERM:
 	case ARCH_GET_XCOMP_GUEST_PERM:
-		if (entering(tcp)) {
-			tprint_arg_next();
-		} else {
+		if (exiting(tcp)) {
 			uint64_t val;
 
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, addr, &val))
 				return 0;
 

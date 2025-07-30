@@ -82,11 +82,10 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS, 80);
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS2, 80);
 
-		if (entering(tcp)) {
-			tprint_arg_next();
+		if (entering(tcp))
 			return 0;
-		}
 
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
@@ -279,11 +278,10 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_PRECISE, 64);
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_PRECISE2, 64);
 
-		if (entering(tcp)) {
-			tprint_arg_next();
+		if (entering(tcp))
 			return 0;
-		}
 
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &sysoff))
 			break;
 

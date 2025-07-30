@@ -13,13 +13,13 @@ SYS_FUNC(close_range)
 {
 	/* fd */
 	PRINT_VAL_U((unsigned int) tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* max_fd */
-	PRINT_VAL_U((unsigned int) tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U((unsigned int) tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(close_range_flags, tcp->u_arg[2], "CLOSE_RANGE_???");
 	return RVAL_DECODED;
 }

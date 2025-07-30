@@ -26,10 +26,9 @@ print_dev_t(const unsigned long long dev)
 	const unsigned int dev_minor = minor(dev);
 
 	tprints_arg_begin("makedev");
-
 	PRINT_VAL_X(dev_major);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(dev_minor);
 	tprint_arg_end();
 

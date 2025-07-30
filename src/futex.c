@@ -41,9 +41,9 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 
 	/* uaddr */
 	printaddr(uaddr);
-	tprint_arg_next();
 
 	/* futex_op */
+	tprint_arg_next();
 	printxval(futexops, op, "FUTEX_???");
 
 	switch (cmd) {

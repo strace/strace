@@ -227,7 +227,7 @@ main(int ac, char **av)
 			break;
 		case ACTION_nanosleep:
 			printf("%s nanosleep({tv_sec=%u, tv_nsec=0}"
-			       ",  <unfinished ...>\n",
+			       " <unfinished ...>\n",
 			       leader_str, (unsigned int) ots.tv_sec);
 			close(fds[1]);
 			(void) syscall(__NR_nanosleep,

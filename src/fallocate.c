@@ -13,17 +13,17 @@ SYS_FUNC(fallocate)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* mode */
-	printflags(falloc_flags, tcp->u_arg[1], "FALLOC_FL_???");
 	tprint_arg_next();
+	printflags(falloc_flags, tcp->u_arg[1], "FALLOC_FL_???");
 
 	/* offset */
-	unsigned int argn = print_arg_lld(tcp, 2);
 	tprint_arg_next();
+	unsigned int argn = print_arg_lld(tcp, 2);
 
 	/* len */
+	tprint_arg_next();
 	print_arg_lld(tcp, argn);
 
 	return RVAL_DECODED;

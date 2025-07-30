@@ -41,11 +41,11 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (entering(tcp)) {
-		tprint_arg_next();
 		if (_IOC_DIR(code) == _IOC_READ)
 			return 0;
 	}
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &value))
 		return RVAL_IOCTL_DECODED;
 

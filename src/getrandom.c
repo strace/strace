@@ -17,13 +17,13 @@ SYS_FUNC(getrandom)
 		else
 			printstr_ex(tcp, tcp->u_arg[0], tcp->u_rval,
 				    QUOTE_FORCE_HEX);
-		tprint_arg_next();
 
 		/* buflen */
-		PRINT_VAL_U(tcp->u_arg[1]);
 		tprint_arg_next();
+		PRINT_VAL_U(tcp->u_arg[1]);
 
 		/* flags */
+		tprint_arg_next();
 		printflags(getrandom_flags, tcp->u_arg[2], "GRND_???");
 	}
 	return 0;

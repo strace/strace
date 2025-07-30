@@ -20,9 +20,9 @@ decode_readlink(struct tcb *tcp, int offset)
 	if (entering(tcp)) {
 		/* pathname */
 		printpath(tcp, tcp->u_arg[offset]);
-		tprint_arg_next();
 	} else {
 		/* buf */
+		tprint_arg_next();
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[offset + 1]);
 		else
@@ -34,9 +34,9 @@ decode_readlink(struct tcb *tcp, int offset)
 			 * past return buffer's end.
 			 */
 			printstrn(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
-		tprint_arg_next();
 
 		/* bufsiz */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[offset + 2]);
 	}
 	return 0;

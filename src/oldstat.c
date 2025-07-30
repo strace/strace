@@ -45,9 +45,9 @@ SYS_FUNC(oldstat)
 	if (entering(tcp)) {
 		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* statbuf */
+		tprint_arg_next();
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -58,9 +58,9 @@ SYS_FUNC(oldfstat)
 	if (entering(tcp)) {
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		/* statbuf */
+		tprint_arg_next();
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;

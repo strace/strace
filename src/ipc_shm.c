@@ -31,13 +31,13 @@ SYS_FUNC(shmget)
 {
 	/* key */
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
-	tprint_arg_next();
 
 	/* size */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* shmflg */
+	tprint_arg_next();
 	unsigned int flags = tcp->u_arg[2] & ~0777;
 	const unsigned int mask = SHM_HUGE_MASK << SHM_HUGE_SHIFT;
 	const unsigned int hugetlb_value = flags & mask;
@@ -69,10 +69,11 @@ static void
 print_shmaddr_shmflg(const kernel_ulong_t shmaddr, const unsigned int shmflg)
 {
 	/* shmaddr */
-	printaddr(shmaddr);
 	tprint_arg_next();
+	printaddr(shmaddr);
 
 	/* shmflg */
+	tprint_arg_next();
 	printflags(shm_flags, shmflg, "SHM_???");
 }
 
@@ -81,7 +82,6 @@ SYS_FUNC(shmat)
 	if (entering(tcp)) {
 		/* shmid */
 		PRINT_VAL_D((int) tcp->u_arg[0]);
-		tprint_arg_next();
 
 		if (indirect_ipccall(tcp))
 			print_shmaddr_shmflg(tcp->u_arg[3], tcp->u_arg[1]);

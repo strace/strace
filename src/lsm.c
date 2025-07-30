@@ -136,8 +136,8 @@ SYS_FUNC(lsm_get_self_attr)
 
 	if (entering(tcp)) {
 		printxval(lsm_attrs, attr, "LSM_ATTR_???");
-		tprint_arg_next();
 
+		tprint_arg_next();
 		if (!tfetch_obj(tcp, p_size, &size) ||
 		    (single && !tfetch_obj(tcp, p_ctx, &ctx))) {
 			printaddr(p_ctx);
@@ -164,9 +164,9 @@ SYS_FUNC(lsm_get_self_attr)
 	if (single)
 		tprint_value_changed();
 	decode_lsm_ctx_sequence(tcp, p_ctx, size);
-	tprint_arg_next();
 
 	const uint32_t saved_size = get_tcb_priv_ulong(tcp);
+	tprint_arg_next();
 	tprint_indirect_begin();
 	PRINT_VAL_U(saved_size);
 	if (saved_size != size) {
@@ -191,8 +191,8 @@ SYS_FUNC(lsm_set_self_attr)
 	struct lsm_ctx ctx;
 
 	printxval(lsm_attrs, attr, "LSM_ATTR_???");
-	tprint_arg_next();
 
+	tprint_arg_next();
 	if (fetch_lsm_ctx_header(tcp, &ctx, p_ctx, size, false))
 		decode_lsm_ctx(tcp, &ctx, p_ctx, size);
 

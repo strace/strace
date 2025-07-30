@@ -83,15 +83,16 @@ ioctl_print_code(const unsigned int code)
 		      abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV,
 		      ioctl_dirs, NULL);
 	tprint_flags_end();
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(_IOC_TYPE(code));
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(_IOC_NR(code));
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(_IOC_SIZE(code));
+
 	tprint_arg_end();
 }
 
@@ -510,6 +511,7 @@ SYS_FUNC(ioctl)
 		struct finfo *finfo = NULL;
 		char path[PATH_MAX + 1];
 		bool deleted;
+
 		if (ioctl_command_overlaps(tcp->u_arg[1]) &&
 		    getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
 				  &deleted) >= 0) {
@@ -520,7 +522,6 @@ SYS_FUNC(ioctl)
 			printfd(tcp, tcp->u_arg[0]);
 
 		tprint_arg_next();
-
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)
 			PRINT_VAL_X((unsigned int) tcp->u_arg[1]);
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)

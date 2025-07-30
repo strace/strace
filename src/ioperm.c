@@ -11,13 +11,13 @@ SYS_FUNC(ioperm)
 {
 	/* from */
 	PRINT_VAL_X(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* num */
-	PRINT_VAL_X(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_X(tcp->u_arg[1]);
 
 	/* turn_on */
+	tprint_arg_next();
 	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;

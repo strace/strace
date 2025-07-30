@@ -12,9 +12,9 @@ SYS_FUNC(umount2)
 {
 	/* target */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* flags */
+	tprint_arg_next();
 	printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 
 	return RVAL_DECODED;

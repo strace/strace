@@ -35,18 +35,19 @@ static int
 decode_setxattr_without_path(struct tcb *const tcp)
 {
 	/* name */
-	printstr(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printstr(tcp, tcp->u_arg[1]);
 
 	/* value */
-	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 	tprint_arg_next();
+	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 
 	/* size */
-	PRINT_VAL_U(tcp->u_arg[3]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[3]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
 
 	return RVAL_DECODED;
@@ -56,7 +57,6 @@ SYS_FUNC(setxattr)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	return decode_setxattr_without_path(tcp);
 }
@@ -65,7 +65,6 @@ SYS_FUNC(fsetxattr)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	return decode_setxattr_without_path(tcp);
 }
@@ -75,24 +74,26 @@ decode_getxattr_without_path(struct tcb *const tcp)
 {
 	if (entering(tcp)) {
 		/* name */
-		printstr(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
+		printstr(tcp, tcp->u_arg[1]);
 
 		if (tcp->u_arg[3])
 			return 0;
 
 		/* value */
-		printaddr(tcp->u_arg[2]);
 		tprint_arg_next();
+		printaddr(tcp->u_arg[2]);
 
 		/* size */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[3]);
 	} else {
 		/* value */
-		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_rval);
 		tprint_arg_next();
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_rval);
 
 		/* size */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[3]);
 	}
 
@@ -104,7 +105,6 @@ SYS_FUNC(getxattr)
 	if (entering(tcp)) {
 		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	}
 
 	return decode_getxattr_without_path(tcp);
@@ -115,7 +115,6 @@ SYS_FUNC(fgetxattr)
 	if (entering(tcp)) {
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	}
 
 	return decode_getxattr_without_path(tcp);
@@ -126,14 +125,15 @@ print_xattr_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const kernel_ulong_t size)
 {
 	/* list */
+	tprint_arg_next();
 	if (!size || syserror(tcp)) {
 		printaddr(addr);
 	} else {
 		printstrn(tcp, addr, tcp->u_rval);
 	}
-	tprint_arg_next();
 
 	/* size */
+	tprint_arg_next();
 	PRINT_VAL_U(size);
 }
 
@@ -142,7 +142,6 @@ SYS_FUNC(listxattr)
 	if (entering(tcp)) {
 		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
@@ -154,7 +153,6 @@ SYS_FUNC(flistxattr)
 	if (entering(tcp)) {
 		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 	} else {
 		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
@@ -165,9 +163,9 @@ SYS_FUNC(removexattr)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* name */
+	tprint_arg_next();
 	printstr(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -176,9 +174,9 @@ SYS_FUNC(fremovexattr)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* name */
+	tprint_arg_next();
 	printstr(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -188,13 +186,13 @@ decode_dirfd_pathname_flags(struct tcb *tcp)
 {
 	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* pathname */
-	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printpath(tcp, tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(xattrat_flags, tcp->u_arg[2], "AT_???");
 }
 
@@ -203,9 +201,9 @@ decode_dirfd_pathname_flags_name(struct tcb *tcp)
 {
 	/* dirfd, pathname, flags */
 	decode_dirfd_pathname_flags(tcp);
-	tprint_arg_next();
 
 	/* name */
+	tprint_arg_next();
 	printstr(tcp, tcp->u_arg[3]);
 }
 
@@ -265,14 +263,14 @@ SYS_FUNC(setxattrat)
 
 	/* dirfd, pathname, flags, name */
 	decode_dirfd_pathname_flags_name(tcp);
-	tprint_arg_next();
 
 	/* args */
+	tprint_arg_next();
 	if (!umove_xattr_args_or_printaddr(tcp, &args, addr, size))
 		print_xattr_args(tcp, &args, addr, size, true);
-	tprint_arg_next();
 
 	/* size */
+	tprint_arg_next();
 	PRINT_VAL_U(size);
 
 	return RVAL_DECODED;
@@ -288,9 +286,9 @@ SYS_FUNC(getxattrat)
 
 		/* dirfd, pathname, flags, name */
 		decode_dirfd_pathname_flags_name(tcp);
-		tprint_arg_next();
 
 		/* args */
+		tprint_arg_next();
 		if (!umove_xattr_args_or_printaddr(tcp, &args, addr, size)) {
 			if (args.size) {
 				set_tcb_priv_data(tcp, xobjdup(&args), free);
@@ -320,7 +318,6 @@ SYS_FUNC(listxattrat)
 	if (entering(tcp)) {
 		/* dirfd, pathname, flags */
 		decode_dirfd_pathname_flags(tcp);
-		tprint_arg_next();
 	} else {
 		print_xattr_list(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	}

@@ -11,9 +11,9 @@ SYS_FUNC(truncate)
 {
 	/* path */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -23,9 +23,9 @@ SYS_FUNC(truncate64)
 {
 	/* path */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
+	tprint_arg_next();
 	print_arg_llu(tcp, 1);
 
 	return RVAL_DECODED;
@@ -35,9 +35,9 @@ SYS_FUNC(ftruncate)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -47,9 +47,9 @@ SYS_FUNC(ftruncate64)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* length */
+	tprint_arg_next();
 	print_arg_llu(tcp, 1);
 
 	return RVAL_DECODED;

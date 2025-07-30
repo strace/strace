@@ -17,8 +17,8 @@ SYS_FUNC(cachestat)
 
 	if (entering(tcp)) {
 		printfd(tcp, fd);
-		tprint_arg_next();
 
+		tprint_arg_next();
 		struct cachestat_range crange;
 		if (!umove_or_printaddr(tcp, range_addr, &crange)) {
 			tprint_struct_begin();
@@ -27,8 +27,8 @@ SYS_FUNC(cachestat)
 			PRINT_FIELD_U(crange, len);
 			tprint_struct_end();
 		}
-		tprint_arg_next();
 	} else {
+		tprint_arg_next();
 		struct cachestat cstat;
 		if (!umove_or_printaddr(tcp, stat_addr, &cstat)) {
 			tprint_struct_begin();
@@ -43,8 +43,8 @@ SYS_FUNC(cachestat)
 			PRINT_FIELD_U(cstat, nr_recently_evicted);
 			tprint_struct_end();
 		}
-		tprint_arg_next();
 
+		tprint_arg_next();
 		PRINT_VAL_X(flags);
 	}
 

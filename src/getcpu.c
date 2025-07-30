@@ -12,13 +12,13 @@ SYS_FUNC(getcpu)
 	if (exiting(tcp)) {
 		/* cpu */
 		printnum_int(tcp, tcp->u_arg[0], "%u");
-		tprint_arg_next();
 
 		/* node */
-		printnum_int(tcp, tcp->u_arg[1], "%u");
 		tprint_arg_next();
+		printnum_int(tcp, tcp->u_arg[1], "%u");
 
 		/* tcache */
+		tprint_arg_next();
 		printaddr(tcp->u_arg[2]);
 	}
 	return 0;

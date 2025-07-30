@@ -18,9 +18,9 @@ SYS_FUNC(sethostname)
 	} else {
 		printstrn(tcp, tcp->u_arg[0], len);
 	}
-	tprint_arg_next();
 
 	/* len */
+	tprint_arg_next();
 	PRINT_VAL_U(len);
 
 	return RVAL_DECODED;
@@ -35,9 +35,9 @@ SYS_FUNC(gethostname)
 			printaddr(tcp->u_arg[0]);
 		else
 			printstr(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* len */
+		tprint_arg_next();
 		PRINT_VAL_U(tcp->u_arg[1]);
 	}
 	return 0;

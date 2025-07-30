@@ -283,16 +283,16 @@ SYS_FUNC(statmount)
 
 	if (entering(tcp)) {
 		print_mnt_id_req(tcp, req);
-		tprint_arg_next();
 		return 0;
 	}
 
+	tprint_arg_next();
 	print_statmount(tcp, buf, bufsize);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_U(bufsize);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_X(flags);
 
 	return 0;

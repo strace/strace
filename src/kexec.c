@@ -63,17 +63,17 @@ SYS_FUNC(kexec_load)
 {
 	/* entry */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* nr_segments */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* segments */
-	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 	tprint_arg_next();
+	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	kernel_ulong_t n = tcp->u_arg[3];
 	tprint_flags_begin();
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
@@ -93,21 +93,21 @@ SYS_FUNC(kexec_file_load)
 {
 	/* kernel_fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* initrd_fd */
-	printfd(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printfd(tcp, tcp->u_arg[1]);
 
 	/* cmdline_len */
-	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[2]);
 
 	/* cmdline */
-	printstrn(tcp, tcp->u_arg[3], tcp->u_arg[2]);
 	tprint_arg_next();
+	printstrn(tcp, tcp->u_arg[3], tcp->u_arg[2]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags64(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
 
 	return RVAL_DECODED;

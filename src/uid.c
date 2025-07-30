@@ -89,13 +89,13 @@ SYS_FUNC(getresuid)
 
 	/* ruid */
 	get_print_uid(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* euid */
-	get_print_uid(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	get_print_uid(tcp, tcp->u_arg[1]);
 
 	/* suid */
+	tprint_arg_next();
 	get_print_uid(tcp, tcp->u_arg[2]);
 
 	return 0;
@@ -105,9 +105,9 @@ SYS_FUNC(setreuid)
 {
 	/* ruid */
 	printuid(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* euid */
+	tprint_arg_next();
 	printuid(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -117,13 +117,13 @@ SYS_FUNC(setresuid)
 {
 	/* ruid */
 	printuid(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* euid */
-	printuid(tcp->u_arg[1]);
 	tprint_arg_next();
+	printuid(tcp->u_arg[1]);
 
 	/* suid */
+	tprint_arg_next();
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -133,13 +133,13 @@ SYS_FUNC(chown)
 {
 	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* owner */
-	printuid(tcp->u_arg[1]);
 	tprint_arg_next();
+	printuid(tcp->u_arg[1]);
 
 	/* group */
+	tprint_arg_next();
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -149,13 +149,13 @@ SYS_FUNC(fchown)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* owner */
-	printuid(tcp->u_arg[1]);
 	tprint_arg_next();
+	printuid(tcp->u_arg[1]);
 
 	/* group */
+	tprint_arg_next();
 	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -198,9 +198,9 @@ SYS_FUNC(setgroups)
 	/* size */
 	const int len = tcp->u_arg[0];
 	PRINT_VAL_D(len);
-	tprint_arg_next();
 
 	/* list */
+	tprint_arg_next();
 	print_groups(tcp, len, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -211,9 +211,9 @@ SYS_FUNC(getgroups)
 		/* size */
 		int size = tcp->u_arg[0];
 		PRINT_VAL_D(size);
-		tprint_arg_next();
 	} else {
 		/* list */
+		tprint_arg_next();
 		print_groups(tcp, tcp->u_rval, tcp->u_arg[1]);
 	}
 	return 0;

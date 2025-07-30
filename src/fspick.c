@@ -13,13 +13,13 @@ SYS_FUNC(fspick)
 {
 	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* pathname */
-	printpath(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printpath(tcp, tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(fspick_flags, tcp->u_arg[2], "FSPICK_???");
 
 	return RVAL_DECODED | RVAL_FD;

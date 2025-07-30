@@ -26,13 +26,13 @@ SYS_FUNC(kcmp)
 
 	/* pid1 */
 	printpid(tcp, pid1, PT_TGID);
-	tprint_arg_next();
 
 	/* pid2 */
-	printpid(tcp, pid2, PT_TGID);
 	tprint_arg_next();
+	printpid(tcp, pid2, PT_TGID);
 
 	/* type */
+	tprint_arg_next();
 	printxval(kcmp_types, type, "KCMP_???");
 
 	switch (type) {
@@ -53,9 +53,9 @@ SYS_FUNC(kcmp)
 			/* idx1 */
 			tprint_arg_next();
 			printfd_pid_tracee_ns(tcp, pid1, idx1);
-			tprint_arg_next();
 
 			/* idx2 */
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, idx2, &slot))
 				break;
 

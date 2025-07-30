@@ -25,18 +25,18 @@ decode_mknod(struct tcb *tcp, int offset)
 
 	/* pathname */
 	printpath(tcp, tcp->u_arg[offset]);
-	tprint_arg_next();
 
 	/* mode */
+	tprint_arg_next();
 	print_symbolic_mode_t(mode);
 
 	switch (mode & S_IFMT) {
 	case S_IFCHR:
 	case S_IFBLK:
 		dev = tcp->u_arg[offset + 2];
-		tprint_arg_next();
 
 		/* dev */
+		tprint_arg_next();
 		print_dev_t(dev);
 		break;
 	}
@@ -53,8 +53,8 @@ SYS_FUNC(mknodat)
 {
 	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	decode_mknod(tcp, 1);
 
 	return RVAL_DECODED;

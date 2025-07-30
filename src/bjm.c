@@ -17,9 +17,9 @@ SYS_FUNC(delete_module)
 {
 	/* name */
 	printstr(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* flags */
+	tprint_arg_next();
 	printflags(delete_module_flags, tcp->u_arg[1], "O_???");
 
 	return RVAL_DECODED;
@@ -29,13 +29,13 @@ SYS_FUNC(init_module)
 {
 	/* module_image */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* len */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* param_values */
+	tprint_arg_next();
 	printstr(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -47,13 +47,13 @@ SYS_FUNC(finit_module)
 {
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* param_values */
-	printstr(tcp, tcp->u_arg[1]);
 	tprint_arg_next();
+	printstr(tcp, tcp->u_arg[1]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(module_init_flags, tcp->u_arg[2], "MODULE_INIT_???");
 
 	return RVAL_DECODED;

@@ -18,11 +18,11 @@ SYS_FUNC(fsconfig)
 	const int aux = tcp->u_arg[4];
 
 	printfd(tcp, fs_fd);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	printxval(fsconfig_cmds, cmd, "FSCONFIG_???");
-	tprint_arg_next();
 
+	tprint_arg_next();
 	switch (cmd) {
 		case FSCONFIG_SET_FLAG:
 		case FSCONFIG_SET_STRING:
@@ -39,8 +39,8 @@ SYS_FUNC(fsconfig)
 			printaddr(key);
 			break;
 	}
-	tprint_arg_next();
 
+	tprint_arg_next();
 	switch (cmd) {
 		case FSCONFIG_SET_STRING:
 			printstr_ex(tcp, value, 256, QUOTE_0_TERMINATED);
@@ -64,8 +64,8 @@ SYS_FUNC(fsconfig)
 			printaddr(value);
 			break;
 	}
-	tprint_arg_next();
 
+	tprint_arg_next();
 	switch (cmd) {
 		case FSCONFIG_SET_PATH:
 		case FSCONFIG_SET_PATH_EMPTY:

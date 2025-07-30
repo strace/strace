@@ -135,16 +135,16 @@ SYS_FUNC(semctl)
 	if (entering(tcp)) {
 		/* semid */
 		PRINT_VAL_D((int) tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* semnum */
-		PRINT_VAL_D((int) tcp->u_arg[1]);
 		tprint_arg_next();
+		PRINT_VAL_D((int) tcp->u_arg[1]);
 
 		/* cmd */
-		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 		tprint_arg_next();
+		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 
+		tprint_arg_next();
 		if (indirect_addr) {
 			semun_ptr_t ptr;
 			if (umove_or_printaddr(tcp, tcp->u_arg[3], &ptr))

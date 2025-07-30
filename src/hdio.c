@@ -24,15 +24,13 @@ typedef struct hd_geometry struct_hd_geometry;
 static int
 print_hdio_getgeo(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	if (entering(tcp)) {
-		tprint_arg_next();
-
+	if (entering(tcp))
 		return 0;
-	}
 
 	/* exiting */
 	struct_hd_geometry geo;
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &geo))
 		return RVAL_IOCTL_DECODED;
 

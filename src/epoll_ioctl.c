@@ -18,6 +18,7 @@ print_struct_epoll_params(struct tcb *const tcp, const kernel_ulong_t addr)
 	CHECK_TYPE_SIZE(struct epoll_params, 8);
 	struct epoll_params ep;
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, addr, &ep))
 		return;
 
@@ -40,16 +41,13 @@ epoll_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case EPIOCSPARAMS:
-		tprint_arg_next();
 		print_struct_epoll_params(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case EPIOCGPARAMS:
-		if (entering(tcp)) {
-			tprint_arg_next();
+		if (entering(tcp))
 			return 0;
-		}
 		print_struct_epoll_params(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;

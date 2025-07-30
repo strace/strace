@@ -161,11 +161,10 @@ tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct tee_ioctl_version_data version;
 
-	if (entering(tcp)) {
-		tprint_arg_next();
+	if (entering(tcp))
 		return 0;
-	}
 
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &version))
 		return RVAL_IOCTL_DECODED;
 

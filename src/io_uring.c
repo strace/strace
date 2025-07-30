@@ -90,9 +90,9 @@ SYS_FUNC(io_uring_setup)
 	if (entering(tcp)) {
 		/* entries */
 		PRINT_VAL_U(entries);
-		tprint_arg_next();
 
 		/* params */
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, params_addr, &params))
 			return RVAL_DECODED | RVAL_FD;
 
@@ -148,25 +148,25 @@ SYS_FUNC(io_uring_enter)
 
 	/* fd */
 	printfd(tcp, fd);
-	tprint_arg_next();
 
 	/* to_submit */
-	PRINT_VAL_U(to_submit);
 	tprint_arg_next();
+	PRINT_VAL_U(to_submit);
 
 	/* min_complete */
-	PRINT_VAL_U(min_complete);
 	tprint_arg_next();
+	PRINT_VAL_U(min_complete);
 
 	/* flags */
-	printflags(uring_enter_flags, flags, "IORING_ENTER_???");
 	tprint_arg_next();
+	printflags(uring_enter_flags, flags, "IORING_ENTER_???");
 
 	/* sigset */
-	print_sigset_addr_len(tcp, sigset_addr, sigset_size);
 	tprint_arg_next();
+	print_sigset_addr_len(tcp, sigset_addr, sigset_size);
 
 	/* sigsetsize */
+	tprint_arg_next();
 	PRINT_VAL_U(sigset_size);
 
 	return RVAL_DECODED;
@@ -897,10 +897,11 @@ SYS_FUNC(io_uring_register)
 			PRINT_VAL_U(fd);
 		else
 			printfd(tcp, fd);
-		tprint_arg_next();
 
 		/* opcode */
+		tprint_arg_next();
 		print_io_uring_register_opcode(tcp, opcode, opcode_flags);
+
 		tprint_arg_next();
 	}
 
@@ -984,8 +985,8 @@ SYS_FUNC(io_uring_register)
 	}
 
 	if (rc || exiting(tcp)) {
-		tprint_arg_next();
 		/* nr_args */
+		tprint_arg_next();
 		PRINT_VAL_U(nargs);
 	}
 

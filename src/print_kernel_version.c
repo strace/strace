@@ -26,13 +26,12 @@ print_kernel_version(const unsigned long version)
 	const unsigned long ver_patch = version & 0xFF;
 
 	tprints_arg_begin("KERNEL_VERSION");
-
 	PRINT_VAL_U(ver_major);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_U(ver_minor);
-	tprint_arg_next();
 
+	tprint_arg_next();
 	PRINT_VAL_U(ver_patch);
 	tprint_arg_end();
 

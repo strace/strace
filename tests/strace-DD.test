@@ -59,7 +59,7 @@ test_D()
 	match_diff "$LOG" "$EXP"
 }
 
-printf 'nanosleep({tv_sec=%s, tv_nsec=0}, ' "$sleep_duration" > "$EXP"
+printf 'nanosleep({tv_sec=%s, tv_nsec=0}' "$sleep_duration" > "$EXP"
 test_D -D
 
 uid="${UID:-`id -u`}"

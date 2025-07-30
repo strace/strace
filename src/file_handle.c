@@ -43,21 +43,20 @@ SYS_FUNC(name_to_handle_at)
 	if (entering(tcp)) {
 		/* dirfd */
 		print_dirfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		/* pathname */
-		printpath(tcp, tcp->u_arg[1]);
 		tprint_arg_next();
+		printpath(tcp, tcp->u_arg[1]);
 
 		/* handle */
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, addr, &h)) {
-			tprint_arg_next();
-
 			/* mount_id */
-			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
+			printaddr(tcp->u_arg[3]);
 
 			/* flags */
+			tprint_arg_next();
 			printflags(name_to_handle_at_flags, tcp->u_arg[4],
 				   "AT_???");
 
@@ -87,13 +86,13 @@ SYS_FUNC(name_to_handle_at)
 			}
 		}
 		tprint_struct_end();
-		tprint_arg_next();
 
 		/* mount_id */
-		printnum_int(tcp, tcp->u_arg[3], "%d");
 		tprint_arg_next();
+		printnum_int(tcp, tcp->u_arg[3], "%d");
 
 		/* flags */
+		tprint_arg_next();
 		printflags(name_to_handle_at_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
@@ -106,9 +105,9 @@ SYS_FUNC(open_by_handle_at)
 
 	/* mount_fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* handle */
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, addr, &h)) {
 		tprint_struct_begin();
 		PRINT_FIELD_U(h, handle_bytes);
@@ -119,9 +118,9 @@ SYS_FUNC(open_by_handle_at)
 		print_f_handle(tcp, addr, h.handle_bytes);
 		tprint_struct_end();
 	}
-	tprint_arg_next();
 
 	/* flags */
+	tprint_arg_next();
 	tprint_open_modes(tcp->u_arg[2]);
 
 	return RVAL_DECODED | RVAL_FD;

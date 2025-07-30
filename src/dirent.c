@@ -109,9 +109,9 @@ SYS_FUNC(readdir)
 #ifdef ENABLE_SECONTEXT
 		tcp->last_dirfd = (int) tcp->u_arg[0];
 #endif
-		tprint_arg_next();
 	} else {
 		/* dirp */
+		tprint_arg_next();
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);
 		else

@@ -151,18 +151,18 @@ SYS_FUNC(sendmmsg)
 	if (entering(tcp)) {
 		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		if (!verbose(tcp)) {
 			/* msgvec */
-			printaddr(tcp->u_arg[1]);
 			tprint_arg_next();
+			printaddr(tcp->u_arg[1]);
 
 			/* vlen */
-			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 			tprint_arg_next();
+			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
+			tprint_arg_next();
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			return RVAL_DECODED;
 		}
@@ -170,17 +170,18 @@ SYS_FUNC(sendmmsg)
 		const unsigned int msg_len_vlen =
 			syserror(tcp) ? 0 : tcp->u_rval;
 		/* msgvec */
+		tprint_arg_next();
 		temporarily_clear_syserror(tcp);
 		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			       msg_len_vlen, false);
 		restore_cleared_syserror(tcp);
-		tprint_arg_next();
 
 		/* vlen */
-		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 		tprint_arg_next();
+		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 		/* flags */
+		tprint_arg_next();
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
@@ -193,44 +194,45 @@ do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	if (entering(tcp)) {
 		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
 
 		if (verbose(tcp)) {
 			save_mmsgvec_namelen(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					     sprint_ts(tcp, tcp->u_arg[4]));
 		} else {
 			/* msgvec */
-			printaddr(tcp->u_arg[1]);
 			tprint_arg_next();
+			printaddr(tcp->u_arg[1]);
 
 			/* vlen */
-			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 			tprint_arg_next();
+			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
-			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprint_arg_next();
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
 			/* timeout */
+			tprint_arg_next();
 			print_ts(tcp, tcp->u_arg[4]);
 		}
 		return 0;
 	} else {
 		if (verbose(tcp)) {
 			/* msgvec */
+			tprint_arg_next();
 			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval,
 				       tcp->u_rval, true);
-			tprint_arg_next();
 
 			/* vlen */
-			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 			tprint_arg_next();
+			PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
 
 			/* flags */
-			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprint_arg_next();
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
 			/* timeout on entrance */
+			tprint_arg_next();
 			tprints_string(*(const char **) get_tcb_priv_data(tcp));
 		}
 		if (syserror(tcp))

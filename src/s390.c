@@ -1270,8 +1270,8 @@ SYS_FUNC(s390_sthyi)
 	if (entering(tcp)) {
 		printxval64(s390_sthyi_function_codes, function_code,
 			    "STHYI_FC_???");
-		tprint_arg_next();
 	} else {
+		tprint_arg_next();
 		switch (function_code) {
 		case STHYI_FC_CP_IFL_CAP:
 			print_sthyi_buf(tcp, resp_buffer_ptr);
@@ -1535,8 +1535,8 @@ SYS_FUNC(s390_pci_mmio_read)
 
 	if (entering(tcp)) {
 		PRINT_VAL_X(mmio_addr);
-		tprint_arg_next();
 	} else {
+		tprint_arg_next();
 		if (!syserror(tcp))
 			printstr_ex(tcp, user_buf, length, QUOTE_FORCE_HEX);
 		else

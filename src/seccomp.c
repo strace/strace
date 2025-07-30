@@ -20,16 +20,16 @@ SYS_FUNC(seccomp)
 	/* operation */
 	if (entering(tcp)) {
 		printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
-		tprint_arg_next();
 	}
 
 	switch (op) {
 	case SECCOMP_GET_ACTION_AVAIL:
 		/* flags */
-		PRINT_VAL_X(flags);
 		tprint_arg_next();
+		PRINT_VAL_X(flags);
 
 		/* args */
+		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, tcp->u_arg[2], &act)) {
 			tprint_indirect_begin();
 			printxval(seccomp_ret_action, act, "SECCOMP_RET_???");
@@ -40,14 +40,15 @@ SYS_FUNC(seccomp)
 	case SECCOMP_GET_NOTIF_SIZES:
 		if (entering(tcp)) {
 			/* flags */
-			PRINT_VAL_X(flags);
 			tprint_arg_next();
+			PRINT_VAL_X(flags);
 
 			return 0;
 		} else {
 			struct seccomp_notif_sizes szs;
 
 			/* args */
+			tprint_arg_next();
 			if (!umove_or_printaddr(tcp, tcp->u_arg[2], &szs)) {
 				tprint_struct_begin();
 				PRINT_FIELD_U(szs, seccomp_notif);
@@ -62,21 +63,23 @@ SYS_FUNC(seccomp)
 
 	case SECCOMP_SET_MODE_FILTER:
 		/* flags */
+		tprint_arg_next();
 		printflags(seccomp_filter_flags, flags,
 			   "SECCOMP_FILTER_FLAG_???");
-		tprint_arg_next();
 
 		/* args */
+		tprint_arg_next();
 		decode_seccomp_fprog(tcp, tcp->u_arg[2]);
 		break;
 
 	case SECCOMP_SET_MODE_STRICT:
 	default:
 		/* flags */
-		PRINT_VAL_X(flags);
 		tprint_arg_next();
+		PRINT_VAL_X(flags);
 
 		/* args */
+		tprint_arg_next();
 		printaddr(tcp->u_arg[2]);
 		break;
 	}

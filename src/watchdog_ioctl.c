@@ -25,10 +25,9 @@ watchdog_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	switch (code) {
 	case WDIOC_GETSUPPORT:
-		if (entering(tcp)) {
-			tprint_arg_next();
+		if (entering(tcp))
 			return 0;
-		}
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &ident))
 			break;
 		tprint_struct_begin();

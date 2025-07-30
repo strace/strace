@@ -46,17 +46,17 @@ SYS_FUNC(migrate_pages)
 {
 	/* pid */
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
-	tprint_arg_next();
 
 	/* maxnode */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* old_nodes */
-	print_nodemask(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 	tprint_arg_next();
+	print_nodemask(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 
 	/* new_nodes */
+	tprint_arg_next();
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -109,25 +109,25 @@ SYS_FUNC(mbind)
 {
 	/* addr */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* len */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* mode */
-	print_mode(tcp, tcp->u_arg[2]);
 	tprint_arg_next();
+	print_mode(tcp, tcp->u_arg[2]);
 
 	/* nodemask */
-	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprint_arg_next();
+	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 
 	/* maxnode */
-	PRINT_VAL_U(tcp->u_arg[4]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[4]);
 
 	/* flags */
+	tprint_arg_next();
 	printflags(mbind_flags, tcp->u_arg[5], "MPOL_???");
 
 	return RVAL_DECODED;
@@ -137,13 +137,13 @@ SYS_FUNC(set_mempolicy)
 {
 	/* mode */
 	print_mode(tcp, (unsigned int) tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* nodemask */
-	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprint_arg_next();
+	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 
 	/* maxnode */
+	tprint_arg_next();
 	PRINT_VAL_U(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -161,21 +161,21 @@ SYS_FUNC(get_mempolicy)
 			printxval(mpol_modes, pol, "MPOL_???");
 			tprint_indirect_end();
 		}
-		tprint_arg_next();
 
 		/* nodemask */
-		print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprint_arg_next();
+		print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 
 		/* maxnode */
-		PRINT_VAL_U(tcp->u_arg[2]);
 		tprint_arg_next();
+		PRINT_VAL_U(tcp->u_arg[2]);
 
 		/* addr */
-		printaddr(tcp->u_arg[3]);
 		tprint_arg_next();
+		printaddr(tcp->u_arg[3]);
 
 		/* flags */
+		tprint_arg_next();
 		printflags64(get_mempolicy_flags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
@@ -185,17 +185,17 @@ SYS_FUNC(set_mempolicy_home_node)
 {
 	/* start */
 	printaddr(tcp->u_arg[0]);
-	tprint_arg_next();
 
 	/* len */
-	PRINT_VAL_U(tcp->u_arg[1]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[1]);
 
 	/* home_node */
-	PRINT_VAL_U(tcp->u_arg[2]);
 	tprint_arg_next();
+	PRINT_VAL_U(tcp->u_arg[2]);
 
 	/* flags */
+	tprint_arg_next();
 	PRINT_VAL_X(tcp->u_arg[3]);
 
 	return RVAL_DECODED;
@@ -237,28 +237,28 @@ SYS_FUNC(move_pages)
 	if (entering(tcp)) {
 		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprint_arg_next();
 
 		/* count */
-		PRINT_VAL_U(npages);
 		tprint_arg_next();
+		PRINT_VAL_U(npages);
 
 		/* pages */
+		tprint_arg_next();
 		print_array(tcp, tcp->u_arg[2], npages, &buf, current_wordsize,
 			    tfetch_mem, print_addr, 0);
-		tprint_arg_next();
 
 		/* nodes */
+		tprint_arg_next();
 		print_array(tcp, tcp->u_arg[3], npages, &buf, sizeof(int),
 			    tfetch_mem, print_int_array_member, 0);
-		tprint_arg_next();
 	} else {
 		/* status */
+		tprint_arg_next();
 		print_array(tcp, tcp->u_arg[4], npages, &buf, sizeof(int),
 			    tfetch_mem, print_status, 0);
-		tprint_arg_next();
 
 		/* flags */
+		tprint_arg_next();
 		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
 	}
 	return 0;
