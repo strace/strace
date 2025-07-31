@@ -139,6 +139,18 @@ tprints_arg_next_name_unconditionally(const char *name)
 }
 
 static inline void
+tprints_arg_name(const char *name)
+{
+}
+
+static inline void
+tprints_arg_next_name(const char *name)
+{
+	tprint_arg_next();
+	tprints_arg_name(name);
+}
+
+static inline void
 tprint_bitset_begin(void)
 {
 	STRACE_PRINTS("[");
