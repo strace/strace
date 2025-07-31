@@ -156,19 +156,15 @@ SYS_FUNC(clone)
 	if (entering(tcp)) {
 		const unsigned int sig = tcp->u_arg[ARG_FLAGS] & CSIGNAL;
 
-		tprints_arg_name_begin("child_stack");
+		tprints_arg_name_unconditionally("child_stack");
 		printaddr(tcp->u_arg[ARG_STACK]);
-		tprint_arg_name_end();
 #ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1) {
-			tprint_arg_next();
-			tprints_arg_name_begin("stack_size");
+			tprints_arg_next_name_unconditionally("stack_size");
 			PRINT_VAL_X(tcp->u_arg[ARG_STACKSIZE]);
-			tprint_arg_name_end();
 		}
 #endif
-		tprint_arg_next();
-		tprints_arg_name_begin("flags");
+		tprints_arg_next_name_unconditionally("flags");
 		if (flags) {
 			tprint_flags_begin();
 			printflags64_in(clone_flags, flags, "CLONE_???");
@@ -180,7 +176,6 @@ SYS_FUNC(clone)
 		} else {
 			printsignal(sig);
 		}
-		tprint_arg_name_end();
 		/*
 		 * TODO on syscall entry:
 		 * We can clear CLONE_PTRACE here since it is an ancient hack
@@ -202,25 +197,19 @@ SYS_FUNC(clone)
 		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
 			kernel_ulong_t addr = tcp->u_arg[ARG_PTID];
 
-			tprint_arg_next();
-			tprints_arg_name_begin("parent_tid");
+			tprints_arg_next_name_unconditionally("parent_tid");
 			if (flags & CLONE_PARENT_SETTID)
 				printnum_pid(tcp, addr, PT_TID);
 			else
 				printnum_fd(tcp, addr);
-			tprint_arg_name_end();
 		}
 		if (flags & CLONE_SETTLS) {
-			tprint_arg_next();
-			tprints_arg_name_begin("tls");
+			tprints_arg_next_name_unconditionally("tls");
 			print_tls_arg(tcp, tcp->u_arg[ARG_TLS]);
-			tprint_arg_name_end();
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
-			tprint_arg_next();
-			tprints_arg_name_begin("child_tidptr");
+			tprints_arg_next_name_unconditionally("child_tidptr");
 			printaddr(tcp->u_arg[ARG_CTID]);
-			tprint_arg_name_end();
 		}
 		if ((flags & nsflags) && !syserror(tcp)) {
 			tcp->auxstr = get_namespace_auxstr(tcp->u_rval, flags, tcp);

@@ -108,6 +108,12 @@ tprint_array_index_end(void)
 }
 
 static inline void
+tprints_arg_begin(const char *name)
+{
+	STRACE_PRINTF("%s(", name);
+}
+
+static inline void
 tprint_arg_next(void)
 {
 	STRACE_PRINTS(", ");
@@ -117,6 +123,19 @@ static inline void
 tprint_arg_end(void)
 {
 	STRACE_PRINTS(")");
+}
+
+static inline void
+tprints_arg_name_unconditionally(const char *name)
+{
+	STRACE_PRINTF("%s=", name);
+}
+
+static inline void
+tprints_arg_next_name_unconditionally(const char *name)
+{
+	tprint_arg_next();
+	tprints_arg_name_unconditionally(name);
 }
 
 static inline void
@@ -269,23 +288,6 @@ static inline void
 tprints_field_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
-}
-
-static inline void
-tprints_arg_name_begin(const char *name)
-{
-	STRACE_PRINTF("%s=", name);
-}
-
-static inline void
-tprint_arg_name_end(void)
-{
-}
-
-static inline void
-tprints_arg_begin(const char *name)
-{
-	STRACE_PRINTF("%s(", name);
 }
 
 static inline void
