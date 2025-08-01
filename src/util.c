@@ -2003,18 +2003,6 @@ printargs(struct tcb *tcp)
 }
 
 int
-printargs_u(struct tcb *tcp)
-{
-	const unsigned int n = n_args(tcp);
-	for (unsigned int i = 0; i < n; ++i) {
-		if (i)
-			tprint_arg_next();
-		PRINT_VAL_U((unsigned int) tcp->u_arg[i]);
-	}
-	return RVAL_DECODED;
-}
-
-int
 printargs_d(struct tcb *tcp)
 {
 	const unsigned int n = n_args(tcp);
