@@ -1020,7 +1020,6 @@ extern void print_xlat_ex(uint64_t val, const char *str, uint32_t style);
 	print_xlat_ex((val_), #val_, XLAT_STYLE_FMT_D)
 
 extern int printargs(struct tcb *);
-extern int printargs_d(struct tcb *);
 
 extern int printflags_ex(uint64_t flags, const char *dflt,
 			 enum xlat_style, const struct xlat *, ...)
