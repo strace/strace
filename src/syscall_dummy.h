@@ -74,6 +74,7 @@
 # define sys_setfsgid16		sys_setfsuid16
 # define sys_setgid		sys_setuid
 # define sys_setgid16		sys_setuid16
+# define sys_setpgrp		sys_setpgid
 # define sys_setregid		sys_setreuid
 # define sys_setregid16		sys_setreuid16
 # define sys_setresgid		sys_setresuid
@@ -101,7 +102,6 @@
 # define sys_vhangup		printargs
 
 /* printargs_d does the right thing */
-# define sys_setpgrp		printargs_d
 # define sys_timer_delete	printargs_d
 # define sys_timer_getoverrun	printargs_d
 
