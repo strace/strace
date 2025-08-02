@@ -165,6 +165,7 @@ libstrace_a_SOURCES =	\
 	io_uring.c	\
 	ioctl.c		\
 	ioperm.c	\
+	iopl.c		\
 	ioprio.c	\
 	iovec.h		\
 	ipc.c \
