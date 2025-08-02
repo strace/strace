@@ -250,6 +250,7 @@ libstrace_a_SOURCES =	\
 	netlink_sock_diag.c \
 	netlink_sock_diag.h \
 	netlink_unix_diag.c \
+	nice.c		\
 	nlattr.c	\
 	nlattr.h	\
 	nsfs.c          \
