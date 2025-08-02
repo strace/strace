@@ -426,6 +426,14 @@ SYS_FUNC(timer_create)
 	return 0;
 }
 
+SYS_FUNC(timer_delete)
+{
+	tprints_arg_name("timerid");
+	PRINT_VAL_D((int) tcp->u_arg[0]);
+
+	return RVAL_DECODED;
+}
+
 static int
 do_timer_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {

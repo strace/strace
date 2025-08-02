@@ -83,6 +83,7 @@
 # define sys_swapoff		sys_chdir
 # define sys_symlink		sys_link
 # define sys_syncfs		sys_close
+# define sys_timer_getoverrun	sys_timer_delete
 # define sys_umount		sys_chdir
 # define sys_unlink		sys_chdir
 # define sys_uselib		sys_chdir
@@ -100,10 +101,6 @@
 # define sys_syscall		printargs
 # define sys_uretprobe		printargs
 # define sys_vhangup		printargs
-
-/* printargs_d does the right thing */
-# define sys_timer_delete	printargs_d
-# define sys_timer_getoverrun	printargs_d
 
 /* unimplemented */
 # define sys_afs_syscall		printargs
