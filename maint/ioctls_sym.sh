@@ -344,6 +344,14 @@ process_file()
 					;;
 			esac
 			;;
+		*asm/ioctls.h)
+			case "$uname_m" in
+				ppc*)
+					# Revert Linux commit v6.16-rc3~41^2.
+					sed 's/^\(#define[[:space:]]\+[^[:space:]]\+[[:space:]]\+\)0x[[:xdigit:]]\+[[:space:]]\+\/\*[[:space:]]\+\([^*]\+struct termio)\) \*\//\1\2/' \
+						< "$s" > "$tmpdir/$f"
+			esac
+			;;
 		*acpi/*|*linux/i2o.h|*media*/exynos-fimc.h|*media/v4l2-subdev.h|*net/bluetooth/*|net/nfc/nci_core.h)
 			# Fetch macros only.
 			grep "${r_define}${r_cmd_name}" < "$s" > "$tmpdir/$f"
@@ -375,6 +383,14 @@ process_file()
 			sed -E '/^enum drm_xe/,/^};/d' < "$s" > "$tmpdir/$f"
 			sed -En '/^enum drm_xe/,/^};/ s/^[[:space:]].*/&/p' < "$s" |
 			sed -n 's/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*_\(IO\|IOW\|IOR\|IOWR\|IOC\)[[:space:]]*(/#define \1 _\2(/
+				s/^\(#define .*)\),$/\1/p
+				s/^\(#define .*,\)$/\1 \\/p
+				s/^\([[:space:]]\+[^),]\+)\),$/\1/p' >> "$tmpdir/$f"
+			;;
+		*drm/nova_drm.h)
+			sed -E '/^enum /,/^};/d' < "$s" > "$tmpdir/$f"
+			sed -En '/^enum /,/^};/ s/^[[:space:]].*/&/p' < "$s" |
+			sed -n 's/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*\(DRM_\(IO\|IOW\|IOR\|IOWR\|IOC\)\)[[:space:]]*(/#define \1 \2(/
 				s/^\(#define .*)\),$/\1/p
 				s/^\(#define .*,\)$/\1 \\/p
 				s/^\([[:space:]]\+[^),]\+)\),$/\1/p' >> "$tmpdir/$f"
