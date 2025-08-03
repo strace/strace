@@ -91,12 +91,12 @@ fetch_msgrcv_args(struct tcb *const tcp, const kernel_ulong_t addr,
 		  kernel_ulong_t *const pair)
 {
 	if (current_wordsize == sizeof(*pair)) {
-		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(*pair), pair))
+		if (umoven(tcp, addr, 2 * sizeof(*pair), pair))
 			return -1;
 	} else {
 		unsigned int tmp[2];
 
-		if (umove_or_printaddr(tcp, addr, &tmp))
+		if (umove(tcp, addr, &tmp))
 			return -1;
 		pair[0] = tmp[0];
 		pair[1] = (int) tmp[1];
@@ -124,7 +124,9 @@ SYS_FUNC(msgrcv)
 				kernel_ulong_t pair[2];
 
 				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair)) {
-					tprint_arg_next();
+					tprints_arg_next_name("ipc_kludge");
+					printaddr(tcp->u_arg[3]);
+					tprints_arg_next_name("msgsz");
 					PRINT_VAL_U(tcp->u_arg[1]);
 				} else {
 					tprint_msgrcv(tcp, pair[0],
