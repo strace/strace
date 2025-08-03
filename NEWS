@@ -10,6 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of BR_*, CRYPTOCFGA_*, FUTEX2_*, IORING_*, IPSET_*, KVM_*,
     MDB_*, NETDEV_*, PR_*, RXRPC_*, SW_*, THERMAL_*, and V4L2_*
     constants.
+  * Updated lists of ioctl commands from Linux 6.16.
 
 Noteworthy changes in release 6.15 (2025-05-26)
 ===============================================
