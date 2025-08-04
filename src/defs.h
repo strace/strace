@@ -83,12 +83,10 @@ extern char *stpcpy(char *dst, const char *src);
  * linux/<ARCH>/syscallent*.h:
  *	all have nargs <= 6 except mips o32 which has nargs <= 7.
  */
-# ifndef MAX_ARGS
-#  ifdef LINUX_MIPSO32
-#   define MAX_ARGS	7
-#  else
-#   define MAX_ARGS	6
-#  endif
+# ifdef LINUX_MIPSO32
+#  define MAX_ARGS	7
+# else
+#  define MAX_ARGS	6
 # endif
 /* default sorting method for call profiling */
 # ifndef DEFAULT_SORTBY
