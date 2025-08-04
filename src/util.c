@@ -1995,8 +1995,11 @@ printargs(struct tcb *tcp)
 {
 	const unsigned int n = n_args(tcp);
 	for (unsigned int i = 0; i < n; ++i) {
-		if (i)
-			tprint_arg_next();
+		const char name[] = { 'a', 'r', 'g', "123456789"[i], '\0' };
+		if (i == 0)
+			tprints_arg_name(name);
+		else
+			tprints_arg_next_name(name);
 		PRINT_VAL_X(tcp->u_arg[i]);
 	}
 	return RVAL_DECODED;
