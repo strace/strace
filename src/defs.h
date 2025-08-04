@@ -404,7 +404,7 @@ struct tcb {
 
 extern const struct_sysent stub_sysent;
 # define tcp_sysent(tcp) (tcp->s_ent ?: &stub_sysent)
-# define n_args(tcp) (tcp_sysent(tcp)->nargs)
+# define n_args(tcp) MIN(tcp_sysent(tcp)->nargs, MAX_ARGS)
 
 # include "xlat.h"
 
