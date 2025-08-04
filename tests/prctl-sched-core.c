@@ -140,7 +140,8 @@ main(int argc, char *argv[])
 					else
 						printf("%p", uptrs[k]);
 				} else {
-					printf("NULL");
+					printf("%s",
+					       ops[i].decode_ptr ? "NULL" : "0");
 				}
 
 				printf(") = %s" INJ_STR "\n", errstr);

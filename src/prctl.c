@@ -655,8 +655,7 @@ SYS_FUNC(prctl)
 				/* arg5 is to be decoded on exiting */
 				return 0;
 			default:
-				tprint_arg_next();
-				printaddr(arg5);
+				print_prctl_args(tcp, 4);
 			}
 		} else {
 			/* PR_SCHED_CORE_GET */
