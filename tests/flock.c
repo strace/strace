@@ -20,7 +20,8 @@ main(void)
 	const unsigned long fd = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_flock, fd, LOCK_SH);
-	printf("flock(%d, LOCK_SH) = %s\n", (int) fd, sprintrc(rc));
+	printf("flock(fd=%d, op=LOCK_SH) = %s\n",
+	       (int) fd, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

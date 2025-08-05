@@ -151,7 +151,7 @@ fanotify_mark--secontext_mismatch	-a32 --secontext=mismatch -e trace=fanotify_ma
 fanotify_mark-Xabbrev	-a32 -Xabbrev -e trace=fanotify_mark
 fanotify_mark-Xraw	-a32 -Xraw -e trace=fanotify_mark
 fanotify_mark-Xverbose	-a32 -Xverbose -e trace=fanotify_mark
-fchdir	-a11
+fchdir	-a14 -N
 fchmod	-a15
 fchmod--secontext	-a15 --secontext -e trace=fchmod
 fchmod--secontext_full	-a15 --secontext=full -e trace=fchmod
@@ -192,7 +192,7 @@ file_handle--secontext_mismatch	--secontext=mismatch -e trace=name_to_handle_at,
 filter_seccomp	. "${srcdir=.}/filter_seccomp.sh"; test_prog_set --seccomp-bpf -f
 filter_seccomp-flag	../$NAME
 finit_module	-a25
-flock	-a19
+flock	-a25 --arg-names
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fsconfig	-s300 -y
 fsconfig-P	-s300 -y -P /dev/full -e trace=fsconfig
