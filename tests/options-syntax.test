@@ -381,12 +381,13 @@ $STRACE_EXE: $umsg" -u '!no such user!' -c -${c%%/*} true
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
 $STRACE_EXE: -n/--syscall-number has no effect with -c/--summary-only
+$STRACE_EXE: -N/--arg-names has no effect with -c/--summary-only
 $STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -t/--absolute-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u '!no such user!' -cinrtTyzZ true
+$STRACE_EXE: $umsg" -u '!no such user!' -cinNrtTyzZ true
 
 	if [ -n "$compiled_with_secontext" ]; then
 		check_e "--secontext has no effect with -c/--summary-only
