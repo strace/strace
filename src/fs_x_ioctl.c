@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014 Mike Frysinger <vapier@gentoo.org>
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

@@ -1,7 +1,7 @@
 /*
  * Check decoding of getsockopt and setsockopt for SOL_SOCKET level.
  *
- * Copyright (c) 2017-2023 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2017-2025 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2022-2024 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
  *

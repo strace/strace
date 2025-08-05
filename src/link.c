@@ -6,6 +6,7 @@
  * Copyright (c) 2006 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2006 Bernhard Kaindl <bk@suse.de>
  * Copyright (c) 2006-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2021-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

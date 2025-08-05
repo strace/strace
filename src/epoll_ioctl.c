@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2024 Eugene Syromyatnikov <evgsyr@gmail.com>.
+ * Copyright (c) 2024-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

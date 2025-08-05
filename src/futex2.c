@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 The strace developers.
+ * Copyright (c) 2021-2025 The strace developers.
  * Copyright (c) 2021 André Almeida <andrealmeid@collabora.com>
  * All rights reserved.
  *

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2020-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

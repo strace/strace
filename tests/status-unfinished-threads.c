@@ -2,6 +2,7 @@
  * Check status=unfinished filtering when a non-leader thread invokes execve.
  *
  * Copyright (c) 2019 Paul Chaignon <paul.chaignon@gmail.com>
+ * Copyright (c) 2019-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

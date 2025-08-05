@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2022 Sean Young <sean@mess.org>
+ * Copyright (c) 2022-2025 The strace developers.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
