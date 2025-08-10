@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 
+#include "test_fs_xflags.h"
+
 static const char *errstr;
 
 static int
@@ -151,28 +153,6 @@ main(int argc, const char *argv[])
 	do_ioctl_ptr(FS_IOC_FSSETXATTR, (char *) p_fsxattr + 1);
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR), (char *) p_fsxattr + 1, errstr);
-
-#define VALID_FS_XFLAGS 0x8001fffb
-#define INVALID_FS_XFLAGS 0x7ffe0004
-#define VALID_FS_XFLAGS_STR	\
-	"FS_XFLAG_REALTIME|" \
-	"FS_XFLAG_PREALLOC|" \
-	"FS_XFLAG_IMMUTABLE|" \
-	"FS_XFLAG_APPEND|" \
-	"FS_XFLAG_SYNC|" \
-	"FS_XFLAG_NOATIME|" \
-	"FS_XFLAG_NODUMP|" \
-	"FS_XFLAG_RTINHERIT|" \
-	"FS_XFLAG_PROJINHERIT|" \
-	"FS_XFLAG_NOSYMLINKS|" \
-	"FS_XFLAG_EXTSIZE|" \
-	"FS_XFLAG_EXTSZINHERIT|" \
-	"FS_XFLAG_NODEFRAG|" \
-	"FS_XFLAG_FILESTREAM|" \
-	"FS_XFLAG_DAX|" \
-	"FS_XFLAG_COWEXTSIZE|" \
-	"FS_XFLAG_HASATTR"
-#define INVALID_FS_XFLAGS_STR	"FS_XFLAG_???"
 
 	p_fsxattr->fsx_xflags = VALID_FS_XFLAGS;
 	p_fsxattr->fsx_extsize = 0xdeadbeefU;

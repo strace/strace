@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2020-2025 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
+#define VALID_FS_XFLAGS 0x8001fffb
+#define INVALID_FS_XFLAGS 0x7ffe0004
+#define VALID_FS_XFLAGS_STR	\
+	"FS_XFLAG_REALTIME|" \
+	"FS_XFLAG_PREALLOC|" \
+	"FS_XFLAG_IMMUTABLE|" \
+	"FS_XFLAG_APPEND|" \
+	"FS_XFLAG_SYNC|" \
+	"FS_XFLAG_NOATIME|" \
+	"FS_XFLAG_NODUMP|" \
+	"FS_XFLAG_RTINHERIT|" \
+	"FS_XFLAG_PROJINHERIT|" \
+	"FS_XFLAG_NOSYMLINKS|" \
+	"FS_XFLAG_EXTSIZE|" \
+	"FS_XFLAG_EXTSZINHERIT|" \
+	"FS_XFLAG_NODEFRAG|" \
+	"FS_XFLAG_FILESTREAM|" \
+	"FS_XFLAG_DAX|" \
+	"FS_XFLAG_COWEXTSIZE|" \
+	"FS_XFLAG_HASATTR"
+#define INVALID_FS_XFLAGS_STR	"FS_XFLAG_???"

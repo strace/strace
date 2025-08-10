@@ -887,6 +887,7 @@ EXTRA_DIST = \
 	sockaddr_xlat.c \
 	sockname.c \
 	stack-fcall.h \
+	test_fs_xflags.h \
 	time_enjoyment.h \
 	umode_t.c \
 	xchownx.c \
