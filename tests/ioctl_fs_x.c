@@ -152,10 +152,29 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR), (char *) p_fsxattr + 1, errstr);
 
-#define VALID_FSX_XFLAGS 0x8001fffb
-#define INVALID_FSX_XFLAGS 0x7ffe0004
+#define VALID_FS_XFLAGS 0x8001fffb
+#define INVALID_FS_XFLAGS 0x7ffe0004
+#define VALID_FS_XFLAGS_STR	\
+	"FS_XFLAG_REALTIME|" \
+	"FS_XFLAG_PREALLOC|" \
+	"FS_XFLAG_IMMUTABLE|" \
+	"FS_XFLAG_APPEND|" \
+	"FS_XFLAG_SYNC|" \
+	"FS_XFLAG_NOATIME|" \
+	"FS_XFLAG_NODUMP|" \
+	"FS_XFLAG_RTINHERIT|" \
+	"FS_XFLAG_PROJINHERIT|" \
+	"FS_XFLAG_NOSYMLINKS|" \
+	"FS_XFLAG_EXTSIZE|" \
+	"FS_XFLAG_EXTSZINHERIT|" \
+	"FS_XFLAG_NODEFRAG|" \
+	"FS_XFLAG_FILESTREAM|" \
+	"FS_XFLAG_DAX|" \
+	"FS_XFLAG_COWEXTSIZE|" \
+	"FS_XFLAG_HASATTR"
+#define INVALID_FS_XFLAGS_STR	"FS_XFLAG_???"
 
-	p_fsxattr->fsx_xflags = VALID_FSX_XFLAGS;
+	p_fsxattr->fsx_xflags = VALID_FS_XFLAGS;
 	p_fsxattr->fsx_extsize = 0xdeadbeefU;
 	p_fsxattr->fsx_projid = 0xcafef00dU;
 	p_fsxattr->fsx_cowextsize = 0xbabec0deU;
@@ -164,15 +183,7 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, {fsx_xflags=%s, fsx_extsize=%u, fsx_projid=%#x"
 	       ", fsx_cowextsize=%u}) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR),
-	       XLAT_KNOWN(VALID_FSX_XFLAGS,
-			  "FS_XFLAG_REALTIME|FS_XFLAG_PREALLOC|"
-			  "FS_XFLAG_IMMUTABLE|FS_XFLAG_APPEND|"
-			  "FS_XFLAG_SYNC|FS_XFLAG_NOATIME|"
-			  "FS_XFLAG_NODUMP|FS_XFLAG_RTINHERIT|"
-			  "FS_XFLAG_PROJINHERIT|FS_XFLAG_NOSYMLINKS|"
-			  "FS_XFLAG_EXTSIZE|FS_XFLAG_EXTSZINHERIT|"
-			  "FS_XFLAG_NODEFRAG|FS_XFLAG_FILESTREAM|"
-			  "FS_XFLAG_DAX|FS_XFLAG_COWEXTSIZE|FS_XFLAG_HASATTR"),
+	       XLAT_KNOWN(VALID_FS_XFLAGS, VALID_FS_XFLAGS_STR),
 	       p_fsxattr->fsx_extsize,
 	       p_fsxattr->fsx_projid,
 	       p_fsxattr->fsx_cowextsize,
@@ -184,7 +195,7 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, {fsx_xflags=%s, fsx_extsize=%u, fsx_projid=%#x"
 	       ", fsx_cowextsize=%u}) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR),
-	       XLAT_UNKNOWN(INVALID_FSX_XFLAGS, "FS_XFLAG_???"),
+	       XLAT_UNKNOWN(INVALID_FS_XFLAGS, INVALID_FS_XFLAGS_STR),
 	       p_fsxattr->fsx_extsize,
 	       p_fsxattr->fsx_projid,
 	       p_fsxattr->fsx_cowextsize,
@@ -195,7 +206,7 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FSGETXATTR), (char *) p_fsxattr + 1, errstr);
 
-	p_fsxattr->fsx_xflags = VALID_FSX_XFLAGS;
+	p_fsxattr->fsx_xflags = VALID_FS_XFLAGS;
 	p_fsxattr->fsx_nextents = 0xfacefeedU;
 
 	if (do_ioctl_ptr(FS_IOC_FSGETXATTR, p_fsxattr) < 0) {
@@ -206,15 +217,7 @@ main(int argc, const char *argv[])
 		       ", fsx_nextents=%u, fsx_projid=%#x"
 		       ", fsx_cowextsize=%u}) = %s\n",
 		       XLAT_STR(FS_IOC_FSGETXATTR),
-		       XLAT_KNOWN(VALID_FSX_XFLAGS,
-				  "FS_XFLAG_REALTIME|FS_XFLAG_PREALLOC|"
-				  "FS_XFLAG_IMMUTABLE|FS_XFLAG_APPEND|"
-				  "FS_XFLAG_SYNC|FS_XFLAG_NOATIME|"
-				  "FS_XFLAG_NODUMP|FS_XFLAG_RTINHERIT|"
-				  "FS_XFLAG_PROJINHERIT|FS_XFLAG_NOSYMLINKS|"
-				  "FS_XFLAG_EXTSIZE|FS_XFLAG_EXTSZINHERIT|"
-				  "FS_XFLAG_NODEFRAG|FS_XFLAG_FILESTREAM|"
-				  "FS_XFLAG_DAX|FS_XFLAG_COWEXTSIZE|FS_XFLAG_HASATTR"),
+		       XLAT_KNOWN(VALID_FS_XFLAGS, VALID_FS_XFLAGS_STR),
 		       p_fsxattr->fsx_extsize,
 		       p_fsxattr->fsx_nextents,
 		       p_fsxattr->fsx_projid,
@@ -232,7 +235,7 @@ main(int argc, const char *argv[])
 		       ", fsx_nextents=%u, fsx_projid=%#x"
 		       ", fsx_cowextsize=%u}) = %s\n",
 		       XLAT_STR(FS_IOC_FSGETXATTR),
-		       XLAT_UNKNOWN(INVALID_FSX_XFLAGS, "FS_XFLAG_???"),
+		       XLAT_UNKNOWN(INVALID_FS_XFLAGS, INVALID_FS_XFLAGS_STR),
 		       p_fsxattr->fsx_extsize,
 		       p_fsxattr->fsx_nextents,
 		       p_fsxattr->fsx_projid,
