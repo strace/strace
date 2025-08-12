@@ -275,6 +275,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set,
 	case SEN_fchmodat:
 	case SEN_fchmodat2:
 	case SEN_fchownat:
+	case SEN_file_getattr:
+	case SEN_file_setattr:
 	case SEN_fspick:
 	case SEN_fstatat64:
 	case SEN_futimesat:

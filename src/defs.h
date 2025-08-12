@@ -415,6 +415,7 @@ extern const struct xlat dirent_types[];
 extern const struct xlat ethernet_protocols[];
 extern const struct xlat evdev_abs[];
 extern const struct xlat evdev_ev[];
+extern const struct xlat fs_xflags[];
 extern const struct xlat fsmagic[];
 extern const struct xlat futexbitset[];
 extern const struct xlat iffflags[];

@@ -128,6 +128,7 @@ libstrace_a_SOURCES =	\
 	fetch_struct_stat64.c \
 	fetch_struct_statfs.c \
 	fetch_struct_xfs_quotastat.c \
+	file_attr.c	\
 	file_handle.c	\
 	filter.h	\
 	filter_qualify.c \
