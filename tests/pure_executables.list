@@ -281,6 +281,7 @@ ioctl_kd-Xverbose
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
+ioctl_kvm_run_auxstr_vcpu_more
 ioctl_lirc
 ioctl_loop
 ioctl_mtd

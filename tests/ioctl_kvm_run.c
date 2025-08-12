@@ -10,7 +10,8 @@
 #if need_print_KVM_RUN
 
 static void
-print_KVM_RUN(const int fd, const char *const dev, const unsigned int reason)
+print_KVM_RUN(const int fd, const char *const dev,
+	      const struct kvm_run *run_before, const struct kvm_run *run_after)
 {
 	printf("ioctl(%d<%s>, KVM_RUN, 0) = 0\n", fd, dev);
 }

@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2025 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+#define print_KVM_RUN_MORE print_KVM_RUN_MORE
+
+#include "ioctl_kvm_run_auxstr_vcpu.c"
+
+#if need_print_KVM_RUN
+static void
+print_KVM_RUN_MORE(const int fd, const char *const dev, const char *str,
+		   const struct kvm_run *run_before, const struct kvm_run *run_after)
+{
+	printf(" VCPU:0> " "{request_interrupt_window=%u, immediate_exit=%u",
+	       run_before->request_interrupt_window, run_before->immediate_exit);
+	printf(", exit_reason=%d /* %s */, "
+	       "ready_for_interrupt_injection=%u, if_flag=%u, flags=%u",
+	       run_after->exit_reason, str,
+	       run_after->ready_for_interrupt_injection, run_after->if_flag,
+	       run_after->flags);
+	printf(", cr8=%#016llx", run_before->cr8);
+	if (run_before->cr8 != run_after->cr8)
+		printf(" => %#016llx", run_after->cr8);
+	printf(", apic_base=%#016llx", run_before->apic_base);
+	if (run_before->apic_base != run_after->apic_base)
+		printf(" => %#016llx", run_after->apic_base);
+	puts("}");
+}
+#endif
