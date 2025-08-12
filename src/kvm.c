@@ -466,7 +466,7 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 		} \
 	} while (0)
 
-	/* If the last KVM_RUN fails, decodin the kvm_run struct
+	/* If the last KVM_RUN failed, decoding the kvm_run struct
 	 * doesn't make sense. */
 	if (syserror(tcp))
 		return;
@@ -477,6 +477,7 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 		tprintf_string(" VCPU:%d> ", info->cpuid);
 	else
 		tprints_string(" VCPU> ");
+
 	tprint_struct_begin();
 
 	/* IN */
