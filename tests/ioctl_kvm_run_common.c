@@ -173,7 +173,8 @@ print_kvm_regs(const struct kvm_regs *regs)
 # define need_print_KVM_RUN 1
 
 static void
-print_KVM_RUN(const int fd, const char *const dev, const unsigned int reason);
+print_KVM_RUN(const int fd, const char *const dev,
+	      const struct kvm_run *run_before, const struct kvm_run *run_after);
 
 static void
 run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
@@ -215,8 +216,9 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 
 	/* Repeatedly run code and handle VM exits. */
 	for (;;) {
+		const struct kvm_run run_before = *run;
 		KVM_IOCTL(vcpu_fd, KVM_RUN, NULL);
-		print_KVM_RUN(vcpu_fd, vcpu_dev, run->exit_reason);
+		print_KVM_RUN(vcpu_fd, vcpu_dev, &run_before, run);
 
 		switch (run->exit_reason) {
 		case KVM_EXIT_HLT:
