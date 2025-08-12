@@ -324,6 +324,19 @@ kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
+static bool
+kvm_ioctl_run_umove(struct tcb *const tcp, struct vcpu_info *info,
+		    struct kvm_run *buf)
+{
+	if (info->mmap_len < sizeof(*buf))
+		return false;
+
+	if (umove(tcp, info->mmap_addr, buf) < 0)
+		return false;
+
+	return true;
+}
+
 # include "xlat/kvm_exit_reason.h"
 static void
 kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
@@ -332,10 +345,7 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 {
 	static struct kvm_run vcpu_run_struct;
 
-	if (info->mmap_len < sizeof(vcpu_run_struct))
-		return;
-
-	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0)
+	if (!kvm_ioctl_run_umove(tcp, info, &vcpu_run_struct))
 		return;
 
 	tcp->auxstr = xlookup(kvm_exit_reason, vcpu_run_struct.exit_reason);
