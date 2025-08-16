@@ -78,8 +78,8 @@ __asm__(
 	"	mov $0xd80003f8, %edx	\n"
 	"	mov $'\n', %al		\n"
 	"	out %al, (%dx)		\n"
-	"	mov $0xd8002000, %ebx	\n"
-	"	movb $0xdf, (%ebx)	\n"
+	"	mov $0xd8002000, %edx	\n"
+	"	mov $0xd80000df, (%edx)	\n"
 	"	hlt			\n"
 	".size code, . - code		\n"
 	".type code_size, @object	\n"
@@ -235,7 +235,8 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 			if (!(p == NULL
 			      && run->mmio.phys_addr == 0x2000
 			      && run->mmio.data[0] == 0xdf
-			      && run->mmio.len == 1
+			      && run->mmio.data[1] == 0x00
+			      && run->mmio.len == 2
 			      && run->mmio.is_write == 1))
 				error_msg_and_fail("Got an unexpected MMIO exit:"
 						   " phys_addr %#llx,"
