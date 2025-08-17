@@ -73,12 +73,19 @@ extern const char code[];
 extern const unsigned short code_size;
 
 __asm__(
+	/* The VM is in real mode. */
 	".type code, @object		\n"
+	".code16			\n"
 	"code:				\n"
-	"	mov $0xd80003f8, %edx	\n"
-	"	mov $'\n', %al		\n"
+	"	mov $0x03f8, %dx	\n"
+	"	movb $'\n', %al		\n"
 	"	out %al, (%dx)		\n"
 	"	hlt			\n"
+# ifdef __x86_64__
+	".code64			\n"
+# else
+	".code32			\n"
+# endif
 	".size code, . - code		\n"
 	".type code_size, @object	\n"
 	"code_size:			\n"
