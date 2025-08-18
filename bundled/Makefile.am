@@ -123,6 +123,8 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
+	linux/include/uapi/linux/spi/spi.h \
+	linux/include/uapi/linux/spi/spidev.h \
 	linux/include/uapi/linux/stat.h \
 	linux/include/uapi/linux/stddef.h \
 	linux/include/uapi/linux/taskstats.h \
