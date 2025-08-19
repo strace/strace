@@ -856,6 +856,7 @@ EXTRA_DIST = \
 	cur_audit_arch.h \
 	fadvise.h \
 	fcntl-common.c \
+	file_xetattr-common.c \
 	fstatat.c \
 	fstatx.c \
 	gen_pure_executables.sh \

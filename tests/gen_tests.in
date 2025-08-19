@@ -184,11 +184,26 @@ fcntl--pidns-translation	test_pidns -a8 -e trace=fcntl
 fcntl64	-a8
 fcntl64--pidns-translation	test_pidns -a8 -e trace=fcntl64
 fdatasync	-a14
+file_getattr	-a33
+file_getattr-P	-a33 --trace=file_getattr -P /dev/full
+file_getattr-success	-a33 --inject=file_getattr:retval=42 --trace=file_getattr
+file_getattr-success-Xabbrev	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xabbrev
+file_getattr-success-Xraw	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xraw
+file_getattr-success-Xverbose	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xverbose
+file_getattr-y	-a34 --trace=file_getattr -y
+file_getattr-yy	-a34 --trace=file_getattr -yy
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
 file_handle--secontext	--secontext -e trace=name_to_handle_at,open_by_handle_at
 file_handle--secontext_full	--secontext=full -e trace=name_to_handle_at,open_by_handle_at
 file_handle--secontext_full_mismatch	--secontext=full,mismatch -e trace=name_to_handle_at,open_by_handle_at
 file_handle--secontext_mismatch	--secontext=mismatch -e trace=name_to_handle_at,open_by_handle_at
+file_setattr	-a33
+file_setattr-P	-a33 --trace=file_setattr -P /dev/full
+file_setattr-Xabbrev	-a33 --trace=file_setattr -Xabbrev
+file_setattr-Xraw	-a33 --trace=file_setattr -Xraw
+file_setattr-Xverbose	-a33 --trace=file_setattr -Xverbose
+file_setattr-y	-a34 --trace=file_setattr -y
+file_setattr-yy	-a34 --trace=file_setattr -yy
 filter_seccomp	. "${srcdir=.}/filter_seccomp.sh"; test_prog_set --seccomp-bpf -f
 filter_seccomp-flag	../$NAME
 finit_module	-a25
