@@ -44,3 +44,11 @@ SCM_TS_OPT_ID	0x404c
 #else
 SCM_TS_OPT_ID	0x51
 #endif
+
+#if defined __sparc__
+SCM_INQ	0x5d
+#elif defined __hppa__
+SCM_INQ	0x4052
+#else
+SCM_INQ	0x54
+#endif
