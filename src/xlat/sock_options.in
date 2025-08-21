@@ -599,3 +599,11 @@ SO_PASSRIGHTS	16465
 #else
 SO_PASSRIGHTS	83
 #endif
+
+#if defined __sparc__
+SO_INQ	93
+#elif defined __hppa__
+SO_INQ	16466
+#else
+SO_INQ	84
+#endif

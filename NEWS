@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of file_getattr and file_setattr syscalls.
+  * Implemented decoding of SO_INQ socket option.
 
 Noteworthy changes in release 6.16 (2025-08-05)
 ===============================================
