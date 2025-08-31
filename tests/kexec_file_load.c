@@ -46,13 +46,14 @@ main(void)
 		sizeof(cmdline_short_str) + 1,
 	};
 	static const struct strval flags[] = {
-		{ (kernel_ulong_t) 0xbadc0dedda7a1050ULL,
+		{ (kernel_ulong_t) 0xbadc0dedda7a1040ULL,
 			"0xbadc0ded", "0x",
-			"da7a1050 /* KEXEC_FILE_??? */" },
+			"da7a1040 /* KEXEC_FILE_??? */" },
 		{ 0, "", "", "0" },
-		{ 0xdeadbeef, "", "",
+		{ 0xdeadbeff, "", "",
 			"KEXEC_FILE_UNLOAD|KEXEC_FILE_ON_CRASH|"
-			"KEXEC_FILE_NO_INITRAMFS|KEXEC_FILE_DEBUG|0xdeadbee0" },
+			"KEXEC_FILE_NO_INITRAMFS|KEXEC_FILE_DEBUG|"
+			"KEXEC_FILE_NO_CMA|0xdeadbee0" },
 	};
 
 
