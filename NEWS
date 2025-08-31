@@ -4,8 +4,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented decoding of file_getattr and file_setattr syscalls.
   * Implemented decoding of SO_INQ socket option.
-  * Updated lists of BPF_*, BTN_*, BTRFS_*, ETHTOOL_*, FALLOC_*, KEY_*, SCM_*,
-    and XDP_* constants.
+  * Updated lists of BPF_*, BTN_*, BTRFS_*, DEVCONF_*, ETHTOOL_*, FALLOC_*,
+    KEY_*, SCM_*, and XDP_* constants.
 
 Noteworthy changes in release 6.16 (2025-08-05)
 ===============================================
