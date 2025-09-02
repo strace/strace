@@ -22,9 +22,17 @@ main(void)
 	prctl_marker();
 
 	rc = syscall(__NR_prctl, PR_SET_SYSCALL_USER_DISPATCH,
-		     PR_SYS_DISPATCH_ON,
+		     PR_SYS_DISPATCH_EXCLUSIVE_ON,
 		     (kernel_ulong_t) 0xdeadbeeffacefeedULL, 0, 0);
-	printf("prctl(PR_SET_SYSCALL_USER_DISPATCH, PR_SYS_DISPATCH_ON, %#llx"
+	printf("prctl(PR_SET_SYSCALL_USER_DISPATCH, PR_SYS_DISPATCH_EXCLUSIVE_ON, %#llx"
+	       ", 0, NULL) = %s\n",
+	       (unsigned long long) (kernel_ulong_t) 0xdeadbeeffacefeedULL,
+	       sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_SET_SYSCALL_USER_DISPATCH,
+		     PR_SYS_DISPATCH_INCLUSIVE_ON,
+		     (kernel_ulong_t) 0xdeadbeeffacefeedULL, 0, 0);
+	printf("prctl(PR_SET_SYSCALL_USER_DISPATCH, PR_SYS_DISPATCH_INCLUSIVE_ON, %#llx"
 	       ", 0, NULL) = %s\n",
 	       (unsigned long long) (kernel_ulong_t) 0xdeadbeeffacefeedULL,
 	       sprintrc(rc));
@@ -48,9 +56,9 @@ main(void)
 	       sprintrc(rc));
 
 	const char dummy = 'a';
-	rc = syscall(__NR_prctl, PR_SET_SYSCALL_USER_DISPATCH, 2, 1, 1, &dummy);
+	rc = syscall(__NR_prctl, PR_SET_SYSCALL_USER_DISPATCH, 3, 1, 1, &dummy);
 	printf("prctl(PR_SET_SYSCALL_USER_DISPATCH"
-	       ", 0x2 /* PR_SYS_DISPATCH_??? */, 0x1, 0x1, %p) = %s\n",
+	       ", 0x3 /* PR_SYS_DISPATCH_??? */, 0x1, 0x1, %p) = %s\n",
 	       &dummy, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
