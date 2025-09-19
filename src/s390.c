@@ -19,7 +19,7 @@
 
 /*
  * Since, for some reason, kernel doesn't expose all these nice constants and
- * structures in UAPI, we have to re-declare them ourselves.
+ * structures in UAPI, we have to declare them ourselves.
  */
 
 /**

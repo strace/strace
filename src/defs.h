@@ -1097,7 +1097,7 @@ typedef void (*print_obj_by_addr_size_fn)(struct tcb *,
  * @param opaque_data      A value that is unconditionally passed to print_func
  *                         in the opaque_data argument.
  * @param flags            Combination of xlat style settings and additional
- *                         flags from enum print_array_flags that are appled
+ *                         flags from enum print_array_flags that are applied
  *                         to index printing.
  * @param index_xlat       xlat that is used for printing indices.
  * @param index_dflt       Default string for the values not found

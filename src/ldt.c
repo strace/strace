@@ -145,7 +145,7 @@ SYS_FUNC(modify_ldt)
 	}
 
 	/*
-	 * For some reason ("tht ABI for sys_modify_ldt() expects
+	 * For some reason ("the ABI for sys_modify_ldt() expects
 	 * 'int'"), modify_ldt clips higher bits on x86_64.
 	 */
 
