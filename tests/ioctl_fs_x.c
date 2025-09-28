@@ -1,7 +1,7 @@
 /*
  * Check decoding of linux/fs.h 'X' ioctl commands.
  *
- * Copyright (c) 2020-2021 The strace developers.
+ * Copyright (c) 2020-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
