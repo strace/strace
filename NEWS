@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of BPF_*, BTN_*, BTRFS_*, DEVCONF_*, ETHTOOL_*, FALLOC_*,
     KEXEC_*, KEY_*, KVM_*, NETCONFA_*, NFT_*, PR_*, SCM_*, V4L2_*, and XDP_*
     constants.
+  * Updated lists of ioctl commands from Linux 6.17.
 
 Noteworthy changes in release 6.16 (2025-08-05)
 ===============================================
