@@ -26,7 +26,7 @@ struct vcpu_info {
 	bool resolved;
 };
 
-static bool dump_kvm_run_structure;
+static bool decode_kvm_run_structure;
 
 static struct vcpu_info *
 vcpu_find(struct tcb *const tcp, int fd)
@@ -177,7 +177,7 @@ kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp)) {
 		tprints_arg_next_name("argp");
 		PRINT_VAL_U(cpuid);
-		if (dump_kvm_run_structure)
+		if (decode_kvm_run_structure)
 			return 0;
 	} else if (!syserror(tcp)) {
 		vcpu_register(tcp, tcp->u_rval, cpuid);
@@ -355,7 +355,7 @@ kvm_ioctl_decode_run(struct tcb *const tcp)
 	if (syserror(tcp))
 		return r;
 
-	if (dump_kvm_run_structure) {
+	if (decode_kvm_run_structure) {
 		tcp->auxstr = NULL;
 		int fd = tcp->u_arg[0];
 		struct vcpu_info *info = vcpu_get_info(tcp, fd);
@@ -422,7 +422,7 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 void
 kvm_run_structure_decoder_init(void)
 {
-	dump_kvm_run_structure = true;
+	decode_kvm_run_structure = true;
 	mmap_cache_enable();
 }
 
