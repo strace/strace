@@ -16,6 +16,7 @@
 # include "arch_kvm.c"
 # include "xmalloc.h"
 # include "mmap_cache.h"
+# include "xlat/kvm_exit_io.h"
 
 struct vcpu_info {
 	struct vcpu_info *next;
@@ -26,7 +27,7 @@ struct vcpu_info {
 	bool resolved;
 };
 
-static bool dump_kvm_run_structure;
+enum decode_kvm_run_structure_modes decode_kvm_run_structure;
 
 static struct vcpu_info *
 vcpu_find(struct tcb *const tcp, int fd)
@@ -65,6 +66,11 @@ kvm_vcpu_info_free(struct tcb *tcp)
 	}
 
 	tcp->vcpu_info_list = NULL;
+	tcp->vcpu_leaving = NULL;
+	if (tcp->vcpu_entering) {
+		free(tcp->vcpu_entering);
+		tcp->vcpu_entering = NULL;
+	}
 }
 
 static void
@@ -177,7 +183,7 @@ kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp)) {
 		tprints_arg_next_name("argp");
 		PRINT_VAL_U(cpuid);
-		if (dump_kvm_run_structure)
+		if (decode_kvm_run_structure)
 			return 0;
 	} else if (!syserror(tcp)) {
 		vcpu_register(tcp, tcp->u_rval, cpuid);
@@ -324,6 +330,19 @@ kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
+static bool
+kvm_ioctl_run_umove(struct tcb *const tcp, struct vcpu_info *info,
+		    struct kvm_run *buf)
+{
+	if (info->mmap_len < sizeof(*buf))
+		return false;
+
+	if (umove(tcp, info->mmap_addr, buf) < 0)
+		return false;
+
+	return true;
+}
+
 # include "xlat/kvm_exit_reason.h"
 static void
 kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
@@ -332,30 +351,41 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 {
 	static struct kvm_run vcpu_run_struct;
 
-	if (info->mmap_len < sizeof(vcpu_run_struct))
-		return;
-
-	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0)
+	if (!kvm_ioctl_run_umove(tcp, info, &vcpu_run_struct))
 		return;
 
 	tcp->auxstr = xlookup(kvm_exit_reason, vcpu_run_struct.exit_reason);
 	if (!tcp->auxstr)
 		tcp->auxstr = "KVM_EXIT_???";
+	if (decode_kvm_run_structure > DECODE_KVM_RUN_STRUCTURE_EXIT_REASON)
+		tcp->vcpu_leaving = &vcpu_run_struct;
 }
 
 static int
 kvm_ioctl_decode_run(struct tcb *const tcp)
 {
 
-	if (entering(tcp))
+	if (entering(tcp)) {
+		if (decode_kvm_run_structure > DECODE_KVM_RUN_STRUCTURE_EXIT_REASON) {
+			int fd = tcp->u_arg[0];
+			struct vcpu_info *info = vcpu_get_info(tcp, fd);
+			if (info) {
+				if (!tcp->vcpu_entering)
+					tcp->vcpu_entering
+						= xzalloc(sizeof(*tcp->vcpu_entering));
+				kvm_ioctl_run_umove(tcp, info,
+						    tcp->vcpu_entering);
+			}
+		}
 		return 0;
+	}
 
 	int r = RVAL_DECODED;
 
 	if (syserror(tcp))
 		return r;
 
-	if (dump_kvm_run_structure) {
+	if (decode_kvm_run_structure) {
 		tcp->auxstr = NULL;
 		int fd = tcp->u_arg[0];
 		struct vcpu_info *info = vcpu_get_info(tcp, fd);
@@ -419,10 +449,127 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 	}
 }
 
-void
-kvm_run_structure_decoder_init(void)
+static void
+kvm_run_structure_decode_io(struct tcb *tcp,
+			      struct kvm_run *state)
 {
-	dump_kvm_run_structure = true;
+	tprints_field_name("io");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(state->io, direction, kvm_exit_io, "KVM_EXIT_IO_???");
+	tprint_struct_next();
+	PRINT_FIELD_0X(state->io, port);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->io, count);
+	tprint_struct_next();
+	PRINT_FIELD_0X(state->io, data_offset);
+	tprint_struct_end();
+}
+
+static void
+kvm_run_structure_decode_mmio(struct tcb *tcp,
+			      struct kvm_run *state)
+{
+	tprints_field_name("mmio");
+	tprint_struct_begin();
+	PRINT_FIELD_0X(state->mmio, phys_addr);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(state->mmio, data, tcp, print_xint_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->mmio, len);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->mmio, is_write);
+	tprint_struct_end();
+}
+
+static void
+kvm_run_structure_decode_main(struct tcb *tcp,
+			      struct kvm_run *state_in,
+			      struct kvm_run *state_out)
+{
+	int fd;
+	struct vcpu_info *info;
+
+# define PRINT_FIELD_BEFRE_AFTER(fmt, before_, after_, field_)	\
+	do {							\
+		tprints_field_name(#field_);			\
+		PRINT_VAL_##fmt((before_).field_);		\
+		if ((before_).field_ != (after_).field_) {	\
+			tprint_value_changed();			\
+			PRINT_VAL_##fmt((after_).field_);	\
+		} \
+	} while (0)
+
+	/* If the last KVM_RUN failed, decoding the kvm_run struct
+	 * doesn't make sense. */
+	if (syserror(tcp))
+		return;
+
+	fd = tcp->u_arg[0];
+	info = vcpu_get_info(tcp, fd);
+	if (info)
+		tprintf_string(" VCPU:%d> ", info->cpuid);
+	else
+		tprints_string(" VCPU> ");
+
+	tprint_struct_begin();
+
+	/* IN */
+	PRINT_FIELD_U(*state_in, request_interrupt_window);
+	tprint_struct_next();
+	PRINT_FIELD_U(*state_in, immediate_exit);
+	tprint_struct_next();
+
+	/* OUT */
+	PRINT_FIELD_U(*state_out, exit_reason);
+	if (tcp->auxstr)
+		tprintf_string(" (%s)", tcp->auxstr);
+	tprint_struct_next();
+	PRINT_FIELD_U(*state_out, ready_for_interrupt_injection);
+	tprint_struct_next();
+	PRINT_FIELD_U(*state_out, if_flag);
+	tprint_struct_next();
+	PRINT_FIELD_U(*state_out, flags);
+	tprint_struct_next();
+
+	/* INOUT */
+	PRINT_FIELD_BEFRE_AFTER(0X, *state_in, *state_out, cr8);
+	tprint_struct_next();
+	PRINT_FIELD_BEFRE_AFTER(0X, *state_in, *state_out, apic_base);
+
+#define DECODE_UNION(FORM)			\
+	tprint_struct_next();			\
+	tprint_union_begin();			\
+	FORM;					\
+	tprint_union_end()
+
+	switch (state_out->exit_reason) {
+	case KVM_EXIT_IO:
+		DECODE_UNION(kvm_run_structure_decode_io(tcp, state_out));
+		break;
+	case KVM_EXIT_MMIO:
+		DECODE_UNION(kvm_run_structure_decode_mmio(tcp, state_out));
+		break;
+	}
+
+	tprint_struct_end();
+	tprint_newline();
+}
+
+void
+kvm_run_structure_decode(struct tcb * tcp)
+{
+	if (!tcp->vcpu_leaving || !tcp->vcpu_entering)
+		return;
+
+	kvm_run_structure_decode_main(tcp, tcp->vcpu_entering,
+				      tcp->vcpu_leaving);
+	tcp->vcpu_leaving = NULL;
+}
+
+void
+kvm_run_structure_decoder_init(enum decode_kvm_run_structure_modes mode)
+{
+	decode_kvm_run_structure = mode;
 	mmap_cache_enable();
 }
 
