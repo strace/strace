@@ -1024,10 +1024,11 @@ Prints thread, process, process group, and session IDs in strace's PID namespace
 if the tracee is in a different PID namespace.
 .RE
 .TP
-.BR "\-e\ kvm" = vcpu
+.BR "\-e\ kvm" = vcpu|vcpu+
 .TQ
-.BR "\-\-kvm" = vcpu
-Prints the exit reason of kvm vcpu.
+.BR "\-\-kvm" = vcpu|vcpu+
+Prints the exit reason of kvm vcpu (=\fBvcpu\fR), or
+prints the whole kvm_run struct including the reason (=\fBvcpu+\fR).
 Requires Linux kernel version 4.16.0 or higher.
 .TP
 .BR "\-e\ namespace" = new

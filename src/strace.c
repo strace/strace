@@ -376,8 +376,8 @@ Output format:\n\
   -e quiet=SET, --quiet=SET\n\
                  suppress various informational messages\n\
      messages:   attach, exit, path-resolution, personality, thread-execve\n\
-  -e kvm=vcpu, --kvm=vcpu\n\
-                 print exit reason of kvm vcpu\n\
+  -e kvm=vcpu[+], --kvm=vcpu[+]\n\
+                 print exit reason of kvm vcpu ('+' for printing kvm_run struct)\n\
   -e namespace=new, --namespace=new\n\
                  print namespace IDs that the tracee enters\n\
   -e decode-fds=SET, --decode-fds=SET\n\

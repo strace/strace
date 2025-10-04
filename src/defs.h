@@ -319,6 +319,8 @@ struct tcb {
 
 # ifdef HAVE_LINUX_KVM_H
 	struct vcpu_info *vcpu_info_list;
+	struct kvm_run *vcpu_leaving;
+	struct kvm_run *vcpu_entering;
 # endif
 
 # ifdef ENABLE_STACKTRACE
@@ -565,6 +567,7 @@ extern enum stack_trace_modes stack_trace_mode;
 enum decode_kvm_run_structure_modes {
 	DECODE_KVM_RUN_STRUCTURE_OFF,
 	DECODE_KVM_RUN_STRUCTURE_EXIT_REASON,
+	DECODE_KVM_RUN_STRUCTURE_MORE,
 };
 # ifdef HAVE_LINUX_KVM_H
 extern enum decode_kvm_run_structure_modes decode_kvm_run_structure;
@@ -1603,6 +1606,7 @@ extern void unwind_tcb_capture(struct tcb *);
 # ifdef HAVE_LINUX_KVM_H
 extern void kvm_run_structure_decoder_init(enum decode_kvm_run_structure_modes);
 extern void kvm_vcpu_info_free(struct tcb *);
+extern void kvm_run_structure_decode(struct tcb *);
 # endif
 
 extern void namespace_auxstr_init(void);
