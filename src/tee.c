@@ -8,18 +8,6 @@
 #include "defs.h"
 #include <linux/tee.h>
 
-/* Not in UAPI.  */
-struct tee_ioctl_shm_register_fd_data {
-	int64_t fd;
-	uint64_t size;
-	uint32_t flags;
-	uint8_t _pad1[4];
-	int32_t id;
-	uint8_t _pad2[4];
-} ATTRIBUTE_ALIGNED(8);
-
-#define TEE_IOC_SHM_REGISTER_FD _IOWR(0xa4, 8, struct tee_ioctl_shm_register_fd_data)
-
 #include "xlat/tee_ioctl_gen_caps.h"
 #include "xlat/tee_ioctl_impl_ids.h"
 #include "xlat/tee_ioctl_login_types.h"

@@ -29,19 +29,6 @@
 # define TEE_IOCTL_SHM_DMA_BUF 0x2
 #endif
 
-/* Not in mainline.  */
-struct tee_ioctl_shm_register_fd_data {
-	__s64 fd;
-	__u64 size;
-	__u32 flags;
-	__u8  _pad1[4];
-	__u32 id;
-	__u8  _pad2[4];
-} ATTRIBUTE_ALIGNED(8);
-
-#define TEE_IOC_SHM_REGISTER_FD _IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 8, \
-					struct tee_ioctl_shm_register_fd_data)
-
 typedef struct {
 	uint8_t b[UUID_SIZE];
 } uuid_t;
@@ -164,7 +151,7 @@ main(void)
 
 	/* Valid parameterless calls */
 	ioctl(-1, TEE_IOC_SHM_REGISTER_FD, NULL);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0xa4, 0x8, 0x20), NULL)"
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0xa4, 0x8, 0x18), NULL)"
 	       RVAL_EBADF);
 	ioctl(-1, _IOC(_IOC_NONE, 0xa4, 0xa, 0), NULL);
 	printf("ioctl(-1, _IOC(_IOC_NONE, 0xa4, 0xa, 0), 0)" RVAL_EBADF);
@@ -200,7 +187,7 @@ main(void)
 		shm_register_fd.fd = fd;
 		shm_register_fd.flags = TEE_IOCTL_SHM_DMA_BUF;
 		ioctl(-1, TEE_IOC_SHM_REGISTER_FD, &shm_register_fd);
-		printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0xa4, 0x8, 0x20), "
+		printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0xa4, 0x8, 0x18), "
 		       "{fd=%d, flags=TEE_IOCTL_SHM_DMA_BUF})" RVAL_EBADF, fd);
 	}
 
