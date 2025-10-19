@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Updated the list of AUDIT_* constants.
 
 Noteworthy changes in release 6.17 (2025-09-29)
 ===============================================
