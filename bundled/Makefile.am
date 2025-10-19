@@ -20,6 +20,7 @@ EXTRA_DIST = \
 	linux/arch/sparc/include/uapi/asm/fcntl.h \
 	linux/include/uapi/asm-generic/fcntl.h \
 	linux/include/uapi/asm-generic/hugetlb_encode.h \
+	linux/include/uapi/linux/audit.h \
 	linux/include/uapi/linux/blkpg.h \
 	linux/include/uapi/linux/blktrace_api.h \
 	linux/include/uapi/linux/blkzoned.h \
@@ -35,6 +36,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/devlink.h \
 	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/dqblk_xfs.h \
+	linux/include/uapi/linux/elf-em.h \
 	linux/include/uapi/linux/ethtool.h \
 	linux/include/uapi/linux/ethtool_netlink.h \
 	linux/include/uapi/linux/ethtool_netlink_generated.h \
