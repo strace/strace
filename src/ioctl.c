@@ -332,7 +332,7 @@ ioctl_decode_unknown_type(struct tcb *const tcp, const unsigned int code,
 
 	if (abbrev(tcp) || (_IOC_SIZE(code) == 0) || (arg == 0)) {
 		/* Let the generic handler print arg value.  */
-		return 0;
+		return RVAL_DECODED;
 	}
 
 	switch (_IOC_DIR(code)) {
