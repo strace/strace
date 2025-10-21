@@ -414,6 +414,8 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 		return hdio_ioctl(tcp, code, arg);
 	case 0x12:
 		return block_ioctl(tcp, code, arg);
+	case 0x15:
+		return fs_0x15_ioctl(tcp, code, arg);
 	case '!': /* 0x21 */
 		return seccomp_ioctl(tcp, code, arg);
 	case '"': /* 0x22 */

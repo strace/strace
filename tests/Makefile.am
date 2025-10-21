@@ -188,6 +188,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_fiemap-success-v-Xabbrev \
 	ioctl_fiemap-success-v-Xraw \
 	ioctl_fiemap-success-v-Xverbose \
+	ioctl_fs_0x15-success \
+	ioctl_fs_0x15-success-Xabbrev \
+	ioctl_fs_0x15-success-Xraw \
+	ioctl_fs_0x15-success-Xverbose \
 	ioctl_fs_x-success \
 	ioctl_fs_x-success-Xabbrev \
 	ioctl_fs_x-success-Xraw \

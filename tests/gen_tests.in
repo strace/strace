@@ -368,6 +368,14 @@ ioctl_fs_x-success	+ioctl-success.sh -a18
 ioctl_fs_x-success-Xabbrev	+ioctl-success.sh -a18 -Xabbrev
 ioctl_fs_x-success-Xraw	+ioctl-success.sh -a21 -Xraw
 ioctl_fs_x-success-Xverbose	+ioctl-success.sh -a35 -Xverbose
+ioctl_fs_0x15	+ioctl.test -a34
+ioctl_fs_0x15-Xabbrev	+ioctl.test -a34 -Xabbrev
+ioctl_fs_0x15-Xraw	+ioctl.test -a21 -Xraw
+ioctl_fs_0x15-Xverbose	+ioctl.test -Xverbose
+ioctl_fs_0x15-success	+ioctl-success.sh -a34
+ioctl_fs_0x15-success-Xabbrev	+ioctl-success.sh -a34 -Xabbrev
+ioctl_fs_0x15-success-Xraw	+ioctl-success.sh -a21 -Xraw
+ioctl_fs_0x15-success-Xverbose	+ioctl-success.sh -Xverbose
 ioctl_gpio	+ioctl.test
 ioctl_gpio-Xabbrev	+ioctl.test -Xabbrev
 ioctl_gpio-Xraw	+ioctl.test -Xraw

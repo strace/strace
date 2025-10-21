@@ -335,6 +335,14 @@ ioctl_fiemap-success-v
 ioctl_fiemap-success-v-Xabbrev
 ioctl_fiemap-success-v-Xraw
 ioctl_fiemap-success-v-Xverbose
+ioctl_fs_0x15
+ioctl_fs_0x15-Xabbrev
+ioctl_fs_0x15-Xraw
+ioctl_fs_0x15-Xverbose
+ioctl_fs_0x15-success
+ioctl_fs_0x15-success-Xabbrev
+ioctl_fs_0x15-success-Xraw
+ioctl_fs_0x15-success-Xverbose
 ioctl_fs_f
 ioctl_fs_f-Xabbrev
 ioctl_fs_f-Xraw

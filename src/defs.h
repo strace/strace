@@ -1450,6 +1450,7 @@ DECL_IOCTL(counter);
 DECL_IOCTL(dm);
 DECL_IOCTL(epoll);
 DECL_IOCTL(evdev);
+DECL_IOCTL(fs_0x15);
 DECL_IOCTL(fs_0x94);
 DECL_IOCTL(fs_f);
 DECL_IOCTL(fs_x);

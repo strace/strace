@@ -245,6 +245,10 @@ ioctl_fiemap
 ioctl_fiemap-Xabbrev
 ioctl_fiemap-Xraw
 ioctl_fiemap-Xverbose
+ioctl_fs_0x15
+ioctl_fs_0x15-Xabbrev
+ioctl_fs_0x15-Xraw
+ioctl_fs_0x15-Xverbose
 ioctl_fs_f
 ioctl_fs_f-Xabbrev
 ioctl_fs_f-Xraw
