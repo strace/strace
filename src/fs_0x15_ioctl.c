@@ -26,6 +26,21 @@ decode_fsuuid2(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 }
 
+static void
+decode_fs_sysfs_path(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct fs_sysfs_path path;
+
+	if (!umove_or_printaddr(tcp, arg, &path)) {
+		tprint_struct_begin();
+		PRINT_FIELD_U(path, len);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SZ(path, name,
+				       MIN((unsigned) path.len + 1, sizeof(path.name)));
+		tprint_struct_end();
+	}
+}
+
 int
 fs_0x15_ioctl(struct tcb *const tcp, const unsigned int code,
 	      const kernel_ulong_t arg)
@@ -36,6 +51,13 @@ fs_0x15_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		tprints_arg_next_name("arg");
 		decode_fsuuid2(tcp, arg);
+		break;
+
+	case FS_IOC_GETFSSYSFSPATH:
+		if (entering(tcp))
+			return 0;
+		tprints_arg_next_name("arg");
+		decode_fs_sysfs_path(tcp, arg);
 		break;
 
 	default:

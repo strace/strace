@@ -97,6 +97,7 @@ main(int argc, const char *argv[])
 
 	static const struct strval32 null_arg_cmds[] = {
 		{ ARG_STR(FS_IOC_GETFSUUID) },
+		{ ARG_STR(FS_IOC_GETFSSYSFSPATH) },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(null_arg_cmds); ++i) {
@@ -107,6 +108,7 @@ main(int argc, const char *argv[])
 	}
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fsuuid2, p_uuid);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_sysfs_path, p_path);
 
 	const struct {
 		uint32_t val;
@@ -114,6 +116,7 @@ main(int argc, const char *argv[])
 		const void *ptr;
 	} efault_arg_cmds[] = {
 		{ ARG_STR(FS_IOC_GETFSUUID), (char *) p_uuid + 1 },
+		{ ARG_STR(FS_IOC_GETFSSYSFSPATH), (char *) p_path + 1 },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(efault_arg_cmds); ++i) {
@@ -146,6 +149,44 @@ main(int argc, const char *argv[])
 			print_quoted_hex(p_uuid->uuid, uuid_len);
 			printf("}) = %s\n", errstr);
 		}
+	}
+
+	/* FS_IOC_GETFSSYSFSPATH */
+
+	static const unsigned int name_lens[] = {
+		0,
+		1,
+		sizeof(p_path->name) - 1,
+		sizeof(p_path->name),
+		sizeof(p_path->name) + 1,
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(name_lens); ++i) {
+		p_path->len = name_lens[i];
+		fill_memory_ex(p_path->name, sizeof(p_path->name),
+			       '#', 'Z' - '#' + 1);
+
+		if (do_ioctl_ptr(FS_IOC_GETFSSYSFSPATH, p_path) < 0) {
+			printf("ioctl(-1, %s, %p) = %s\n",
+			       XLAT_STR(FS_IOC_GETFSSYSFSPATH), p_path, errstr);
+		} else {
+			printf("ioctl(-1, %s, {len=%u, name=\"%.*s\"...}) = %s\n",
+			       XLAT_STR(FS_IOC_GETFSSYSFSPATH), p_path->len,
+			       (int) MIN(p_path->len, sizeof(p_path->name) - 1),
+			       p_path->name, errstr);
+
+			if (p_path->len < sizeof(p_path->name)) {
+				p_path->name[p_path->len] = '\0';
+				do_ioctl_ptr(FS_IOC_GETFSSYSFSPATH, p_path);
+
+				printf("ioctl(-1, %s, {len=%u, name=\"%.*s\"})"
+				       " = %s\n",
+				       XLAT_STR(FS_IOC_GETFSSYSFSPATH),
+				       p_path->len, (int) p_path->len,
+				       p_path->name, errstr);
+			}
+		}
+
 	}
 
 	puts("+++ exited with 0 +++");
