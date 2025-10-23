@@ -98,6 +98,7 @@ main(int argc, const char *argv[])
 	static const struct strval32 null_arg_cmds[] = {
 		{ ARG_STR(FS_IOC_GETFSUUID) },
 		{ ARG_STR(FS_IOC_GETFSSYSFSPATH) },
+		{ ARG_STR(FS_IOC_GETLBMD_CAP) },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(null_arg_cmds); ++i) {
@@ -109,6 +110,7 @@ main(int argc, const char *argv[])
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fsuuid2, p_uuid);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_sysfs_path, p_path);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct logical_block_metadata_cap, p_cap);
 
 	const struct {
 		uint32_t val;
@@ -117,6 +119,7 @@ main(int argc, const char *argv[])
 	} efault_arg_cmds[] = {
 		{ ARG_STR(FS_IOC_GETFSUUID), (char *) p_uuid + 1 },
 		{ ARG_STR(FS_IOC_GETFSSYSFSPATH), (char *) p_path + 1 },
+		{ ARG_STR(FS_IOC_GETLBMD_CAP), (char *) p_cap + 1 },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(efault_arg_cmds); ++i) {
@@ -187,6 +190,83 @@ main(int argc, const char *argv[])
 			}
 		}
 
+	}
+
+	/* FS_IOC_GETLBMD_CAP */
+
+#define	VALID_LBMD_FLAGS	0x3
+#define VALID_LBMD_FLAGS_STR	"LBMD_PI_CAP_INTEGRITY|LBMD_PI_CAP_REFTAG"
+#define	INVALID_LBMD_FLAGS	0xfffffffc
+
+#define VALID_LBMD_TYPE		0x1
+#define VALID_LBMD_TYPE_STR	"LBMD_PI_CSUM_IP"
+#define INVALID_LBMD_TYPE	0x8
+
+	fill_memory(p_cap, sizeof(*p_cap));
+	p_cap->lbmd_flags = VALID_LBMD_FLAGS;
+	p_cap->lbmd_guard_tag_type = VALID_LBMD_TYPE;
+
+	if (do_ioctl_ptr(FS_IOC_GETLBMD_CAP, p_cap) < 0) {
+		printf("ioctl(-1, %s, %p) = %s\n",
+		       XLAT_STR(FS_IOC_GETLBMD_CAP), p_cap, errstr);
+	} else {
+		printf("ioctl(-1, %s, {lbmd_flags=%s"
+		       ", lbmd_interval=%u"
+		       ", lbmd_size=%u"
+		       ", lbmd_opaque_size=%u"
+		       ", lbmd_opaque_offset=%u"
+		       ", lbmd_pi_size=%u"
+		       ", lbmd_pi_offset=%u"
+		       ", lbmd_guard_tag_type=%s"
+		       ", lbmd_app_tag_size=%u"
+		       ", lbmd_ref_tag_size=%u"
+		       ", lbmd_storage_tag_size=%u}) = %s\n",
+		       XLAT_STR(FS_IOC_GETLBMD_CAP),
+		       XLAT_KNOWN(VALID_LBMD_FLAGS, VALID_LBMD_FLAGS_STR),
+		       p_cap->lbmd_interval,
+		       p_cap->lbmd_size,
+		       p_cap->lbmd_opaque_size,
+		       p_cap->lbmd_opaque_offset,
+		       p_cap->lbmd_pi_size,
+		       p_cap->lbmd_pi_offset,
+		       XLAT_KNOWN(VALID_LBMD_TYPE, VALID_LBMD_TYPE_STR),
+		       p_cap->lbmd_app_tag_size,
+		       p_cap->lbmd_ref_tag_size,
+		       p_cap->lbmd_storage_tag_size,
+		       errstr);
+	}
+
+	p_cap->lbmd_flags = INVALID_LBMD_FLAGS;
+	p_cap->lbmd_guard_tag_type = INVALID_LBMD_TYPE;
+
+	if (do_ioctl_ptr(FS_IOC_GETLBMD_CAP, p_cap) < 0) {
+		printf("ioctl(-1, %s, %p) = %s\n",
+		       XLAT_STR(FS_IOC_GETLBMD_CAP), p_cap, errstr);
+	} else {
+		printf("ioctl(-1, %s, {lbmd_flags=%s"
+		       ", lbmd_interval=%u"
+		       ", lbmd_size=%u"
+		       ", lbmd_opaque_size=%u"
+		       ", lbmd_opaque_offset=%u"
+		       ", lbmd_pi_size=%u"
+		       ", lbmd_pi_offset=%u"
+		       ", lbmd_guard_tag_type=%s"
+		       ", lbmd_app_tag_size=%u"
+		       ", lbmd_ref_tag_size=%u"
+		       ", lbmd_storage_tag_size=%u}) = %s\n",
+		       XLAT_STR(FS_IOC_GETLBMD_CAP),
+		       XLAT_UNKNOWN(INVALID_LBMD_FLAGS, "LBMD_PI_CAP_???"),
+		       p_cap->lbmd_interval,
+		       p_cap->lbmd_size,
+		       p_cap->lbmd_opaque_size,
+		       p_cap->lbmd_opaque_offset,
+		       p_cap->lbmd_pi_size,
+		       p_cap->lbmd_pi_offset,
+		       XLAT_UNKNOWN(INVALID_LBMD_TYPE, "LBMD_PI_CSUM_???"),
+		       p_cap->lbmd_app_tag_size,
+		       p_cap->lbmd_ref_tag_size,
+		       p_cap->lbmd_storage_tag_size,
+		       errstr);
 	}
 
 	puts("+++ exited with 0 +++");
