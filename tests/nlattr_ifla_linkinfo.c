@@ -568,7 +568,8 @@ main(void)
 		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING"
 		           "|1<<BR_BOOLOPT_MST_ENABLE"
 		           "|1<<BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION"
-			   "|0xfeedcaf0}" },
+		           "|1<<BR_BOOLOPT_FDB_LOCAL_VLAN_0"
+			   "|0xfeedcae0}" },
 	};
 	for (size_t k = 0; k < ARRAY_SIZE(boolopts); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,

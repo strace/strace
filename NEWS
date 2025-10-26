@@ -2,10 +2,10 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Added -e kvm=vcpu+ option for kvm_run struct decoding.
   * Implemented decoding of FS_IOC_GETFSUUID, FS_IOC_GETFSSYSFSPATH, and
     FS_IOC_GETLBMD_CAP ioctl commands.
-  * Updated lists of AUDIT_* and RWF_* constants.
-  * Added -e kvm=vcpu+ option for decoding kvm_run struct.
+  * Updated lists of AUDIT_*, BR_*, and RWF_* constants.
 
 Noteworthy changes in release 6.17 (2025-09-29)
 ===============================================
