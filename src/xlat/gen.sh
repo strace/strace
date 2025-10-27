@@ -256,10 +256,6 @@ gen_header()
 			[ XT_SORTED != "$xlat_type" ] ||
 				check_sort_order "1ULL<<${line#1<<}"
 			;;
-		[0-9]*)	# numeric constants
-			[ XT_SORTED != "$xlat_type" ] ||
-				check_sort_order "${line}"
-			;;
 		esac
 	done < "$input"
 
@@ -352,9 +348,6 @@ gen_header()
 			;;
 		'1<<'[\(A-Z_]*)	# symbolic constants with shift
 			cond_xlat "${line}"
-			;;
-		[0-9]*)	# numeric constants
-			print_xlat "${line}"
 			;;
 		*)	# verbatim lines
 			echo "${line}"
