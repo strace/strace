@@ -252,7 +252,7 @@ gen_header()
 		[A-Z_]*)
 			cond_def "$line" "$xlat_type"
 			;;
-		'1<<'[A-Z_]*)	# symbolic constants with shift
+		'1<<'[\(A-Z_]*)	# symbolic constants with shift
 			[ XT_SORTED != "$xlat_type" ] ||
 				check_sort_order "1ULL<<${line#1<<}"
 			;;
@@ -350,7 +350,7 @@ gen_header()
 		[A-Z_!]*)	# symbolic constants
 			cond_xlat "${line}"
 			;;
-		'1<<'[A-Z_]*)	# symbolic constants with shift
+		'1<<'[\(A-Z_]*)	# symbolic constants with shift
 			cond_xlat "${line}"
 			;;
 		[0-9]*)	# numeric constants
