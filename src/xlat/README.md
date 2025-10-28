@@ -177,6 +177,12 @@ checks.  Multiple includes allowed.
 Marks the xlat file as automatically generated.  This directive is intended
 for other tools and is currently ignored by `gen.sh`.
 
+### `#From`
+
+Annotates the xlat file with the source of the xlat constants.  There could be
+several `#From` directives in a single xlat file.  This directive is intended
+for other tools and is currently ignored by `gen.sh`.
+
 ### `#<anything else>`
 
 Any other line starting with `#` is passed through verbatim.  Allows custom
