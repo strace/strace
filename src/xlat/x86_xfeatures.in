@@ -1,4 +1,4 @@
-/* From arch/x86/include/asm/fpu/types.h */
+#From arch/x86/include/asm/fpu/types.h
 XFEATURE_MASK_FPSSE		(XFEATURE_MASK_FP | XFEATURE_MASK_SSE)
 XFEATURE_MASK_FP		(1 << XFEATURE_FP)
 XFEATURE_MASK_SSE		(1 << XFEATURE_SSE)

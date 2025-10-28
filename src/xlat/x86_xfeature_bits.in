@@ -1,5 +1,5 @@
 #value_indexed
-/* From arch/x86/include/asm/fpu/types.h */
+#From arch/x86/include/asm/fpu/types.h
 XFEATURE_FP				0
 XFEATURE_SSE				1
 XFEATURE_YMM				2

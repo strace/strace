@@ -1,5 +1,5 @@
 #value_indexed
-/* from include/linux/kern_levels.h */
+#From include/linux/kern_levels.h
 LOGLEVEL_EMERG		0
 LOGLEVEL_ALERT		1
 LOGLEVEL_CRIT		2
