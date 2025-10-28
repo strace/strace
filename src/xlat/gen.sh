@@ -218,6 +218,8 @@ gen_header()
 		esac
 
 		case $line in
+		'#Generated '*) # ignore
+			;;
 		'#conditional')
 			unconditional=
 			;;
@@ -320,6 +322,8 @@ gen_header()
 		esac
 
 		case ${line} in
+		'#Generated '*) # ignore
+			;;
 		'#conditional')
 			unconditional=
 			;;

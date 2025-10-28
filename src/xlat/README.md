@@ -172,6 +172,11 @@ Generates autoconf m4 macro for checking constant declarations.  Creates
 Adds header includes to the generated m4 file.  Used with `#enum` for autoconf
 checks.  Multiple includes allowed.
 
+### `#Generated`
+
+Marks the xlat file as automatically generated.  This directive is intended
+for other tools and is currently ignored by `gen.sh`.
+
 ### `#<anything else>`
 
 Any other line starting with `#` is passed through verbatim.  Allows custom
