@@ -1,5 +1,6 @@
 #unconditional
 #sorted sort -k2,2
+#From include/uapi/linux/input.h
 FF_RUMBLE
 FF_PERIODIC
 FF_CONSTANT

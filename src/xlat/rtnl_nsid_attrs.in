@@ -1,3 +1,4 @@
+#From include/uapi/linux/net_namespace.h
 NETNSA_NSID_NOT_ASSIGNED	-1
 NETNSA_NONE			0
 NETNSA_NSID			1

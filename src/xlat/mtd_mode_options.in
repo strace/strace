@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/mtd/mtd-abi.h
 MTD_OPS_PLACE_OOB
 MTD_OPS_AUTO_OOB
 MTD_OPS_RAW

@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/fcntl.h
 AT_SYMLINK_NOFOLLOW
 AT_EMPTY_PATH

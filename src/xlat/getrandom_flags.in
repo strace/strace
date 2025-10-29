@@ -1,3 +1,4 @@
+#From include/uapi/linux/random.h
 GRND_NONBLOCK	1
 GRND_RANDOM	2
 GRND_INSECURE	4

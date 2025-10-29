@@ -1,4 +1,5 @@
 #value_indexed
+#From arch/s390/include/uapi/asm/guarded_storage.h
 GS_ENABLE	0
 GS_DISABLE	1
 GS_SET_BC_CB	2

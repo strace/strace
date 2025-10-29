@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/if_pppol2tp.h
 PPPOL2TP_SO_DEBUG	1
 PPPOL2TP_SO_RECVSEQ	2
 PPPOL2TP_SO_SENDSEQ	3

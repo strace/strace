@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/mtd/mtd-abi.h
 MTD_ABSENT
 MTD_RAM
 MTD_ROM

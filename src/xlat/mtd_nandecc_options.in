@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/mtd/mtd-abi.h
 MTD_NANDECC_OFF
 MTD_NANDECC_PLACE
 MTD_NANDECC_AUTOPLACE

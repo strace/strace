@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/caif/caif_socket.h
 CAIFPROTO_AT		0
 CAIFPROTO_DATAGRAM	1
 CAIFPROTO_DATAGRAM_LOOP	2

@@ -1,4 +1,5 @@
 #value_indexed
+#From include/linux/syslog.h
 SYSLOG_ACTION_CLOSE		0
 SYSLOG_ACTION_OPEN		1
 SYSLOG_ACTION_READ		2

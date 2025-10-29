@@ -1,3 +1,7 @@
+#From include/uapi/linux/ip_vs.h
+#From include/uapi/linux/netfilter_arp/arp_tables.h
+#From include/uapi/linux/netfilter_bridge/ebtables.h
+#From include/uapi/linux/netfilter_ipv4/ip_tables.h
 /*
  * Options specific to getsockopt(SOL_IP).
  * Common {g,s}etsockopt(SOL_IP) options

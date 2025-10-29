@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/can.h
 CAN_RAW		1
 CAN_BCM		2
 CAN_TP16	3

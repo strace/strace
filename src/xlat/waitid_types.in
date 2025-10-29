@@ -2,6 +2,7 @@
 #enum
 #include <sys/types.h>
 #include <sys/wait.h>
+#From include/uapi/linux/wait.h
 P_ALL	0
 P_PID	1
 P_PGID	2

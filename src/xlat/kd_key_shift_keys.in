@@ -1,4 +1,5 @@
 #sorted
+#From include/uapi/linux/keyboard.h
 K_SHIFT		K(KT_SHIFT,KG_SHIFT)
 K_ALTGR		K(KT_SHIFT,KG_ALTGR)
 K_CTRL		K(KT_SHIFT,KG_CTRL)

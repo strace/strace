@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/netlink_diag.h
 NDIAG_SHOW_MEMINFO
 NDIAG_SHOW_GROUPS
 NDIAG_SHOW_RING_CFG

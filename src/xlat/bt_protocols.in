@@ -1,4 +1,5 @@
 #value_indexed
+#From include/net/bluetooth/bluetooth.h
 BTPROTO_L2CAP	0
 BTPROTO_HCI	1
 BTPROTO_SCO	2

@@ -1,4 +1,5 @@
 #value_indexed
+#From include/net/bluetooth/bluetooth.h
 BDADDR_BREDR		0
 BDADDR_LE_PUBLIC	1
 BDADDR_LE_RANDOM	2

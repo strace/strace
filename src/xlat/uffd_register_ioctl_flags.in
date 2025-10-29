@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/userfaultfd.h
 1<<_UFFDIO_WAKE
 1<<_UFFDIO_COPY
 1<<_UFFDIO_ZEROPAGE

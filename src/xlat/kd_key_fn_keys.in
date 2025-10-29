@@ -1,4 +1,5 @@
 #sorted
+#From include/uapi/linux/keyboard.h
 K_F1		K(KT_FN,0)
 K_F2		K(KT_FN,1)
 K_F3		K(KT_FN,2)

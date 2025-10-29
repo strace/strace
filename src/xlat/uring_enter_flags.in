@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/io_uring.h
 IORING_ENTER_GETEVENTS
 IORING_ENTER_SQ_WAKEUP
 IORING_ENTER_SQ_WAIT

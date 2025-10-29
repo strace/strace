@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/nexthop.h
 NEXTHOP_GRP_TYPE_MPATH	0
 NEXTHOP_GRP_TYPE_RES	1

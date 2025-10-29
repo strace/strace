@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/bpf.h
 BPF_MAP_CREATE 0
 BPF_MAP_LOOKUP_ELEM 1
 BPF_MAP_UPDATE_ELEM 2

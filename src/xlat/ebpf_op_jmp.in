@@ -1,3 +1,4 @@
+#From include/uapi/linux/bpf.h
 BPF_JNE		0x50
 BPF_JSGT	0x60
 BPF_JSGE	0x70

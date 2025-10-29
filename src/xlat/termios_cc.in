@@ -1,3 +1,5 @@
+#From arch/mips/include/uapi/asm/termbits.h
+#From include/uapi/asm-generic/termbits.h
 VINTR    /* Interrupt character [ISIG].  */
 VQUIT    /* Quit character [ISIG].  */
 VERASE   /* Erase character [ICANON].  */

@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/smc_diag.h
 SMC_DIAG_NONE
 SMC_DIAG_CONNINFO
 SMC_DIAG_LGRINFO

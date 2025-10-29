@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/unix_diag.h
 UNIX_DIAG_NAME
 UNIX_DIAG_VFS
 UNIX_DIAG_PEER

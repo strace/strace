@@ -1,4 +1,5 @@
 #sorted sort -k2,2
+#From include/net/bluetooth/l2cap.h
 L2CAP_CID_SIGNALING	0x0001
 L2CAP_CID_CONN_LESS	0x0002
 L2CAP_CID_A2MP		0x0003

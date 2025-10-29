@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/videodev2.h
 V4L2_FRMSIZE_TYPE_DISCRETE
 V4L2_FRMSIZE_TYPE_CONTINUOUS
 V4L2_FRMSIZE_TYPE_STEPWISE

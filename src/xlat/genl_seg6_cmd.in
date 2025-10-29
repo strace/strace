@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/seg6_genl.h
 
 SEG6_CMD_UNSPEC
 SEG6_CMD_SETHMAC

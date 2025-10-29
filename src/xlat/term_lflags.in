@@ -1,3 +1,5 @@
+#From arch/sparc/include/uapi/asm/termbits.h
+#From include/uapi/asm-generic/termbits.h
 ISIG         /* Enable signals.  */
 ICANON       /* Do erase and kill processing.  */
 XCASE

@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_bridge.h
 BRIDGE_XSTATS_UNSPEC	0
 BRIDGE_XSTATS_VLAN	1
 BRIDGE_XSTATS_MCAST	2

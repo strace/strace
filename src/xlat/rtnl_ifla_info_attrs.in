@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_INFO_UNSPEC
 IFLA_INFO_KIND
 IFLA_INFO_DATA

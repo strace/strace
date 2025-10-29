@@ -1,4 +1,6 @@
 #unconditional
+#From include/uapi/asm-generic/fcntl.h
+#From include/uapi/linux/userfaultfd.h
 UFFD_USER_MODE_ONLY
 O_NONBLOCK
 O_CLOEXEC

@@ -1,3 +1,4 @@
+#From include/uapi/linux/module.h
 MODULE_INIT_IGNORE_MODVERSIONS (1 << 0)
 MODULE_INIT_IGNORE_VERMAGIC    (1 << 1)
 MODULE_INIT_COMPRESSED_FILE    (1 << 2)

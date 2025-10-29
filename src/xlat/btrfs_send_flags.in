@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/btrfs.h
 BTRFS_SEND_FLAG_NO_FILE_DATA
 BTRFS_SEND_FLAG_OMIT_STREAM_HEADER
 BTRFS_SEND_FLAG_OMIT_END_CMD

@@ -1,3 +1,5 @@
+#From include/uapi/asm-generic/termbits-common.h
+#From include/uapi/asm-generic/termbits.h
 IGNBRK   /* Ignore break condition.  */
 BRKINT   /* Signal interrupt on break.  */
 IGNPAR   /* Ignore characters with parity errors.  */

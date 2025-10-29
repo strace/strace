@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/sock_diag.h
 SK_MEMINFO_RMEM_ALLOC	0
 SK_MEMINFO_RCVBUF	1
 SK_MEMINFO_WMEM_ALLOC	2

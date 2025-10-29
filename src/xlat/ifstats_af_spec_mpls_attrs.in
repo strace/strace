@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/mpls.h
 MPLS_STATS_UNSPEC	0
 MPLS_STATS_LINK		1

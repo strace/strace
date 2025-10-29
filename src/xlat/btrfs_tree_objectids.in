@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/btrfs_tree.h
 BTRFS_ROOT_TREE_OBJECTID
 BTRFS_EXTENT_TREE_OBJECTID
 BTRFS_CHUNK_TREE_OBJECTID

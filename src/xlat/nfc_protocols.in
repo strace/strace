@@ -1,3 +1,4 @@
 #value_indexed
+#From include/uapi/linux/nfc.h
 NFC_SOCKPROTO_RAW	0
 NFC_SOCKPROTO_LLCP	1

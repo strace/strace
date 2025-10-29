@@ -1,4 +1,5 @@
 #value_indexed
 #unconditional
+#From include/uapi/linux/sock_diag.h
 SK_DIAG_BPF_STORAGE_REP_NONE	0
 SK_DIAG_BPF_STORAGE		1

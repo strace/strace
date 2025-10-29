@@ -1,6 +1,7 @@
 #enum
 #value_indexed
 #unconditional
+#From include/uapi/linux/counter.h
 COUNTER_COMPONENT_NONE			0
 COUNTER_COMPONENT_SIGNAL		1
 COUNTER_COMPONENT_COUNT			2

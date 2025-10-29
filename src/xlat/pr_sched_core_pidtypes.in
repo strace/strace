@@ -1,4 +1,5 @@
 #value_indexed
+#From include/linux/pid_types.h
 PIDTYPE_PID	0
 PIDTYPE_TGID	1
 PIDTYPE_PGID	2

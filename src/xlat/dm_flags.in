@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/dm-ioctl.h
 DM_READONLY_FLAG
 DM_SUSPEND_FLAG
 DM_EXISTS_FLAG

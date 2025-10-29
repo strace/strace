@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/asm-generic/fcntl.h
 O_CREAT
 O_EXCL
 O_NOCTTY

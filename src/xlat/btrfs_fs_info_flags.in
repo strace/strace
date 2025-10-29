@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/btrfs.h
 BTRFS_FS_INFO_FLAG_CSUM_INFO
 BTRFS_FS_INFO_FLAG_GENERATION
 BTRFS_FS_INFO_FLAG_METADATA_UUID

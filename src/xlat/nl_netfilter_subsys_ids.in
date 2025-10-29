@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/netfilter/nfnetlink.h
 NFNL_SUBSYS_NONE
 NFNL_SUBSYS_CTNETLINK
 NFNL_SUBSYS_CTNETLINK_EXP

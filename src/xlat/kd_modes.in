@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/kd.h
 KD_TEXT		0x0
 KD_GRAPHICS	0x1
 KD_TEXT0	0x2

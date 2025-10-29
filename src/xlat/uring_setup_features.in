@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/io_uring.h
 IORING_FEAT_SINGLE_MMAP
 IORING_FEAT_NODROP
 IORING_FEAT_SUBMIT_STABLE

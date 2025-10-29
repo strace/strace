@@ -1,3 +1,4 @@
+#From include/scsi/sg.h
 SG_INFO_CHECK		1
 SG_INFO_DIRECT_IO	2
 SG_INFO_MIXED_IO	4

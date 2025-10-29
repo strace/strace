@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_bridge.h
 IFLA_BRIDGE_VLAN_TUNNEL_UNSPEC	0
 IFLA_BRIDGE_VLAN_TUNNEL_ID	1
 IFLA_BRIDGE_VLAN_TUNNEL_VID	2

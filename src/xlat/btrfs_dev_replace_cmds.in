@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/btrfs.h
 BTRFS_IOCTL_DEV_REPLACE_CMD_START
 BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS
 BTRFS_IOCTL_DEV_REPLACE_CMD_CANCEL

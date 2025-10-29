@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_VF_VLAN_INFO_UNSPEC	0
 IFLA_VF_VLAN_INFO		1

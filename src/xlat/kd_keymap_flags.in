@@ -1,3 +1,4 @@
+#From include/uapi/linux/keyboard.h
 1<<KG_SHIFT        1<<0
 1<<KG_ALTGR        1<<1
 1<<KG_CTRL         1<<2

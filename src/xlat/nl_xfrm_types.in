@@ -1,6 +1,7 @@
 #sorted
 #enum
 #include <linux/xfrm.h>
+#From include/uapi/linux/xfrm.h
 XFRM_MSG_NEWSA		0x10
 XFRM_MSG_DELSA		0x11
 XFRM_MSG_GETSA		0x12

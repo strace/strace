@@ -1,3 +1,4 @@
+#From include/uapi/linux/nbd.h
 NBD_SET_SOCK		_IO( 0xab, 0 )
 NBD_SET_BLKSIZE		_IO( 0xab, 1 )
 NBD_SET_SIZE		_IO( 0xab, 2 )

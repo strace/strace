@@ -1,4 +1,5 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/userfaultfd.h
 UFFDIO_COPY_MODE_DONTWAKE
 UFFDIO_COPY_MODE_WP

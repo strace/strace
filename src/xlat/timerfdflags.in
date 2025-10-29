@@ -1,5 +1,6 @@
 /* The Linux userspace headers didn't export these for a long time. */
 
+#From include/uapi/linux/timerfd.h
 TFD_TIMER_ABSTIME (1 << 0)
 TFD_TIMER_CANCEL_ON_SET (1 << 1)
 TFD_CLOEXEC O_CLOEXEC

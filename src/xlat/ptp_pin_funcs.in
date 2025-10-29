@@ -1,5 +1,6 @@
 #enum
 #value_indexed
+#From include/uapi/linux/ptp_clock.h
 PTP_PF_NONE	0
 PTP_PF_EXTTS	1
 PTP_PF_PEROUT	2

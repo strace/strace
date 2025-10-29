@@ -1,3 +1,5 @@
+#From include/uapi/linux/ipc.h
+#From include/uapi/linux/shm.h
 IPC_CREAT	01000
 IPC_EXCL	02000
 SHM_HUGETLB	04000

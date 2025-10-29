@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/inet_diag.h
 INET_DIAG_BC_NOP
 INET_DIAG_BC_JMP
 INET_DIAG_BC_S_GE

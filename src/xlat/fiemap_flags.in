@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/fiemap.h
 FIEMAP_FLAG_SYNC
 FIEMAP_FLAG_XATTR
 FIEMAP_FLAG_CACHE

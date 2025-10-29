@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/time.h
 ITIMER_REAL	0
 ITIMER_VIRTUAL	1
 ITIMER_PROF	2

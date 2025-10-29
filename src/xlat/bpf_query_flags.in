@@ -1,1 +1,2 @@
+#From include/uapi/linux/bpf.h
 BPF_F_QUERY_EFFECTIVE	(1U << 0)

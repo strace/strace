@@ -1,2 +1,3 @@
+#From include/uapi/linux/bpf_common.h
 BPF_K	0x00
 BPF_X	0x08

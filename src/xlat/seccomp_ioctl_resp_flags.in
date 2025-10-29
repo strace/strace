@@ -1,2 +1,3 @@
 #unconditional
+#From include/uapi/linux/seccomp.h
 SECCOMP_USER_NOTIF_FLAG_CONTINUE

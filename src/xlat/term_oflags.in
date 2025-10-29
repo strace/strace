@@ -1,4 +1,7 @@
 #ifdef ALPHA
+#From arch/mips/include/uapi/asm/termbits.h
+#From include/uapi/asm-generic/termbits-common.h
+#From include/uapi/asm-generic/termbits.h
 XTABS   /* required by POSIX to == TAB3; but not on Alpha! */
 #endif
 

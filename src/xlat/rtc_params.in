@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/rtc.h
 RTC_PARAM_FEATURES		0
 RTC_PARAM_CORRECTION		1
 RTC_PARAM_BACKUP_SWITCH_MODE	2

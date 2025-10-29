@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/bpf.h
 BPF_MAP_TYPE_UNSPEC 0
 BPF_MAP_TYPE_HASH 1
 BPF_MAP_TYPE_ARRAY 2

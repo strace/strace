@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/futex.h
 FUTEX2_SIZE_U8		0
 FUTEX2_SIZE_U16		1
 FUTEX2_SIZE_U32		2

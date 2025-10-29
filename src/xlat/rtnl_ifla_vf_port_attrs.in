@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_VF_PORT_UNSPEC
 IFLA_VF_PORT

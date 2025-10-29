@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/smc_diag.h
 1<<(SMC_DIAG_CONNINFO-1)
 1<<(SMC_DIAG_LGRINFO-1)

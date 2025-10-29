@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/asm-generic/resource.h
 RLIMIT_CPU		0
 RLIMIT_FSIZE		1
 RLIMIT_DATA		2

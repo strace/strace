@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/if_bridge.h
 1<<BR_BOOLOPT_NO_LL_LEARN
 1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING
 1<<BR_BOOLOPT_MST_ENABLE

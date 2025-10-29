@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/neighbour.h
 NDTPA_UNSPEC			0
 NDTPA_IFINDEX			1
 NDTPA_REFCNT			2

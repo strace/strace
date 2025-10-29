@@ -1,4 +1,6 @@
 #value_indexed
+#From include/uapi/linux/bpf.h
+#From include/uapi/linux/bpf_common.h
 BPF_LD		0x0
 BPF_LDX		0x1
 BPF_ST		0x2

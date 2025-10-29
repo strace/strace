@@ -1,4 +1,15 @@
 #sorted sort -k2,2
+#From fs/befs/befs_fs_types.h
+#From fs/freevxfs/vxfs.h
+#From fs/hfs/hfs.h
+#From fs/hfsplus/hfsplus_raw.h
+#From fs/jfs/jfs_incore.h
+#From fs/ubifs/ubifs.h
+#From fs/ufs/ufs_fs.h
+#From include/uapi/linux/bfs_fs.h
+#From include/uapi/linux/gfs2_ondisk.h
+#From include/uapi/linux/magic.h
+#From include/uapi/linux/romfs_fs.h
 QNX4_SUPER_MAGIC	0x0000002f
 Z3FOLD_MAGIC		0x00000033
 AUTOFS_SUPER_MAGIC	0x00000187

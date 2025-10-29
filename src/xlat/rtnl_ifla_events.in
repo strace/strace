@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_EVENT_NONE
 IFLA_EVENT_REBOOT
 IFLA_EVENT_FEATURES

@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/unix_diag.h
 UDIAG_SHOW_NAME
 UDIAG_SHOW_VFS
 UDIAG_SHOW_PEER

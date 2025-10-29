@@ -1,4 +1,5 @@
 #sorted sort -k4,4g
+#From include/uapi/linux/if.h
 IFF_UP		(1 << 0)
 IFF_BROADCAST	(1 << 1)
 IFF_DEBUG	(1 << 2)

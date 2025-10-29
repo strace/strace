@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/prctl.h
 PR_SPEC_STORE_BYPASS	0
 PR_SPEC_INDIRECT_BRANCH	1
 PR_SPEC_L1D_FLUSH	2

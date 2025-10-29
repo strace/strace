@@ -1,2 +1,3 @@
+#From include/uapi/linux/kd.h
 KD_FONT_FLAG_DONT_RECALC	0x1
 KD_FONT_FLAG_OLD		0x80000000

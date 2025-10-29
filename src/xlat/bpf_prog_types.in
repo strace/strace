@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/bpf.h
 BPF_PROG_TYPE_UNSPEC 0
 BPF_PROG_TYPE_SOCKET_FILTER 1
 BPF_PROG_TYPE_KPROBE 2

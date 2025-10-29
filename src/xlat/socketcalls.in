@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/net.h
 SYS_SOCKET	1
 SYS_BIND	2
 SYS_CONNECT	3

@@ -1,3 +1,5 @@
+#From arch/arc/include/uapi/asm/signal.h
+#From include/uapi/asm-generic/signal-defs.h
 SA_RESTORER
 SA_ONSTACK
 SA_RESTART

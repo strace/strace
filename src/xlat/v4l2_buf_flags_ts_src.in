@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/videodev2.h
 /* V4L2_BUF_FLAG_TSTAMP_SRC_MASK	0x00070000 */
 V4L2_BUF_FLAG_TSTAMP_SRC_EOF
 V4L2_BUF_FLAG_TSTAMP_SRC_SOE

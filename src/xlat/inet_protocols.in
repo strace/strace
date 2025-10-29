@@ -1,4 +1,6 @@
 #sorted sort -k2,2n
+#From include/uapi/linux/in.h
+#From include/uapi/linux/in6.h
 IPPROTO_IP		0
 IPPROTO_ICMP		1
 IPPROTO_IGMP		2

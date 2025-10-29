@@ -1,4 +1,5 @@
 #sorted
+#From include/uapi/linux/keyboard.h
 K_SHIFT_SLOCK		K(KT_SLOCK,KG_SHIFT)
 K_ALTGR_SLOCK		K(KT_SLOCK,KG_ALTGR)
 K_CTRL_SLOCK		K(KT_SLOCK,KG_CTRL)

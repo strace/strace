@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/packet_diag.h
 PACKET_DIAG_INFO
 PACKET_DIAG_MCLIST
 PACKET_DIAG_RX_RING

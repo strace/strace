@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/videodev2.h
 V4L2_STD_PAL_B          ((v4l2_std_id)0x00000001)
 V4L2_STD_PAL_B1         ((v4l2_std_id)0x00000002)
 V4L2_STD_PAL_G          ((v4l2_std_id)0x00000004)

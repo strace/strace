@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/kvm.h
 KVM_CAP_IRQCHIP				0
 KVM_CAP_HLT				1
 KVM_CAP_MMU_SHADOW_CACHE_CONTROL	2

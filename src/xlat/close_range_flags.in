@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/close_range.h
 CLOSE_RANGE_UNSHARE
 CLOSE_RANGE_CLOEXEC

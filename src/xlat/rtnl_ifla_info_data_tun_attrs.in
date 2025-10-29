@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_TUN_UNSPEC
 IFLA_TUN_OWNER
 IFLA_TUN_GROUP

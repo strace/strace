@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/netlink.h
 NLM_F_REQUEST
 NLM_F_MULTI
 NLM_F_ACK

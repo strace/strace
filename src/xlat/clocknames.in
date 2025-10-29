@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/time.h
 CLOCK_REALTIME 0
 CLOCK_MONOTONIC 1
 CLOCK_PROCESS_CPUTIME_ID 2

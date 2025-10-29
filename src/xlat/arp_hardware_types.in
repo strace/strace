@@ -1,4 +1,5 @@
 #sorted sort -k2,2g
+#From include/uapi/linux/if_arp.h
 ARPHRD_NETROM			0
 ARPHRD_ETHER			1
 ARPHRD_EETHER			2

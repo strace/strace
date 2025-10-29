@@ -1,5 +1,6 @@
 #unconditional
 #sorted sort -k2,2
+#From include/uapi/linux/v4l2-controls.h
 V4L2_CTRL_CLASS_USER
 V4L2_CTRL_CLASS_CODEC
 V4L2_CTRL_CLASS_CAMERA

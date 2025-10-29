@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/ipv6.h
 DEVCONF_FORWARDING				0
 DEVCONF_HOPLIMIT				1
 DEVCONF_MTU6					2

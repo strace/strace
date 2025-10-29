@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/videodev2.h
 V4L2_IN_ST_NO_POWER    0x00000001
 V4L2_IN_ST_NO_SIGNAL   0x00000002
 V4L2_IN_ST_NO_COLOR    0x00000004

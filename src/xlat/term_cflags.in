@@ -1,3 +1,5 @@
+#From include/uapi/asm-generic/termbits-common.h
+#From include/uapi/asm-generic/termbits.h
 CSTOPB
 CREAD
 PARENB

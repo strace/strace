@@ -1,4 +1,5 @@
 #value_indexed
+#From include/net/bluetooth/hci_sock.h
 HCI_CHANNEL_RAW		0
 HCI_CHANNEL_USER	1
 HCI_CHANNEL_MONITOR	2

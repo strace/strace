@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/nfc.h
 NFC_LLCP_RW		0
 NFC_LLCP_MIUX		1
 NFC_LLCP_REMOTE_MIU	2

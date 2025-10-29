@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/btrfs.h
 BTRFS_BALANCE_DATA
 BTRFS_BALANCE_SYSTEM
 BTRFS_BALANCE_METADATA

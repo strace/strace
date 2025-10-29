@@ -1,4 +1,7 @@
 #value_indexed
+#From include/linux/socket.h
+#From include/uapi/linux/if_pppox.h
+#From include/uapi/linux/tipc.h
 AF_UNSPEC	0
 AF_UNIX		1
 AF_INET		2

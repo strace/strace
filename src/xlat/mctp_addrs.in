@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/mctp.h
 MCTP_ADDR_NULL	0x00
 MCTP_ADDR_ANY	0xff

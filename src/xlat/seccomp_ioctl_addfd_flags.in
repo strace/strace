@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/seccomp.h
 SECCOMP_ADDFD_FLAG_SETFD
 SECCOMP_ADDFD_FLAG_SEND

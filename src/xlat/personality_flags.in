@@ -1,3 +1,4 @@
+#From include/uapi/linux/personality.h
 UNAME26			0x0020000
 ADDR_NO_RANDOMIZE	0x0040000
 FDPIC_FUNCPTRS		0x0080000

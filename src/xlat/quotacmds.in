@@ -1,3 +1,5 @@
+#From include/uapi/linux/dqblk_xfs.h
+#From include/uapi/linux/quota.h
 Q_V1_QUOTAON	OLD_CMD(0x1)
 Q_V1_QUOTAOFF	OLD_CMD(0x2)
 Q_V1_GETQUOTA	OLD_CMD(0x3)

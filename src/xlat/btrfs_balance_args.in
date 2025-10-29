@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/btrfs.h
 BTRFS_BALANCE_ARGS_PROFILES
 BTRFS_BALANCE_ARGS_USAGE
 BTRFS_BALANCE_ARGS_DEVID

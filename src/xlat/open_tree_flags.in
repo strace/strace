@@ -1,4 +1,6 @@
 #unconditional
+#From include/uapi/linux/fcntl.h
+#From include/uapi/linux/mount.h
 OPEN_TREE_CLONE
 OPEN_TREE_CLOEXEC
 AT_SYMLINK_NOFOLLOW

@@ -1,2 +1,3 @@
 #unconditional
+#From include/uapi/linux/lsm.h
 LSM_FLAG_SINGLE

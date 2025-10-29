@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/input-event-codes.h
 REP_DELAY
 REP_PERIOD

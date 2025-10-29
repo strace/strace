@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/prctl.h
 PR_FP_MODE_FR		(1 << 0)	/* 64b FP registers */
 PR_FP_MODE_FRE		(1 << 1)	/* 32b compatibility */

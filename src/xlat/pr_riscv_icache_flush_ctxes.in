@@ -1,3 +1,4 @@
 #value_indexed
+#From include/uapi/linux/prctl.h
 PR_RISCV_CTX_SW_FENCEI_ON	0
 PR_RISCV_CTX_SW_FENCEI_OFF	1

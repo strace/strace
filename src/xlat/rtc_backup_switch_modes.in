@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/rtc.h
 RTC_BSM_DISABLED	0
 RTC_BSM_DIRECT		1
 RTC_BSM_LEVEL		2

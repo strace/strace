@@ -1,3 +1,4 @@
+#From include/uapi/linux/shm.h
 SHM_RDONLY	010000
 SHM_RND		020000
 SHM_REMAP	040000

@@ -1,3 +1,4 @@
+#From include/uapi/linux/tty.h
 N_TTY		0
 N_SLIP		1
 N_MOUSE		2

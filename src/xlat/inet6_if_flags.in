@@ -1,4 +1,5 @@
 #sorted sort -k2,2g
+#From include/net/if_inet6.h
 IF_RS_SENT	0x10
 IF_RA_RCVD	0x20
 IF_RA_MANAGED	0x40

@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/kvm.h
 KVM_EXIT_UNKNOWN		0
 KVM_EXIT_EXCEPTION		1
 KVM_EXIT_IO			2

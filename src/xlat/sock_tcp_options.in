@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/tcp.h
 TCP_NODELAY			1
 TCP_MAXSEG			2
 TCP_CORK			3

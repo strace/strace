@@ -1,3 +1,4 @@
 #value_indexed
+#From include/uapi/linux/perf_event.h
 PERF_COUNT_HW_CACHE_RESULT_ACCESS 0
 PERF_COUNT_HW_CACHE_RESULT_MISS   1

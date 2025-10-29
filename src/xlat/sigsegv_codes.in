@@ -1,3 +1,4 @@
+#From include/uapi/asm-generic/siginfo.h
 SEGV_MAPERR	1
 SEGV_ACCERR	2
 SEGV_STACKFLOW	/* 3 - bfin */

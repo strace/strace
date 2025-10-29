@@ -1,3 +1,4 @@
+#From net/nfc/llcp.h
 LLCP_SAP_SDP	0x1
 LLCP_SAP_IP	0x2
 LLCP_SAP_OBEX	0x3

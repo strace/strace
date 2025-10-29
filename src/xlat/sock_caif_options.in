@@ -1,3 +1,4 @@
+#From include/uapi/linux/caif/caif_socket.h
 CAIFSO_LINK_SELECT	127
 CAIFSO_REQ_PARAM	128
 CAIFSO_RSP_PARAM	129

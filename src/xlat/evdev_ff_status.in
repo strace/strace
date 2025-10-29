@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/input.h
 FF_STATUS_STOPPED
 FF_STATUS_PLAYING

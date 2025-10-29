@@ -1,4 +1,5 @@
 #sorted
+#From include/uapi/linux/keyboard.h
 K_BRL_BLANK     K(KT_BRL, 0)
 K_BRL_DOT1      K(KT_BRL, 1)
 K_BRL_DOT2      K(KT_BRL, 2)

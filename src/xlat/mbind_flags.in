@@ -1,3 +1,4 @@
+#From include/uapi/linux/mempolicy.h
 MPOL_MF_STRICT		1
 MPOL_MF_MOVE		2
 MPOL_MF_MOVE_ALL	4

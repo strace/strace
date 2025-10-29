@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/mroute.h
 IPMRA_CREPORT_UNSPEC	0
 IPMRA_CREPORT_MSGTYPE	1
 IPMRA_CREPORT_VIF_ID	2

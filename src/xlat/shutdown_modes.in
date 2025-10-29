@@ -1,4 +1,5 @@
 #value_indexed
+#From include/linux/net.h
 SHUT_RD 0
 SHUT_WR 1
 SHUT_RDWR 2

@@ -1,2 +1,3 @@
+#From include/uapi/linux/bpf.h
 BPF_F_RDONLY	(1U << 3)
 BPF_F_WRONLY	(1U << 4)

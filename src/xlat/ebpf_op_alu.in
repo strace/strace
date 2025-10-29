@@ -1,3 +1,4 @@
+#From include/uapi/linux/bpf.h
 BPF_MOV		0xb0
 BPF_ARSH	0xc0
 BPF_END		0xd0

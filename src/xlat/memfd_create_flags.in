@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/memfd.h
 MFD_CLOEXEC
 MFD_ALLOW_SEALING
 MFD_HUGETLB

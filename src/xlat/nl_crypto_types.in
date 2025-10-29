@@ -1,3 +1,4 @@
+#From include/uapi/linux/cryptouser.h
 CRYPTO_MSG_NEWALG	0x10
 CRYPTO_MSG_DELALG	0x11
 CRYPTO_MSG_UPDATEALG	0x12

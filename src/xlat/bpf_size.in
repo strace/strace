@@ -1,3 +1,5 @@
+#From include/uapi/linux/bpf.h
+#From include/uapi/linux/bpf_common.h
 BPF_W	0x00
 BPF_H	0x08
 BPF_B	0x10

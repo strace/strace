@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/btrfs.h
 BTRFS_BALANCE_CTL_PAUSE
 BTRFS_BALANCE_CTL_CANCEL

@@ -1,3 +1,4 @@
+#From arch/alpha/include/uapi/asm/termios.h
 _VINTR
 _VQUIT
 _VERASE

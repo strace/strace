@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/rtnetlink.h
 RTEXT_FILTER_VF			(1 << 0)
 RTEXT_FILTER_BRVLAN		(1 << 1)
 RTEXT_FILTER_BRVLAN_COMPRESSED	(1 << 2)

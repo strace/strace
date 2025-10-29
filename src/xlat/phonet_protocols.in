@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/phonet.h
 PN_PROTO_TRANSPORT	0
 PN_PROTO_PHONET		1
 PN_PROTO_PIPE		2

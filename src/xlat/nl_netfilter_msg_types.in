@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/netfilter/nfnetlink.h
 NFNL_MSG_BATCH_BEGIN
 NFNL_MSG_BATCH_END

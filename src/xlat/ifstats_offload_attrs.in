@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/if_link.h
 IFLA_OFFLOAD_XSTATS_UNSPEC	0
 IFLA_OFFLOAD_XSTATS_CPU_HIT	1

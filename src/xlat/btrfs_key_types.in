@@ -1,5 +1,7 @@
 #sorted
 #val_type uint64_t
+#From include/linux/libfdt_env.h
+#From include/uapi/linux/btrfs_tree.h
 BTRFS_INODE_ITEM_KEY
 BTRFS_INODE_REF_KEY
 BTRFS_INODE_EXTREF_KEY

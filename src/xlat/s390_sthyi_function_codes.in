@@ -1,1 +1,2 @@
+#From arch/s390/include/uapi/asm/sthyi.h
 STHYI_FC_CP_IFL_CAP 0

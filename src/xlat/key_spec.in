@@ -1,5 +1,6 @@
 #unconditional
 #val_type int
+#From include/uapi/linux/keyctl.h
 KEY_SPEC_THREAD_KEYRING
 KEY_SPEC_PROCESS_KEYRING
 KEY_SPEC_SESSION_KEYRING

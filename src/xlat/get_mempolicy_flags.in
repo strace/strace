@@ -1,3 +1,4 @@
+#From include/uapi/linux/mempolicy.h
 MPOL_F_NODE	1
 MPOL_F_ADDR	2
 MPOL_F_MEMS_ALLOWED	4

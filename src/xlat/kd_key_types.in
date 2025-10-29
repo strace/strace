@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/keyboard.h
 KT_LATIN	0
 KT_FN		1
 KT_SPEC		2

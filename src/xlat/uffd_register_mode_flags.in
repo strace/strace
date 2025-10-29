@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
+#From include/uapi/linux/userfaultfd.h
 UFFDIO_REGISTER_MODE_MISSING
 UFFDIO_REGISTER_MODE_WP
 UFFDIO_REGISTER_MODE_MINOR

@@ -1,3 +1,4 @@
+#From arch/x86/include/uapi/asm/kvm.h
 #ifndef BIT
 /*
  * Workaround a bug in kernel headers fixed by linux commit v4.7-rc1~32^2~42.

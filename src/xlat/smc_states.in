@@ -1,3 +1,4 @@
+#From net/smc/smc.h
 SMC_ACTIVE		1
 SMC_INIT		2
 SMC_CLOSED		7

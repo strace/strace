@@ -1,3 +1,4 @@
 #unconditional
+#From include/uapi/linux/bsg.h
 BSG_FLAG_Q_AT_TAIL
 BSG_FLAG_Q_AT_HEAD

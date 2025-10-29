@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/neighbour.h
 NUD_NONE	0x00
 NUD_INCOMPLETE	0x01
 NUD_REACHABLE	0x02

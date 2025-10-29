@@ -1,3 +1,4 @@
 #value_indexed
+#From net/smc/smc.h
 SMCPROTO_SMC	0
 SMCPROTO_SMC6	1

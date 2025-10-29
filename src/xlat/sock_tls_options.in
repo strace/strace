@@ -1,3 +1,4 @@
 #value_indexed
+#From include/uapi/linux/tls.h
 TLS_TX	1
 TLS_RX	2

@@ -1,4 +1,5 @@
 #unconditional
+#From include/uapi/linux/mptcp.h
 MPTCP_SUBFLOW_FLAG_MCAP_REM		(1 << 0)
 MPTCP_SUBFLOW_FLAG_MCAP_LOC		(1 << 1)
 MPTCP_SUBFLOW_FLAG_JOIN_REM		(1 << 2)

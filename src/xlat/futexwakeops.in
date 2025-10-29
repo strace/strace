@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/futex.h
 FUTEX_OP_SET	0
 FUTEX_OP_ADD	1
 FUTEX_OP_OR	2

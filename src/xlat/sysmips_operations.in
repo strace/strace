@@ -1,3 +1,4 @@
+#From arch/mips/include/uapi/asm/sysmips.h
 SETNAME
 FLUSH_CACHE
 MIPS_FIXADE

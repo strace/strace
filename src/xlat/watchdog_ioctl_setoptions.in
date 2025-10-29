@@ -1,3 +1,4 @@
+#From include/uapi/linux/watchdog.h
 WDIOS_DISABLECARD      0x0001
 WDIOS_ENABLECARD       0x0002
 WDIOS_TEMPPANIC        0x0004

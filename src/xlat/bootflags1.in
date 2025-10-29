@@ -1,1 +1,2 @@
+#From include/uapi/linux/reboot.h
 LINUX_REBOOT_MAGIC1 0xfee1dead

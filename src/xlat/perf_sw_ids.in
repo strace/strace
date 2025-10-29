@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/perf_event.h
 PERF_COUNT_SW_CPU_CLOCK         0
 PERF_COUNT_SW_TASK_CLOCK        1
 PERF_COUNT_SW_PAGE_FAULTS       2

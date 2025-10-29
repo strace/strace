@@ -1,4 +1,5 @@
 #value_indexed
+#From include/uapi/linux/lwtunnel.h
 LWTUNNEL_ENCAP_NONE		0
 LWTUNNEL_ENCAP_MPLS		1
 LWTUNNEL_ENCAP_IP		2

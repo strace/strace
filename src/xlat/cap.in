@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
+#From include/uapi/linux/capability.h
 CAP_CHOWN
 CAP_DAC_OVERRIDE
 CAP_DAC_READ_SEARCH

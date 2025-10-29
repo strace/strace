@@ -1,3 +1,5 @@
+#From include/uapi/linux/inet_diag.h
+#From include/uapi/linux/sock_diag.h
 TCPDIAG_GETSOCK		18
 DCCPDIAG_GETSOCK	19
 SOCK_DIAG_BY_FAMILY	20
