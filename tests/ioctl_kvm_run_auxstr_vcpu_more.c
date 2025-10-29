@@ -10,46 +10,47 @@
 
 #if need_print_KVM_RUN
 static void
-print_KVM_RUN_MORE(const int fd, const char *const dev, const char *str,
-		   const struct kvm_run *run_before, const struct kvm_run *run_after)
+print_kvm_run_more(const char *prefix, const char *reason_str, const struct kvm_run *run)
 {
-	printf(" VCPU:0> " "{request_interrupt_window=%u, immediate_exit=%u",
-	       run_before->request_interrupt_window, run_before->immediate_exit);
-	printf(", exit_reason=%d /* %s */, "
-	       "ready_for_interrupt_injection=%u, if_flag=%u, flags=%u",
-	       run_after->exit_reason, str,
-	       run_after->ready_for_interrupt_injection, run_after->if_flag,
-	       run_after->flags);
-	printf(", cr8=%#016llx", run_before->cr8);
-	if (run_before->cr8 != run_after->cr8)
-		printf(" => %#016llx", run_after->cr8);
-	printf(", apic_base=%#016llx", run_before->apic_base);
-	if (run_before->apic_base != run_after->apic_base)
-		printf(" => %#016llx", run_after->apic_base);
+	printf(" %s {request_interrupt_window=%u, immediate_exit=%u"
+	       ", exit_reason=%d /* %s */, ready_for_interrupt_injection=%u"
+	       ", if_flag=%u, flags=%u, cr8=%#016llx, apic_base=%#016llx",
+	       prefix, run->request_interrupt_window, run->immediate_exit,
+	       run->exit_reason, reason_str, run->ready_for_interrupt_injection,
+	       run->if_flag, run->flags, run->cr8, run->apic_base);
 
-	switch (run_after->exit_reason) {
+	switch (run->exit_reason) {
 	case KVM_EXIT_IO:
 		printf(", {io={direction=%s"
 		       ", size=%u, port=%#04x, count=%u, data_offset=%#016llx}}",
-		       run_after->io.direction == KVM_EXIT_IO_IN
+		       run->io.direction == KVM_EXIT_IO_IN
 		       ? "KVM_EXIT_IO_IN" : "KVM_EXIT_IO_OUT",
-		       run_after->io.size, run_after->io.port,
-		       run_after->io.count, run_after->io.data_offset);
+		       run->io.size, run->io.port,
+		       run->io.count, run->io.data_offset);
 		break;
 	case KVM_EXIT_MMIO:
 		printf(", {mmio={phys_addr=%#016llx"
 		       ", data=[%#0x, %#0x, %#0x, %#0x, %#0x, %#0x, %#0x, %#0x]"
 		       ", len=%u, is_write=%u}}",
-		       run_after->mmio.phys_addr,
-		       run_after->mmio.data[0], run_after->mmio.data[1],
-		       run_after->mmio.data[2], run_after->mmio.data[3],
-		       run_after->mmio.data[4], run_after->mmio.data[5],
-		       run_after->mmio.data[6], run_after->mmio.data[7],
-		       run_after->mmio.len,
-		       run_after->mmio.is_write);
+		       run->mmio.phys_addr,
+		       run->mmio.data[0], run->mmio.data[1],
+		       run->mmio.data[2], run->mmio.data[3],
+		       run->mmio.data[4], run->mmio.data[5],
+		       run->mmio.data[6], run->mmio.data[7],
+		       run->mmio.len,
+		       run->mmio.is_write);
 		break;
 	}
 
 	puts("}");
+}
+
+static void
+print_KVM_RUN_MORE(const int fd, const char *const dev,
+		   const char *str_before, const struct kvm_run *run_before,
+		   const char *str_after, const struct kvm_run *run_after)
+{
+	print_kvm_run_more("VCPU:0<", str_before, run_before);
+	print_kvm_run_more("VCPU:0>", str_after, run_after);
 }
 #endif

@@ -488,57 +488,30 @@ kvm_run_structure_decode_mmio(struct tcb *tcp,
 
 static void
 kvm_run_structure_decode_main(struct tcb *tcp,
-			      struct kvm_run *state_in,
-			      struct kvm_run *state_out)
+			      struct kvm_run *state,
+			      const char *auxstr)
 {
-	int fd;
-	struct vcpu_info *info;
-
-# define PRINT_FIELD_BEFORE_AFTER(fmt, before_, after_, field_)	\
-	do {							\
-		tprints_field_name(#field_);			\
-		PRINT_VAL_##fmt((before_).field_);		\
-		if ((before_).field_ != (after_).field_) {	\
-			tprint_value_changed();			\
-			PRINT_VAL_##fmt((after_).field_);	\
-		} \
-	} while (0)
-
-	/* If the last KVM_RUN failed, decoding the kvm_run struct
-	 * doesn't make sense. */
-	if (syserror(tcp))
-		return;
-
-	fd = tcp->u_arg[0];
-	info = vcpu_get_info(tcp, fd);
-	if (info)
-		tprintf_string(" VCPU:%d> ", info->cpuid);
-	else
-		tprints_string(" VCPU> ");
 	tprint_struct_begin();
 
-	/* IN */
-	PRINT_FIELD_U(*state_in, request_interrupt_window);
+	PRINT_FIELD_U(*state, request_interrupt_window);
 	tprint_struct_next();
-	PRINT_FIELD_U(*state_in, immediate_exit);
-	tprint_struct_next();
-
-	/* OUT */
-	PRINT_FIELD_U(*state_out, exit_reason);
-	if (tcp->auxstr)
-		tprints_comment(tcp->auxstr);
-	tprint_struct_next();
-	PRINT_FIELD_U(*state_out, ready_for_interrupt_injection);
-	tprint_struct_next();
-	PRINT_FIELD_U(*state_out, if_flag);
-	tprint_struct_next();
-	PRINT_FIELD_X(*state_out, flags);
+	PRINT_FIELD_U(*state, immediate_exit);
 	tprint_struct_next();
 
-	/* INOUT */
-	PRINT_FIELD_BEFORE_AFTER(0X, *state_in, *state_out, cr8);
+	PRINT_FIELD_U(*state, exit_reason);
+	if (auxstr)
+		tprints_comment(auxstr);
 	tprint_struct_next();
-	PRINT_FIELD_BEFORE_AFTER(0X, *state_in, *state_out, apic_base);
+	PRINT_FIELD_U(*state, ready_for_interrupt_injection);
+	tprint_struct_next();
+	PRINT_FIELD_U(*state, if_flag);
+	tprint_struct_next();
+	PRINT_FIELD_X(*state, flags);
+	tprint_struct_next();
+
+	PRINT_FIELD_0X(*state, cr8);
+	tprint_struct_next();
+	PRINT_FIELD_0X(*state, apic_base);
 
 #define DECODE_UNION(...)			\
 	do {					\
@@ -548,12 +521,12 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 		tprint_union_end();		\
 	} while (0)
 
-	switch (state_out->exit_reason) {
+	switch (state->exit_reason) {
 	case KVM_EXIT_IO:
-		DECODE_UNION(kvm_run_structure_decode_io(tcp, state_out));
+		DECODE_UNION(kvm_run_structure_decode_io(tcp, state));
 		break;
 	case KVM_EXIT_MMIO:
-		DECODE_UNION(kvm_run_structure_decode_mmio(tcp, state_out));
+		DECODE_UNION(kvm_run_structure_decode_mmio(tcp, state));
 		break;
 	}
 
@@ -564,11 +537,36 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 void
 kvm_run_structure_decode(struct tcb * tcp)
 {
-	if (!tcp->vcpu_leaving || !tcp->vcpu_entering)
-		return;
+	int fd = tcp->u_arg[0];
+	struct vcpu_info * info = vcpu_get_info(tcp, fd);
 
-	kvm_run_structure_decode_main(tcp, tcp->vcpu_entering,
-				      tcp->vcpu_leaving);
+	/* Before */
+	if (tcp->vcpu_entering) {
+		if (info)
+			tprintf_string(" VCPU:%d< ", info->cpuid);
+		else
+			tprints_string(" VCPU< ");
+		const char *auxstr = xlookup(kvm_exit_reason,
+					     tcp->vcpu_entering->exit_reason);
+		kvm_run_structure_decode_main(tcp, tcp->vcpu_entering,
+					      auxstr);
+	}
+
+	if (syserror(tcp)) {
+		tcp->vcpu_leaving = NULL;
+		return;
+	}
+
+	/* After */
+	if (tcp->vcpu_leaving) {
+		if (info)
+			tprintf_string(" VCPU:%d> ", info->cpuid);
+		else
+			tprints_string(" VCPU> ");
+		kvm_run_structure_decode_main(tcp, tcp->vcpu_leaving,
+					      tcp->auxstr);
+	}
+
 	tcp->vcpu_leaving = NULL;
 }
 
