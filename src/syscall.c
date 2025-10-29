@@ -1027,8 +1027,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		unwind_tcb_print(tcp);
 #endif
 #ifdef HAVE_LINUX_KVM_H
-	if (decode_kvm_run_structure == DECODE_KVM_RUN_STRUCTURE_MORE)
+	if (tcp->flags & TCP_AFTER_KVM_RUN
+	    && decode_kvm_run_structure == DECODE_KVM_RUN_STRUCTURE_MORE)
 		kvm_run_structure_decode(tcp);
+	tcp->flags &= ~TCP_AFTER_KVM_RUN;
 #endif
 	return 0;
 }

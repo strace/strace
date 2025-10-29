@@ -371,6 +371,7 @@ struct tcb {
 # define TCB_SECCOMP_FILTER		0x40000	/* This process has a seccomp filter
 						 * attached.
 						 */
+# define TCP_AFTER_KVM_RUN		0x80000	/* The process has returned from KVM_RUN ioctl */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */

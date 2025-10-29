@@ -442,6 +442,7 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 		return RVAL_DECODED | RVAL_FD;
 
 	case KVM_RUN:
+		tcp->flags |= TCP_AFTER_KVM_RUN;
 		return kvm_ioctl_decode_run(tcp);
 
 	case KVM_GET_VCPU_MMAP_SIZE:
