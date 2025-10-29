@@ -82,6 +82,10 @@ __asm__(
 	"	out %al, (%dx)		\n"
 	"	mov $0x2000, %dx	\n"
 	"	movb $0xdf, (%edx)	\n"
+	"	mov $0x2001, %dx	\n"
+	"	movb (%edx), %al	\n" /* read from iomem */
+	"	mov $0x03f9, %dx	\n"
+	"	out %al, (%dx)		\n" /* use ioport again */
 	"	hlt			\n"
 # ifdef __x86_64__
 	".code64			\n"
@@ -240,26 +244,49 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 			    && run->io.data_offset < mmap_size
 			    && p && *p == ((char *) run)[run->io.data_offset])
 				p = NULL;
+			else if (run->io.direction == KVM_EXIT_IO_OUT
+			    && run->io.size == 1
+			    && run->io.port == 0x03f9
+			    && run->io.count == 1
+			    && run->io.data_offset < mmap_size
+			    && p == NULL)
+				; /* Do nothing */
 			else
 				error_msg_and_fail("unhandled KVM_EXIT_IO");
 			break;
 		case KVM_EXIT_MMIO:
-			if (!(p == NULL
-			      && run->mmio.phys_addr == 0x2000
-			      && run->mmio.data[0] == 0xdf
-			      && run->mmio.len == 1
-			      && run->mmio.is_write == 1))
-				error_msg_and_fail("Got an unexpected MMIO exit:"
-						   " phys_addr %#llx,"
-						   " data %02x %02x %02x %02x"
-						   " %02x %02x %02x %02x,"
-						   " len %u, is_write %hhu\n",
-						   (unsigned long long) run->mmio.phys_addr,
-						   run->mmio.data[0], run->mmio.data[1],
-						   run->mmio.data[2], run->mmio.data[3],
-						   run->mmio.data[4], run->mmio.data[5],
-						   run->mmio.data[6], run->mmio.data[7],
-						   run->mmio.len, run->mmio.is_write);
+			/* The guest writes to iomem. */
+			if (p == NULL
+			    && run->mmio.data[0] == 0xdf
+			    && run->mmio.len == 1
+			    && run->mmio.phys_addr == 0x2000
+			    && run->mmio.is_write == 1)
+				break;
+			/* The guest reads from iomem. */
+			if (p == NULL
+			    && run->mmio.len == 1
+			    && run->mmio.phys_addr == 0x2001
+			    && run->mmio.is_write == 0) {
+				/* Provide the data before invoking
+				 * ioctl(KVM_RUN).
+				 *
+				 * strace finds the data in the
+				 * kvm_run before-state and will
+				 * decode it.  */
+				run->mmio.data[0] = 0xab;
+				break;
+			}
+			error_msg_and_fail("Got an unexpected MMIO exit:"
+					   " phys_addr %#llx,"
+					   " data %02x %02x %02x %02x"
+					   " %02x %02x %02x %02x,"
+					   " len %u, is_write %hhu\n",
+					   (unsigned long long) run->mmio.phys_addr,
+					   run->mmio.data[0], run->mmio.data[1],
+					   run->mmio.data[2], run->mmio.data[3],
+					   run->mmio.data[4], run->mmio.data[5],
+					   run->mmio.data[6], run->mmio.data[7],
+					   run->mmio.len, run->mmio.is_write);
 			break;
 		case KVM_EXIT_FAIL_ENTRY:
 			error_msg_and_fail("Got an unexpected FAIL_ENTRY exit:"
