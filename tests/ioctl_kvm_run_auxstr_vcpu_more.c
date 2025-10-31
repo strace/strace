@@ -12,12 +12,26 @@
 static void
 print_kvm_run_more(const char *prefix, const char *reason_str, const struct kvm_run *run)
 {
-	printf(" %s {request_interrupt_window=%u, immediate_exit=%u"
+	printf(" %s {request_interrupt_window=%u"
+# ifdef HAVE_STRUCT_KVM_RUN_IMMEDIATE_EXIT
+	       ", immediate_exit=%u"
+# endif
 	       ", exit_reason=%d /* %s */, ready_for_interrupt_injection=%u"
-	       ", if_flag=%u, flags=%u, cr8=%#016llx, apic_base=%#016llx",
-	       prefix, run->request_interrupt_window, run->immediate_exit,
+	       ", if_flag=%u"
+# ifdef HAVE_STRUCT_KVM_RUN_FLAGS
+	       ", flags=%u"
+# endif
+	       ", cr8=%#016llx, apic_base=%#016llx",
+	       prefix, run->request_interrupt_window,
+# ifdef HAVE_STRUCT_KVM_RUN_IMMEDIATE_EXIT
+	       run->immediate_exit,
+# endif
 	       run->exit_reason, reason_str, run->ready_for_interrupt_injection,
-	       run->if_flag, run->flags, run->cr8, run->apic_base);
+	       run->if_flag,
+# ifdef HAVE_STRUCT_KVM_RUN_FLAGS
+	       run->flags,
+# endif
+	       run->cr8, run->apic_base);
 
 	switch (run->exit_reason) {
 	case KVM_EXIT_IO:

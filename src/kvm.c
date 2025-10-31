@@ -495,8 +495,10 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 
 	PRINT_FIELD_U(*state, request_interrupt_window);
 	tprint_struct_next();
+# ifdef HAVE_STRUCT_KVM_RUN_IMMEDIATE_EXIT
 	PRINT_FIELD_U(*state, immediate_exit);
 	tprint_struct_next();
+# endif
 
 	PRINT_FIELD_U(*state, exit_reason);
 	if (auxstr)
@@ -506,8 +508,10 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 	tprint_struct_next();
 	PRINT_FIELD_U(*state, if_flag);
 	tprint_struct_next();
+# ifdef	HAVE_STRUCT_KVM_RUN_FLAGS
 	PRINT_FIELD_X(*state, flags);
 	tprint_struct_next();
+# endif
 
 	PRINT_FIELD_0X(*state, cr8);
 	tprint_struct_next();
