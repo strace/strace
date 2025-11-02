@@ -1,0 +1,254 @@
+.\" Copyright (c) 2018-2025 The strace developers.
+.\" All rights reserved.
+.\"
+.\" SPDX-License-Identifier: LGPL-2.1-or-later
+.\"
+.TH GEN_XLAT_DEFS.SH 1
+.\"
+.SH NAME
+maint/gen_xlat_defs.sh \- generate xlat .in files from Linux UAPI headers
+.\"
+.SH SYNOPSIS
+.SY maint/gen_xlat_defs.sh
+.OR \-\-help
+.YS
+.SY maint/gen_xlat_defs.sh
+.OR \-f \fIVAL_PRINT_FMT\fP
+.OR \-p \fIREGEXP_PATTERN\fP
+.OR \-d \fILINUX_SRC_DIR\fP
+.OR \-c \fICOMMON_DEFS_GLOB_PATTERN\fP
+.OR \-a \fIARCH_DEFS_FILE\fP
+.RI " < " xlat_file_name.in
+.YS
+.\"
+.SH DESCRIPTION
+.B maint/gen_xlat_defs.sh
+generates xlat .in files based on existing files and Linux UAPI headers.
+It extracts constant definitions from the Linux kernel source code and
+produces architecture-aware xlat definition files suitable for use by
+strace's xlat system.
+.PP
+The script reads an existing xlat .in file from standard input, extracts
+constant names matching the specified pattern, looks up their values in
+the Linux kernel UAPI headers, and outputs an updated .in file that
+includes architecture-specific value differences where applicable.
+.PP
+The script automatically detects when a constant has different numeric values
+across different architectures and generates appropriate preprocessor
+directives (\fB#if\fP, \fB#elif\fP, \fB#else\fP, \fB#endif\fP) to handle these
+differences.  It also preserves existing comments and directives from the
+input file (except for the generated-by comment line).
+.\"
+.SH OPTIONS
+.TP
+.BI \-f \ VAL_PRINT_FMT
+Specifies the printf format string for printing numeric values in the
+output.  Common formats include:
+.RS
+.TP
+.B d
+Decimal format (e.g., \fB42\fP)
+.TP
+.B #x
+Hexadecimal format with 0x prefix (e.g., \fB0x2a\fP)
+.TP
+.B #o
+Octal format with 0 prefix (e.g., \fB052\fP)
+.TP
+.B u
+Unsigned decimal format (e.g., \fB42\fP)
+.RE
+.TP
+.BI \-p \ REGEXP_PATTERN
+Specifies a regular expression pattern used to match constant names in the
+input file.  Only lines matching this pattern will be processed.  The
+pattern should match the prefix or naming convention of the constants
+being extracted (e.g., \fBMADV_\fP, \fB_?MAP_\fP, \fBSO_\fP).
+.TP
+.BI \-d \ LINUX_SRC_DIR
+Specifies the path to the Linux kernel source directory.  This directory
+should contain the standard Linux kernel source tree structure with
+\fBinclude/uapi/\fP subdirectories.
+.TP
+.BI \-c \ COMMON_DEFS_GLOB_PATTERN
+Specifies a glob pattern for locating common (architecture-independent)
+definitions in the Linux UAPI headers.  The pattern is relative to
+\fIinclude/uapi/\fP in the Linux source directory.  Examples:
+\fBasm-generic/mman-common.h\fP, \fBasm-generic/socket.h\fP,
+\fBasm-generic/fcntl.h\fP.
+.TP
+.BI \-a \ ARCH_DEFS_FILE
+Specifies the architecture-specific definitions file name.  The script
+searches for this file in
+\fIarch/*/include/uapi/\fP subdirectories of the Linux source directory.
+Examples: \fBasm/mman.h\fP, \fBasm/socket.h\fP, \fBasm/fcntl.h\fP.
+.\"
+.SH INPUT FORMAT
+The script reads an xlat .in file from standard input.  The input file
+can contain:
+.RS
+.TP
+Constant name lines
+Lines containing constant names (optionally with trailing whitespace)
+that match the specified regex pattern.  These will be looked up in
+the kernel headers.
+.TP
+Comments
+Lines starting with \fB#\fP or containing \fB/* ... */\fP style comments.
+These are preserved in the output.
+.TP
+Blank lines
+Empty lines are preserved to maintain formatting.
+.TP
+Directives
+Special directives like \fB#sorted\fP, \fB#unconditional\fP, etc. are
+preserved.
+.RE
+.\"
+.SH OUTPUT FORMAT
+The script outputs an updated xlat .in file with the following features:
+.RS
+.TP
+Generated-by header
+The first line contains a comment indicating how the file was generated,
+including all the command-line options used.
+.TP
+Architecture-specific conditionals
+When a constant has different values across architectures, the script
+generates preprocessor conditionals like:
+.sp
+.in +4n
+.EX
+#if defined __arch1__ || defined __arch2__
+CONSTANT_NAME	value1
+#elif defined __arch3__
+CONSTANT_NAME	value2
+#else
+CONSTANT_NAME	value3
+#endif
+.EE
+.in
+.TP
+Preserved content
+All comments, blank lines, and directives from the input are preserved
+(except the old generated-by line).
+.RE
+.\"
+.SH EXAMPLES
+The following examples demonstrate common usage patterns:
+.PP
+Generate madvise command constants:
+.RS
+.EX
+maint/gen_xlat_defs.sh -f 'd' -p 'MADV_' -d /path/to/linux \\
+    -c 'asm-generic/mman-common.h' -a 'asm/mman.h' \\
+    < src/xlat/madvise_cmds.in > src/xlat/madvise_cmds.in.new
+.EE
+.RE
+.PP
+Generate mmap flag constants with hexadecimal output:
+.RS
+.EX
+maint/gen_xlat_defs.sh -f '#x' -p '_?MAP_' -d /path/to/linux \\
+    -c 'asm-generic/mman*.h' -a 'asm/mman.h' \\
+    < src/xlat/mmap_flags.in > src/xlat/mmap_flags.in.new
+.EE
+.RE
+.PP
+Generate open mode flag constants with octal output:
+.RS
+.EX
+maint/gen_xlat_defs.sh -f '#o' -p '[_OF]' -d /path/to/linux \\
+    -c 'asm-generic/fcntl.h' -a 'asm/fcntl.h' \\
+    < src/xlat/open_mode_flags.in > src/xlat/open_mode_flags.in.new
+.EE
+.RE
+.PP
+Generate socket option constants:
+.RS
+.EX
+maint/gen_xlat_defs.sh -f 'u' -p 'SO_' -d /path/to/linux \\
+    -c 'asm-generic/socket.h' -a 'asm/socket.h' \\
+    < src/xlat/sock_options.in > src/xlat/sock_options.in.new
+.EE
+.RE
+.\"
+.SH ARCHITECTURE HANDLING
+The script automatically handles architecture-specific differences in
+constant values.  It:
+.RS
+.TP
+1.
+First looks up the constant in the common (architecture-independent)
+headers to determine the default value.
+.TP
+2.
+Then searches all architecture-specific header files for different
+definitions of the same constant.
+.TP
+3.
+Groups architectures with the same value together using logical OR
+conditions.
+.TP
+4.
+Generates appropriate \fB#if\fP / \fB#elif\fP / \fB#else\fP / \fB#endif\fP
+blocks to handle all variations.
+.RE
+.PP
+The script also performs special handling for certain architecture
+aliases:
+.RS
+.TP
+.B parisc
+Mapped to \fBhppa\fP in the output
+.TP
+.B arm64
+Included when \fBaarch64\fP is defined
+.TP
+.B x86
+Expanded to \fBx86_64\fP or \fBi386\fP
+.RE
+.\"
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+An error occurred.  This can be due to:
+.RS
+.TP
+Missing required command-line options
+All five options (\fB-f\fP, \fB-p\fP, \fB-d\fP, \fB-c\fP, \fB-a\fP) are
+required.
+.TP
+Invalid Linux source directory
+The specified directory does not exist or lacks the expected structure.
+.TP
+Pattern matching failures
+No constants were found matching the specified pattern.
+.RE
+.\"
+.SH NOTES
+.PP
+The script is designed to work with the standard Linux kernel source tree
+layout where UAPI headers are located in \fIinclude/uapi/\fP and
+architecture-specific headers are in \fIarch/*/include/uapi/\fP.
+.PP
+When a constant is not found in the common headers, the script issues a
+warning but continues processing.  The constant will appear in the output
+without a default value, and only architecture-specific definitions will
+be included if found.
+.PP
+The script preserves the existing structure and formatting of the input
+file as much as possible, only updating the constant definitions and adding
+architecture-specific conditionals where needed.
+.\"
+.SH SEE ALSO
+.BR strace (1)
+.PP
+The xlat file format documentation in \fIsrc/xlat/README.md\fP provides
+additional information about how generated .in files are used.
+.\"
+.SH AUTHORS
+The strace developers.
