@@ -39,13 +39,17 @@ usage()
 		rc=1
 	fi
 	cat <<-EOF
-		Usage: $0 -d LINUX_SRC [-t] xlat_file1.in [xlat_file2.in] ...
+		Usage: $0 -d LINUX_SRC [-t] [-c COMMIT_RANGE] \\
+			xlat_file1.in [xlat_file2.in] ...
 
 		-d LINUX_SRC    Path to Linux kernel source directory
 				(mandatory)
 		-t              Table output format: prints
 				xlat_file<TAB>line_type<TAB>header_file
 				for each header (default: header file only)
+		-c COMMIT_RANGE Filter table to only include headers that
+				changed between commits (requires -t)
+				(e.g., COMMIT1..COMMIT2)
 
 		The script reads xlat files specified as arguments,
 		looks for lines starting with
@@ -59,6 +63,7 @@ usage()
 
 LINUX_SRC=
 TABLE=
+COMMIT_RANGE=
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -70,6 +75,12 @@ while [ $# -gt 0 ]; do
 			;;
 		-t)
 			TABLE=1
+			;;
+		-c)
+			shift
+			[ $# -gt 0 ] ||
+				usage "-c requires an argument"
+			COMMIT_RANGE="$1"
 			;;
 		-h|--help)
 			usage
@@ -92,6 +103,39 @@ done
 	fatal "Linux source directory does not exist: $LINUX_SRC"
 [ -d "$LINUX_SRC/include/uapi" ] ||
 	fatal "$LINUX_SRC/include/uapi does not exist"
+
+# Validate -c option
+if [ -n "$COMMIT_RANGE" ]; then
+	[ -n "$TABLE" ] ||
+		fatal "-c option requires -t option"
+
+	# Validate commit range format
+	case "$COMMIT_RANGE" in
+		*...*)
+			fatal "Three-dot syntax (COMMIT1...COMMIT2) is not supported"
+			;;
+		*..*)
+			# Valid: two-dot range syntax
+			;;
+		*)
+			fatal "Single commit is not supported, use COMMIT1..COMMIT2"
+			;;
+	esac
+
+	# Validate commit range endpoints
+	COMMIT1="${COMMIT_RANGE%%..*}"
+	COMMIT2="${COMMIT_RANGE#*..}"
+
+	cd "$LINUX_SRC" || exit 1
+
+	git rev-parse "$COMMIT1^{commit}" >/dev/null ||
+		fatal "Commit $COMMIT1 not found in $LINUX_SRC"
+
+	git rev-parse "$COMMIT2^{commit}" >/dev/null ||
+		fatal "Commit $COMMIT2 not found in $LINUX_SRC"
+
+	cd - > /dev/null || exit 1
+fi
 
 # Expand a pattern (glob or plain filename) and print matching header files
 # Arguments:
@@ -278,8 +322,51 @@ process_file()
 	}
 }
 
+# Process all input files and output sorted unique headers
+process_all_files()
+{
+	for file; do
+		process_file "$file" ||:
+	done |
+		sort -u
+}
+
 # Process input files, collecting all headers and deduplicating
-for file do
-	process_file "$file" ||:
-done |
-	sort -u
+if [ -z "$COMMIT_RANGE" ]; then
+	# Normal processing
+	process_all_files "$@"
+else
+	# Generate table and filter by changed headers
+	table_file=
+	changed_file=
+	cleanup()
+	{
+		trap - EXIT HUP PIPE INT QUIT TERM
+		[ -z "$table_file" ] || rm -f -- "$table_file"
+		[ -z "$changed_file" ] || rm -f -- "$changed_file"
+		exit "$@"
+	}
+
+	trap 'cleanup $?' EXIT
+	trap 'cleanup 1' HUP PIPE INT QUIT TERM
+
+	# Use temporary file to collect table output
+	table_file=$(mktemp)
+	process_all_files "$@" > "$table_file"
+
+	# Filter by changed headers
+	cd "$LINUX_SRC" || exit 1
+
+	# Extract unique header files from column 3 and find which changed
+	# Use temporary file instead of variable to avoid storing large output
+	changed_file=$(mktemp)
+	cut -f3 < "$table_file" | sort -u |
+		xargs git diff --name-only "$COMMIT_RANGE" -- |
+		sort -u > "$changed_file"
+
+	cd - > /dev/null || exit 1
+
+	# Join table with changed headers list
+	sort -t $'\t' -k3 "$table_file" |
+		join -t $'\t' -1 3 -2 1 -o 1.1,1.2,1.3 - "$changed_file"
+fi
