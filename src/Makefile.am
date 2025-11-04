@@ -9,7 +9,7 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-bin_PROGRAMS = strace
+bin_PROGRAMS = strace asinfo
 bin_SCRIPTS = strace-log-merge
 
 OS		= linux
@@ -45,6 +45,26 @@ strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
 strace_LDADD = libstrace.a $(clock_LIBS) $(timer_LIBS)
 strace_SOURCES = strace.c
+
+asinfo_CPPFLAGS = $(AM_CPPFLAGS)
+asinfo_CFLAGS = $(AM_CFLAGS)
+asinfo_LDFLAGS =
+asinfo_LDADD =
+asinfo_SOURCES = asinfo.c
+
+BUILT_SOURCES += asinfo_syscalls.h
+CLEANFILES    += asinfo_syscalls.h
+
+asinfo_syscalls.h: $(srcdir)/$(OS)/$(ARCH)/syscallent.h
+	$(AM_V_GEN){ \
+	  echo '/* Generated; do not edit. */'; \
+	  echo 'static const char *asinfo_syscall_names[] = {'; \
+	  sed -n 's/^\\[\\s*\\([0-9][0-9]*\\)\\s*\\].*\"\\([a-zA-Z0-9_][a-zA-Z0-9_]*\\)\".*/[\\1] = \"\\2\",/p' $<; \
+	  echo '};'; \
+	  echo 'static const unsigned int asinfo_syscall_count = (unsigned int)(sizeof(asinfo_syscall_names)/sizeof(asinfo_syscall_names[0]));'; \
+	} > $@-t && mv $@-t $@
+
+asinfo-asinfo.o: asinfo_syscalls.h
 
 noinst_PROGRAMS = \
 	disable_ptrace_get_syscall_info	\
