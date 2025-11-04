@@ -183,6 +183,22 @@ Annotates the xlat file with the source of the xlat constants.  There could be
 several `#From` directives in a single xlat file.  This directive is intended
 for other tools and is currently ignored by `gen.sh`.
 
+### `#Prefix PREFIX1_ ... PREFIXn_`
+
+Annotates the xlat file with the prefix pattern(s) to use when searching for
+constants in Linux headers.  Multiple prefixes can be specified, separated by
+spaces.  This directive is intended for other tools and is currently ignored
+by `gen.sh`.
+
+**Example:**
+```
+#From include/uapi/linux/io_uring.h
+#Prefix IORING_REGISTER_ IORING_UNREGISTER_
+IORING_REGISTER_BUFFERS
+IORING_UNREGISTER_BUFFERS
+...
+```
+
 ### `#<anything else>`
 
 Any other line starting with `#` is passed through verbatim.  Allows custom
