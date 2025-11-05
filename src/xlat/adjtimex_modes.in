@@ -1,4 +1,5 @@
 #From include/uapi/linux/timex.h
+#Prefix ADJ_
 ADJ_OFFSET_SS_READ	0xa001
 ADJ_OFFSET_SINGLESHOT	0x8001
 ADJ_OFFSET		0x0001

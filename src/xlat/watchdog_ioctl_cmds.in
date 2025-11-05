@@ -1,4 +1,5 @@
 #From include/uapi/linux/watchdog.h
+#Prefix WDIOC_
 WDIOC_GETSUPPORT        _IOR('W', 0, struct watchdog_info)
 WDIOC_GETSTATUS         _IOR('W', 1, int)
 WDIOC_GETBOOTSTATUS     _IOR('W', 2, int)

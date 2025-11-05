@@ -1,4 +1,5 @@
 #value_indexed
 #From include/uapi/linux/kvm.h
+#Prefix KVM_EXIT_IO_
 KVM_EXIT_IO_IN  0
 KVM_EXIT_IO_OUT 1

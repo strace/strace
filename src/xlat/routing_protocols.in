@@ -1,6 +1,7 @@
 #unconditional
 #sorted sort -k2,2n
 #From include/uapi/linux/rtnetlink.h
+#Prefix RTPROT_
 RTPROT_UNSPEC
 RTPROT_REDIRECT
 RTPROT_KERNEL

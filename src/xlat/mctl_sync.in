@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/mman-common.h
+#Prefix MS_
 MS_SYNC
 MS_ASYNC
 MS_INVALIDATE

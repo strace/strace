@@ -1,5 +1,6 @@
 #sorted sort -k2,2n
 #From include/uapi/linux/dccp.h
+#Prefix DCCP_SOCKOPT_
 DCCP_SOCKOPT_PACKET_SIZE	1
 DCCP_SOCKOPT_SERVICE		2
 DCCP_SOCKOPT_CHANGE_L		3

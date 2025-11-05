@@ -2,6 +2,7 @@
 #value_indexed
 #unconditional
 #From include/uapi/linux/counter.h
+#Prefix COUNTER_EVENT_
 COUNTER_EVENT_OVERFLOW			0
 COUNTER_EVENT_UNDERFLOW			1
 COUNTER_EVENT_OVERFLOW_UNDERFLOW	2

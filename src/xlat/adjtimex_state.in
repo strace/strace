@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/timex.h
+#Prefix TIME_
 TIME_OK		0
 TIME_INS	1
 TIME_DEL	2

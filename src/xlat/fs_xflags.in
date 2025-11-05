@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/fs.h
+#Prefix FS_XFLAG_
 FS_XFLAG_REALTIME
 FS_XFLAG_PREALLOC
 FS_XFLAG_IMMUTABLE

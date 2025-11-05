@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/securebits.h
+#Prefix SECBIT_
 SECBIT_NOROOT
 SECBIT_NOROOT_LOCKED
 SECBIT_NO_SETUID_FIXUP

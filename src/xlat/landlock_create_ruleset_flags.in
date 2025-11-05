@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/landlock.h
+#Prefix LANDLOCK_CREATE_RULESET_
 LANDLOCK_CREATE_RULESET_VERSION
 LANDLOCK_CREATE_RULESET_ERRATA

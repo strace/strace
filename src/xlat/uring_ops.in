@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/io_uring.h
+#Prefix IORING_OP_
 IORING_OP_NOP
 IORING_OP_READV
 IORING_OP_WRITEV

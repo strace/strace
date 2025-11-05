@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/fcntl.h
+#Prefix LOCK_
 LOCK_SH		1
 LOCK_EX		2
 LOCK_NB		4

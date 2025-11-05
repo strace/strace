@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/capability.h
+#Prefix _LINUX_CAPABILITY_VERSION_
 _LINUX_CAPABILITY_VERSION_1
 _LINUX_CAPABILITY_VERSION_2
 _LINUX_CAPABILITY_VERSION_3

@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_link.h
+#Prefix IFLA_PROTO_DOWN_REASON_
 IFLA_PROTO_DOWN_REASON_UNSPEC
 IFLA_PROTO_DOWN_REASON_MASK
 IFLA_PROTO_DOWN_REASON_VALUE

@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/keyctl.h
+#Prefix KEYCTL_CAPS1_
 KEYCTL_CAPS1_NS_KEYRING_NAME
 KEYCTL_CAPS1_NS_KEY_TAG
 KEYCTL_CAPS1_NOTIFICATIONS

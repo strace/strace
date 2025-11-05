@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/loop.h
+#Prefix LO_CRYPT_
 LO_CRYPT_NONE
 LO_CRYPT_XOR
 LO_CRYPT_DES

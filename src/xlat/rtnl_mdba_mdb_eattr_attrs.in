@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_bridge.h
+#Prefix MDBA_MDB_EATTR_
 MDBA_MDB_EATTR_UNSPEC
 MDBA_MDB_EATTR_TIMER
 MDBA_MDB_EATTR_SRC_LIST

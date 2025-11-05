@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/mount.h
+#Prefix MOVE_MOUNT_
 MOVE_MOUNT_F_SYMLINKS
 MOVE_MOUNT_F_AUTOMOUNTS
 MOVE_MOUNT_F_EMPTY_PATH

@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/mtd/mtd-abi.h
+#Prefix MTD_FILE_MODE_
 MTD_FILE_MODE_NORMAL
 MTD_FILE_MODE_OTP_FACTORY
 MTD_FILE_MODE_OTP_USER

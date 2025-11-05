@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/lsm.h
+#Prefix LSM_ATTR_
 LSM_ATTR_UNDEF
 LSM_ATTR_CURRENT
 LSM_ATTR_EXEC

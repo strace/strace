@@ -1,4 +1,5 @@
 #From include/uapi/linux/timex.h
+#Prefix STA_
 STA_PLL		0x0001
 STA_PPSFREQ	0x0002
 STA_PPSTIME	0x0004

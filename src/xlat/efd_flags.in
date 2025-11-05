@@ -1,4 +1,5 @@
 #From include/uapi/linux/eventfd.h
+#Prefix EFD_
 EFD_SEMAPHORE	1
 EFD_CLOEXEC	O_CLOEXEC
 EFD_NONBLOCK	O_NONBLOCK

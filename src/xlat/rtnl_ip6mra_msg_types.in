@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/mroute6.h
+#Prefix MRT6MSG_
 MRT6MSG_NOCACHE		1
 MRT6MSG_WRONGMIF	2
 MRT6MSG_WHOLEPKT	3

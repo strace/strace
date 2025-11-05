@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/netlink_diag.h
+#Prefix NDIAG_FLAG_
 NDIAG_FLAG_CB_RUNNING
 NDIAG_FLAG_PKTINFO
 NDIAG_FLAG_BROADCAST_ERROR

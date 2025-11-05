@@ -1,4 +1,5 @@
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_FLAG_
 PERF_FLAG_FD_NO_GROUP	1
 PERF_FLAG_FD_OUTPUT	2
 PERF_FLAG_PID_CGROUP	4

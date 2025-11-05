@@ -1,4 +1,5 @@
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_ATTR_SIZE_
 PERF_ATTR_SIZE_VER0 64
 PERF_ATTR_SIZE_VER1 72
 PERF_ATTR_SIZE_VER2 80

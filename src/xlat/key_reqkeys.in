@@ -1,6 +1,7 @@
 #unconditional
 #val_type int
 #From include/uapi/linux/keyctl.h
+#Prefix KEY_REQKEY_DEFL_
 KEY_REQKEY_DEFL_NO_CHANGE
 KEY_REQKEY_DEFL_DEFAULT
 KEY_REQKEY_DEFL_THREAD_KEYRING

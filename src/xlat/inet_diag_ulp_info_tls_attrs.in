@@ -1,6 +1,7 @@
 #value_indexed
 #unconditional
 #From include/uapi/linux/tls.h
+#Prefix TLS_INFO_
 TLS_INFO_UNSPEC		0
 TLS_INFO_VERSION	1
 TLS_INFO_CIPHER		2

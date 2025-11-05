@@ -1,4 +1,5 @@
 #From arch/alpha/include/uapi/asm/gentrap.h
+#Prefix GEN_
 GEN_INTOVF	-1
 GEN_INTDIV	-2
 GEN_FLTOVF	-3

@@ -1,4 +1,5 @@
 #value_indexed
 #From include/uapi/linux/prctl.h
+#Prefix PR_TSC_
 PR_TSC_ENABLE 1
 PR_TSC_SIGSEGV 2

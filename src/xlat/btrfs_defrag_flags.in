@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/btrfs.h
+#Prefix BTRFS_DEFRAG_RANGE_
 BTRFS_DEFRAG_RANGE_COMPRESS
 BTRFS_DEFRAG_RANGE_START_IO
 BTRFS_DEFRAG_RANGE_COMPRESS_LEVEL

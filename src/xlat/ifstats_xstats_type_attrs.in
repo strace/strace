@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_link.h
+#Prefix LINK_XSTATS_TYPE_
 LINK_XSTATS_TYPE_UNSPEC	0
 LINK_XSTATS_TYPE_BRIDGE	1
 LINK_XSTATS_TYPE_BOND	2

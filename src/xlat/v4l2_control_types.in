@@ -1,6 +1,7 @@
 #unconditional
 #sorted
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_CTRL_TYPE_
 V4L2_CTRL_TYPE_INTEGER
 V4L2_CTRL_TYPE_BOOLEAN
 V4L2_CTRL_TYPE_MENU

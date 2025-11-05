@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_bonding.h
+#Prefix BOND_3AD_STAT_
 BOND_3AD_STAT_LACPDU_RX		0
 BOND_3AD_STAT_LACPDU_TX		1
 BOND_3AD_STAT_LACPDU_UNKNOWN_RX	2

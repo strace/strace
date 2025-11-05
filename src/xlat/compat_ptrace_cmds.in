@@ -1,5 +1,6 @@
 #sorted
 #From arch/arm64/include/asm/ptrace.h
+#Prefix COMPAT_PTRACE_
 #if defined __arm64__ || defined __aarch64__
 COMPAT_PTRACE_GETREGS		12
 COMPAT_PTRACE_SETREGS		13

@@ -1,4 +1,5 @@
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_FORMAT_
 PERF_FORMAT_TOTAL_TIME_ENABLED 1 << 0
 PERF_FORMAT_TOTAL_TIME_RUNNING 1 << 1
 PERF_FORMAT_ID                 1 << 2

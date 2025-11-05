@@ -1,3 +1,4 @@
 #From include/uapi/linux/prctl.h
+#Prefix PR_MDWE_
 PR_MDWE_REFUSE_EXEC_GAIN	(1U << 0)
 PR_MDWE_NO_INHERIT		(1U << 1)

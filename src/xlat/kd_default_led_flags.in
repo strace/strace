@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/kd.h
+#Prefix LED_
 LED_SCR
 LED_NUM
 LED_CAP

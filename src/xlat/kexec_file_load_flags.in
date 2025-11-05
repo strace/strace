@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/kexec.h
+#Prefix KEXEC_FILE_
 KEXEC_FILE_UNLOAD
 KEXEC_FILE_ON_CRASH
 KEXEC_FILE_NO_INITRAMFS

@@ -1,4 +1,5 @@
 #From include/uapi/linux/netfilter_ipv6/ip6_tables.h
+#Prefix IP6T_SO_SET_
 /*
  * Options specific to setsockopt(SOL_IPV6).
  * Common {g,s}etsockopt(SOL_IPV6) options

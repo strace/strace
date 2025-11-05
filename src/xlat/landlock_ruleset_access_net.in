@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/landlock.h
+#Prefix LANDLOCK_ACCESS_NET_
 LANDLOCK_ACCESS_NET_BIND_TCP
 LANDLOCK_ACCESS_NET_CONNECT_TCP

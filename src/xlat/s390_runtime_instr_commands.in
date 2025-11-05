@@ -1,4 +1,5 @@
 #value_indexed
 #From arch/s390/include/uapi/asm/runtime_instr.h
+#Prefix S390_RUNTIME_INSTR_
 S390_RUNTIME_INSTR_START	0x1
 S390_RUNTIME_INSTR_STOP		0x2

@@ -1,4 +1,5 @@
 #From include/uapi/linux/pidfd.h
+#Prefix PIDFD_SIGNAL_
 PIDFD_SIGNAL_THREAD		(1U << 0)
 PIDFD_SIGNAL_THREAD_GROUP	(1U << 1)
 PIDFD_SIGNAL_PROCESS_GROUP	(1U << 2)

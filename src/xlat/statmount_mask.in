@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/mount.h
+#Prefix STATMOUNT_
 STATMOUNT_SB_BASIC
 STATMOUNT_MNT_BASIC
 STATMOUNT_PROPAGATE_FROM

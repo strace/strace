@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/snmp.h
+#Prefix ICMP6_MIB_
 ICMP6_MIB_NUM		0
 ICMP6_MIB_INMSGS	1
 ICMP6_MIB_INERRORS	2

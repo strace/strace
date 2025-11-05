@@ -1,4 +1,5 @@
 #From include/scsi/sg.h
+#Prefix SG_FLAG_
 SG_FLAG_DIRECT_IO		1
 SG_FLAG_UNUSED_LUN_INHIBIT	2
 SG_FLAG_MMAP_IO			4

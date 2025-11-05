@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/packet_diag.h
+#Prefix PDI_
 PDI_RUNNING
 PDI_AUXDATA
 PDI_ORIGDEV

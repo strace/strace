@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/siginfo.h
+#Prefix TRAP_
 TRAP_STEP /* 1 - bfin */
 TRAP_BRKPT 1
 TRAP_TRACEFLOW /* 2 - bfin */

@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/if_alg.h
+#Prefix ALG_SET_
 ALG_SET_KEY			1
 ALG_SET_IV			2
 ALG_SET_OP			3

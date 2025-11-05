@@ -1,4 +1,5 @@
 #From include/uapi/linux/fs.h
+#Prefix RENAME_
 RENAME_NOREPLACE	1
 RENAME_EXCHANGE		2
 RENAME_WHITEOUT		4

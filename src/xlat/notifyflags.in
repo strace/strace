@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/fcntl.h
+#Prefix DN_
 DN_ACCESS
 DN_MODIFY
 DN_CREATE

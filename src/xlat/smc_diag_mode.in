@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/smc_diag.h
+#Prefix SMC_DIAG_MODE_
 SMC_DIAG_MODE_SMCR		0
 SMC_DIAG_MODE_FALLBACK_TCP	1
 SMC_DIAG_MODE_SMCD		2

@@ -1,4 +1,5 @@
 #From include/uapi/linux/hdreg.h
+#Prefix IDE_NICE_
 1<<IDE_NICE_DSC_OVERLAP
 1<<IDE_NICE_ATAPI_OVERLAP
 1<<IDE_NICE_1

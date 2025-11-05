@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/userfaultfd.h
+#Prefix UFFD_FEATURE_
 UFFD_FEATURE_PAGEFAULT_FLAG_WP
 UFFD_FEATURE_EVENT_FORK
 UFFD_FEATURE_EVENT_REMAP

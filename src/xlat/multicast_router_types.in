@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_bridge.h
+#Prefix MDB_RTR_TYPE_
 MDB_RTR_TYPE_DISABLED
 MDB_RTR_TYPE_TEMP_QUERY
 MDB_RTR_TYPE_PERM

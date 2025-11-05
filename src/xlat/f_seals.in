@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/fcntl.h
+#Prefix F_SEAL_
 F_SEAL_SEAL
 F_SEAL_SHRINK
 F_SEAL_GROW

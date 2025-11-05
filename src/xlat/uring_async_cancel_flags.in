@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IORING_ASYNC_CANCEL_
 IORING_ASYNC_CANCEL_ALL
 IORING_ASYNC_CANCEL_FD
 IORING_ASYNC_CANCEL_ANY

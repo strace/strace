@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/btrfs_tree.h
+#Prefix BTRFS_CSUM_TYPE_
 BTRFS_CSUM_TYPE_CRC32
 BTRFS_CSUM_TYPE_XXHASH
 BTRFS_CSUM_TYPE_SHA256

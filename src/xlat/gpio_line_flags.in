@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/gpio.h
+#Prefix GPIOLINE_FLAG_
 GPIOLINE_FLAG_KERNEL
 GPIOLINE_FLAG_IS_OUT
 GPIOLINE_FLAG_ACTIVE_LOW

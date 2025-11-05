@@ -1,4 +1,5 @@
 #value_indexed
 #From include/uapi/linux/prctl.h
+#Prefix PR_RISCV_SCOPE_
 PR_RISCV_SCOPE_PER_PROCESS	0
 PR_RISCV_SCOPE_PER_THREAD	1

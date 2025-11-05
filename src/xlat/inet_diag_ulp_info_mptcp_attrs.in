@@ -1,6 +1,7 @@
 #value_indexed
 #unconditional
 #From include/uapi/linux/mptcp_pm.h
+#Prefix MPTCP_SUBFLOW_ATTR_
 MPTCP_SUBFLOW_ATTR_UNSPEC	0
 MPTCP_SUBFLOW_ATTR_TOKEN_REM	1
 MPTCP_SUBFLOW_ATTR_TOKEN_LOC	2

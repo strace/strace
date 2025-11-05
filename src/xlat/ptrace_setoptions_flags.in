@@ -1,4 +1,5 @@
 #From include/uapi/linux/ptrace.h
+#Prefix PTRACE_O_
 PTRACE_O_TRACESYSGOOD
 PTRACE_O_TRACEFORK
 PTRACE_O_TRACEVFORK

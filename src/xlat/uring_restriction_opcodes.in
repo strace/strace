@@ -1,6 +1,7 @@
 #value_indexed
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IORING_RESTRICTION_
 IORING_RESTRICTION_REGISTER_OP
 IORING_RESTRICTION_SQE_OP
 IORING_RESTRICTION_SQE_FLAGS_ALLOWED

@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/keyctl.h
+#Prefix KEYCTL_SUPPORTS_
 KEYCTL_SUPPORTS_ENCRYPT
 KEYCTL_SUPPORTS_DECRYPT
 KEYCTL_SUPPORTS_SIGN

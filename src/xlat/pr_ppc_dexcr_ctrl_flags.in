@@ -1,4 +1,5 @@
 #From include/uapi/linux/prctl.h
+#Prefix PR_PPC_DEXCR_CTRL_
 PR_PPC_DEXCR_CTRL_EDITABLE	0x1
 PR_PPC_DEXCR_CTRL_SET		0x2
 PR_PPC_DEXCR_CTRL_CLEAR		0x4

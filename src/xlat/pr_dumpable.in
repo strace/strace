@@ -1,5 +1,6 @@
 #value_indexed
 #From include/linux/sched/coredump.h
+#Prefix SUID_DUMP_
 SUID_DUMP_DISABLE	0	/* No setuid dumping */
 SUID_DUMP_USER		1	/* Dump as user of process */
 SUID_DUMP_ROOT		2	/* Dump as root */

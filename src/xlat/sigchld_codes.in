@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/asm-generic/siginfo.h
+#Prefix CLD_
 CLD_EXITED 1
 CLD_KILLED 2
 CLD_DUMPED 3

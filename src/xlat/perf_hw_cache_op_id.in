@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_COUNT_HW_CACHE_OP_
 PERF_COUNT_HW_CACHE_OP_READ     0
 PERF_COUNT_HW_CACHE_OP_WRITE    1
 PERF_COUNT_HW_CACHE_OP_PREFETCH 2

@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IO_URING_OP_
 IO_URING_OP_SUPPORTED

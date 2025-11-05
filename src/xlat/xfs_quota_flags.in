@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/dqblk_xfs.h
+#Prefix FS_QUOTA_
 FS_QUOTA_UDQ_ACCT
 FS_QUOTA_UDQ_ENFD
 FS_QUOTA_GDQ_ACCT

@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/asm-generic/fcntl.h
+#Prefix F_OWNER_
 F_OWNER_TID
 F_OWNER_PID
 F_OWNER_PGRP

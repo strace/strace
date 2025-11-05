@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_bridge.h
+#Prefix BR_MCAST_DIR_
 BR_MCAST_DIR_RX	0
 BR_MCAST_DIR_TX	1

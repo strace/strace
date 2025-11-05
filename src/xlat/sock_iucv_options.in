@@ -1,4 +1,5 @@
 #From include/net/iucv/af_iucv.h
+#Prefix SO_
 SO_IPRMDATA_MSG	0x0080
 SO_MSGLIMIT	0x1000
 SO_MSGSIZE	0x0800

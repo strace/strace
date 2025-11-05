@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/lsm.h
+#Prefix LSM_ID_
 LSM_ID_UNDEF
 LSM_ID_CAPABILITY
 LSM_ID_SELINUX

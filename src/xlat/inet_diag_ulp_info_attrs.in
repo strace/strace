@@ -1,6 +1,7 @@
 #value_indexed
 #unconditional
 #From include/uapi/linux/inet_diag.h
+#Prefix INET_ULP_INFO_
 INET_ULP_INFO_UNSPEC	0
 INET_ULP_INFO_NAME	1
 INET_ULP_INFO_TLS	2

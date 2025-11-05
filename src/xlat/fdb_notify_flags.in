@@ -1,3 +1,4 @@
 #From include/uapi/linux/neighbour.h
+#Prefix FDB_NOTIFY_
 FDB_NOTIFY_BIT		(1 << 0)
 FDB_NOTIFY_INACTIVE_BIT	(1 << 1)

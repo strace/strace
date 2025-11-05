@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/btrfs.h
+#Prefix BTRFS_QUOTA_CTL_
 BTRFS_QUOTA_CTL_ENABLE
 BTRFS_QUOTA_CTL_DISABLE
 BTRFS_QUOTA_CTL_RESCAN__NOTUSED

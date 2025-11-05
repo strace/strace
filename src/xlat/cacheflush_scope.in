@@ -1,4 +1,5 @@
 #From arch/m68k/include/uapi/asm/cachectl.h
+#Prefix FLUSH_SCOPE_
 FLUSH_SCOPE_LINE
 FLUSH_SCOPE_PAGE
 FLUSH_SCOPE_ALL

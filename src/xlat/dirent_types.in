@@ -1,4 +1,5 @@
 #From include/linux/fs_types.h
+#Prefix DT_
 DT_UNKNOWN
 DT_FIFO
 DT_CHR

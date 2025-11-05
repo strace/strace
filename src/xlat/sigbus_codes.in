@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/siginfo.h
+#Prefix BUS_
 BUS_ADRALN 1
 BUS_ADRERR 2
 BUS_OBJERR 3

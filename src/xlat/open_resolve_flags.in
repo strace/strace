@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/openat2.h
+#Prefix RESOLVE_
 RESOLVE_NO_XDEV
 RESOLVE_NO_MAGICLINKS
 RESOLVE_NO_SYMLINKS

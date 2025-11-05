@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/rtc.h
+#Prefix RTC_FEATURE_
 RTC_FEATURE_ALARM		0
 RTC_FEATURE_ALARM_RES_MINUTE	1
 RTC_FEATURE_NEED_WEEK_DAY	2

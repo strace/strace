@@ -1,4 +1,5 @@
 #From include/uapi/linux/mman.h
+#Prefix MREMAP_
 MREMAP_MAYMOVE		1
 MREMAP_FIXED		2
 MREMAP_DONTUNMAP	4

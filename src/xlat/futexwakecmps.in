@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/futex.h
+#Prefix FUTEX_OP_CMP_
 FUTEX_OP_CMP_EQ	0
 FUTEX_OP_CMP_NE	1
 FUTEX_OP_CMP_LT	2

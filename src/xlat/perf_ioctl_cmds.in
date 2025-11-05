@@ -1,4 +1,5 @@
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_EVENT_IOC_
 PERF_EVENT_IOC_ENABLE			_IO ('$', 0)
 PERF_EVENT_IOC_DISABLE			_IO ('$', 1)
 PERF_EVENT_IOC_REFRESH			_IO ('$', 2)

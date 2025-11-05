@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/netdev.h
+#Prefix NETDEV_CMD_
 
 NETDEV_CMD_DEV_GET
 NETDEV_CMD_DEV_ADD_NTF

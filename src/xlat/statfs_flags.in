@@ -1,4 +1,5 @@
 #From include/linux/statfs.h
+#Prefix ST_
 ST_VALID	0x0020
 ST_RDONLY	0x0001
 ST_NOSUID	0x0002

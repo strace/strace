@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/fiemap.h
+#Prefix FIEMAP_EXTENT_
 FIEMAP_EXTENT_LAST
 FIEMAP_EXTENT_UNKNOWN
 FIEMAP_EXTENT_DELALLOC

@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IORING_RSRC_REGISTER_
 IORING_RSRC_REGISTER_SPARSE

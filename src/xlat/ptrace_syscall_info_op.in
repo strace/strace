@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/ptrace.h
+#Prefix PTRACE_SYSCALL_INFO_
 PTRACE_SYSCALL_INFO_NONE
 PTRACE_SYSCALL_INFO_ENTRY
 PTRACE_SYSCALL_INFO_EXIT

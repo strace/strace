@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/if_bridge.h
+#Prefix BRIDGE_FLAGS_
 BRIDGE_FLAGS_MASTER	1
 BRIDGE_FLAGS_SELF	2

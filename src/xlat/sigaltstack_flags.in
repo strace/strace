@@ -1,4 +1,5 @@
 #From include/uapi/linux/signal.h
+#Prefix SS_
 SS_ONSTACK 1
 SS_DISABLE 2
 SS_AUTODISARM (1U << 31)

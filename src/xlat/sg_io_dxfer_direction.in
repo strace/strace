@@ -1,4 +1,5 @@
 #From include/scsi/sg.h
+#Prefix SG_DXFER_
 SG_DXFER_NONE
 SG_DXFER_TO_DEV
 SG_DXFER_FROM_DEV

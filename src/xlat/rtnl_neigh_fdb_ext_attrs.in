@@ -1,6 +1,7 @@
 #enum
 #value_indexed
 #From include/uapi/linux/neighbour.h
+#Prefix NFEA_
 NFEA_UNSPEC		0
 NFEA_ACTIVITY_NOTIFY	1
 NFEA_DONT_REFRESH	2

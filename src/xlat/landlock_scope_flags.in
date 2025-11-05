@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/landlock.h
+#Prefix LANDLOCK_SCOPE_
 LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET
 LANDLOCK_SCOPE_SIGNAL

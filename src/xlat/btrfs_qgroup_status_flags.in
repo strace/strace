@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/btrfs_tree.h
+#Prefix BTRFS_QGROUP_STATUS_FLAG_
 BTRFS_QGROUP_STATUS_FLAG_ON
 BTRFS_QGROUP_STATUS_FLAG_RESCAN
 BTRFS_QGROUP_STATUS_FLAG_INCONSISTENT

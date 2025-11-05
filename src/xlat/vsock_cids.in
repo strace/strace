@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/vm_sockets.h
+#Prefix VMADDR_CID_
 VMADDR_CID_HYPERVISOR	0
 VMADDR_CID_LOCAL	1
 VMADDR_CID_HOST		2

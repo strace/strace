@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/netlink_diag.h
+#Prefix NETLINK_DIAG_
 NETLINK_DIAG_MEMINFO
 NETLINK_DIAG_GROUPS
 NETLINK_DIAG_RX_RING

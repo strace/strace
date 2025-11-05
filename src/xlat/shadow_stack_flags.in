@@ -1,2 +1,3 @@
 #From include/uapi/asm-generic/mman.h
+#Prefix SHADOW_STACK_
 SHADOW_STACK_SET_TOKEN	1

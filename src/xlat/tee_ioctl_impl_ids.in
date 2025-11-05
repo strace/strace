@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/tee.h
+#Prefix TEE_IMPL_ID_
 TEE_IMPL_ID_OPTEE
 TEE_IMPL_ID_AMDTEE
 TEE_IMPL_ID_TSTEE

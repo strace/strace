@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/landlock.h
+#Prefix LANDLOCK_RULE_
 LANDLOCK_RULE_PATH_BENEATH
 LANDLOCK_RULE_NET_PORT

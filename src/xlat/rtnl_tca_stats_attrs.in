@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/gen_stats.h
+#Prefix TCA_STATS_
 TCA_STATS_UNSPEC
 TCA_STATS_BASIC
 TCA_STATS_RATE_EST

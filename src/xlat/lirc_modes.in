@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/lirc.h
+#Prefix LIRC_MODE_
 LIRC_MODE_RAW
 LIRC_MODE_PULSE
 LIRC_MODE_MODE2

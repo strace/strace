@@ -1,3 +1,4 @@
 #From include/uapi/linux/signalfd.h
+#Prefix SFD_
 SFD_CLOEXEC	O_CLOEXEC
 SFD_NONBLOCK	O_NONBLOCK

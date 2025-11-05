@@ -1,4 +1,5 @@
 #value_indexed
 #From include/uapi/linux/io_uring.h
+#Prefix IO_WQ_
 IO_WQ_BOUND	0
 IO_WQ_UNBOUND	1

@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/packet_diag.h
+#Prefix PACKET_SHOW_
 PACKET_SHOW_INFO
 PACKET_SHOW_MCLIST
 PACKET_SHOW_RING_CFG

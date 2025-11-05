@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/seccomp.h
+#Prefix SECCOMP_FILTER_FLAG_
 SECCOMP_FILTER_FLAG_TSYNC
 SECCOMP_FILTER_FLAG_LOG
 SECCOMP_FILTER_FLAG_SPEC_ALLOW

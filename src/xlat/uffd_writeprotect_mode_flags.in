@@ -1,5 +1,6 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/userfaultfd.h
+#Prefix UFFDIO_WRITEPROTECT_MODE_
 UFFDIO_WRITEPROTECT_MODE_WP
 UFFDIO_WRITEPROTECT_MODE_DONTWAKE

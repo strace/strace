@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/aio_abi.h
+#Prefix IOCB_CMD_
 IOCB_CMD_PREAD		0
 IOCB_CMD_PWRITE		1
 IOCB_CMD_FSYNC		2

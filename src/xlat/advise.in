@@ -1,4 +1,5 @@
 #From include/uapi/linux/fadvise.h
+#Prefix POSIX_FADV_
 POSIX_FADV_NORMAL	0
 POSIX_FADV_RANDOM	1
 POSIX_FADV_SEQUENTIAL	2

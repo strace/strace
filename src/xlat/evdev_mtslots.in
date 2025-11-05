@@ -1,6 +1,7 @@
 #unconditional
 #sorted
 #From include/uapi/linux/input-event-codes.h
+#Prefix ABS_MT_
 ABS_MT_SLOT
 ABS_MT_TOUCH_MAJOR
 ABS_MT_TOUCH_MINOR

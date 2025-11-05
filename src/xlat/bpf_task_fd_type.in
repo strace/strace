@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/bpf.h
+#Prefix BPF_FD_TYPE_
 BPF_FD_TYPE_RAW_TRACEPOINT	0
 BPF_FD_TYPE_TRACEPOINT		1
 BPF_FD_TYPE_KPROBE		2
