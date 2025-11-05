@@ -168,7 +168,7 @@ calculate_prefix()
 			if (i > min_len && line_len < prefix_len)
 				prefix = substr(prefix, 1, line_len)
 		}
-		END { print prefix }
+		END { sub(/[^_]*$/, "", prefix); print prefix }
 	' < "$constants_file")
 
 	# If prefix is empty, infer from filename
