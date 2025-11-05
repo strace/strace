@@ -143,12 +143,28 @@ extract_xlat_constants()
 		sort -u
 }
 
+# Extract #Prefix directive from xlat file
+extract_prefix_directive()
+{
+	local xlat_file="$1"
+
+	sed '/^#Prefix[[:space:]]\+/!d;s///;q' "$xlat_file"
+}
+
 # Calculate longest common prefix from constants in a file
 calculate_prefix()
 {
 	local constants_file="$1"
 	local xlat_file="$2"
-	local prefix basename_file
+	local prefix basename_file prefix_directive
+
+	# Check if #Prefix directive exists
+	prefix_directive=$(extract_prefix_directive "$xlat_file")
+	if [ -n "$prefix_directive" ]; then
+		# Use prefix from #Prefix directive
+		echo "$prefix_directive"
+		return 0
+	fi
 
 	# Determine longest common prefix from xlat constants using awk
 	prefix=$(awk '
@@ -184,23 +200,40 @@ calculate_prefix()
 	echo "$prefix"
 }
 
-# Extract constants from Linux header matching a prefix pattern
-extract_header_constants()
+# Build grep regex pattern for a single prefix
+build_prefix_pattern()
 {
-	local commit="$1"
-	local header_file="$2"
-	local prefix="$3"
-	local define_p enum_v enum_c enum_cc enum_ccl enum_l
-	local full_p sed_def sed_enum
+	local prefix="$1"
+	local define_p enum_c enum_cc enum_ccl enum_l enum_v
 
-	# Match both #define and enum constants
 	define_p="^[[:space:]]*#[[:space:]]*define[[:space:]]\+${prefix}[A-Z0-9_]*\b"
 	enum_v="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*="
 	enum_c="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*,"
 	enum_cc="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*/\*.*\*/[[:space:]]*,"
 	enum_ccl="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*/\*.*\*/[[:space:]]*$"
 	enum_l="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*$"
-	full_p="${define_p}\|${enum_v}\|${enum_c}\|${enum_cc}\|${enum_ccl}\|${enum_l}"
+	echo "${define_p}\|${enum_v}\|${enum_c}\|${enum_cc}\|${enum_ccl}\|${enum_l}"
+}
+
+# Extract constants from Linux header matching a prefix pattern
+extract_header_constants()
+{
+	local commit="$1"
+	local header_file="$2"
+	local prefix="$3"
+	local full_p p sed_def sed_enum
+
+	set -- $prefix
+	full_p=""
+	for prefix do
+		p=$(build_prefix_pattern "$prefix")
+		if [ -z "$full_p" ]; then
+			full_p="$p"
+		else
+			full_p="${full_p}\\|${p}"
+		fi
+	done
+
 	sed_def="s/^[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\).*/\1/"
 	sed_enum="s/^[[:space:]]*\([A-Z0-9_]*\).*/\1/"
 
