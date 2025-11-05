@@ -13,20 +13,8 @@ log.  Now we put that information only in the commit log, and generate
 the top-level ChangeLog file from logs at "make dist" time.  As such,
 there are strict requirements on the form of the commit log messages.
 
-
-Commit requirements
-===================
-Each commit message should always start with a one-line summary, the second
-line should be blank, and the remaining lines are usually ChangeLog-style
-entries for all affected files, except the leading TABs which should
-be omitted.
-
-Changes must not introduce whitespace errors in git sense (trailing
-whitespace, spaces before tabs, spaces for indentation, blank lines
-at the end of file), this can be checked with the following command:
-
-	git -c core.whitespace=space-before-tab,trailing-space diff-index \
-		--check 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+For comprehensive guidelines on writing commit messages, see
+doc/COMMIT-MESSAGES.md file.
 
 It is also preferred (but not required) that commit patches pass
 scripts/checkpatch.pl script from the Linux kernel[1], as currently established
