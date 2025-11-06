@@ -36,11 +36,16 @@ print_kvm_run_more(const char *prefix, const char *reason_str, const struct kvm_
 	switch (run->exit_reason) {
 	case KVM_EXIT_IO:
 		printf(", {io={direction=%s"
-		       ", size=%u, port=%#04x, count=%u, data_offset=%#016llx}}",
+		       ", size=%u, port=%#04x, count=%u, data_offset=%#016llx",
 		       run->io.direction == KVM_EXIT_IO_IN
 		       ? "KVM_EXIT_IO_IN" : "KVM_EXIT_IO_OUT",
 		       run->io.size, run->io.port,
 		       run->io.count, run->io.data_offset);
+		fputs(", data=[", stdout);
+		for (unsigned long i = 0; i < (run->io.size * run->io.count); ++i)
+			printf("%s%#x", i == 0?  "" : ", ",
+			       ((unsigned char *)run + run->io.data_offset)[i]);
+		fputs("]}}", stdout);
 		break;
 	case KVM_EXIT_MMIO:
 		printf(", {mmio={phys_addr=%#016llx"
