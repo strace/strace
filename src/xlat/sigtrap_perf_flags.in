@@ -1,2 +1,3 @@
 #From include/uapi/asm-generic/siginfo.h
+#Prefix TRAP_PERF_FLAG_
 TRAP_PERF_FLAG_ASYNC	(1 << 0)

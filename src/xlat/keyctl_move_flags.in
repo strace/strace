@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/keyctl.h
+#Prefix KEYCTL_MOVE_
 KEYCTL_MOVE_EXCL

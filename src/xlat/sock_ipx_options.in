@@ -1,2 +1,3 @@
 #From include/linux/socket.h
+#Prefix IPX_
 IPX_TYPE	1

@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/mtd/ubi-user.h
+#Prefix UBI_VOL_
 UBI_VOL_SKIP_CRC_CHECK_FLG

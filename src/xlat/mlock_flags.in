@@ -1,2 +1,3 @@
 #From include/uapi/asm-generic/mman-common.h
+#Prefix MLOCK_
 MLOCK_ONFAULT	1

@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/mctp.h
+#Prefix MCTP_NET_
 MCTP_NET_ANY	0x0

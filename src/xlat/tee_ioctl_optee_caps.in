@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/tee.h
+#Prefix TEE_OPTEE_CAP_
 TEE_OPTEE_CAP_TZ

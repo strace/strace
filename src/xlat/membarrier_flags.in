@@ -1,2 +1,3 @@
 #From include/uapi/linux/membarrier.h
+#Prefix MEMBARRIER_CMD_FLAG_
 MEMBARRIER_CMD_FLAG_CPU		(1 << 0)

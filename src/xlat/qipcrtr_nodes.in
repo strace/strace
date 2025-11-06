@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/qrtr.h
+#Prefix QRTR_NODE_
 QRTR_NODE_BCAST	0xffffffffU

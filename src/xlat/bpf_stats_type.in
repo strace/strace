@@ -1,3 +1,4 @@
 #value_indexed
 #From include/uapi/linux/bpf.h
+#Prefix BPF_STATS_
 BPF_STATS_RUN_TIME	0

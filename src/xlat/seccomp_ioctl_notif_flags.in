@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/seccomp.h
+#Prefix SECCOMP_USER_NOTIF_
 SECCOMP_USER_NOTIF_FD_SYNC_WAKE_UP

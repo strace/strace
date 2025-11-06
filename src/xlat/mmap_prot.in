@@ -1,6 +1,7 @@
 #From arch/powerpc/include/uapi/asm/mman.h
 #From arch/sparc/include/uapi/asm/mman.h
 #From include/uapi/asm-generic/mman-common.h
+#Prefix PROT_
 PROT_NONE
 PROT_READ
 PROT_WRITE

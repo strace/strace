@@ -1,4 +1,5 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/bsg.h
+#Prefix BSG_PROTOCOL_
 BSG_PROTOCOL_SCSI

@@ -1,4 +1,5 @@
 #From drivers/tee/amdtee/amdtee_private.h
+#Prefix TEEC_ORIGIN_
 /* Not in UAPI.  */
 TEEC_ORIGIN_API		0x00000001
 TEEC_ORIGIN_COMMS	0x00000002

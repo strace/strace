@@ -1,3 +1,4 @@
 #value_indexed
 #From include/uapi/linux/kcm.h
+#Prefix KCMPROTO_
 KCMPROTO_CONNECTED	0

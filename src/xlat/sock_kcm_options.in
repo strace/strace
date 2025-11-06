@@ -1,2 +1,3 @@
 #From include/uapi/linux/kcm.h
+#Prefix KCM_
 KCM_RECV_DISABLE	1

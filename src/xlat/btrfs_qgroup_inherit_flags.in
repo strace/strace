@@ -1,4 +1,5 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/btrfs.h
+#Prefix BTRFS_QGROUP_INHERIT_
 BTRFS_QGROUP_INHERIT_SET_LIMITS

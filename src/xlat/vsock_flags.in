@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/vm_sockets.h
+#Prefix VMADDR_FLAG_
 VMADDR_FLAG_TO_HOST	0x1

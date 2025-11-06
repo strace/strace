@@ -1,3 +1,4 @@
 #unconditional
 #From include/uapi/linux/lsm.h
+#Prefix LSM_FLAG_
 LSM_FLAG_SINGLE

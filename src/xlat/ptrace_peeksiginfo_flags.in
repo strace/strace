@@ -1,2 +1,3 @@
 #From include/uapi/linux/ptrace.h
+#Prefix PTRACE_PEEKSIGINFO_
 PTRACE_PEEKSIGINFO_SHARED 1

@@ -1,2 +1,3 @@
 #From include/linux/crypto.h
+#Prefix CRYPTO_ALG_
 CRYPTO_ALG_KERN_DRIVER_ONLY	0x1000
