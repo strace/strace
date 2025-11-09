@@ -350,7 +350,7 @@ check_tipc(void)
 	} tipc_vecs[] = {
 		{ { AF_TIPC },
 		  "{sa_family=" XLAT_KNOWN(0x1e, "AF_TIPC")
-		  ", addrtype=0" NRAW(" /* TIPC_ADDR_??? */")
+		  ", addrtype=0" NRAW(" /* TIPC_??? */")
 		  ", scope=0" NRAW(" /* TIPC_???_SCOPE */")
 		  ", addr=\"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\"}" },
 		{ { AF_TIPC, .addrtype = 0x1, .scope = 0x2,

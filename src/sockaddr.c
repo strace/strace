@@ -590,7 +590,7 @@ print_sockaddr_data_tipc(struct tcb *tcp, const void *const buf,
 {
 	const struct sockaddr_tipc *const sa = buf;
 
-	PRINT_FIELD_XVAL(*sa, addrtype, af_tipc_types, "TIPC_ADDR_???");
+	PRINT_FIELD_XVAL(*sa, addrtype, af_tipc_types, "TIPC_???");
 	tprint_struct_next();
 	tprints_field_name("scope");
 
