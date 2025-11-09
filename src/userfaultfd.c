@@ -105,7 +105,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_X(uc, len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(uc, mode, uffd_copy_flags,
-					  "UFFDIO_COPY_???");
+					  "UFFDIO_COPY_MODE_???");
 
 			return 0;
 		}
@@ -173,7 +173,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 					    tprintf_uffdio_range);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(uz, mode, uffd_zeropage_flags,
-					  "UFFDIO_ZEROPAGE_???");
+					  "UFFDIO_ZEROPAGE_MODE_???");
 
 			return 0;
 		}
@@ -199,7 +199,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(uwp, mode,
 					  uffd_writeprotect_mode_flags,
-					  "UFFDIO_WRITEPROTECT_MODE_WP???");
+					  "UFFDIO_WRITEPROTECT_MODE_???");
 			tprint_struct_end();
 		}
 
