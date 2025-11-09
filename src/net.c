@@ -634,7 +634,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_caif_options, name, "CAIFSO_???");
 		break;
 	case SOL_ALG:
-		printxval(sock_alg_options, name, "ALG_???");
+		printxval(sock_alg_options, name, "ALG_SET_???");
 		break;
 	case SOL_NFC:
 		printxval(sock_nfcllcp_options, name, "NFC_LLCP_???");
