@@ -1244,7 +1244,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		btrfs_print_objectid(args, parent_root);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(args, flags, btrfs_send_flags,
-				  "BTRFS_SEND_FLAGS_???");
+				  "BTRFS_SEND_FLAG_???");
 		tprint_struct_end();
 		break;
 	}

@@ -1454,7 +1454,7 @@ btrfs_test_send_ioctl(void)
 	printf(", parent_root=");
 	btrfs_print_objectid(args.parent_root);
 	printf(", flags=");
-	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAGS_???");
+	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAG_???");
 	ioctl(-1, BTRFS_IOC_SEND, &args);
 	printf("})" RVAL_EBADF);
 
@@ -1476,7 +1476,7 @@ btrfs_test_send_ioctl(void)
 	printf(", parent_root=");
 	btrfs_print_objectid(args.parent_root);
 	printf(", flags=");
-	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAGS_???");
+	prfl_btrfs(btrfs_send_flags, args.flags, "BTRFS_SEND_FLAG_???");
 	ioctl(-1, BTRFS_IOC_SEND, &args);
 	printf("})" RVAL_EBADF);
 }
