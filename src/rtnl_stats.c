@@ -221,7 +221,7 @@ decode_ifstats_link_xstats_bond_3ad(struct tcb *const tcp,
 				    const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, ifstats_xstats_bond_3ad_attrs,
-		      "BOND_XSTATS_???",
+		      "BOND_3AD_STAT_???",
 		      ARRSZ_PAIR(ifstats_xstats_bond_3ad_decoders),
 		      opaque_data);
 
