@@ -43,7 +43,7 @@ nbd_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	case NBD_SET_FLAGS:
 		tprints_arg_next_name("argp");
-		printflags(nbd_ioctl_flags, arg, "NBD_IOC_FLAG_???");
+		printflags(nbd_ioctl_flags, arg, "NBD_FLAG_???");
 		return RVAL_IOCTL_DECODED;
 
 	default:
