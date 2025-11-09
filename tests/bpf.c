@@ -1800,7 +1800,7 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 				    kprobe_multi.cookies),
 		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
 		       ", attach_type=BPF_TRACE_KPROBE_MULTI, flags=0"
-		       ", kprobe_multi={flags=0xdeadc0de /* BPF_F_??? */"
+		       ", kprobe_multi={flags=0xdeadc0de /* BPF_F_KPROBE_MULTI_??? */"
 		       ", cnt=3135220973"
 		       ", syms=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", addrs=" BIG_ADDR("0xffffffff00000000", "NULL")

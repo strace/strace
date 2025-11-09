@@ -1494,7 +1494,7 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 		tprint_struct_begin();
 		PRINT_FIELD_FLAGS(attr.kprobe_multi, flags,
 				  bpf_link_create_kprobe_multi_flags,
-				  "BPF_F_???");
+				  "BPF_F_KPROBE_MULTI_???");
 		tprint_struct_next();
 		PRINT_FIELD_U(attr.kprobe_multi, cnt);
 		tprint_struct_next();
