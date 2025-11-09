@@ -74,7 +74,7 @@ main(void)
 		printf("%p", fmt);
 	} else {
 		printf("[");
-		printxval(quota_formats, *fmt, "QFMT_VFS_???");
+		printxval(quota_formats, *fmt, "QFMT_???");
 		printf("]");
 	}
 	printf(") = %s\n", errstr);

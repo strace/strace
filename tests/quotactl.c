@@ -183,7 +183,7 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		fmtstr = "QFMT_SHMEM";
 		break;
 	default:
-		printf("%#x /* QFMT_VFS_??? */]", *fmtval);
+		printf("%#x /* QFMT_??? */]", *fmtval);
 		return;
 	}
 #endif
@@ -276,7 +276,7 @@ main(void)
 		 "%#x", bogus_id);
 #else
 	snprintf(invalid_id_str, sizeof(invalid_id_str),
-		 "%#x /* QFMT_VFS_??? */", bogus_id);
+		 "%#x /* QFMT_??? */", bogus_id);
 #endif
 	check_quota(CQF_ID_STR, QCMD(Q_QUOTAON, 0xfacefeed),
 		    gen_quotacmd(invalid_cmd_str, QCMD(Q_QUOTAON, 0xfacefeed)),

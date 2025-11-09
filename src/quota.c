@@ -102,7 +102,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		break;
 	case Q_QUOTAON:
 		tprints_arg_next_name("id");
-		printxval(quota_formats, id, "QFMT_VFS_???");
+		printxval(quota_formats, id, "QFMT_???");
 		tprints_arg_next_name("addr");
 		printpath(tcp, data);
 		break;
@@ -279,7 +279,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (umove_or_printaddr(tcp, data, &fmt))
 			break;
 		tprint_indirect_begin();
-		printxval(quota_formats, fmt, "QFMT_VFS_???");
+		printxval(quota_formats, fmt, "QFMT_???");
 		tprint_indirect_end();
 		break;
 	}
