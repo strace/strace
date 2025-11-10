@@ -1,3 +1,0 @@
-#unconditional
-#From include/uapi/linux/tee.h
-TEE_MAX_ARG_SIZE

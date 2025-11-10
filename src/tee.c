@@ -11,7 +11,6 @@
 #include "xlat/tee_ioctl_gen_caps.h"
 #include "xlat/tee_ioctl_impl_ids.h"
 #include "xlat/tee_ioctl_login_types.h"
-#include "xlat/tee_ioctl_max_arg_size.h"
 #include "xlat/tee_ioctl_origins.h"
 #include "xlat/tee_ioctl_optee_caps.h"
 #include "xlat/tee_ioctl_param_attr_types.h"
