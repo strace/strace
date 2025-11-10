@@ -1054,7 +1054,7 @@ static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 		       ", duration=4207541978"
 		       ", ctx_size_in=0, ctx_size_out=0"
 		       ", ctx_in=NULL, ctx_out=NULL"
-		       ", flags=0xfffffffc /* BPF_F_??? */"
+		       ", flags=0xfffffffc /* BPF_F_TEST_??? */"
 		       ", cpu=3141592653, batch_size=2718281828}"
 	},
 };

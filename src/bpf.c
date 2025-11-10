@@ -528,7 +528,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 	 */
 	if (len > offsetof(struct BPF_PROG_TEST_RUN_struct, flags)) {
 		tprint_struct_next();
-		PRINT_FIELD_FLAGS(attr, flags, bpf_test_run_flags, "BPF_F_???");
+		PRINT_FIELD_FLAGS(attr, flags, bpf_test_run_flags,
+				  "BPF_F_TEST_???");
 		tprint_struct_next();
 		PRINT_FIELD_U(attr, cpu);
 	}
