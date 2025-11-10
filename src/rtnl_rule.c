@@ -121,7 +121,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 			PRINT_FIELD_U(msg, src_len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(msg, tos,
-					  ip_type_of_services, "IPTOS_TOS_???");
+					  ip_type_of_services, "IPTOS_???");
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(msg, table,
 					 routing_table_ids, "RT_TABLE_???");
