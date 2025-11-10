@@ -566,7 +566,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 	 * check, see net/vmw_vsock/af_vsock.c:vsock_connectible_[gs]etsockopt.
 	 */
 	case AF_VSOCK:
-		printxval(sock_vsock_options, name, "SO_VM_???");
+		printxval(sock_vsock_options, name, "SO_VM_SOCKETS_???");
 		break;
 	case SOL_IPV6:
 		printxvals(name, "IPV6_???", sock_ipv6_options,
