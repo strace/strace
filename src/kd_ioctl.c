@@ -350,7 +350,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 				      XLAT_STYLE_DEFAULT);
 		} else {
 			PRINT_FIELD_FLAGS(val, kb_table, kd_keymap_flags,
-					  "K_???");
+					  "1<<KG_???");
 		}
 
 		tprint_struct_next();
