@@ -318,7 +318,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 			PRINT_FIELD_U(rtmsg, rtm_src_len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(rtmsg, rtm_tos,
-					  ip_type_of_services, "IPTOS_TOS_???");
+					  ip_type_of_services, "IPTOS_???");
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(rtmsg, rtm_table,
 					 routing_table_ids, NULL);
