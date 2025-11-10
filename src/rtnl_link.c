@@ -1223,7 +1223,7 @@ decode_ifla_port(struct tcb *const tcp,
 		 const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_port_attrs,
-		      "IFLA_VF_PORT_???", ARRSZ_PAIR(ifla_port_nla_decoders),
+		      "IFLA_PORT_???", ARRSZ_PAIR(ifla_port_nla_decoders),
 		      opaque_data);
 
 	return true;
