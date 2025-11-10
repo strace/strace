@@ -36,21 +36,21 @@ main(void)
 	char *str256 = tail_memdup(str256_buf, sizeof(str256_buf) - 1);
 
 	rc = syscall(__NR_reboot, 0, 0, 0, 0);
-	printf("reboot(0 /* LINUX_REBOOT_MAGIC_??? */, "
-	       "0 /* LINUX_REBOOT_MAGIC_??? */, "
+	printf("reboot(0 /* LINUX_REBOOT_MAGIC1??? */, "
+	       "0 /* LINUX_REBOOT_MAGIC2??? */, "
 	       "LINUX_REBOOT_CMD_CAD_OFF) = %s\n",
 	       sprintrc(rc));
 
 	rc = syscall(__NR_reboot, bogus_magic1, bogus_magic2, bogus_cmd, -1);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, "
-	       "%#x /* LINUX_REBOOT_MAGIC_??? */, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, "
+	       "%#x /* LINUX_REBOOT_MAGIC2??? */, "
 	       "%#x /* LINUX_REBOOT_CMD_??? */) = %s\n",
 	       (unsigned int) bogus_magic1, (unsigned int) bogus_magic2,
 	       (unsigned int) bogus_cmd, sprintrc(rc));
 
 	rc = syscall(__NR_reboot, LINUX_REBOOT_MAGIC1,
 			  INVALID_MAGIC, LINUX_REBOOT_CMD_RESTART2, buf);
-	printf("reboot(LINUX_REBOOT_MAGIC1, %#x /* LINUX_REBOOT_MAGIC_??? */,"
+	printf("reboot(LINUX_REBOOT_MAGIC1, %#x /* LINUX_REBOOT_MAGIC2??? */,"
 	       " LINUX_REBOOT_CMD_RESTART2, \"%s\") = %s\n",
 	       INVALID_MAGIC, buf, sprintrc(rc));
 
@@ -62,35 +62,35 @@ main(void)
 
 	rc = syscall(__NR_reboot, INVALID_MAGIC, LINUX_REBOOT_MAGIC2A,
 			  LINUX_REBOOT_CMD_RESTART2, str256);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, LINUX_REBOOT_MAGIC2A, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, LINUX_REBOOT_MAGIC2A, "
 	       "LINUX_REBOOT_CMD_RESTART2, \"%.255s\"...) = %s\n",
 	       INVALID_MAGIC, str256, sprintrc(rc));
 
 	rc = syscall(__NR_reboot, INVALID_MAGIC, LINUX_REBOOT_MAGIC2B,
 			  LINUX_REBOOT_CMD_RESTART2, str256 + 1);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, LINUX_REBOOT_MAGIC2B, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, LINUX_REBOOT_MAGIC2B, "
 	       "LINUX_REBOOT_CMD_RESTART2, \"%.255s\"...) = %s\n",
 	       INVALID_MAGIC, str256 + 1, sprintrc(rc));
 
 	rc = syscall(__NR_reboot, INVALID_MAGIC, LINUX_REBOOT_MAGIC2C,
 			  LINUX_REBOOT_CMD_RESTART2, str256 + 2);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, LINUX_REBOOT_MAGIC2C, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, LINUX_REBOOT_MAGIC2C, "
 	       "LINUX_REBOOT_CMD_RESTART2, %p) = %s\n",
 	       INVALID_MAGIC, str256 + 2, sprintrc(rc));
 
 	str256[255] = '\0';
 	rc = syscall(__NR_reboot, INVALID_MAGIC, bogus_magic1,
 			  LINUX_REBOOT_CMD_RESTART2, str256);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, "
-	       "%#x /* LINUX_REBOOT_MAGIC_??? */, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, "
+	       "%#x /* LINUX_REBOOT_MAGIC2??? */, "
 	       "LINUX_REBOOT_CMD_RESTART2, \"%.255s\"...) = %s\n",
 	       INVALID_MAGIC, (unsigned int) bogus_magic1, str256,
 	       sprintrc(rc));
 
 	rc = syscall(__NR_reboot, INVALID_MAGIC, bogus_magic1,
 			  LINUX_REBOOT_CMD_RESTART2, str256 + 1);
-	printf("reboot(%#x /* LINUX_REBOOT_MAGIC_??? */, "
-	       "%#x /* LINUX_REBOOT_MAGIC_??? */, "
+	printf("reboot(%#x /* LINUX_REBOOT_MAGIC1??? */, "
+	       "%#x /* LINUX_REBOOT_MAGIC2??? */, "
 	       "LINUX_REBOOT_CMD_RESTART2, \"%.254s\") = %s\n",
 	       INVALID_MAGIC, (unsigned int) bogus_magic1, str256 + 1,
 	       sprintrc(rc));

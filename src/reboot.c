@@ -19,11 +19,11 @@ SYS_FUNC(reboot)
 
 	/* magic */
 	tprints_arg_name("magic");
-	printxval(bootflags1, magic1, "LINUX_REBOOT_MAGIC_???");
+	printxval(bootflags1, magic1, "LINUX_REBOOT_MAGIC1???");
 
 	/* magic2 */
 	tprints_arg_next_name("magic2");
-	printxval(bootflags2, magic2, "LINUX_REBOOT_MAGIC_???");
+	printxval(bootflags2, magic2, "LINUX_REBOOT_MAGIC2???");
 
 	/* cmd */
 	tprints_arg_next_name("op");
