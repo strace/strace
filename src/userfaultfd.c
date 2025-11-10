@@ -142,7 +142,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(ur, ioctls,
 					  uffd_register_ioctl_flags,
-					  "UFFDIO_???");
+					  "1<<_UFFDIO_???");
 		}
 
 		tprint_struct_end();
