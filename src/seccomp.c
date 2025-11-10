@@ -21,7 +21,7 @@ SYS_FUNC(seccomp)
 	/* operation */
 	if (entering(tcp)) {
 		tprints_arg_name("operation");
-		printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
+		printxval(seccomp_ops, op, "SECCOMP_???");
 	}
 
 	switch (op) {
