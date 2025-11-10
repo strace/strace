@@ -83,7 +83,7 @@ print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 
 	const char *mode_str = xlookup(mpol_modes, mode);
 	if (!mode_str) {
-		printflags64(mpol_mode_flags, mode_arg, "MPOL_???");
+		printflags64(mpol_mode_flags, mode_arg, "MPOL_F_???");
 		return;
 	}
 
@@ -130,7 +130,7 @@ SYS_FUNC(mbind)
 
 	/* flags */
 	tprints_arg_next_name("flags");
-	printflags(mbind_flags, tcp->u_arg[5], "MPOL_???");
+	printflags(mbind_flags, tcp->u_arg[5], "MPOL_MF_???");
 
 	return RVAL_DECODED;
 }
@@ -180,7 +180,7 @@ SYS_FUNC(get_mempolicy)
 
 		/* flags */
 		tprints_arg_next_name("flags");
-		printflags64(get_mempolicy_flags, tcp->u_arg[4], "MPOL_???");
+		printflags64(get_mempolicy_flags, tcp->u_arg[4], "MPOL_F_???");
 	}
 	return 0;
 }
@@ -265,7 +265,7 @@ SYS_FUNC(move_pages)
 
 		/* flags */
 		tprints_arg_next_name("flags");
-		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
+		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_MF_???");
 	}
 	return 0;
 }
