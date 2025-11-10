@@ -330,7 +330,7 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 	case _IOC_NR(EVIOCGPROP(0)):
 		return decode_bitset(tcp, arg, evdev_prop,
-				     INPUT_PROP_MAX, "PROP_???");
+				     INPUT_PROP_MAX, "INPUT_PROP_???");
 	case _IOC_NR(EVIOCGSND(0)):
 		return decode_bitset(tcp, arg, evdev_snd,
 				     SND_MAX, "SND_???");
