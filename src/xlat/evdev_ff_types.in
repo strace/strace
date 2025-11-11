@@ -2,6 +2,7 @@
 #sorted sort -k2,2
 #From include/uapi/linux/input.h
 #Prefix FF_
+FF_HAPTIC
 FF_RUMBLE
 FF_PERIODIC
 FF_CONSTANT
