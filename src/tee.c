@@ -116,6 +116,28 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 		PRINT_VAL_U(param->c);
 		break;
 
+	case TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INPUT:
+	case TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INOUT:
+	case TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_OUTPUT:
+		tprint_struct_next();
+		tprints_field_name("buf");
+		PRINT_VAL_X(param->a);
+		tprint_struct_next();
+		tprints_field_name("size");
+		PRINT_VAL_X(param->b);
+		break;
+
+	case TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INPUT:
+	case TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INOUT:
+	case TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_OUTPUT:
+		tprint_struct_next();
+		tprints_field_name("obj_id");
+		PRINT_VAL_X(param->a);
+		tprint_struct_next();
+		tprints_field_name("flags");
+		PRINT_VAL_X(param->b);
+		break;
+
 	case TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT:
 	case TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INOUT:
 	case TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT:

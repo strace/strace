@@ -19,7 +19,7 @@
 
 #include "xlat.h"
 
-#define NUM_PARAMS 8
+#define NUM_PARAMS 14
 #define UUID_SIZE 16
 
 #ifndef TEE_IOCTL_SHM_MAPPED
@@ -90,6 +90,12 @@ fill_params(struct tee_ioctl_param *params)
 	params[6].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
 	params[7].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT |
 			 TEE_IOCTL_PARAM_ATTR_META;
+	params[8].attr = TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INPUT;
+	params[9].attr = TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_OUTPUT;
+	params[10].attr = TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INOUT;
+	params[11].attr = TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INPUT;
+	params[12].attr = TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_OUTPUT;
+	params[13].attr = TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INOUT;
 }
 
 static void
@@ -102,7 +108,13 @@ print_params(struct tee_ioctl_param *params)
 	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INPUT, shm_offs=%#llx, size=%#llx, shm_id=%llu}, "
 	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT, shm_offs=%#llx, size=%#llx, shm_id=%llu}, "
 	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT, shm_offs=%#llx, size=%#llx, shm_id=%llu}, "
-	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT|TEE_IOCTL_PARAM_ATTR_META, a=%#llx, b=%#llx, c=%#llx}",
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT|TEE_IOCTL_PARAM_ATTR_META, a=%#llx, b=%#llx, c=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INPUT, buf=%#llx, size=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_OUTPUT, buf=%#llx, size=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_UBUF_INOUT, buf=%#llx, size=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INPUT, obj_id=%#llx, flags=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_OUTPUT, obj_id=%#llx, flags=%#llx}, "
+	       "{attr=TEE_IOCTL_PARAM_ATTR_TYPE_OBJREF_INOUT, obj_id=%#llx, flags=%#llx}",
 	       (unsigned long long) two_beef, (unsigned long long) red_beef,
 	       (unsigned long long) blu_beef, (unsigned long long) two_beef,
 	       (unsigned long long) red_beef, (unsigned long long) blu_beef,
@@ -113,7 +125,13 @@ print_params(struct tee_ioctl_param *params)
 	       (unsigned long long) blu_beef, (unsigned long long) two_beef,
 	       (unsigned long long) red_beef, (unsigned long long) blu_beef,
 	       (unsigned long long) two_beef, (unsigned long long) red_beef,
-	       (unsigned long long) blu_beef
+	       (unsigned long long) blu_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef,
+	       (unsigned long long) two_beef, (unsigned long long) red_beef
 	       );
 }
 
