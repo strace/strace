@@ -53,7 +53,7 @@ main(void)
 		{ 0xdeadbeff, "", "",
 			"KEXEC_FILE_UNLOAD|KEXEC_FILE_ON_CRASH|"
 			"KEXEC_FILE_NO_INITRAMFS|KEXEC_FILE_DEBUG|"
-			"KEXEC_FILE_NO_CMA|0xdeadbee0" },
+			"KEXEC_FILE_NO_CMA|KEXEC_FILE_FORCE_DTB|0xdeadbec0" },
 	};
 
 
