@@ -692,8 +692,8 @@ test_nla_ops_family(const int fd)
 
 	static const struct strval32 nl80211_cmds[] = {
 		{ ARG_STR(NL80211_CMD_GET_WIPHY) },
-		{ ARG_STR(NL80211_CMD_EPCS_CFG) },
-		{ NL80211_CMD_EPCS_CFG + 1, "NL80211_CMD_???" },
+		{ ARG_STR(NL80211_CMD_NAN_CLUSTER_JOINED) },
+		{ NL80211_CMD_NAN_CLUSTER_JOINED + 1, "NL80211_CMD_???" },
 	};
 	TEST_NLA_OPS_FAMILY(NL80211_GENL_NAME, nl80211_cmds);
 
