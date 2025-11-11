@@ -43,7 +43,7 @@ SYS_FUNC(renameat2)
 
 	/* flags */
 	tprints_arg_next_name("flags");
-	printflags(rename_flags, tcp->u_arg[4], "RENAME_??");
+	printflags(rename_flags, tcp->u_arg[4], "RENAME_???");
 
 	return RVAL_DECODED;
 }
