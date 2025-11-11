@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_COLORSPACE_
 V4L2_COLORSPACE_DEFAULT
 V4L2_COLORSPACE_SMPTE170M
 V4L2_COLORSPACE_SMPTE240M

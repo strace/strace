@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IOSQE_
 IOSQE_FIXED_FILE
 IOSQE_IO_DRAIN
 IOSQE_IO_LINK

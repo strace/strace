@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/asm-generic/mman-common.h
+#Prefix MADV_
 MADV_NORMAL		0
 MADV_RANDOM		1
 MADV_SEQUENTIAL		2

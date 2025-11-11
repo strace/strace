@@ -1,3 +1,4 @@
 #From include/uapi/linux/inotify.h
+#Prefix IN_
 IN_NONBLOCK O_NONBLOCK
 IN_CLOEXEC  O_CLOEXEC

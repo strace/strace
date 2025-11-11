@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/nexthop.h
+#Prefix NHA_RES_BUCKET_
 NHA_RES_BUCKET_PAD		0
 NHA_RES_BUCKET_INDEX		1
 NHA_RES_BUCKET_IDLE_TIME	2

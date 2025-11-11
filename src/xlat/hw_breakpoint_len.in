@@ -1,4 +1,5 @@
 #From include/uapi/linux/hw_breakpoint.h
+#Prefix HW_BREAKPOINT_LEN_
 HW_BREAKPOINT_LEN_1 1
 HW_BREAKPOINT_LEN_2 2
 HW_BREAKPOINT_LEN_4 4

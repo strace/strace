@@ -1,6 +1,7 @@
 #unconditional
 #nocheckval
 #From include/uapi/asm-generic/mman-common.h
+#Prefix MADV_
 /* These values were used on hppa before v6.2-rc1~39^2~7. */
 MADV_MERGEABLE		65
 MADV_UNMERGEABLE	66

@@ -1,5 +1,6 @@
 #From arch/sparc/include/uapi/asm/siginfo.h
 #From include/uapi/asm-generic/siginfo.h
+#Prefix SI_
 SI_USER 0
 SI_KERNEL 0x80
 SI_QUEUE -1

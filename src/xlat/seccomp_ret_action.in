@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/seccomp.h
+#Prefix SECCOMP_RET_
 SECCOMP_RET_KILL_PROCESS
 SECCOMP_RET_KILL_THREAD
 SECCOMP_RET_TRAP

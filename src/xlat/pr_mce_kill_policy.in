@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/prctl.h
+#Prefix PR_MCE_KILL_
 PR_MCE_KILL_LATE 0
 PR_MCE_KILL_EARLY 1
 PR_MCE_KILL_DEFAULT 2

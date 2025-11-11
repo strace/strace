@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/tipc.h
+#Prefix TIPC_
 TIPC_SERVICE_RANGE
 TIPC_SERVICE_ADDR
 TIPC_SOCKET_ADDR

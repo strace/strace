@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/keyctl.h
+#Prefix KEYCTL_
 KEYCTL_GET_KEYRING_ID
 KEYCTL_JOIN_SESSION_KEYRING
 KEYCTL_UPDATE

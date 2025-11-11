@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/rtnetlink.h
+#Prefix RTAX_
 RTAX_UNSPEC
 RTAX_LOCK
 RTAX_MTU

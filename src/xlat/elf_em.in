@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/elf-em.h
+#Prefix EM_
 /* See also https://www.sco.com/developers/gabi/latest/ch4.eheader.html */
 EM_NONE			0
 EM_M32			1 /* AT&T WE 32100 */

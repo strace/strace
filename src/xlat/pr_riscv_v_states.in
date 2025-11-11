@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/prctl.h
+#Prefix PR_RISCV_V_VSTATE_CTRL_
 PR_RISCV_V_VSTATE_CTRL_DEFAULT	0
 PR_RISCV_V_VSTATE_CTRL_OFF	1
 PR_RISCV_V_VSTATE_CTRL_ON	2

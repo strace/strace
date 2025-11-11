@@ -1,3 +1,4 @@
 #From include/uapi/linux/pidfd.h
+#Prefix PIDFD_
 PIDFD_NONBLOCK	O_NONBLOCK
 PIDFD_THREAD	O_EXCL

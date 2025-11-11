@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_SLICED_
 V4L2_SLICED_VBI_625
 V4L2_SLICED_TELETEXT_B
 V4L2_SLICED_VPS

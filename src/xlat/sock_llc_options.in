@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/llc.h
+#Prefix LLC_OPT_
 LLC_OPT_UNKNOWN		0
 LLC_OPT_RETRY		1
 LLC_OPT_SIZE		2

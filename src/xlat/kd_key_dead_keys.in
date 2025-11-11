@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/keyboard.h
+#Prefix K_
 K_DGRAVE	K(KT_DEAD,0)
 K_DACUTE	K(KT_DEAD,1)
 K_DCIRCM	K(KT_DEAD,2)

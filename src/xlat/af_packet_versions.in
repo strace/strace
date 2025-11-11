@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/if_packet.h
+#Prefix TPACKET_
 TPACKET_V1	0
 TPACKET_V2	1
 TPACKET_V3	2

@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/sched.h
+#Prefix CLONE_
 CLONE_NEWTIME
 CLONE_CLEAR_SIGHAND
 CLONE_INTO_CGROUP

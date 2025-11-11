@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/rtnetlink.h
+#Prefix TCA_
 TCA_UNSPEC
 TCA_KIND
 TCA_OPTIONS

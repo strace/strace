@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/ethtool_netlink_generated.h
+#Prefix ETHTOOL_MSG_
 
 ETHTOOL_MSG_KERNEL_NONE
 ETHTOOL_MSG_STRSET_GET_REPLY

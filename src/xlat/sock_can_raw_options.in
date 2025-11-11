@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/can/raw.h
+#Prefix CAN_RAW_
 CAN_RAW_FILTER		1
 CAN_RAW_ERR_FILTER	2
 CAN_RAW_LOOPBACK	3

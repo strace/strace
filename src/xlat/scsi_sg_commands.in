@@ -1,4 +1,5 @@
 #From include/scsi/sg.h
+#Prefix SG_
 SG_SET_TIMEOUT		0x2201
 SG_GET_TIMEOUT		0x2202
 SG_EMULATED_HOST	0x2203

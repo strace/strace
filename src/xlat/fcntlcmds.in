@@ -1,6 +1,7 @@
 #unconditional
 #From include/uapi/asm-generic/fcntl.h
 #From include/uapi/linux/fcntl.h
+#Prefix F_
 F_DUPFD
 F_GETFD
 F_SETFD

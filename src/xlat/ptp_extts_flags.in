@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/ptp_clock.h
+#Prefix PTP_
 PTP_ENABLE_FEATURE
 PTP_RISING_EDGE
 PTP_FALLING_EDGE

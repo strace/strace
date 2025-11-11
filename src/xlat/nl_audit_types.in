@@ -1,5 +1,6 @@
 #sorted sort -k2,2n
 #From include/uapi/linux/audit.h
+#Prefix AUDIT_
 AUDIT_GET	1000
 AUDIT_SET	1001
 AUDIT_LIST	1002

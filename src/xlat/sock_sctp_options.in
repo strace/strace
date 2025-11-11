@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/sctp.h
+#Prefix SCTP_
 SCTP_RTOINFO			0
 SCTP_ASSOCINFO			1
 SCTP_INITMSG			2

@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/kexec.h
+#Prefix KEXEC_ARCH_
 KEXEC_ARCH_DEFAULT
 KEXEC_ARCH_386
 KEXEC_ARCH_68K

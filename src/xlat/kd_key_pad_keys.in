@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/keyboard.h
+#Prefix K_
 K_P0		K(KT_PAD,0)
 K_P1		K(KT_PAD,1)
 K_P2		K(KT_PAD,2)

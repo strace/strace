@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/icmp.h
+#Prefix ICMP_
 ICMP_ECHOREPLY		0
 ICMP_DEST_UNREACH	3
 ICMP_SOURCE_QUENCH	4

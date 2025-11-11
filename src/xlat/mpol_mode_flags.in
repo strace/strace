@@ -1,4 +1,5 @@
 #From include/uapi/linux/mempolicy.h
+#Prefix MPOL_F_
 MPOL_F_STATIC_NODES	(1U << 15)
 MPOL_F_RELATIVE_NODES	(1U << 14)
 MPOL_F_NUMA_BALANCING	(1U << 13)

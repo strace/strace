@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/ioctl.h
+#Prefix _IOC_
 _IOC_NONE
 _IOC_READ
 _IOC_WRITE

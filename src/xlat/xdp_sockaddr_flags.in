@@ -1,4 +1,5 @@
 #From include/uapi/linux/if_xdp.h
+#Prefix XDP_
 XDP_SHARED_UMEM		(1 << 0)
 XDP_COPY		(1 << 1)
 XDP_ZEROCOPY		(1 << 2)

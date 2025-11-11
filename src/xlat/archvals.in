@@ -1,5 +1,6 @@
 #sorted
 #From arch/x86/include/uapi/asm/prctl.h
+#Prefix ARCH_
 ARCH_SET_GS			0x1001
 ARCH_SET_FS			0x1002
 ARCH_GET_FS			0x1003

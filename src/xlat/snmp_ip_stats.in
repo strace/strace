@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/snmp.h
+#Prefix IPSTATS_MIB_
 IPSTATS_MIB_NUM			0
 IPSTATS_MIB_INPKTS		1
 IPSTATS_MIB_INOCTETS		2

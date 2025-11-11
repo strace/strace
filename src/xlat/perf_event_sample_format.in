@@ -1,4 +1,5 @@
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_SAMPLE_
 PERF_SAMPLE_IP              1 << 0
 PERF_SAMPLE_TID             1 << 1
 PERF_SAMPLE_TIME            1 << 2

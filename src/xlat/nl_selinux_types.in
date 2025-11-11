@@ -1,3 +1,4 @@
 #From include/uapi/linux/selinux_netlink.h
+#Prefix SELNL_MSG_
 SELNL_MSG_SETENFORCE	0x10
 SELNL_MSG_POLICYLOAD	0x11

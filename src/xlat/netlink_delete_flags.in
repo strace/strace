@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/netlink.h
+#Prefix NLM_F_
 NLM_F_NONREC
 NLM_F_BULK

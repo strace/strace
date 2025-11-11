@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/phonet.h
+#Prefix PNPIPE_
 PNPIPE_ENCAP		1
 PNPIPE_IFINDEX		2
 PNPIPE_HANDLE		3

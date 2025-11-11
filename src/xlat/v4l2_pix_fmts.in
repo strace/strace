@@ -1,6 +1,7 @@
 #unconditional
 #sorted sed -En 's/.*v4l2_fourcc(_be)?\('"'(.)', '(.)', '(.)', '(.)'"'\).*/\10\5\4\3\2\t\0/p' |LC_COLLATE=C sort -k1,1 -t' ' |cut -f2-
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_PIX_FMT_
 V4L2_PIX_FMT_Y10
 V4L2_PIX_FMT_Y12
 V4L2_PIX_FMT_Y4

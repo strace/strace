@@ -1,5 +1,6 @@
 #sorted sort -k2,2n
 #From include/uapi/linux/tipc.h
+#Prefix TIPC_
 TIPC_IMPORTANCE		127
 TIPC_SRC_DROPPABLE	128
 TIPC_DEST_DROPPABLE	129

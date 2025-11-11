@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/xattr.h
+#Prefix XATTR_
 XATTR_CREATE
 XATTR_REPLACE

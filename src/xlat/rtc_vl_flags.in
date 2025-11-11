@@ -1,4 +1,5 @@
 #From include/uapi/linux/rtc.h
+#Prefix RTC_VL_
 RTC_VL_DATA_INVALID	(1 << 0)
 RTC_VL_BACKUP_LOW	(1 << 1)
 RTC_VL_BACKUP_EMPTY	(1 << 2)

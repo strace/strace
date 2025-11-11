@@ -1,5 +1,6 @@
 #val_type unsigned long
 #From include/uapi/asm-generic/signal-defs.h
+#Prefix SIG_
 SIG_ERR
 SIG_DFL
 SIG_IGN

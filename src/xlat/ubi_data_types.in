@@ -1,4 +1,5 @@
 #From drivers/mtd/ubi/ubi.h
+#Prefix UBI_
 UBI_LONGTERM	1
 UBI_SHORTTERM	2
 UBI_UNKNOWN	3

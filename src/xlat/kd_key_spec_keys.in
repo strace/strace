@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/keyboard.h
+#Prefix K_
 K_HOLE		K(KT_SPEC,0)
 K_ENTER		K(KT_SPEC,1)
 K_SH_REGS	K(KT_SPEC,2)

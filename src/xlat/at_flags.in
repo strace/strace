@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/fcntl.h
+#Prefix AT_
 AT_SYMLINK_NOFOLLOW
 AT_REMOVEDIR
 AT_SYMLINK_FOLLOW

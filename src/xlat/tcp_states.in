@@ -1,5 +1,6 @@
 #value_indexed
 #From include/net/tcp_states.h
+#Prefix TCP_
 TCP_ESTABLISHED		1
 TCP_SYN_SENT		2
 TCP_SYN_RECV		3

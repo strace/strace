@@ -1,4 +1,5 @@
 #value_indexed
 #From net/smc/smc_core.h
+#Prefix SMC_
 SMC_CLNT	0
 SMC_SERV	1

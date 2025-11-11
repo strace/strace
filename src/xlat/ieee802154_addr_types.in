@@ -1,6 +1,7 @@
 #value_indexed
 #enum
 #From include/net/af_ieee802154.h
+#Prefix IEEE802154_ADDR_
 IEEE802154_ADDR_NONE	0
 IEEE802154_ADDR_SHORT	2
 IEEE802154_ADDR_LONG	3

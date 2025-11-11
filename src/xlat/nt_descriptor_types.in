@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/elf.h
+#Prefix NT_
 NT_PRSTATUS	1
 NT_FPREGSET	2
 NT_PRPSINFO	3

@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/asm-generic/fcntl.h
+#Prefix O_
 O_RDONLY
 O_WRONLY
 O_RDWR

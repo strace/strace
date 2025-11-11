@@ -1,4 +1,5 @@
 #From include/uapi/linux/tty.h
+#Prefix N_
 N_TTY		0
 N_SLIP		1
 N_MOUSE		2

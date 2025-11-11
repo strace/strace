@@ -1,4 +1,5 @@
 #From include/uapi/linux/resource.h
+#Prefix PRIO_
 PRIO_PROCESS
 PRIO_PGRP
 PRIO_USER

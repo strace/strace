@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/sched.h
+#Prefix CLONE_
 CLONE_VM
 CLONE_FS
 CLONE_FILES

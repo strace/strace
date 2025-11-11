@@ -1,6 +1,7 @@
 #unconditional
 #sorted
 #From include/uapi/linux/prctl.h
+#Prefix PR_
 PR_SET_PDEATHSIG
 PR_GET_PDEATHSIG
 PR_GET_DUMPABLE

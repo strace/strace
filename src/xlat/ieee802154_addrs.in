@@ -1,3 +1,4 @@
 #From include/net/af_ieee802154.h
+#Prefix IEEE802154_ADDR_
 IEEE802154_ADDR_UNDEF		0xfffe
 IEEE802154_ADDR_BROADCAST	0xffff

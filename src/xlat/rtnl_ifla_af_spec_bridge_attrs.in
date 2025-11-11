@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/if_bridge.h
+#Prefix IFLA_BRIDGE_
 IFLA_BRIDGE_FLAGS		0
 IFLA_BRIDGE_MODE		1
 IFLA_BRIDGE_VLAN_INFO		2

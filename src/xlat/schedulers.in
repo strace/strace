@@ -1,4 +1,5 @@
 #From include/uapi/linux/sched.h
+#Prefix SCHED_
 SCHED_OTHER
 SCHED_FIFO
 SCHED_RR

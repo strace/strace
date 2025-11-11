@@ -1,4 +1,5 @@
 #From include/uapi/linux/membarrier.h
+#Prefix MEMBARRIER_CMD_
 MEMBARRIER_CMD_QUERY					0
 MEMBARRIER_CMD_GLOBAL					(1 << 0)
 MEMBARRIER_CMD_GLOBAL_EXPEDITED				(1 << 1)

@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/capability.h
+#Prefix CAP_
 1<<CAP_CHOWN
 1<<CAP_DAC_OVERRIDE
 1<<CAP_DAC_READ_SEARCH

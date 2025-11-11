@@ -1,6 +1,7 @@
 #unconditional
 #val_type uint64_t
 #From include/uapi/linux/btrfs_tree.h
+#Prefix BTRFS_BLOCK_GROUP_
 BTRFS_BLOCK_GROUP_DATA
 BTRFS_BLOCK_GROUP_SYSTEM
 BTRFS_BLOCK_GROUP_METADATA

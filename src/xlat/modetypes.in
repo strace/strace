@@ -1,4 +1,5 @@
 #From include/uapi/linux/stat.h
+#Prefix S_
 S_IFREG
 S_IFSOCK
 S_IFIFO

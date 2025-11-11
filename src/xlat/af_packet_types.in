@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/if_packet.h
+#Prefix PACKET_
 PACKET_HOST		0
 PACKET_BROADCAST	1
 PACKET_MULTICAST	2

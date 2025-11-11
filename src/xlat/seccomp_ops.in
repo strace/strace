@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/seccomp.h
+#Prefix SECCOMP_
 SECCOMP_SET_MODE_STRICT
 SECCOMP_SET_MODE_FILTER
 SECCOMP_GET_ACTION_AVAIL

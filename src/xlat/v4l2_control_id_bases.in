@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/v4l2-controls.h
+#Prefix V4L2_CID_
 V4L2_CID_BASE
 V4L2_CID_USER_MEYE_BASE
 V4L2_CID_USER_BTTV_BASE

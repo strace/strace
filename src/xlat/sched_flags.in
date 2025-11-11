@@ -1,4 +1,5 @@
 #From include/uapi/linux/sched.h
+#Prefix SCHED_FLAG_
 SCHED_FLAG_RESET_ON_FORK	0x01
 SCHED_FLAG_RECLAIM		0x02
 SCHED_FLAG_DL_OVERRUN		0x04

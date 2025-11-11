@@ -1,4 +1,5 @@
 #From include/scsi/sg.h
+#Prefix SG_INFO_
 SG_INFO_CHECK		1
 SG_INFO_DIRECT_IO	2
 SG_INFO_MIXED_IO	4

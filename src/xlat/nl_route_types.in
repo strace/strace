@@ -1,6 +1,7 @@
 #unconditional
 
 #From include/uapi/linux/rtnetlink.h
+#Prefix RTM_
 RTM_NEWLINK
 RTM_DELLINK
 RTM_GETLINK

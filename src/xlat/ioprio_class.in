@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/ioprio.h
+#Prefix IOPRIO_CLASS_
 IOPRIO_CLASS_NONE	0
 IOPRIO_CLASS_RT		1
 IOPRIO_CLASS_BE		2

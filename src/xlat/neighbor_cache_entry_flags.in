@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/neighbour.h
+#Prefix NTF_
 NTF_USE
 NTF_SELF
 NTF_MASTER

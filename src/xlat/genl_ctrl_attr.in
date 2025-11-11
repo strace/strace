@@ -1,6 +1,7 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/genetlink.h
+#Prefix CTRL_ATTR_
 
 CTRL_ATTR_UNSPEC
 CTRL_ATTR_FAMILY_ID

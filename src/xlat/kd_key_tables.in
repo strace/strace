@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/kd.h
+#Prefix K_
 K_NORMTAB	0
 K_SHIFTTAB	1
 K_ALTTAB	2

@@ -1,3 +1,4 @@
 #From include/uapi/linux/quota.h
+#Prefix DQF_
 DQF_ROOT_SQUASH	(1 << 0)
 DQF_SYS_FILE	(1 << 16)

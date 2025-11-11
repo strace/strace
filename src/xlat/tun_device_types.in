@@ -1,4 +1,5 @@
 #value_indexed
 #From include/uapi/linux/if_tun.h
+#Prefix IFF_
 IFF_TUN	1
 IFF_TAP 2

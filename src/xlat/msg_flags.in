@@ -1,4 +1,5 @@
 #From include/linux/socket.h
+#Prefix MSG_
 MSG_OOB			0x1
 MSG_PEEK		0x2
 MSG_DONTROUTE		0x4

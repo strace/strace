@@ -1,5 +1,6 @@
 #value_indexed
 #From include/linux/kern_levels.h
+#Prefix LOGLEVEL_
 LOGLEVEL_EMERG		0
 LOGLEVEL_ALERT		1
 LOGLEVEL_CRIT		2

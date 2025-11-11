@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/bpf.h
+#Prefix BPF_
 BPF_CGROUP_INET_INGRESS 0
 BPF_CGROUP_INET_EGRESS 1
 BPF_CGROUP_INET_SOCK_CREATE 2

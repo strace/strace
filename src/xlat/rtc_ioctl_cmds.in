@@ -1,4 +1,5 @@
 #From include/uapi/linux/rtc.h
+#Prefix RTC_
 RTC_AIE_ON	_IO ('p', 0x01)
 RTC_AIE_OFF	_IO ('p', 0x02)
 RTC_UIE_ON	_IO ('p', 0x03)

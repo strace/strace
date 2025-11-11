@@ -1,5 +1,6 @@
 #From arch/arm64/include/uapi/asm/mman.h
 #From include/uapi/asm-generic/mman-common.h
+#Prefix PKEY_
 PKEY_UNRESTRICTED	0
 PKEY_DISABLE_ACCESS	0x1
 PKEY_DISABLE_WRITE	0x2

@@ -1,4 +1,5 @@
 #From include/uapi/linux/prctl.h
+#Prefix PR_SPEC_
 PR_SPEC_NOT_AFFECTED	0
 PR_SPEC_PRCTL		(1 << 0)
 PR_SPEC_ENABLE		(1 << 1)

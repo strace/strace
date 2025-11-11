@@ -1,5 +1,6 @@
 #unconditional
 #value_indexed
 #From include/uapi/linux/tipc.h
+#Prefix TIPC_GROUP_
 TIPC_GROUP_LOOPBACK
 TIPC_GROUP_MEMBER_EVTS

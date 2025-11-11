@@ -1,4 +1,5 @@
 #From include/uapi/linux/mount.h
+#Prefix MS_
 MS_RDONLY	(1U<<0)
 MS_NOSUID	(1U<<1)
 MS_NODEV	(1U<<2)

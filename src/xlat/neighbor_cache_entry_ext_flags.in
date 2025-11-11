@@ -1,4 +1,5 @@
 #From include/uapi/linux/neighbour.h
+#Prefix NTF_EXT_
 NTF_EXT_MANAGED		(1 << 0)
 NTF_EXT_LOCKED		(1 << 1)
 NTF_EXT_EXT_VALIDATED	(1 << 2)

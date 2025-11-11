@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/keyboard.h
+#Prefix K_
 K_SHIFTLOCK	K(KT_LOCK,KG_SHIFT)
 K_ALTGRLOCK	K(KT_LOCK,KG_ALTGR)
 K_CTRLLOCK	K(KT_LOCK,KG_CTRL)

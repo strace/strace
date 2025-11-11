@@ -1,5 +1,6 @@
 #From include/uapi/linux/bpf_common.h
 #From include/uapi/linux/filter.h
+#Prefix BPF_
 BPF_K	0x00
 BPF_X	0x08
 BPF_A	0x10

@@ -1,4 +1,5 @@
 #From include/linux/mISDNif.h
+#Prefix ISDN_P_
 ISDN_P_BASE		0
 ISDN_P_TE_S0		1
 ISDN_P_NT_S0		2

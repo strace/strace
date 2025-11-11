@@ -1,4 +1,5 @@
 #unconditional
 #From include/uapi/linux/io_uring.h
+#Prefix IORING_REGISTER_
 IORING_REGISTER_SRC_REGISTERED
 IORING_REGISTER_DST_REPLACE

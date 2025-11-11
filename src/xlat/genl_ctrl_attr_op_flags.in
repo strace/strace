@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/genetlink.h
+#Prefix GENL_
 
 GENL_ADMIN_PERM
 GENL_CMD_CAP_DO

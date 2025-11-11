@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/sched.h
+#Prefix CLONE_NEW
 CLONE_NEWTIME
 CLONE_NEWNS
 CLONE_NEWCGROUP

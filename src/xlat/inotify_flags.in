@@ -1,4 +1,5 @@
 #From include/uapi/linux/inotify.h
+#Prefix IN_
 IN_ACCESS 0x00000001
 IN_MODIFY 0x00000002
 IN_ATTRIB 0x00000004

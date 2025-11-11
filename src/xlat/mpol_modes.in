@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/mempolicy.h
+#Prefix MPOL_
 MPOL_DEFAULT			0
 MPOL_PREFERRED			1
 MPOL_BIND			2

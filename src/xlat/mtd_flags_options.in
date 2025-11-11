@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/mtd/mtd-abi.h
+#Prefix MTD_
 MTD_WRITEABLE
 MTD_BIT_WRITEABLE
 MTD_NO_ERASE

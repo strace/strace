@@ -1,4 +1,5 @@
 #From include/uapi/linux/bpf.h
+#Prefix BPF_F_
 BPF_F_NO_PREALLOC	1U
 BPF_F_NO_COMMON_LRU	(1U << 1)
 BPF_F_NUMA_NODE		(1U << 2)

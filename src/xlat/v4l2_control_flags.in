@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_CTRL_FLAG_
 V4L2_CTRL_FLAG_DISABLED
 V4L2_CTRL_FLAG_GRABBED
 V4L2_CTRL_FLAG_READ_ONLY

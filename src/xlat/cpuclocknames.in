@@ -1,5 +1,6 @@
 #value_indexed
 #From include/linux/posix-timers_types.h
+#Prefix CPUCLOCK_
 CPUCLOCK_PROF	0
 CPUCLOCK_VIRT	1
 CPUCLOCK_SCHED	2

@@ -1,6 +1,7 @@
 #unconditional
 #nocheckval
 #From include/uapi/asm-generic/mman-common.h
+#Prefix MADV_
 /*
  * These values are used on hppa since v6.2-rc1~39^2~7
  * and on other architectures since their introduction;

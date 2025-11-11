@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/videodev2.h
+#Prefix V4L2_CAP_
 V4L2_CAP_VIDEO_CAPTURE
 V4L2_CAP_VIDEO_OUTPUT
 V4L2_CAP_VIDEO_OVERLAY

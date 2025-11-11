@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/prctl.h
+#Prefix PR_PPC_DEXCR_
 PR_PPC_DEXCR_SBHE	0
 PR_PPC_DEXCR_IBRTPD	1
 PR_PPC_DEXCR_SRAPD	2

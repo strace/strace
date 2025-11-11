@@ -1,4 +1,5 @@
 #From include/uapi/linux/fanotify.h
+#Prefix FAN_
 FAN_ACCESS		0x00000001
 FAN_MODIFY		0x00000002
 FAN_ATTRIB		0x00000004

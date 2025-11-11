@@ -1,3 +1,4 @@
 #From include/linux/net.h
+#Prefix SOCK_
 SOCK_CLOEXEC
 SOCK_NONBLOCK

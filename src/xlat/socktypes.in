@@ -1,5 +1,6 @@
 #ifdef __mips__
 #From include/linux/net.h
+#Prefix SOCK_
 SOCK_DGRAM	1
 SOCK_STREAM	2
 #else

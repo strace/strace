@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/lirc.h
+#Prefix LIRC_CAN_
 LIRC_CAN_SEND_PULSE
 LIRC_CAN_SEND_LIRCCODE
 LIRC_CAN_SET_SEND_CARRIER

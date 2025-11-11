@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/perf_event.h
+#Prefix PERF_COUNT_HW_
 PERF_COUNT_HW_CPU_CYCLES               0
 PERF_COUNT_HW_INSTRUCTIONS             1
 PERF_COUNT_HW_CACHE_REFERENCES         2

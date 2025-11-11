@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/falloc.h
+#Prefix FALLOC_FL_
 FALLOC_FL_KEEP_SIZE
 FALLOC_FL_PUNCH_HOLE
 FALLOC_FL_NO_HIDE_STALE

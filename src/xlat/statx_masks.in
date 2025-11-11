@@ -1,4 +1,5 @@
 #From include/uapi/linux/stat.h
+#Prefix STATX_
 STATX_ALL		0x00000fffU
 STATX_BASIC_STATS	0x000007ffU
 

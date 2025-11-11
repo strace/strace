@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/input-event-codes.h
+#Prefix EV_
 EV_SYN
 EV_KEY
 EV_REL

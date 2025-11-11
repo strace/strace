@@ -1,2 +1,3 @@
 #From include/uapi/linux/reboot.h
+#Prefix LINUX_REBOOT_MAGIC1
 LINUX_REBOOT_MAGIC1 0xfee1dead

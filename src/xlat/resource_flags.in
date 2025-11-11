@@ -1,4 +1,5 @@
 #From include/uapi/linux/ipc.h
+#Prefix IPC_
 IPC_CREAT
 IPC_EXCL
 IPC_NOWAIT

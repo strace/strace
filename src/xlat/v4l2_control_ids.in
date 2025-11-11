@@ -1,6 +1,7 @@
 #unconditional
 #sorted
 #From include/uapi/linux/v4l2-controls.h
+#Prefix V4L2_CID_
 /* User-class control IDs */
 V4L2_CID_BRIGHTNESS
 V4L2_CID_CONTRAST

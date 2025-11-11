@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/rxrpc.h
+#Prefix RXRPC_
 RXRPC_SECURITY_KEY		1
 RXRPC_SECURITY_KEYRING		2
 RXRPC_EXCLUSIVE_CONNECTION	3

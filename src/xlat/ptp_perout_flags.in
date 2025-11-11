@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/ptp_clock.h
+#Prefix PTP_PEROUT_
 PTP_PEROUT_ONE_SHOT
 PTP_PEROUT_DUTY_CYCLE
 PTP_PEROUT_PHASE

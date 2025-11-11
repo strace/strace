@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/if_packet.h
+#Prefix PACKET_
 PACKET_ADD_MEMBERSHIP	1
 PACKET_DROP_MEMBERSHIP	2
 PACKET_RECV_OUTPUT	3

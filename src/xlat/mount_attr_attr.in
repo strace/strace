@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/mount.h
+#Prefix MOUNT_ATTR_
 MOUNT_ATTR_RDONLY
 MOUNT_ATTR_NOSUID
 MOUNT_ATTR_NODEV
