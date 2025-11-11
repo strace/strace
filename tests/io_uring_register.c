@@ -172,7 +172,7 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0x7fffffffU, 35 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 36 };
 	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
@@ -486,10 +486,9 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_REGISTER_MEM_REGION),
-		  true },
+		  "register_op=", ARG_STR(IORING_REGISTER_QUERY), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 35, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 36, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
