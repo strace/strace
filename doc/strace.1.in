@@ -1030,6 +1030,11 @@ if the tracee is in a different PID namespace.
 Prints the exit reason of kvm vcpu (=\fBvcpu\fR), or
 prints the whole kvm_run struct including the reason (=\fBvcpu+\fR).
 Requires Linux kernel version 4.16.0 or higher.
+.IP
+The \fBvcpu+\fR output uses prefixes \fBVCPU:\fICPU#\fB<\fR and \fBVCPU:\fICPU#\fB>\fR.
+Lines starting with the former indicate the state of the structure
+before calling KVM_RUN, and those starting with the latter show the
+state after calling KVM_RUN.
 .TP
 .BR "\-e\ namespace" = new
 .TQ
