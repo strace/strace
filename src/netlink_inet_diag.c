@@ -26,7 +26,6 @@
 #include "xlat/inet_diag_bytecodes.h"
 #include "xlat/inet_diag_extended_flags.h"
 #include "xlat/inet_diag_req_attrs.h"
-#include "xlat/inet_diag_shutdown_flags.h"
 #include "xlat/inet_diag_ulp_info_attrs.h"
 #include "xlat/inet_diag_ulp_info_mptcp_attrs.h"
 #include "xlat/inet_diag_ulp_info_tls_attrs.h"
@@ -365,7 +364,7 @@ decode_diag_shutdown(struct tcb *const tcp,
 		     const void *const opaque_data)
 {
 	struct decode_nla_xlat_opts opts = {
-		.xlat  = inet_diag_shutdown_flags,
+		.xlat  = sock_shutdown_flags,
 		.dflt  = "???_SHUTDOWN",
 		/*
 		 * While these values are exposed to the user space all over

@@ -447,6 +447,7 @@ extern const struct xlat seccomp_filter_flags[];
 extern const struct xlat seccomp_ret_action[];
 extern const struct xlat setns_types[];
 extern const struct xlat sg_io_info[];
+extern const struct xlat sock_shutdown_flags[];
 extern const struct xlat socketlayers[];
 extern const struct xlat socktypes[];
 extern const struct xlat tcp_state_flags[];
