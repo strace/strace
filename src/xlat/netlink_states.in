@@ -1,5 +1,6 @@
 #From include/net/tcp_states.h
 #From include/uapi/linux/netlink.h
+#Prefix NETLINK_ TCP_
 NETLINK_UNCONNECTED	0
 NETLINK_CONNECTED	1
 /* The initial socket state, as set by net/code/sock.c:sock_init_data */

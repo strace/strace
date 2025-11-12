@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/poll.h
+#Prefix POLL
 POLLIN		0x0001
 POLLPRI		0x0002
 POLLOUT		0x0004

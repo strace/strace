@@ -1,4 +1,5 @@
 #From include/linux/fs.h
+#Prefix MNT_ UMOUNT_
 MNT_FORCE	1
 MNT_DETACH	2
 MNT_EXPIRE	4

@@ -1,4 +1,5 @@
 #From include/uapi/linux/ipc.h
 #From include/uapi/linux/sem.h
+#Prefix IPC_ SEM_
 SEM_UNDO
 IPC_NOWAIT

@@ -1,6 +1,7 @@
 #From arch/sparc/include/uapi/asm/termbits.h
 #From include/uapi/asm-generic/termbits-common.h
 #From include/uapi/asm-generic/termbits.h
+#Prefix B
 B0
 B50
 B75

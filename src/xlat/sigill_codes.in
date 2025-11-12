@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/siginfo.h
+#Prefix ILL_
 ILL_ILLOPC 1
 ILL_ILLPARAOP   /*  2 - bfin */
 ILL_ILLOPN 2

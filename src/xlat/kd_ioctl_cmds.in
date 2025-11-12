@@ -1,5 +1,6 @@
 #sorted
 #From include/uapi/linux/kd.h
+#Prefix GIO_ KD KIOC PIO_
 KIOCSOUND	0x4B2F
 KDMKTONE	0x4B30
 KDGETLED	0x4B31

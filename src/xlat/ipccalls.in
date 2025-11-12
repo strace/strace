@@ -1,4 +1,5 @@
 #From include/uapi/linux/ipc.h
+#Prefix MSG SEM SHM
 SEMOP		 1
 SEMGET		 2
 SEMCTL		 3

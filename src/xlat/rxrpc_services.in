@@ -2,6 +2,7 @@
 #From fs/afs/afs_cm.h
 #From fs/afs/afs_vl.h
 #From fs/afs/protocol_yfs.h
+#Prefix YFS_
 CM_SERVICE	1	/* fs/afs/afs_cm.h */
 YFS_FS_SERVICE	2500	/* fs/afs/protocol_yfs.h */
 YFS_CM_SERVICE	2501	/* fs/afs/protocol_yfs.h */

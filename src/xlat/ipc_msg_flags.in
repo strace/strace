@@ -1,5 +1,6 @@
 #From include/uapi/linux/ipc.h
 #From include/uapi/linux/msg.h
+#Prefix IPC_ MSG_
 MSG_NOERROR	010000
 MSG_EXCEPT	020000
 MSG_COPY	040000

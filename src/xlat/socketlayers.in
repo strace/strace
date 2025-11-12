@@ -6,6 +6,7 @@
 #From include/uapi/linux/rds.h
 #From include/uapi/linux/tipc.h
 #From include/uapi/linux/vm_sockets.h
+#Prefix AF_ SOL_
 SOL_IP		0
 #if !(defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__)
 SOL_SOCKET	1

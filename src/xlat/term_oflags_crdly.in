@@ -1,4 +1,5 @@
 #From include/uapi/asm-generic/termbits.h
+#Prefix CR
 CR0
 CR1
 CR2

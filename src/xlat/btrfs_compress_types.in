@@ -1,5 +1,6 @@
 #value_indexed
 #From fs/btrfs/fs.h
+#Prefix BTRFS_COMPRESS_
 BTRFS_COMPRESS_NONE 0
 BTRFS_COMPRESS_ZLIB 1
 BTRFS_COMPRESS_LZO 2

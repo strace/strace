@@ -2,6 +2,7 @@
 #value_indexed
 #From include/uapi/linux/cgroupstats.h
 #From include/uapi/linux/taskstats.h
+#Prefix TASKSTATS_CMD_ CGROUPSTATS_CMD_
 
 TASKSTATS_CMD_UNSPEC
 TASKSTATS_CMD_GET

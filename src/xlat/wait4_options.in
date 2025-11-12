@@ -1,4 +1,5 @@
 #From include/uapi/linux/wait.h
+#Prefix W __W
 WNOHANG
 #ifndef WSTOPPED
 WUNTRACED

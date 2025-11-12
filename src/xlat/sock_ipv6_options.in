@@ -1,6 +1,7 @@
 #value_indexed
 #From include/uapi/linux/in.h
 #From include/uapi/linux/in6.h
+#Prefix IPV6_ MCAST_
 IPV6_ADDRFORM			1
 IPV6_2292PKTINFO		2
 IPV6_2292HOPOPTS		3

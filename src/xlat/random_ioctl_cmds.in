@@ -1,4 +1,5 @@
 #From include/uapi/linux/random.h
+#Prefix RND
 RNDGETENTCNT		_IOR( 'R', 0x00, int )
 RNDADDTOENTCNT		_IOW( 'R', 0x01, int )
 RNDGETPOOL		_IOR( 'R', 0x02, int [2] )

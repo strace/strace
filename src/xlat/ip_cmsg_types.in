@@ -1,5 +1,6 @@
 #From include/linux/socket.h
 #From include/uapi/linux/in.h
+#Prefix IP_ SCM_
 IP_TOS		1
 IP_TTL		2
 IP_RECVOPTS	6

@@ -1,6 +1,7 @@
 #sorted sort -k2,2g
 #From include/uapi/linux/ipc.h
 #From include/uapi/linux/shm.h
+#Prefix IPC_ SHM_
 IPC_RMID 0
 IPC_SET 1
 IPC_STAT 2

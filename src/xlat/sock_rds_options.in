@@ -1,5 +1,6 @@
 #From include/uapi/asm-generic/socket.h
 #From include/uapi/linux/rds.h
+#Prefix RDS_ SO_RDS_
 RDS_CANCEL_SENT_TO	1
 RDS_GET_MR		2
 RDS_FREE_MR		3

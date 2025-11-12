@@ -1,5 +1,6 @@
 #unconditional
 #From include/uapi/linux/inet_diag.h
+#Prefix INET_DIAG_
 1<<(INET_DIAG_MEMINFO-1)
 1<<(INET_DIAG_INFO-1)
 1<<(INET_DIAG_VEGASINFO-1)

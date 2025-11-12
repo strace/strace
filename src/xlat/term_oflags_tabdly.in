@@ -1,5 +1,6 @@
 #ifndef ALPHA
 #From include/uapi/asm-generic/termbits.h
+#Prefix TAB XTAB
 XTABS /* required by POSIX to == TAB3; but not on Alpha! */
 #endif
 
