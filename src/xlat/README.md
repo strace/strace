@@ -199,6 +199,25 @@ IORING_UNREGISTER_BUFFERS
 ...
 ```
 
+### `#Pattern PATTERN1 ... PATTERNn`
+
+Annotates the xlat file with the regular expression pattern(s) to use when
+searching for constants in Linux headers.  Multiple patterns can be specified,
+separated by spaces.  This directive is intended for other tools and is
+currently ignored by `gen.sh`.
+
+Unlike `#Prefix`, which matches constant names by simple prefix, `#Pattern`
+allows more flexible matching using regular expressions.
+
+**Example:**
+```
+#From include/uapi/linux/dqblk_xfs.h
+#Pattern FS_.*_QUOTA
+FS_USER_QUOTA
+FS_PROJ_QUOTA
+FS_GROUP_QUOTA
+```
+
 ### `#<anything else>`
 
 Any other line starting with `#` is passed through verbatim.  Allows custom
