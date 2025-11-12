@@ -1,3 +1,4 @@
 #From include/net/sock.h
+#Pattern .*_SHUTDOWN
 RCV_SHUTDOWN	1
 SEND_SHUTDOWN	2
