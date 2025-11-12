@@ -10,6 +10,7 @@
 #From include/uapi/linux/gfs2_ondisk.h
 #From include/uapi/linux/magic.h
 #From include/uapi/linux/romfs_fs.h
+#Pattern .*_(MAGIC|CIGAM).*
 QNX4_SUPER_MAGIC	0x0000002f
 Z3FOLD_MAGIC		0x00000033
 AUTOFS_SUPER_MAGIC	0x00000187
