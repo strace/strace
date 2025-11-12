@@ -138,7 +138,7 @@ extract_xlat_constants()
 	[ -f "$xlat_file" ] || return 1
 
 	# Remove comments, directives, and extract constant names
-	sed -n 's/^\(1<<\)\?\([A-Z_][A-Z0-9_]*\).*/\2/p' \
+	sed -n 's/^\(1<<\)\?\([A-Z_][A-Z_0-9]*\).*/\2/p' \
 		"$xlat_file" |
 		sort -u
 }
@@ -200,19 +200,36 @@ calculate_prefix()
 	echo "$prefix"
 }
 
-# Build grep regex pattern for a single prefix
-build_prefix_pattern()
+# Extract all constants from Linux header
+extract_all_header_constants()
+{
+	local commit="$1"
+	local header_file="$2"
+	local sed_define sed_enum
+
+	sed_define='s/^[[:space:]]*#[[:space:]]*define[[:space:]]\+\([A-Z_][A-Z_0-9]*\)[[:space:]].*/\1/p'
+	sed_enum='s/^[[:space:]]*\([A-Z_][A-Z_0-9]*\)[[:space:]]*\(\/\*.*\*\/[[:space:]]*\)\?\([=,]\|$\).*/\1/p'
+
+	git --git-dir="$GIT_DIR" show "${commit}:${header_file}" 2>/dev/null |
+		sed -n -e "$sed_define" -e "$sed_enum" |
+		sort -u
+}
+
+# Filter constants by prefix pattern
+filter_constants_by_prefix()
 {
 	local prefix="$1"
-	local define_p enum_c enum_cc enum_ccl enum_l enum_v
+	local pattern=
 
-	define_p="^[[:space:]]*#[[:space:]]*define[[:space:]]\+${prefix}[A-Z0-9_]*\b"
-	enum_v="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*="
-	enum_c="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*,"
-	enum_cc="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*/\*.*\*/[[:space:]]*,"
-	enum_ccl="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*/\*.*\*/[[:space:]]*$"
-	enum_l="^[[:space:]]*${prefix}[A-Z0-9_]*[[:space:]]*$"
-	echo "${define_p}\|${enum_v}\|${enum_c}\|${enum_cc}\|${enum_ccl}\|${enum_l}"
+	# Build grep pattern from space-separated prefixes
+	set -- $prefix
+	for prefix do
+		[ -z "$pattern" ] ||
+			pattern="$pattern|"
+		pattern="$pattern$prefix[A-Z_0-9]*"
+	done
+
+	grep -E -x -e "$pattern" ||:
 }
 
 # Extract constants from Linux header matching a prefix pattern
@@ -221,26 +238,9 @@ extract_header_constants()
 	local commit="$1"
 	local header_file="$2"
 	local prefix="$3"
-	local full_p p sed_def sed_enum
 
-	set -- $prefix
-	full_p=""
-	for prefix do
-		p=$(build_prefix_pattern "$prefix")
-		if [ -z "$full_p" ]; then
-			full_p="$p"
-		else
-			full_p="${full_p}\\|${p}"
-		fi
-	done
-
-	sed_def="s/^[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\).*/\1/"
-	sed_enum="s/^[[:space:]]*\([A-Z0-9_]*\).*/\1/"
-
-	git --git-dir="$GIT_DIR" show "${commit}:${header_file}" 2>/dev/null |
-		grep "$full_p" |
-		sed -e "$sed_def" -e "$sed_enum" |
-		sort -u
+	extract_all_header_constants "$commit" "$header_file" |
+		filter_constants_by_prefix "$prefix"
 }
 
 # Process a single line from the table
