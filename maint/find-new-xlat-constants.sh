@@ -42,6 +42,10 @@ usage()
 		Arguments:
 		  COMMIT_RANGE       Git commit range (e.g., COMMIT1..COMMIT2)
 
+		Xlat file directives:
+		  #Prefix PREFIX...  Space-separated list of prefixes to match
+		  #Pattern REGEX...  Space-separated list of regular expressions
+
 		Examples:
 		  $0 -d /path/to/linux v6.17..v6.18-rc4 < headers_table.txt \\
 		      > new_constants.txt
@@ -151,6 +155,14 @@ extract_prefix_directive()
 	sed '/^#Prefix[[:space:]]\+/!d;s///;q' "$xlat_file"
 }
 
+# Extract #Pattern directive from xlat file
+extract_pattern_directive()
+{
+	local xlat_file="$1"
+
+	sed '/^#Pattern[[:space:]]\+/!d;s///;q' "$xlat_file"
+}
+
 # Calculate longest common prefix from constants in a file
 calculate_prefix()
 {
@@ -232,8 +244,25 @@ filter_constants_by_prefix()
 	grep -E -x -e "$pattern" ||:
 }
 
+# Filter constants by regular expression patterns
+filter_constants_by_pattern()
+{
+	local patterns="$1"
+	local pattern=
+
+	# Build grep pattern from space-separated regex patterns
+	set -- $patterns
+	for pat do
+		[ -z "$pattern" ] ||
+			pattern="$pattern|"
+		pattern="$pattern$pat"
+	done
+
+	grep -E -x -e "$pattern" ||:
+}
+
 # Extract constants from Linux header matching a prefix pattern
-extract_header_constants()
+extract_header_constants_by_prefix()
 {
 	local commit="$1"
 	local header_file="$2"
@@ -243,13 +272,24 @@ extract_header_constants()
 		filter_constants_by_prefix "$prefix"
 }
 
+# Extract constants from Linux header matching regex patterns
+extract_header_constants_by_pattern()
+{
+	local commit="$1"
+	local header_file="$2"
+	local patterns="$3"
+
+	extract_all_header_constants "$commit" "$header_file" |
+		filter_constants_by_pattern "$patterns"
+}
+
 # Process a single line from the table
 process_line()
 {
 	local xlat_file="$1"
 	local line_type="$2"
 	local header_file="$3"
-	local prefix basename_file
+	local prefix basename_file pattern_directive
 
 	# Skip empty lines
 	[ -n "$xlat_file" ] || return 0
@@ -271,12 +311,24 @@ process_line()
 	[ -s "$xlat_constants_file" ] ||
 		return 0
 
-	# Calculate prefix from xlat constants
-	prefix=$(calculate_prefix "$xlat_constants_file" "$xlat_file")
-
-	# Extract constants from COMMIT1 and COMMIT2 headers to temporary files
-	extract_header_constants "$COMMIT1" "$header_file" "$prefix" > "$v1_file"
-	extract_header_constants "$COMMIT2" "$header_file" "$prefix" > "$v2_file"
+	# Check if #Pattern directive exists
+	pattern_directive=$(extract_pattern_directive "$xlat_file")
+	if [ -n "$pattern_directive" ]; then
+		# Use pattern-based matching
+		extract_header_constants_by_pattern \
+			"$COMMIT1" "$header_file" "$pattern_directive" \
+			> "$v1_file"
+		extract_header_constants_by_pattern \
+			"$COMMIT2" "$header_file" "$pattern_directive" \
+			> "$v2_file"
+	else
+		# Use prefix-based matching
+		prefix=$(calculate_prefix "$xlat_constants_file" "$xlat_file")
+		extract_header_constants_by_prefix \
+			"$COMMIT1" "$header_file" "$prefix" > "$v1_file"
+		extract_header_constants_by_prefix \
+			"$COMMIT2" "$header_file" "$prefix" > "$v2_file"
+	fi
 
 	# Find new constants (in v2 but not in v1 and not in xlat)
 	comm -23 "$v2_file" "$v1_file" |
