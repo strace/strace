@@ -1,5 +1,5 @@
 #unconditional
 #From include/uapi/mtd/ubi-user.h
-#Prefix UBI_
+#Pattern UBI_.*_VOLUME
 UBI_DYNAMIC_VOLUME
 UBI_STATIC_VOLUME
