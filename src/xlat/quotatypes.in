@@ -1,5 +1,6 @@
 #value_indexed
 #From include/uapi/linux/quota.h
+#Pattern .*QUOTA
 USRQUOTA 0
 GRPQUOTA 1
 PRJQUOTA 2
