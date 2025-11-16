@@ -261,6 +261,16 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 		break;
 	tprint_struct_next();
 	PRINT_FIELD_U64(attr, map_extra);
+
+	/*
+	 * The following field was introduced by Linux commit
+	 * v6.9-rc1~159^2~423^2~10^2~6.
+	 */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct,
+			    value_type_btf_obj_fd))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_FD(attr, value_type_btf_obj_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
