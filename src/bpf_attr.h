@@ -53,11 +53,13 @@ struct BPF_MAP_CREATE_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) map_extra;
 	int32_t  value_type_btf_obj_fd;
 	int32_t  map_token_fd;
+	uint64_t ATTRIBUTE_ALIGNED(8) excl_prog_hash;
+	uint32_t excl_prog_hash_size;
 };
 
 # define BPF_MAP_CREATE_struct_size \
-	offsetofend(struct BPF_MAP_CREATE_struct, map_token_fd)
-# define expected_BPF_MAP_CREATE_struct_size 80
+	offsetofend(struct BPF_MAP_CREATE_struct, excl_prog_hash_size)
+# define expected_BPF_MAP_CREATE_struct_size 92
 
 struct BPF_MAP_LOOKUP_ELEM_struct {
 	uint32_t map_fd;

@@ -280,6 +280,17 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 		break;
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, map_token_fd, tcp);
+
+	/*
+	 * The following fields were introduced by Linux commit
+	 * v6.18-rc1~175^2~35.
+	 */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, excl_prog_hash))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(attr, excl_prog_hash);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, excl_prog_hash_size);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
