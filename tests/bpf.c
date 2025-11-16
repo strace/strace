@@ -527,6 +527,28 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 		       ", map_extra=0"
 		       ", value_type_btf_obj_fd=-1"
 	},
+	{ /* 12 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_token_fd = -1
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct,
+				    map_token_fd),
+		.str = "map_type=BPF_MAP_TYPE_UNSPEC"
+		       ", key_size=0"
+		       ", value_size=0"
+		       ", max_entries=0"
+		       ", map_flags=0"
+		       ", inner_map_fd=0" FD0_PATH
+		       ", map_name=\"\""
+		       ", map_ifindex=0"
+		       ", btf_fd=0" FD0_PATH
+		       ", btf_key_type_id=0"
+		       ", btf_value_type_id=0"
+		       ", btf_vmlinux_value_type_id=0"
+		       ", map_extra=0"
+		       ", value_type_btf_obj_fd=0" FD0_PATH
+		       ", map_token_fd=-1"
+	},
 };
 
 static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
