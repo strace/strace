@@ -75,7 +75,8 @@ print_bpf_attr(void)
 		", core_relo_cnt=0"
 		", fd_array=NULL"
 		", core_relos=NULL"
-		", core_relo_rec_size=0}");
+		", core_relo_rec_size=0"
+		", log_true_size=0}");
 }
 
 int

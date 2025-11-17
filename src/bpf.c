@@ -354,127 +354,169 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 {
-	tprint_struct_begin();
-	PRINT_FIELD_XVAL(attr, prog_type, bpf_prog_types, "BPF_PROG_TYPE_???");
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, insn_cnt);
-	tprint_struct_next();
-	PRINT_FIELD_OBJ_TCB_VAL(attr, insns, tcp,
-				print_ebpf_prog, attr.insn_cnt);
+	if (entering(tcp)) {
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(attr, prog_type, bpf_prog_types,
+				 "BPF_PROG_TYPE_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, insn_cnt);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_TCB_VAL(attr, insns, tcp,
+					print_ebpf_prog, attr.insn_cnt);
 
-	tprint_struct_next();
-	tprints_field_name("license");
-	print_big_u64_addr(attr.license);
-	printstr(tcp, attr.license);
+		tprint_struct_next();
+		tprints_field_name("license");
+		print_big_u64_addr(attr.license);
+		printstr(tcp, attr.license);
 
-	/* log_* fields were added in Linux commit v3.18-rc1~52^2~1^2~4.  */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, log_level))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, log_level);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, log_size);
-	tprint_struct_next();
-	tprints_field_name("log_buf");
-	print_big_u64_addr(attr.log_buf);
-	printstr_ex(tcp, attr.log_buf, attr.log_size, QUOTE_0_TERMINATED);
+		/*
+		 * log_* fields were added in Linux commit
+		 * v3.18-rc1~52^2~1^2~4.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, log_level))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, log_level);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, log_size);
+		tprint_struct_next();
+		tprints_field_name("log_buf");
+		print_big_u64_addr(attr.log_buf);
+		printstr_ex(tcp, attr.log_buf, attr.log_size,
+			    QUOTE_0_TERMINATED);
 
-	/* kern_version field was added in Linux commit v4.1-rc1~84^2~50.  */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_OBJ_VAL(attr, kern_version, print_kernel_version);
+		/*
+		 * kern_version field was added in Linux commit
+		 * v4.1-rc1~84^2~50.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(attr, kern_version, print_kernel_version);
 
-	/* prog_flags field was added in Linux commit v4.12-rc2~34^2~29^2~2.  */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_FLAGS(attr, prog_flags, bpf_prog_flags, "BPF_F_???");
+		/*
+		 * prog_flags field was added in Linux commit
+		 * v4.12-rc2~34^2~29^2~2.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, prog_flags, bpf_prog_flags,
+				  "BPF_F_???");
 
-	/* prog_name field was added in Linux commit v4.15-rc1~84^2~605^2~4. */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_name))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_CSTRING_SZ(attr, prog_name,
-			       MIN(sizeof(attr.prog_name),
-				   len - offsetof(struct BPF_PROG_LOAD_struct,
-						   prog_name)));
+		/*
+		 * prog_name field was added in Linux commit
+		 * v4.15-rc1~84^2~605^2~4.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_name))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SZ(attr, prog_name,
+				       MIN(sizeof(attr.prog_name),
+					   len - offsetof(
+						struct BPF_PROG_LOAD_struct,
+						prog_name)));
 
-	/*
-	 * prog_ifindex field was added as prog_target_ifindex in Linux commit
-	 * v4.15-rc1~84^2~127^2~13 and renamed to its current name in
-	 * v4.15-rc1~15^2~5^2~3^2~7.
-	 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_ifindex))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_IFINDEX(attr, prog_ifindex);
+		/*
+		 * prog_ifindex field was added as prog_target_ifindex
+		 * in Linux commit v4.15-rc1~84^2~127^2~13 and renamed
+		 * to its current name in v4.15-rc1~15^2~5^2~3^2~7.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_ifindex))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_IFINDEX(attr, prog_ifindex);
 
-	/*
-	 * expected_attach_type was added in Linux commit
-	 * v4.17-rc1~148^2~19^2^2~8.
-	 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, expected_attach_type))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_XVAL(attr, expected_attach_type, bpf_attach_type,
-			 "BPF_???");
+		/*
+		 * expected_attach_type was added in Linux commit
+		 * v4.17-rc1~148^2~19^2^2~8.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct,
+				    expected_attach_type))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(attr, expected_attach_type, bpf_attach_type,
+				 "BPF_???");
 
-	/*
-	 * The following seven fields were introduced by Linux commits
-	 * v5.0-rc1~129^2~209^2~16^2~8 and v5.0-rc1~129^2~114^2~5^2~6.
-	 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_btf_fd))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_FD(attr, prog_btf_fd, tcp);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, func_info_rec_size);
-	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, func_info);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, func_info_cnt);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, line_info_rec_size);
-	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, line_info);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, line_info_cnt);
+		/*
+		 * The following seven fields were introduced by Linux commits
+		 * v5.0-rc1~129^2~209^2~16^2~8 and v5.0-rc1~129^2~114^2~5^2~6.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_btf_fd))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_FD(attr, prog_btf_fd, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, func_info_rec_size);
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(attr, func_info);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, func_info_cnt);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, line_info_rec_size);
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(attr, line_info);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, line_info_cnt);
 
-	/* attach_btf_id was added in Linux commit v5.5-rc1~174^2~310^2~19^2~7 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, attach_btf_id))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, attach_btf_id);
+		/*
+		 * attach_btf_id was added in Linux commit
+		 * v5.5-rc1~174^2~310^2~19^2~7.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, attach_btf_id))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, attach_btf_id);
 
-	/* attach_prog_fd was added in Linux commit v5.5-rc1~174^2~49^2~12^2~3 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, attach_prog_fd))
-		break;
-	tprint_struct_next();
-	PRINT_FIELD_FD(attr, attach_prog_fd, tcp);
+		/*
+		 * attach_prog_fd was added in Linux commit
+		 * v5.5-rc1~174^2~49^2~12^2~3.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct,
+				    attach_prog_fd))
+			break;
+		tprint_struct_next();
+		PRINT_FIELD_FD(attr, attach_prog_fd, tcp);
 
-	/* fd_array was added in Linux commit v5.14-rc1~119^2~501^2~2^2~13. */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, fd_array))
-		break;
+		/*
+		 * fd_array was added in Linux commit
+		 * v5.14-rc1~119^2~501^2~2^2~13.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, fd_array))
+			break;
 
-	/*
-	 * core_relo* were introduced by Linux commit
-	 * v5.17-rc1~170^2~228^2~20^2~12.
-	 */
-	if (len <= offsetof(struct BPF_PROG_LOAD_struct, core_relos)) {
+		/*
+		 * core_relo* were introduced by Linux commit
+		 * v5.17-rc1~170^2~228^2~20^2~12.
+		 */
+		if (len <= offsetof(struct BPF_PROG_LOAD_struct, core_relos)) {
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(attr, fd_array);
+			break;
+		}
+
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, core_relo_cnt);
 		tprint_struct_next();
 		PRINT_FIELD_ADDR64(attr, fd_array);
-		break;
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(attr, core_relos);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, core_relo_rec_size);
+
+		return 0;
 	}
 
+	/*
+	 * log_true_size field was added in Linux commit
+	 * v6.4-rc1~132^2~87^2~19^2~7.  It is an output field,
+	 * so it is decoded on exiting syscall.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, log_true_size))
+		break;
+
 	tprint_struct_next();
-	PRINT_FIELD_U(attr, core_relo_cnt);
-	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, fd_array);
-	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, core_relos);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, core_relo_rec_size);
+	PRINT_FIELD_U(attr, log_true_size);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
