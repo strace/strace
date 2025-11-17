@@ -138,11 +138,12 @@ struct BPF_PROG_LOAD_struct {
 	uint32_t core_relo_rec_size;
 	uint32_t log_true_size;
 	int32_t  prog_token_fd;
+	uint32_t fd_array_cnt;
 };
 
 # define BPF_PROG_LOAD_struct_size \
-	offsetofend(struct BPF_PROG_LOAD_struct, prog_token_fd)
-# define expected_BPF_PROG_LOAD_struct_size 148
+	offsetofend(struct BPF_PROG_LOAD_struct, fd_array_cnt)
+# define expected_BPF_PROG_LOAD_struct_size 152
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;

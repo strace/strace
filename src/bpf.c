@@ -526,6 +526,15 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, prog_token_fd, tcp);
+
+	/*
+	 * fd_array_cnt field was added in Linux commit
+	 * v6.14-rc1~133^2~45^2~3.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, fd_array_cnt))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, fd_array_cnt);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
