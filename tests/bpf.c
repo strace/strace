@@ -968,6 +968,40 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		       ", core_relo_rec_size=0"
 		       ", log_true_size=4096"
 	},
+	{ /* 9 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_token_fd = -1
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct,
+				    prog_token_fd),
+		.str = "prog_type=BPF_PROG_TYPE_UNSPEC"
+		       ", insn_cnt=0"
+		       ", insns=NULL"
+		       ", license=NULL"
+		       ", log_level=0"
+		       ", log_size=0"
+		       ", log_buf=NULL"
+		       ", kern_version=KERNEL_VERSION(0, 0, 0)"
+		       ", prog_flags=0"
+		       ", prog_name=\"\""
+		       ", prog_ifindex=0"
+		       ", expected_attach_type=BPF_CGROUP_INET_INGRESS"
+		       ", prog_btf_fd=0" FD0_PATH
+		       ", func_info_rec_size=0"
+		       ", func_info=NULL"
+		       ", func_info_cnt=0"
+		       ", line_info_rec_size=0"
+		       ", line_info=NULL"
+		       ", line_info_cnt=0"
+		       ", attach_btf_id=0"
+		       ", attach_prog_fd=0" FD0_PATH
+		       ", core_relo_cnt=0"
+		       ", fd_array=NULL"
+		       ", core_relos=NULL"
+		       ", core_relo_rec_size=0"
+		       ", log_true_size=0"
+		       ", prog_token_fd=-1"
+	},
 };
 
 static void

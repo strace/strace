@@ -517,6 +517,15 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 
 	tprint_struct_next();
 	PRINT_FIELD_U(attr, log_true_size);
+
+	/*
+	 * prog_token_fd field was added in Linux commit
+	 * v6.9-rc1~159^2~423^2~4^2~24.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_token_fd))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_FD(attr, prog_token_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
