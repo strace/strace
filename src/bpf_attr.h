@@ -132,13 +132,15 @@ struct BPF_PROG_LOAD_struct {
 	uint32_t line_info_cnt;
 	uint32_t attach_btf_id;
 	uint32_t attach_prog_fd;
-	uint32_t pad;
+	uint32_t core_relo_cnt;
 	uint64_t ATTRIBUTE_ALIGNED(8) fd_array;
+	uint64_t ATTRIBUTE_ALIGNED(8) core_relos;
+	uint32_t core_relo_rec_size;
 };
 
 # define BPF_PROG_LOAD_struct_size \
-	sizeof(struct BPF_PROG_LOAD_struct)
-# define expected_BPF_PROG_LOAD_struct_size 128
+	offsetofend(struct BPF_PROG_LOAD_struct, core_relo_rec_size)
+# define expected_BPF_PROG_LOAD_struct_size 140
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;

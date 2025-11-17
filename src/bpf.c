@@ -456,8 +456,25 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	/* fd_array was added in Linux commit v5.14-rc1~119^2~501^2~2^2~13. */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, fd_array))
 		break;
+
+	/*
+	 * core_relo* were introduced by Linux commit
+	 * v5.17-rc1~170^2~228^2~20^2~12.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, core_relos)) {
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(attr, fd_array);
+		break;
+	}
+
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, core_relo_cnt);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(attr, fd_array);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(attr, core_relos);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, core_relo_rec_size);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
