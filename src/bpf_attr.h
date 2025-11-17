@@ -139,11 +139,14 @@ struct BPF_PROG_LOAD_struct {
 	uint32_t log_true_size;
 	int32_t  prog_token_fd;
 	uint32_t fd_array_cnt;
+	uint64_t ATTRIBUTE_ALIGNED(8) signature;
+	uint32_t signature_size;
+	int32_t  keyring_id;
 };
 
 # define BPF_PROG_LOAD_struct_size \
-	offsetofend(struct BPF_PROG_LOAD_struct, fd_array_cnt)
-# define expected_BPF_PROG_LOAD_struct_size 152
+	offsetofend(struct BPF_PROG_LOAD_struct, keyring_id)
+# define expected_BPF_PROG_LOAD_struct_size 168
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;

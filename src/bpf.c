@@ -535,6 +535,19 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	tprint_struct_next();
 	PRINT_FIELD_U(attr, fd_array_cnt);
+
+	/*
+	 * The following fields were introduced by Linux commit
+	 * v6.18-rc1~175^2~24^2~4.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, signature))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(attr, signature);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, signature_size);
+	tprint_struct_next();
+	PRINT_FIELD_D(attr, keyring_id);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
