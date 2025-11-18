@@ -1375,25 +1375,7 @@ static const struct bpf_attr_check BPF_PROG_GET_FD_BY_ID_checks[] = {
 			.prog_id = 0xdeadbeef
 		} },
 		.size = offsetofend(struct BPF_PROG_GET_FD_BY_ID_struct, prog_id),
-		.str = "prog_id=3735928559, next_id=0"
-	},
-	{
-		.data = { .BPF_PROG_GET_FD_BY_ID_data = {
-			.prog_id = 0xbadc0ded,
-			.next_id = 0xcafef00d
-		} },
-		.size = offsetofend(struct BPF_PROG_GET_FD_BY_ID_struct, next_id),
-		.str = "prog_id=3134983661, next_id=3405705229"
-	},
-	{
-		.data = { .BPF_PROG_GET_FD_BY_ID_data = {
-			.prog_id = 0xbadc0ded,
-			.next_id = 0xcafef00d,
-			.open_flags = 0xffffff27
-		} },
-		.size = offsetofend(struct BPF_PROG_GET_FD_BY_ID_struct, open_flags),
-		.str = "prog_id=3134983661, next_id=3405705229"
-		       ", open_flags=0xffffff27 /* BPF_F_??? */"
+		.str = "prog_id=3735928559"
 	}
 };
 

@@ -226,13 +226,11 @@ struct BPF_PROG_GET_NEXT_ID_struct {
 
 struct BPF_PROG_GET_FD_BY_ID_struct {
 	uint32_t prog_id;
-	uint32_t next_id;
-	uint32_t open_flags;
 };
 
 # define BPF_PROG_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_FD_BY_ID_struct)
-# define expected_BPF_PROG_GET_FD_BY_ID_struct_size 12
+# define expected_BPF_PROG_GET_FD_BY_ID_struct_size 4
 
 struct BPF_MAP_GET_FD_BY_ID_struct {
 	uint32_t map_id;
