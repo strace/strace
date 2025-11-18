@@ -647,14 +647,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
-BEGIN_BPF_CMD_DECODER(BPF_PROG_DETACH)
-{
-	tprint_struct_begin();
-	PRINT_FIELD_FD(attr, target_fd, tcp);
-	tprint_struct_next();
-	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
-}
-END_BPF_CMD_DECODER(RVAL_DECODED)
+#define decode_BPF_PROG_DETACH decode_BPF_PROG_ATTACH
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 {

@@ -182,15 +182,9 @@ struct BPF_PROG_ATTACH_struct {
 	offsetofend(struct BPF_PROG_ATTACH_struct, expected_revision)
 # define expected_BPF_PROG_ATTACH_struct_size 32
 
-struct BPF_PROG_DETACH_struct {
-	uint32_t target_fd;
-	uint32_t dummy;
-	uint32_t attach_type;
-};
-
-# define BPF_PROG_DETACH_struct_size \
-	sizeof(struct BPF_PROG_DETACH_struct)
-# define expected_BPF_PROG_DETACH_struct_size 12
+# define BPF_PROG_DETACH_struct_size BPF_PROG_ATTACH_struct_size
+# define expected_BPF_PROG_DETACH_struct_size \
+	expected_BPF_PROG_ATTACH_struct_size
 
 struct BPF_PROG_TEST_RUN_struct /* test */ {
 	uint32_t prog_fd;

@@ -71,7 +71,6 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_PROG_LOAD);
 	BPF_ATTR_DATA_FIELD(BPF_OBJ_PIN);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_ATTACH);
-	BPF_ATTR_DATA_FIELD(BPF_PROG_DETACH);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_TEST_RUN);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_GET_NEXT_ID);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_GET_FD_BY_ID);
@@ -1225,22 +1224,7 @@ static const struct bpf_attr_check BPF_PROG_ATTACH_checks[] = {
 	},
 };
 
-
-static const struct bpf_attr_check BPF_PROG_DETACH_checks[] = {
-	{
-		.data = { .BPF_PROG_DETACH_data = { .target_fd = -1 } },
-		.size = offsetofend(struct BPF_PROG_DETACH_struct, target_fd),
-		.str = "target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS"
-	},
-	{
-		.data = { .BPF_PROG_DETACH_data = {
-			.target_fd = -1,
-			.attach_type = 2
-		} },
-		.size = offsetofend(struct BPF_PROG_DETACH_struct, attach_type),
-		.str = "target_fd=-1, attach_type=BPF_CGROUP_INET_SOCK_CREATE"
-	}
-};
+#define BPF_PROG_DETACH_checks BPF_PROG_ATTACH_checks
 
 static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 	{
