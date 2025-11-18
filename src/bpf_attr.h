@@ -290,11 +290,14 @@ struct BPF_BTF_LOAD_struct {
 
 struct BPF_BTF_GET_FD_BY_ID_struct {
 	uint32_t btf_id;
+	uint32_t next_id;
+	uint32_t open_flags;
+	int32_t fd_by_id_token_fd;
 };
 
 # define BPF_BTF_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_BTF_GET_FD_BY_ID_struct)
-# define expected_BPF_BTF_GET_FD_BY_ID_struct_size 4
+# define expected_BPF_BTF_GET_FD_BY_ID_struct_size 16
 
 struct BPF_TASK_FD_QUERY_struct /* task_fd_query */ {
 	uint32_t pid;

@@ -1357,6 +1357,18 @@ BEGIN_BPF_CMD_DECODER(BPF_BTF_GET_FD_BY_ID)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(attr, btf_id);
+
+	/*
+	 * open_flags and fd_by_id_token_fd fields have been added
+	 * in Linux commit v6.15-rc1~98^2~3^2~3.
+	 */
+	if (len <= offsetof(struct BPF_BTF_GET_FD_BY_ID_struct, open_flags))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, open_flags, bpf_file_mode_flags,
+			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FD(attr, fd_by_id_token_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 

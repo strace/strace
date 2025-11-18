@@ -6,7 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of FS_IOC_GETFSUUID, FS_IOC_GETFSSYSFSPATH, and
     FS_IOC_GETLBMD_CAP ioctl commands.
   * Updated decoding of BPF_MAP_CREATE, BPF_PROG_ATTACH, BPF_PROG_DETACH,
-    and BPF_PROG_LOAD bpf commands.
+    BPF_PROG_LOAD, and BPF_*_GET_*_ID bpf commands.
   * Updated lists of AUDIT_*, BR_*, FF_*, IFLA_*, INPUT_PROP_*, IORING_*,
     KEXEC_FILE_*, KEY_*, KVM_CAP_*, NL80211_CMD_*, RWF_*, and TEE_* constants.
 

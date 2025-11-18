@@ -1661,6 +1661,18 @@ static const struct bpf_attr_check BPF_BTF_GET_FD_BY_ID_checks[] = {
 		.data = { .BPF_BTF_GET_FD_BY_ID_data = { .btf_id = 0xdeadbeef } },
 		.size = offsetofend(struct BPF_BTF_GET_FD_BY_ID_struct, btf_id),
 		.str = "btf_id=3735928559"
+	},
+	{
+		.data = { .BPF_BTF_GET_FD_BY_ID_data = {
+			.btf_id = 0xbadc0ded,
+			.open_flags = 0xffffff27,
+			.fd_by_id_token_fd = -100
+		} },
+		.size = offsetofend(struct BPF_BTF_GET_FD_BY_ID_struct,
+				    fd_by_id_token_fd),
+		.str = "btf_id=3134983661"
+		       ", open_flags=0xffffff27 /* BPF_F_??? */"
+		       ", fd_by_id_token_fd=-100"
 	}
 };
 
