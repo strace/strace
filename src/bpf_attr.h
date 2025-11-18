@@ -163,16 +163,24 @@ struct BPF_OBJ_PIN_struct {
 # define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size
 
 struct BPF_PROG_ATTACH_struct {
-	uint32_t target_fd;
+	union {
+		uint32_t target_fd;
+		uint32_t target_ifindex;
+	};
 	uint32_t attach_bpf_fd;
 	uint32_t attach_type;
 	uint32_t attach_flags;
 	uint32_t replace_bpf_fd;
+	union {
+		uint32_t relative_fd;
+		uint32_t relative_id;
+	};
+	uint64_t ATTRIBUTE_ALIGNED(8) expected_revision;
 };
 
 # define BPF_PROG_ATTACH_struct_size \
-	sizeof(struct BPF_PROG_ATTACH_struct)
-# define expected_BPF_PROG_ATTACH_struct_size 20
+	offsetofend(struct BPF_PROG_ATTACH_struct, expected_revision)
+# define expected_BPF_PROG_ATTACH_struct_size 32
 
 struct BPF_PROG_DETACH_struct {
 	uint32_t target_fd;

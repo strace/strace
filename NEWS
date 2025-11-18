@@ -5,7 +5,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added -e kvm=vcpu+ option for kvm_run struct decoding.
   * Implemented decoding of FS_IOC_GETFSUUID, FS_IOC_GETFSSYSFSPATH, and
     FS_IOC_GETLBMD_CAP ioctl commands.
-  * Updated decoding of BPF_MAP_CREATE and BPF_PROG_LOAD bpf command.
+  * Updated decoding of BPF_MAP_CREATE, BPF_PROG_ATTACH, and BPF_PROG_LOAD
+    bpf commands.
   * Updated lists of AUDIT_*, BR_*, FF_*, IFLA_*, INPUT_PROP_*, IORING_*,
     KEXEC_FILE_*, KEY_*, KVM_CAP_*, NL80211_CMD_*, RWF_*, and TEE_* constants.
 

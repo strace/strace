@@ -1171,6 +1171,58 @@ static const struct bpf_attr_check BPF_PROG_ATTACH_checks[] = {
 		       ", attach_flags=0xdf80 /* BPF_F_??? */"
 		       ", replace_bpf_fd=-3"
 	},
+	{
+		.data = { .BPF_PROG_ATTACH_data = {
+			.relative_fd = -1,
+			.expected_revision = 0xdeadbeefcafebabe,
+		} },
+		.size = offsetofend(struct BPF_PROG_ATTACH_struct,
+				    expected_revision),
+		.str = "target_fd=0" FD0_PATH
+		       ", attach_bpf_fd=0" FD0_PATH
+		       ", attach_type=BPF_CGROUP_INET_INGRESS"
+		       ", attach_flags=0"
+		       ", replace_bpf_fd=0" FD0_PATH
+		       ", relative_fd=-1"
+		       ", expected_revision=16045690984503098046"
+	},
+	{
+		.data = { .BPF_PROG_ATTACH_data = {
+			.target_ifindex = 0xdeadbeef,
+			.attach_type = 0x2e,
+			.attach_flags = 0,
+			.relative_fd = -1,
+			.expected_revision = 0xfacefeed,
+		} },
+		.size = offsetofend(struct BPF_PROG_ATTACH_struct,
+				    expected_revision),
+		.str = "target_ifindex=3735928559"
+		       ", attach_bpf_fd=0" FD0_PATH
+		       ", attach_type=BPF_TCX_INGRESS"
+		       ", attach_flags=0"
+		       ", replace_bpf_fd=0" FD0_PATH
+		       ", relative_fd=-1"
+		       ", expected_revision=4207869677"
+	},
+	{
+		.data = { .BPF_PROG_ATTACH_data = {
+			.target_fd = -1,
+			.attach_bpf_fd = -2,
+			.attach_type = 0,
+			.attach_flags = 0x20,
+			.replace_bpf_fd = -3,
+			.relative_id = 0xfacefeed,
+			.expected_revision = 0xdeadbeef,
+		} },
+		.size = offsetofend(struct BPF_PROG_ATTACH_struct,
+				    expected_revision),
+		.str = "target_fd=-1, attach_bpf_fd=-2"
+		       ", attach_type=BPF_CGROUP_INET_INGRESS"
+		       ", attach_flags=BPF_F_ID"
+		       ", replace_bpf_fd=-3"
+		       ", relative_id=4207869677"
+		       ", expected_revision=3735928559"
+	},
 };
 
 

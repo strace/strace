@@ -577,14 +577,40 @@ END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 #define decode_BPF_OBJ_GET decode_BPF_OBJ_PIN
 
+static bool
+bpf_attach_type_is_ifindex(uint32_t attach_type)
+{
+	switch (attach_type) {
+		case BPF_TCX_INGRESS:
+		case BPF_TCX_EGRESS:
+		case BPF_NETKIT_PRIMARY:
+		case BPF_NETKIT_PEER:
+		case BPF_XDP:
+			return true;
+		default:
+			return false;
+	}
+}
+
 BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_FD(attr, target_fd, tcp);
+	/*
+	 * target_ifindex union member has been added in Linux commit
+	 * v6.6-rc1~162^2~371^2~2^2~7.  Print target_fd or target_ifindex
+	 * based on attach_type.
+	 */
+	if (bpf_attach_type_is_ifindex(attr.attach_type))
+		PRINT_FIELD_IFINDEX(attr, target_ifindex);
+	else
+		PRINT_FIELD_FD(attr, target_fd, tcp);
+
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, attach_bpf_fd, tcp);
+
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
+
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(attr, attach_flags, bpf_attach_flags, "BPF_F_???");
 
@@ -594,8 +620,30 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 	 */
 	if (len <= offsetof(struct BPF_PROG_ATTACH_struct, replace_bpf_fd))
 		break;
+
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, replace_bpf_fd, tcp);
+
+	/*
+	 * The following fields were introduced by Linux commit
+	 * v6.6-rc1~162^2~371^2~2^2~7.
+	 */
+	if (len <= offsetof(struct BPF_PROG_ATTACH_struct, relative_fd))
+		break;
+
+	tprint_struct_next();
+	/*
+	 * relative_id union member has been added in Linux commit
+	 * v6.6-rc1~162^2~371^2~2^2~7.  Print relative_fd or relative_id
+	 * based on BPF_F_ID flag in attach_flags.
+	 */
+	if (attr.attach_flags & BPF_F_ID)
+		PRINT_FIELD_U(attr, relative_id);
+	else
+		PRINT_FIELD_FD(attr, relative_fd, tcp);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, expected_revision);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
