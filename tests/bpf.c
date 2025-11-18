@@ -1362,16 +1362,6 @@ static const struct bpf_attr_check BPF_PROG_GET_NEXT_ID_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_GET_NEXT_ID_struct, next_id),
 		.str = "start_id=3134983661, next_id=3405705229"
-	},
-	{
-		.data = { .BPF_PROG_GET_NEXT_ID_data = {
-			.start_id = 0xbadc0ded,
-			.next_id = 0xcafef00d,
-			.open_flags = 0xffffff27
-		} },
-		.size = offsetofend(struct BPF_PROG_GET_NEXT_ID_struct, open_flags),
-		.str = "start_id=3134983661, next_id=3405705229"
-		       ", open_flags=0xffffff27 /* BPF_F_??? */"
 	}
 };
 

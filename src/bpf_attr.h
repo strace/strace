@@ -212,12 +212,11 @@ struct BPF_PROG_TEST_RUN_struct /* test */ {
 struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t start_id;
 	uint32_t next_id;
-	uint32_t open_flags;
 };
 
 # define BPF_PROG_GET_NEXT_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_NEXT_ID_struct)
-# define expected_BPF_PROG_GET_NEXT_ID_struct_size 12
+# define expected_BPF_PROG_GET_NEXT_ID_struct_size 8
 
 # define BPF_MAP_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
 # define BPF_MAP_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
