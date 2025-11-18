@@ -743,8 +743,6 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(attr, map_id);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, next_id);
 
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_MAP_GET_FD_BY_ID_struct, open_flags))

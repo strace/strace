@@ -1385,7 +1385,7 @@ static const struct bpf_attr_check BPF_MAP_GET_FD_BY_ID_checks[] = {
 			.map_id = 0xdeadbeef
 		} },
 		.size = offsetofend(struct BPF_MAP_GET_FD_BY_ID_struct, map_id),
-		.str = "map_id=3735928559, next_id=0"
+		.str = "map_id=3735928559"
 	},
 	{
 		.data = { .BPF_MAP_GET_FD_BY_ID_data = {
@@ -1393,7 +1393,7 @@ static const struct bpf_attr_check BPF_MAP_GET_FD_BY_ID_checks[] = {
 			.next_id = 0xcafef00d
 		} },
 		.size = offsetofend(struct BPF_MAP_GET_FD_BY_ID_struct, next_id),
-		.str = "map_id=3134983661, next_id=3405705229"
+		.str = "map_id=3134983661"
 	},
 	{
 		.data = { .BPF_MAP_GET_FD_BY_ID_data = {
@@ -1402,8 +1402,7 @@ static const struct bpf_attr_check BPF_MAP_GET_FD_BY_ID_checks[] = {
 			.open_flags = 0xffffff27
 		} },
 		.size = offsetofend(struct BPF_MAP_GET_FD_BY_ID_struct, open_flags),
-		.str = "map_id=3134983661, next_id=3405705229"
-		       ", open_flags=0xffffff27 /* BPF_F_??? */"
+		.str = "map_id=3134983661, open_flags=0xffffff27 /* BPF_F_??? */"
 	}
 };
 
