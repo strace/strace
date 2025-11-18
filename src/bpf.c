@@ -709,22 +709,19 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_NEXT_ID)
 {
 	if (entering(tcp)) {
-		set_tcb_priv_ulong(tcp, attr.next_id);
-
 		tprint_struct_begin();
 		PRINT_FIELD_U(attr, start_id);
-		tprint_struct_next();
-		PRINT_FIELD_U(attr, next_id);
 
 		return 0;
 	}
 
-	uint32_t saved_next_id = get_tcb_priv_ulong(tcp);
-
-	if (saved_next_id != attr.next_id) {
-		tprint_value_changed();
-		PRINT_VAL_U(attr.next_id);
-	}
+	/*
+	 * next_id field is an output field, so it is decoded on exiting
+	 * syscall.  The kernel always writes this field regardless of
+	 * the size argument.
+	 */
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, next_id);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
