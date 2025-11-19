@@ -1428,6 +1428,14 @@ static const struct bpf_attr_check BPF_OBJ_GET_INFO_BY_FD_checks[] = {
 static uint32_t prog_load_ids[] = { 0, 1, 0xffffffff, 2718281828, };
 uint32_t *prog_load_ids_ptr;
 
+static uint32_t prog_attach_flags_data[] = {
+	0x1,		/* BPF_F_ALLOW_OVERRIDE */
+	0x3,		/* BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI */
+	0x20,		/* BPF_F_ID */
+	0xbeefca80,	/* Unknown flags */
+};
+uint32_t *prog_attach_flags_ptr;
+
 static void
 init_BPF_PROG_QUERY_attr4(struct bpf_attr_check *check, size_t idx)
 {
@@ -1486,6 +1494,45 @@ print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check,
 	       prog_load_ids_ptr + ARRAY_SIZE(prog_load_ids)
 #else
 	       ", prog_ids=%p, prog_cnt=5}", prog_load_ids_ptr
+#endif
+	       );
+}
+
+static void
+init_BPF_PROG_QUERY_attr6(struct bpf_attr_check *check, size_t idx)
+{
+	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
+
+	if (!prog_load_ids_ptr)
+		prog_load_ids_ptr = tail_memdup(prog_load_ids,
+						sizeof(prog_load_ids));
+	if (!prog_attach_flags_ptr)
+		prog_attach_flags_ptr =
+			tail_memdup(prog_attach_flags_data,
+				    sizeof(prog_attach_flags_data));
+
+	attr->prog_ids = (uintptr_t) prog_load_ids_ptr;
+	attr->prog_attach_flags = (uintptr_t) prog_attach_flags_ptr;
+	attr->prog_cnt = ARRAY_SIZE(prog_attach_flags_data);
+}
+
+static void
+print_BPF_PROG_QUERY_attr6(const struct bpf_attr_check *check,
+			   unsigned long addr, size_t idx)
+{
+	printf("query={target_fd=-1153374643"
+	       ", attach_type=0xfeedface /* BPF_??? */"
+	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
+	       ", attach_flags=0xbeefca80 /* BPF_F_??? */"
+#if defined(INJECT_RETVAL)
+	       ", prog_ids=[0, 1, 4294967295, 2718281828], prog_cnt=4"
+	       ", prog_attach_flags=[BPF_F_ALLOW_OVERRIDE"
+	       ", BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
+	       ", BPF_F_ID"
+	       ", 0xbeefca80 /* BPF_F_??? */]}"
+#else
+	       ", prog_ids=%p, prog_cnt=4, prog_attach_flags=%p}",
+	       prog_load_ids_ptr, prog_attach_flags_ptr
 #endif
 	       );
 }
@@ -1570,6 +1617,18 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.init_fn = init_BPF_PROG_QUERY_attr5,
 		.print_fn = print_BPF_PROG_QUERY_attr5,
+	},
+	{ /* 6 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 0xfeedface,
+			.query_flags = 0xdeadf00d,
+			.attach_flags = 0xbeefca80,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct,
+				    prog_attach_flags),
+		.init_fn = init_BPF_PROG_QUERY_attr6,
+		.print_fn = print_BPF_PROG_QUERY_attr6,
 	},
 };
 

@@ -259,11 +259,13 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t attach_flags;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_ids;
 	uint32_t prog_cnt;
+	uint32_t dummy;
+	uint64_t ATTRIBUTE_ALIGNED(8) prog_attach_flags;
 };
 
 # define BPF_PROG_QUERY_struct_size \
-	offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt)
-# define expected_BPF_PROG_QUERY_struct_size 28
+	offsetofend(struct BPF_PROG_QUERY_struct, prog_attach_flags)
+# define expected_BPF_PROG_QUERY_struct_size 40
 
 struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) name;

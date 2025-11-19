@@ -1265,9 +1265,19 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
+static bool
+print_bpf_attach_flags_array_member(struct tcb *tcp, void *elem_buf,
+				     size_t elem_size, void *data)
+{
+	uint32_t flags = *(uint32_t *) elem_buf;
+	printflags(bpf_attach_flags, flags, "BPF_F_???");
+
+	return true;
+}
+
 BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 {
-	uint32_t prog_id_buf;
+	uint32_t uint32_buf;
 
 	if (entering(tcp)) {
 		tprint_struct_begin();
@@ -1293,8 +1303,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	}
 
 	print_big_u64_addr(attr.prog_ids);
-	print_array(tcp, attr.prog_ids, attr.prog_cnt, &prog_id_buf,
-		    sizeof(prog_id_buf), tfetch_mem,
+	print_array(tcp, attr.prog_ids, attr.prog_cnt, &uint32_buf,
+		    sizeof(uint32_buf), tfetch_mem,
 		    print_uint_array_member, 0);
 
 	tprint_struct_next();
@@ -1305,6 +1315,22 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		tprint_value_changed();
 	}
 	PRINT_VAL_U(attr.prog_cnt);
+
+	/*
+	 * prog_attach_flags field has been added in Linux commit
+	 * v6.0-rc1~141^2~163^2~30^2~6.  It is an output field.
+	 */
+	if (len <= offsetof(struct BPF_PROG_QUERY_struct,
+			    prog_attach_flags))
+		goto end;
+	tprint_struct_next();
+	tprints_field_name("prog_attach_flags");
+	print_big_u64_addr(attr.prog_attach_flags);
+	print_array(tcp, attr.prog_attach_flags, attr.prog_cnt, &uint32_buf,
+		    sizeof(uint32_buf), tfetch_mem,
+		    print_bpf_attach_flags_array_member, 0);
+
+end:
 	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
