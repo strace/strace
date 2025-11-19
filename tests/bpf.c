@@ -689,6 +689,16 @@ get_log_buf_tail(void)
 	return get_log_buf() + log_buf_size;
 }
 
+static unsigned char signature_data[] = {
+	0x30, 0x82, 0x01, 0x0a,  /* PKCS#7 signature header */
+	0x02, 0x82, 0x01, 0x01,
+	0x00, 0xab, 0xcd, 0xef,
+	0xde, 0xad, 0xbe, 0xef,
+	0xca, 0xfe, 0xba, 0xbe,
+	0xfa, 0xce, 0xfe, 0xed,
+};
+unsigned char *signature_ptr;
+
 #if VERBOSE
 # define INSNS_FMT \
 	"[{code=BPF_JMP|BPF_K|BPF_EXIT, dst_reg=BPF_REG_10" \
@@ -752,6 +762,46 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check,
 	       ", expected_attach_type=BPF_CGROUP_INET6_BIND",
 	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
 	       license, IFINDEX_LO_STR);
+}
+
+static void
+init_BPF_PROG_LOAD_attr_signature(struct bpf_attr_check *check, size_t idx)
+{
+	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
+
+	if (!signature_ptr)
+		signature_ptr = tail_memdup(signature_data,
+					    sizeof(signature_data));
+
+	attr->insns = (uintptr_t) insns;
+	attr->license = (uintptr_t) license;
+	attr->signature = (uintptr_t) signature_ptr;
+	attr->signature_size = sizeof(signature_data);
+	attr->keyring_id = 123;
+}
+
+static void
+print_BPF_PROG_LOAD_attr_signature(const struct bpf_attr_check *check,
+				   unsigned long addr, size_t idx)
+{
+	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=" INSNS_FMT
+	       ", license=\"%s\", log_level=0, log_size=0, log_buf=NULL"
+	       ", kern_version=KERNEL_VERSION(0, 0, 0)"
+	       ", prog_flags=0, prog_name=\"\", prog_ifindex=0"
+	       ", expected_attach_type=BPF_CGROUP_INET_INGRESS"
+	       ", prog_btf_fd=0" FD0_PATH
+	       ", func_info_rec_size=0, func_info=NULL, func_info_cnt=0"
+	       ", line_info_rec_size=0, line_info=NULL, line_info_cnt=0"
+	       ", attach_btf_id=0, attach_prog_fd=0" FD0_PATH
+	       ", core_relo_cnt=0, fd_array=NULL, core_relos=NULL"
+	       ", core_relo_rec_size=0, log_true_size=0"
+	       ", prog_token_fd=0" FD0_PATH ", fd_array_cnt=0"
+	       ", signature=\"\\x30\\x82\\x01\\x0a\\x02\\x82\\x01\\x01"
+	       "\\x00\\xab\\xcd\\xef\\xde\\xad\\xbe\\xef"
+	       "\\xca\\xfe\\xba\\xbe\\xfa\\xce\\xfe\\xed\""
+	       ", signature_size=%zu, keyring_id=123",
+	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
+	       license, sizeof(signature_data));
 }
 
 static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 33,
@@ -1038,7 +1088,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 11 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.signature = 0xdeadbeefbadc0ded,
+			.signature = 0xffffffff00000000,
 			.signature_size = 256,
 			.keyring_id = -1
 		} },
@@ -1072,9 +1122,18 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		       ", log_true_size=0"
 		       ", prog_token_fd=0" FD0_PATH
 		       ", fd_array_cnt=0"
-		       ", signature=0xdeadbeefbadc0ded"
+		       ", signature=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", signature_size=256"
 		       ", keyring_id=-1"
+	},
+	{ /* 12 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.insn_cnt = ARRAY_SIZE(insns),
+			.keyring_id = 123
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, keyring_id),
+		.init_fn = init_BPF_PROG_LOAD_attr_signature,
+		.print_fn = print_BPF_PROG_LOAD_attr_signature,
 	},
 };
 

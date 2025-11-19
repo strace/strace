@@ -543,7 +543,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, signature))
 		break;
 	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, signature);
+	tprints_field_name("signature");
+	print_big_u64_addr(attr.signature);
+	printstr_ex(tcp, attr.signature, attr.signature_size,
+		    QUOTE_FORCE_HEX);
 	tprint_struct_next();
 	PRINT_FIELD_U(attr, signature_size);
 	tprint_struct_next();
