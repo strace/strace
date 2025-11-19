@@ -253,7 +253,10 @@ struct BPF_OBJ_GET_INFO_BY_FD_struct /* info */ {
 # define expected_BPF_OBJ_GET_INFO_BY_FD_struct_size 16
 
 struct BPF_PROG_QUERY_struct /* query */ {
-	uint32_t target_fd;
+	union {
+		uint32_t target_fd;
+		uint32_t target_ifindex;
+	};
 	uint32_t attach_type;
 	uint32_t query_flags;
 	uint32_t attach_flags;
@@ -261,11 +264,14 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t prog_cnt;
 	uint32_t dummy;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_attach_flags;
+	uint64_t ATTRIBUTE_ALIGNED(8) link_ids;
+	uint64_t ATTRIBUTE_ALIGNED(8) link_attach_flags;
+	uint64_t ATTRIBUTE_ALIGNED(8) revision;
 };
 
 # define BPF_PROG_QUERY_struct_size \
-	offsetofend(struct BPF_PROG_QUERY_struct, prog_attach_flags)
-# define expected_BPF_PROG_QUERY_struct_size 40
+	offsetofend(struct BPF_PROG_QUERY_struct, revision)
+# define expected_BPF_PROG_QUERY_struct_size 64
 
 struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) name;

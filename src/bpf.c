@@ -1283,7 +1283,15 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		tprint_struct_begin();
 		tprints_field_name("query");
 		tprint_struct_begin();
-		PRINT_FIELD_FD(attr, target_fd, tcp);
+		/*
+		 * target_ifindex union member has been added in Linux
+		 * commit v6.6-rc1~162^2~371^2~2^2~7.  Print target_fd
+		 * or target_ifindex based on attach_type.
+		 */
+		if (bpf_attach_type_is_ifindex(attr.attach_type))
+			PRINT_FIELD_IFINDEX(attr, target_ifindex);
+		else
+			PRINT_FIELD_FD(attr, target_fd, tcp);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type,
 				 "BPF_???");
@@ -1329,6 +1337,29 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	print_array(tcp, attr.prog_attach_flags, attr.prog_cnt, &uint32_buf,
 		    sizeof(uint32_buf), tfetch_mem,
 		    print_bpf_attach_flags_array_member, 0);
+
+	/*
+	 * link_ids, link_attach_flags, and revision fields have been
+	 * added in Linux commit v6.6-rc1~162^2~371^2~2^2~7.
+	 */
+	if (len <= offsetof(struct BPF_PROG_QUERY_struct, link_ids))
+		goto end;
+	tprint_struct_next();
+	tprints_field_name("link_ids");
+	print_big_u64_addr(attr.link_ids);
+	print_array(tcp, attr.link_ids, attr.prog_cnt, &uint32_buf,
+		    sizeof(uint32_buf), tfetch_mem,
+		    print_uint_array_member, 0);
+
+	tprint_struct_next();
+	tprints_field_name("link_attach_flags");
+	print_big_u64_addr(attr.link_attach_flags);
+	print_array(tcp, attr.link_attach_flags, attr.prog_cnt, &uint32_buf,
+		    sizeof(uint32_buf), tfetch_mem,
+		    print_bpf_attach_flags_array_member, 0);
+
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, revision);
 
 end:
 	tprint_struct_end();

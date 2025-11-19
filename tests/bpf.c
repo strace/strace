@@ -1537,6 +1537,40 @@ print_BPF_PROG_QUERY_attr6(const struct bpf_attr_check *check,
 	       );
 }
 
+static void
+init_BPF_PROG_QUERY_attr7(struct bpf_attr_check *check, size_t idx)
+{
+	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
+
+	attr->link_ids = (uintptr_t) prog_load_ids_ptr;
+	attr->link_attach_flags = (uintptr_t) prog_attach_flags_ptr;
+	attr->prog_cnt = ARRAY_SIZE(prog_attach_flags_data);
+}
+
+static void
+print_BPF_PROG_QUERY_attr7(const struct bpf_attr_check *check,
+			   unsigned long addr, size_t idx)
+{
+	printf("query={target_ifindex=3735928559"
+	       ", attach_type=BPF_TCX_INGRESS"
+	       ", query_flags=0, attach_flags=0"
+	       ", prog_ids=NULL, prog_cnt=4"
+	       ", prog_attach_flags=NULL"
+#if defined(INJECT_RETVAL)
+	       ", link_ids=[0, 1, 4294967295, 2718281828]"
+	       ", link_attach_flags=[BPF_F_ALLOW_OVERRIDE"
+	       ", BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
+	       ", BPF_F_ID"
+	       ", 0xbeefca80 /* BPF_F_??? */]"
+	       ", revision=0xfacefeed}"
+#else
+	       ", link_ids=%p, link_attach_flags=%p"
+	       ", revision=0xfacefeed}",
+	       prog_load_ids_ptr, prog_attach_flags_ptr
+#endif
+	       );
+}
+
 static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{
 		.data = { .BPF_PROG_QUERY_data = { .target_fd = -1 } },
@@ -1629,6 +1663,16 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 				    prog_attach_flags),
 		.init_fn = init_BPF_PROG_QUERY_attr6,
 		.print_fn = print_BPF_PROG_QUERY_attr6,
+	},
+	{ /* 7 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_ifindex = 0xdeadbeef,
+			.attach_type = 0x2e,
+			.revision = 0xfacefeed,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, revision),
+		.init_fn = init_BPF_PROG_QUERY_attr7,
+		.print_fn = print_BPF_PROG_QUERY_attr7,
 	},
 };
 
