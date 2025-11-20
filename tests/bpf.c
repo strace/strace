@@ -1959,8 +1959,16 @@ print_BPF_LINK_CREATE_attr1(const struct bpf_attr_check *check,
 }
 
 /* Keep sorted */
-static const uint8_t special_attach_types[] =
-	{ 0, BPF_TRACE_ITER, BPF_PERF_EVENT, BPF_TRACE_KPROBE_MULTI };
+static const uint8_t special_attach_types[] = {
+	0,
+	24 /* BPF_TRACE_FENTRY */,
+	25 /* BPF_TRACE_FEXIT */,
+	26 /* BPF_MODIFY_RETURN */,
+	27 /* BPF_LSM_MAC */,
+	28 /* BPF_TRACE_ITER */,
+	41 /* BPF_PERF_EVENT */,
+	42 /* BPF_TRACE_KPROBE_MULTI */,
+};
 
 static void
 init_BPF_LINK_CREATE_attr2(struct bpf_attr_check *check, size_t idx)
@@ -2248,6 +2256,63 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		.iters = 2,
 		.init_fn = init_BPF_LINK_CREATE_attr12,
 		.print_fn = print_BPF_LINK_CREATE_attr12,
+	},
+
+	/* tracing struct tests */
+	{ /* 13 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 24, /* BPF_TRACE_FENTRY */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tracing.cookie),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_TRACE_FENTRY, flags=0"
+		       ", tracing={target_btf_id=0, cookie=0}}"
+	},
+	{ /* 14 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 25, /* BPF_TRACE_FEXIT */
+			.tracing = {
+				.target_btf_id = 0xfacefeed,
+				.cookie = 0xdeadc0defacecafe,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tracing.cookie),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_TRACE_FEXIT, flags=0"
+		       ", tracing={target_btf_id=4207869677"
+		       ", cookie=0xdeadc0defacecafe}}"
+	},
+	{ /* 15 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 26, /* BPF_MODIFY_RETURN */
+			.tracing = {
+				.target_btf_id = 0xfacefeed,
+				.cookie = 0xdeadc0defacecafe,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tracing.cookie),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_MODIFY_RETURN, flags=0"
+		       ", tracing={target_btf_id=4207869677"
+		       ", cookie=0xdeadc0defacecafe}}"
+	},
+	{ /* 16 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 27, /* BPF_LSM_MAC */
+			.tracing = {
+				.target_btf_id = 0xfacefeed,
+				.cookie = 0xdeadc0defacecafe,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tracing.cookie),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_LSM_MAC, flags=0"
+		       ", tracing={target_btf_id=4207869677"
+		       ", cookie=0xdeadc0defacecafe}}"
 	},
 };
 

@@ -1695,6 +1695,22 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 		attr_size = offsetofend(typeof(attr), perf_event.bpf_cookie);
 		break;
 
+	/* TODO: prog type == BPF_PROG_TYPE_TRACING */
+	case BPF_TRACE_FENTRY:
+	case BPF_TRACE_FEXIT:
+	case BPF_MODIFY_RETURN:
+	case BPF_LSM_MAC:
+		/* Introduced in Linux commit v5.19-rc1~159^2~4^2~37^2~2 */
+		tprint_struct_next();
+		tprints_field_name("tracing");
+		tprint_struct_begin();
+		PRINT_FIELD_U(attr.tracing, target_btf_id);
+		tprint_struct_next();
+		PRINT_FIELD_X(attr.tracing, cookie);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), tracing.cookie);
+		break;
+
 	/* TODO: prog type == BPF_PROG_TYPE_KPROBE */
 	case BPF_TRACE_KPROBE_MULTI: {
 		/* Introduced in Linux commit v5.18-rc1~136^2~11^2~28^2~10 */

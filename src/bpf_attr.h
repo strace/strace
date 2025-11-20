@@ -445,6 +445,15 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			uint64_t ATTRIBUTE_ALIGNED(8) addrs;
 			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
 		} kprobe_multi;
+
+		struct {
+			uint32_t target_btf_id;
+			/*
+			 * The kernel UAPI is broken by Linux commit
+			 * v5.19-rc1~159^2~4^2~37^2~2 .
+			 */
+			uint64_t ATTRIBUTE_ALIGNED(8) cookie; /* skip check */
+		} tracing; /* skip check */
 	};
 };
 
