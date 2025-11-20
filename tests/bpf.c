@@ -1970,15 +1970,21 @@ static const uint8_t special_attach_types[] = {
 	42 /* BPF_TRACE_KPROBE_MULTI */,
 };
 
+static size_t
+skip_special_attach_types(size_t idx)
+{
+	for (size_t i = 0; i < ARRAY_SIZE(special_attach_types)
+			   && idx >= special_attach_types[i]; i++, idx++)
+		;
+	return idx;
+}
+
 static void
 init_BPF_LINK_CREATE_attr2(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_LINK_CREATE_struct *attr = &check->data.BPF_LINK_CREATE_data;
 
-	/* skip special_attach_types */
-	for (size_t i = 0; i < ARRAY_SIZE(special_attach_types)
-			   && idx >= special_attach_types[i]; i++, idx++);
-
+	idx = skip_special_attach_types(idx);
 	attr->attach_type = idx;
 
 	check->data.char_data[19] = ' ';
@@ -1995,9 +2001,7 @@ static void
 print_BPF_LINK_CREATE_attr2(const struct bpf_attr_check *check,
 			    unsigned long addr, size_t idx)
 {
-	/* skip special_attach_types */
-	for (size_t i = 0; i < ARRAY_SIZE(special_attach_types)
-			   && idx >= special_attach_types[i]; i++, idx++);
+	idx = skip_special_attach_types(idx);
 
 	printf("link_create={prog_fd=-1, target_fd=-559038737"
 	       ", attach_type=%s, flags=0xbadc0ded}, "
