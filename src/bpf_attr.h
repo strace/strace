@@ -454,6 +454,13 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			 */
 			uint64_t ATTRIBUTE_ALIGNED(8) cookie; /* skip check */
 		} tracing; /* skip check */
+
+		struct {
+			uint32_t pf;
+			uint32_t hooknum;
+			int32_t priority;
+			uint32_t flags;
+		} netfilter;
 	};
 };
 

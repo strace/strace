@@ -1968,6 +1968,7 @@ static const uint8_t special_attach_types[] = {
 	28 /* BPF_TRACE_ITER */,
 	41 /* BPF_PERF_EVENT */,
 	42 /* BPF_TRACE_KPROBE_MULTI */,
+	45 /* BPF_NETFILTER */,
 };
 
 static size_t
@@ -2317,6 +2318,35 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		       ", attach_type=BPF_LSM_MAC, flags=0"
 		       ", tracing={target_btf_id=4207869677"
 		       ", cookie=0xdeadc0defacecafe}}"
+	},
+
+	/* netfilter struct tests */
+	{ /* 17 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 45, /* BPF_NETFILTER */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    netfilter.flags),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_NETFILTER, flags=0"
+		       ", netfilter={pf=0, hooknum=0, priority=0, flags=0}}"
+	},
+	{ /* 18 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 45, /* BPF_NETFILTER */
+			.netfilter = {
+				.pf = 2, /* NFPROTO_IPV4 */
+				.hooknum = 1, /* NF_INET_LOCAL_IN */
+				.priority = -128,
+				.flags = 1, /* BPF_F_NETFILTER_IP_DEFRAG */
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    netfilter.flags),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_NETFILTER, flags=0"
+		       ", netfilter={pf=2, hooknum=1, priority=-128"
+		       ", flags=BPF_F_NETFILTER_IP_DEFRAG}}"
 	},
 };
 

@@ -32,6 +32,7 @@
 #include "xlat/bpf_task_fd_type.h"
 #include "xlat/bpf_test_run_flags.h"
 #include "xlat/bpf_link_create_kprobe_multi_flags.h"
+#include "xlat/bpf_link_create_netfilter_flags.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -1709,6 +1710,25 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 		PRINT_FIELD_X(attr.tracing, cookie);
 		tprint_struct_end();
 		attr_size = offsetofend(typeof(attr), tracing.cookie);
+		break;
+
+	/* TODO: prog type == BPF_PROG_TYPE_NETFILTER */
+	case BPF_NETFILTER:
+		/* Introduced in Linux commit v6.4-rc6~18^2~5^2~2 */
+		tprint_struct_next();
+		tprints_field_name("netfilter");
+		tprint_struct_begin();
+		PRINT_FIELD_U(attr.netfilter, pf);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr.netfilter, hooknum);
+		tprint_struct_next();
+		PRINT_FIELD_D(attr.netfilter, priority);
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr.netfilter, flags,
+				  bpf_link_create_netfilter_flags,
+				  "BPF_F_NETFILTER_???");
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), netfilter.flags);
 		break;
 
 	/* TODO: prog type == BPF_PROG_TYPE_KPROBE */
