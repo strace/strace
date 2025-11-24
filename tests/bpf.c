@@ -1941,6 +1941,21 @@ static const struct bpf_attr_check BPF_MAP_DELETE_BATCH_checks[] = {
 	}
 };
 
+static bool
+attach_type_is_ifindex(uint32_t attach_type)
+{
+	switch (attach_type) {
+		case 37: /* BPF_XDP */
+		case 46: /* BPF_TCX_INGRESS */
+		case 47: /* BPF_TCX_EGRESS */
+		case 54: /* BPF_NETKIT_PRIMARY */
+		case 55: /* BPF_NETKIT_PEER */
+			return true;
+		default:
+			return false;
+	}
+}
+
 static void
 init_BPF_LINK_CREATE_attr1(struct bpf_attr_check *check, size_t idx)
 {
@@ -1953,8 +1968,11 @@ static void
 print_BPF_LINK_CREATE_attr1(const struct bpf_attr_check *check,
 			    unsigned long addr, size_t idx)
 {
-	printf("link_create={prog_fd=-1, target_fd=-559038737"
-	       ", attach_type=%s, flags=0x4}",
+	uint32_t attach_type = check->data.BPF_LINK_CREATE_data.attach_type;
+
+	printf("link_create={prog_fd=-1, %s, attach_type=%s, flags=0x4}",
+	       attach_type_is_ifindex(attach_type) ?
+		"target_ifindex=3735928559" : "target_fd=-559038737",
 	       sprintxval(bpf_attach_type, idx, "BPF_???"));
 }
 
@@ -2002,9 +2020,11 @@ static void
 print_BPF_LINK_CREATE_attr2(const struct bpf_attr_check *check,
 			    unsigned long addr, size_t idx)
 {
+	uint32_t attach_type = check->data.BPF_LINK_CREATE_data.attach_type;
+
 	idx = skip_special_attach_types(idx);
 
-	printf("link_create={prog_fd=-1, target_fd=-559038737"
+	printf("link_create={prog_fd=-1, %s"
 	       ", attach_type=%s, flags=0xbadc0ded}, "
 #if VERBOSE
 	       "extra_data=\"\\x00\\x00\\x00\\x20\\x00\\x00\\x00\\x4f"
@@ -2015,6 +2035,8 @@ print_BPF_LINK_CREATE_attr2(const struct bpf_attr_check *check,
 	       "..."
 #endif
 	       ,
+	       attach_type_is_ifindex(attach_type) ?
+		"target_ifindex=3735928559" : "target_fd=-559038737",
 	       sprintxval(bpf_attach_type, idx, "BPF_???"));
 }
 

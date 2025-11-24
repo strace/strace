@@ -1643,7 +1643,15 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	tprint_struct_begin();
 	PRINT_FIELD_FD(attr, prog_fd, tcp);
 	tprint_struct_next();
-	PRINT_FIELD_FD(attr, target_fd, tcp);
+	/*
+	 * target_ifindex union member was added in Linux commit
+	 * v6.6-rc1~162^2~371^2~2^2~6.
+	 * Print target_fd or target_ifindex based on attach_type.
+	 */
+	if (bpf_attach_type_is_ifindex(attr.attach_type))
+		PRINT_FIELD_IFINDEX(attr, target_ifindex);
+	else
+		PRINT_FIELD_FD(attr, target_fd, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	tprint_struct_next();

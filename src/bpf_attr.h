@@ -423,7 +423,10 @@ struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
 
 struct BPF_LINK_CREATE_struct /* link_create */ {
 	uint32_t prog_fd;
-	uint32_t target_fd;
+	union {
+		uint32_t target_fd;
+		uint32_t target_ifindex;
+	};
 	uint32_t attach_type;
 	uint32_t flags;
 	union {
