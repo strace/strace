@@ -476,12 +476,22 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			 */
 			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision; /* skip check */
 		} tcx; /* skip check */
+
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) path;
+			uint64_t ATTRIBUTE_ALIGNED(8) offsets;
+			uint64_t ATTRIBUTE_ALIGNED(8) ref_ctr_offsets;
+			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
+			uint32_t cnt;
+			uint32_t flags;
+			uint32_t pid;
+		} uprobe_multi;
 	};
 };
 
 # define BPF_LINK_CREATE_struct_size \
-	sizeof(struct BPF_LINK_CREATE_struct)
-# define expected_BPF_LINK_CREATE_struct_size 48
+	offsetofend(struct BPF_LINK_CREATE_struct, uprobe_multi.pid)
+# define expected_BPF_LINK_CREATE_struct_size 60
 
 struct BPF_LINK_UPDATE_struct /* link_update */ {
 	uint32_t link_fd;

@@ -1990,6 +1990,7 @@ static const uint8_t special_attach_types[] = {
 	45 /* BPF_NETFILTER */,
 	46 /* BPF_TCX_INGRESS */,
 	47 /* BPF_TCX_EGRESS */,
+	48 /* BPF_TRACE_UPROBE_MULTI */,
 };
 
 static size_t
@@ -2406,6 +2407,42 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		       ", attach_type=BPF_TCX_EGRESS, flags=BPF_F_ID"
 		       ", tcx={relative_id=4207869677"
 		       ", expected_revision=0x123456789abcdef0}}"
+	},
+
+	/* uprobe_multi struct tests */
+	{ /* 21 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 48, /* BPF_TRACE_UPROBE_MULTI */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    uprobe_multi.pid),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_TRACE_UPROBE_MULTI, flags=0"
+		       ", uprobe_multi={path=NULL, offsets=NULL"
+		       ", ref_ctr_offsets=NULL, cookies=NULL, cnt=0, flags=0, pid=0}}"
+	},
+	{ /* 22 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 48, /* BPF_TRACE_UPROBE_MULTI */
+			.uprobe_multi = {
+				.path = 0xffffffff00000000,
+				.offsets = 0xffffffff00000001,
+				.ref_ctr_offsets = 0xffffffff00000002,
+				.cookies = 0xffffffff00000003,
+				.cnt = 5,
+				.flags = 1, /* BPF_F_UPROBE_MULTI_RETURN */
+				.pid = 1735928559,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    uprobe_multi.pid),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_TRACE_UPROBE_MULTI, flags=0"
+		       ", uprobe_multi={path=" BIG_ADDR("0xffffffff00000000", "NULL")
+		       ", offsets=" BIG_ADDR("0xffffffff00000001", "0x1")
+		       ", ref_ctr_offsets=" BIG_ADDR("0xffffffff00000002", "0x2")
+		       ", cookies=" BIG_ADDR("0xffffffff00000003", "0x3")
+		       ", cnt=5, flags=BPF_F_UPROBE_MULTI_RETURN, pid=1735928559}}"
 	},
 };
 

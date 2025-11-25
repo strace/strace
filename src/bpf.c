@@ -33,6 +33,7 @@
 #include "xlat/bpf_test_run_flags.h"
 #include "xlat/bpf_link_create_kprobe_multi_flags.h"
 #include "xlat/bpf_link_create_netfilter_flags.h"
+#include "xlat/bpf_link_create_uprobe_multi_flags.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -1795,6 +1796,51 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 			    tfetch_mem, print_xint_array_member, 0);
 		tprint_struct_end();
 		attr_size = offsetofend(typeof(attr), kprobe_multi.cookies);
+		break;
+	}
+
+	case BPF_TRACE_UPROBE_MULTI: {
+		/*
+		 * Introduced in Linux commit v6.6-rc1~10^2~4^2~16^2~25,
+		 * v6.6-rc1~10^2~4^2~16^2~24, and v6.6-rc1~10^2~4^2~16^2~23.
+		 */
+		uint64_t addr;
+
+		tprint_struct_next();
+		tprints_field_name("uprobe_multi");
+		tprint_struct_begin();
+		tprints_field_name("path");
+		print_big_u64_addr(attr.uprobe_multi.path);
+		printpath(tcp, attr.uprobe_multi.path);
+		tprint_struct_next();
+		tprints_field_name("offsets");
+		print_big_u64_addr(attr.uprobe_multi.offsets);
+		print_array(tcp, attr.uprobe_multi.offsets, attr.uprobe_multi.cnt,
+			    &addr, sizeof(addr),
+			    tfetch_mem, print_xint_array_member, 0);
+		tprint_struct_next();
+		tprints_field_name("ref_ctr_offsets");
+		print_big_u64_addr(attr.uprobe_multi.ref_ctr_offsets);
+		print_array(tcp, attr.uprobe_multi.ref_ctr_offsets,
+			    attr.uprobe_multi.cnt,
+			    &addr, sizeof(addr), tfetch_mem,
+			    print_xint_array_member, 0);
+		tprint_struct_next();
+		tprints_field_name("cookies");
+		print_big_u64_addr(attr.uprobe_multi.cookies);
+		print_array(tcp, attr.uprobe_multi.cookies, attr.uprobe_multi.cnt,
+			    &addr, sizeof(addr), tfetch_mem,
+			    print_xint_array_member, 0);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr.uprobe_multi, cnt);
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr.uprobe_multi, flags,
+				  bpf_link_create_uprobe_multi_flags,
+				  "BPF_F_UPROBE_MULTI_???");
+		tprint_struct_next();
+		PRINT_FIELD_TGID(attr.uprobe_multi, pid, tcp);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), uprobe_multi.pid);
 		break;
 	}
 
