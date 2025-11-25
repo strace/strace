@@ -1739,6 +1739,24 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 		attr_size = offsetofend(typeof(attr), netfilter.flags);
 		break;
 
+	/* TODO: prog type == BPF_PROG_TYPE_SCHED_CLS */
+	case BPF_TCX_INGRESS:
+	case BPF_TCX_EGRESS:
+		/* Introduced in Linux commit v6.6-rc1~162^2~371^2~2^2~6 */
+		tprint_struct_next();
+		tprints_field_name("tcx");
+		tprint_struct_begin();
+		if (attr.flags & BPF_F_ID) {
+			PRINT_FIELD_U(attr.tcx, relative_id);
+		} else {
+			PRINT_FIELD_FD(attr.tcx, relative_fd, tcp);
+		}
+		tprint_struct_next();
+		PRINT_FIELD_X(attr.tcx, expected_revision);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), tcx.expected_revision);
+		break;
+
 	/* TODO: prog type == BPF_PROG_TYPE_KPROBE */
 	case BPF_TRACE_KPROBE_MULTI: {
 		/* Introduced in Linux commit v5.18-rc1~136^2~11^2~28^2~10 */

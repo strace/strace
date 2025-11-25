@@ -464,6 +464,18 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			int32_t priority;
 			uint32_t flags;
 		} netfilter;
+
+		struct {
+			union {
+				uint32_t relative_fd;
+				uint32_t relative_id;
+			};
+			/*
+			 * The kernel UAPI is broken by Linux commit
+			 * v6.6-rc1~162^2~371^2~2^2~6.
+			 */
+			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision; /* skip check */
+		} tcx; /* skip check */
 	};
 };
 

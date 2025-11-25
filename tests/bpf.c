@@ -1987,6 +1987,8 @@ static const uint8_t special_attach_types[] = {
 	41 /* BPF_PERF_EVENT */,
 	42 /* BPF_TRACE_KPROBE_MULTI */,
 	45 /* BPF_NETFILTER */,
+	46 /* BPF_TCX_INGRESS */,
+	47 /* BPF_TCX_EGRESS */,
 };
 
 static size_t
@@ -2369,6 +2371,39 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		       ", attach_type=BPF_NETFILTER, flags=0"
 		       ", netfilter={pf=2, hooknum=1, priority=-128"
 		       ", flags=BPF_F_NETFILTER_IP_DEFRAG}}"
+	},
+
+	/* tcx struct + target_ifindex tests */
+	{ /* 19 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.target_ifindex = BE_LE(0xdeadbeef, 0xefbeadde),
+			.attach_type = 46, /* BPF_TCX_INGRESS */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tcx.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH
+		       ", target_ifindex=" BE_LE("3735928559", "4022250974")
+		       ", attach_type=BPF_TCX_INGRESS, flags=0"
+		       ", tcx={relative_fd=0" FD0_PATH
+		       ", expected_revision=0}}"
+	},
+	{ /* 20 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.target_ifindex = BE_LE(0xdeadbeef, 0xefbeadde),
+			.attach_type = 47, /* BPF_TCX_EGRESS */
+			.flags = 0x20, /* BPF_F_ID */
+			.tcx = {
+				.relative_id = 0xfacefeed,
+				.expected_revision = 0x123456789abcdef0ULL,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    tcx.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH
+		       ", target_ifindex=" BE_LE("3735928559", "4022250974")
+		       ", attach_type=BPF_TCX_EGRESS, flags=0x20"
+		       ", tcx={relative_id=4207869677"
+		       ", expected_revision=0x123456789abcdef0}}"
 	},
 };
 
