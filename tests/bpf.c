@@ -1970,7 +1970,8 @@ print_BPF_LINK_CREATE_attr1(const struct bpf_attr_check *check,
 {
 	uint32_t attach_type = check->data.BPF_LINK_CREATE_data.attach_type;
 
-	printf("link_create={prog_fd=-1, %s, attach_type=%s, flags=0x4}",
+	printf("link_create={prog_fd=-1, %s, attach_type=%s"
+	       ", flags=BPF_F_REPLACE}",
 	       attach_type_is_ifindex(attach_type) ?
 		"target_ifindex=3735928559" : "target_fd=-559038737",
 	       sprintxval(bpf_attach_type, idx, "BPF_???"));
@@ -2026,8 +2027,9 @@ print_BPF_LINK_CREATE_attr2(const struct bpf_attr_check *check,
 
 	idx = skip_special_attach_types(idx);
 
-	printf("link_create={prog_fd=-1, %s"
-	       ", attach_type=%s, flags=0xbadc0ded}, "
+	printf("link_create={prog_fd=-1, %s, attach_type=%s"
+	       ", flags=BPF_F_ALLOW_OVERRIDE|BPF_F_REPLACE|BPF_F_BEFORE"
+			"|BPF_F_ID|BPF_F_PREORDER|0xbadc0d80}, "
 #if VERBOSE
 	       "extra_data=\"\\x00\\x00\\x00\\x20\\x00\\x00\\x00\\x4f"
 	       "\\x00\\x00\\x00\\x48\\x00\\x00\\x00\\x20\\x00\\x00\\x00\\x48"
@@ -2401,7 +2403,7 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 				    tcx.expected_revision),
 		.str = "link_create={prog_fd=0" FD0_PATH
 		       ", target_ifindex=" BE_LE("3735928559", "4022250974")
-		       ", attach_type=BPF_TCX_EGRESS, flags=0x20"
+		       ", attach_type=BPF_TCX_EGRESS, flags=BPF_F_ID"
 		       ", tcx={relative_id=4207869677"
 		       ", expected_revision=0x123456789abcdef0}}"
 	},

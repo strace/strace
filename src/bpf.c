@@ -1655,7 +1655,7 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	tprint_struct_next();
-	PRINT_FIELD_X(attr, flags);
+	PRINT_FIELD_FLAGS(attr, flags, bpf_attach_flags, "BPF_F_???");
 
 	if (len <= offsetof(struct BPF_LINK_CREATE_struct, target_btf_id))
 		goto print_bpf_link_create_end;
