@@ -486,6 +486,18 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			uint32_t flags;
 			uint32_t pid;
 		} uprobe_multi;
+
+		struct {
+			union {
+				uint32_t relative_fd;
+				uint32_t relative_id;
+			};
+			/*
+			 * The kernel UAPI is broken by Linux commit
+			 * v6.7-rc1~160^2~22^2~6^2~6.
+			 */
+			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision;
+		} netkit; /* skip check */
 	};
 };
 

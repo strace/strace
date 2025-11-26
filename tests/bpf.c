@@ -1991,6 +1991,8 @@ static const uint8_t special_attach_types[] = {
 	46 /* BPF_TCX_INGRESS */,
 	47 /* BPF_TCX_EGRESS */,
 	48 /* BPF_TRACE_UPROBE_MULTI */,
+	54 /* BPF_NETKIT_PRIMARY */,
+	55 /* BPF_NETKIT_PEER */,
 };
 
 static size_t
@@ -2397,7 +2399,7 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 			.flags = 0x20, /* BPF_F_ID */
 			.tcx = {
 				.relative_id = 0xfacefeed,
-				.expected_revision = 0x123456789abcdef0ULL,
+				.expected_revision = 0x123456789abcdef0,
 			},
 		} },
 		.size = offsetofend(struct BPF_LINK_CREATE_struct,
@@ -2443,6 +2445,39 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		       ", ref_ctr_offsets=" BIG_ADDR("0xffffffff00000002", "0x2")
 		       ", cookies=" BIG_ADDR("0xffffffff00000003", "0x3")
 		       ", cnt=5, flags=BPF_F_UPROBE_MULTI_RETURN, pid=1735928559}}"
+	},
+
+	/* netkit struct tests */
+	{ /* 23 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.target_ifindex = BE_LE(0xdeadbeef, 0xefbeadde),
+			.attach_type = 54, /* BPF_NETKIT_PRIMARY */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    netkit.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH
+		       ", target_ifindex=" BE_LE("3735928559", "4022250974")
+		       ", attach_type=BPF_NETKIT_PRIMARY, flags=0"
+		       ", netkit={relative_fd=0" FD0_PATH
+		       ", expected_revision=0}}"
+	},
+	{ /* 24 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.target_ifindex = BE_LE(0xdeadbeef, 0xefbeadde),
+			.attach_type = 55, /* BPF_NETKIT_PEER */
+			.flags = 0x20, /* BPF_F_ID */
+			.netkit = {
+				.relative_id = 0xfacefeed,
+				.expected_revision = 0x123456789abcdef0,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    netkit.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH
+		       ", target_ifindex=" BE_LE("3735928559", "4022250974")
+		       ", attach_type=BPF_NETKIT_PEER, flags=BPF_F_ID"
+		       ", netkit={relative_id=4207869677"
+		       ", expected_revision=0x123456789abcdef0}}"
 	},
 };
 

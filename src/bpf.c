@@ -1758,6 +1758,24 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 		attr_size = offsetofend(typeof(attr), tcx.expected_revision);
 		break;
 
+	/* TODO: prog type == BPF_PROG_TYPE_SCHED_CLS */
+	case BPF_NETKIT_PRIMARY:
+	case BPF_NETKIT_PEER:
+		/* Introduced in Linux commit v6.7-rc1~160^2~22^2~6^2~6 */
+		tprint_struct_next();
+		tprints_field_name("netkit");
+		tprint_struct_begin();
+		if (attr.flags & BPF_F_ID) {
+			PRINT_FIELD_U(attr.netkit, relative_id);
+		} else {
+			PRINT_FIELD_FD(attr.netkit, relative_fd, tcp);
+		}
+		tprint_struct_next();
+		PRINT_FIELD_X(attr.netkit, expected_revision);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), netkit.expected_revision);
+		break;
+
 	/* TODO: prog type == BPF_PROG_TYPE_KPROBE */
 	case BPF_TRACE_KPROBE_MULTI: {
 		/* Introduced in Linux commit v5.18-rc1~136^2~11^2~28^2~10 */
