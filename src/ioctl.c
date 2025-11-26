@@ -47,7 +47,7 @@ compare(const void *a, const void *b)
 static const struct_ioctlent *
 ioctl_lookup(const unsigned int code)
 {
-	struct_ioctlent *iop;
+	const struct_ioctlent *iop;
 
 	iop = bsearch((const void *) (const uintptr_t) code, ioctlent,
 			nioctlents, sizeof(ioctlent[0]), compare);
