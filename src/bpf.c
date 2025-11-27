@@ -1663,18 +1663,57 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 
 	/* Trying to guess the union decoding based on the attach type */
 	switch (attr.attach_type) {
-	/* TODO: check that prog type == BPF_PROG_TYPE_EXT */
-	/*
-	 * Yes, it is BPF_CGROUP_INET_INGRESS, see the inconceivable genius
-	 * of the expected_attach_type check in v5.6-rc1~151^2~46^2~1^2~2.
-	 */
-	case 0:
-		/* Introduced in Linux commit v5.10-rc1~107^2~96^2~12^2~5 */
-		if (attr.target_btf_id) {
+	/* see include/linux/bpf-cgroup.h:to_cgroup_bpf_attach_type() */
+	case BPF_CGROUP_INET_INGRESS:
+	case BPF_CGROUP_INET_EGRESS:
+	case BPF_CGROUP_INET_SOCK_CREATE:
+	case BPF_CGROUP_SOCK_OPS:
+	case BPF_CGROUP_DEVICE:
+	case BPF_CGROUP_INET4_BIND:
+	case BPF_CGROUP_INET6_BIND:
+	case BPF_CGROUP_INET4_CONNECT:
+	case BPF_CGROUP_INET6_CONNECT:
+	case BPF_CGROUP_UNIX_CONNECT:
+	case BPF_CGROUP_INET4_POST_BIND:
+	case BPF_CGROUP_INET6_POST_BIND:
+	case BPF_CGROUP_UDP4_SENDMSG:
+	case BPF_CGROUP_UDP6_SENDMSG:
+	case BPF_CGROUP_UNIX_SENDMSG:
+	case BPF_CGROUP_SYSCTL:
+	case BPF_CGROUP_UDP4_RECVMSG:
+	case BPF_CGROUP_UDP6_RECVMSG:
+	case BPF_CGROUP_UNIX_RECVMSG:
+	case BPF_CGROUP_GETSOCKOPT:
+	case BPF_CGROUP_SETSOCKOPT:
+	case BPF_CGROUP_INET4_GETPEERNAME:
+	case BPF_CGROUP_INET6_GETPEERNAME:
+	case BPF_CGROUP_UNIX_GETPEERNAME:
+	case BPF_CGROUP_INET4_GETSOCKNAME:
+	case BPF_CGROUP_INET6_GETSOCKNAME:
+	case BPF_CGROUP_UNIX_GETSOCKNAME:
+	case BPF_CGROUP_INET_SOCK_RELEASE:
+		/* Introduced in Linux commit v6.17-rc1~125^2~101^2~3 */
+		if (attr.flags & (BPF_F_BEFORE | BPF_F_AFTER)) {
 			tprint_struct_next();
-			PRINT_FIELD_U(attr, target_btf_id);
+			tprints_field_name("cgroup");
+			tprint_struct_begin();
+			if (attr.flags & BPF_F_ID) {
+				PRINT_FIELD_U(attr.cgroup, relative_id);
+			} else {
+				PRINT_FIELD_FD(attr.cgroup, relative_fd, tcp);
+			}
+			tprint_struct_next();
+			PRINT_FIELD_X(attr.cgroup, expected_revision);
+			tprint_struct_end();
+			attr_size = offsetofend(typeof(attr), cgroup.expected_revision);
+		} else {
+			/* Introduced in Linux commit v5.10-rc1~107^2~96^2~12^2~5 */
+			if (attr.target_btf_id) {
+				tprint_struct_next();
+				PRINT_FIELD_U(attr, target_btf_id);
+			}
+			attr_size = offsetofend(typeof(attr), target_btf_id);
 		}
-		attr_size = offsetofend(typeof(attr), target_btf_id);
 		break;
 
 	/* TODO: prog type == BPF_PROG_TYPE_TRACING */

@@ -1979,18 +1979,45 @@ print_BPF_LINK_CREATE_attr1(const struct bpf_attr_check *check,
 
 /* Keep sorted */
 static const uint8_t special_attach_types[] = {
-	0,
+	0 /* BPF_CGROUP_INET_INGRESS */,
+	1 /* BPF_CGROUP_INET_EGRESS */,
+	2 /* BPF_CGROUP_INET_SOCK_CREATE */,
+	3 /* BPF_CGROUP_SOCK_OPS */,
+	6 /* BPF_CGROUP_DEVICE */,
+	8 /* BPF_CGROUP_INET4_BIND */,
+	9 /* BPF_CGROUP_INET6_BIND */,
+	10 /* BPF_CGROUP_INET4_CONNECT */,
+	11 /* BPF_CGROUP_INET6_CONNECT */,
+	12 /* BPF_CGROUP_INET4_POST_BIND */,
+	13 /* BPF_CGROUP_INET6_POST_BIND */,
+	14 /* BPF_CGROUP_UDP4_SENDMSG */,
+	15 /* BPF_CGROUP_UDP6_SENDMSG */,
+	18 /* BPF_CGROUP_SYSCTL */,
+	19 /* BPF_CGROUP_UDP4_RECVMSG */,
+	20 /* BPF_CGROUP_UDP6_RECVMSG */,
+	21 /* BPF_CGROUP_GETSOCKOPT */,
+	22 /* BPF_CGROUP_SETSOCKOPT */,
 	24 /* BPF_TRACE_FENTRY */,
 	25 /* BPF_TRACE_FEXIT */,
 	26 /* BPF_MODIFY_RETURN */,
 	27 /* BPF_LSM_MAC */,
 	28 /* BPF_TRACE_ITER */,
+	29 /* BPF_CGROUP_INET4_GETPEERNAME */,
+	30 /* BPF_CGROUP_INET6_GETPEERNAME */,
+	31 /* BPF_CGROUP_INET4_GETSOCKNAME */,
+	32 /* BPF_CGROUP_INET6_GETSOCKNAME */,
+	34 /* BPF_CGROUP_INET_SOCK_RELEASE */,
 	41 /* BPF_PERF_EVENT */,
 	42 /* BPF_TRACE_KPROBE_MULTI */,
 	45 /* BPF_NETFILTER */,
 	46 /* BPF_TCX_INGRESS */,
 	47 /* BPF_TCX_EGRESS */,
 	48 /* BPF_TRACE_UPROBE_MULTI */,
+	49 /* BPF_CGROUP_UNIX_CONNECT */,
+	50 /* BPF_CGROUP_UNIX_SENDMSG */,
+	51 /* BPF_CGROUP_UNIX_RECVMSG */,
+	52 /* BPF_CGROUP_UNIX_GETPEERNAME */,
+	53 /* BPF_CGROUP_UNIX_GETSOCKNAME */,
 	54 /* BPF_NETKIT_PRIMARY */,
 	55 /* BPF_NETKIT_PEER */,
 };
@@ -2478,6 +2505,48 @@ static struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
 		       ", attach_type=BPF_NETKIT_PEER, flags=BPF_F_ID"
 		       ", netkit={relative_id=4207869677"
 		       ", expected_revision=0x123456789abcdef0}}"
+	},
+
+	/* cgroup struct tests */
+	{ /* 25 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 0, /* BPF_CGROUP_INET_INGRESS */
+			.flags = 8, /* BPF_F_BEFORE */
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    cgroup.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_CGROUP_INET_INGRESS, flags=BPF_F_BEFORE"
+		       ", cgroup={relative_fd=0" FD0_PATH
+		       ", expected_revision=0}}"
+	},
+	{ /* 26 */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 1, /* BPF_CGROUP_INET_EGRESS */
+			.flags = 0x30, /* BPF_F_AFTER | BPF_F_ID */
+			.cgroup = {
+				.relative_id = 0xfacefeed,
+				.expected_revision = 0x123456789abcdef0ULL,
+			},
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    cgroup.expected_revision),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_CGROUP_INET_EGRESS"
+		       ", flags=BPF_F_AFTER|BPF_F_ID"
+		       ", cgroup={relative_id=4207869677"
+		       ", expected_revision=0x123456789abcdef0}}"
+	},
+	{ /* 27 - cgroup without BPF_F_BEFORE/AFTER should use target_btf_id */
+		.data = { .BPF_LINK_CREATE_data = {
+			.attach_type = 34, /* BPF_CGROUP_INET_SOCK_RELEASE */
+			.target_btf_id = 0xfacefeed,
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct,
+				    target_btf_id),
+		.str = "link_create={prog_fd=0" FD0_PATH", target_fd=0" FD0_PATH
+		       ", attach_type=BPF_CGROUP_INET_SOCK_RELEASE, flags=0"
+		       ", target_btf_id=4207869677}"
 	},
 };
 
