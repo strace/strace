@@ -1815,6 +1815,14 @@ static struct bpf_attr_check BPF_BTF_LOAD_checks[] = {
 		       ", btf_size=9"
 		       ", btf_log_size=4294967295"
 		       ", btf_log_level=42"
+	},
+	{ /* 2 */
+		.data = { .BPF_BTF_LOAD_data = {
+			.btf_log_true_size = 0xfacefeed
+		} },
+		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf_log_true_size),
+		.str = "btf=NULL, btf_log_buf=NULL, btf_size=0, btf_log_size=0"
+		       ", btf_log_level=0, btf_log_true_size=4207869677"
 	}
 };
 

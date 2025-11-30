@@ -1400,18 +1400,32 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_BTF_LOAD)
 {
-	tprint_struct_begin();
-	tprints_field_name("btf");
-	print_big_u64_addr(attr.btf);
-	printstrn(tcp, attr.btf, attr.btf_size);
-	tprint_struct_next();
-	PRINT_FIELD_ADDR64(attr, btf_log_buf);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, btf_size);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, btf_log_size);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, btf_log_level);
+	if (entering(tcp)) {
+		tprint_struct_begin();
+		tprints_field_name("btf");
+		print_big_u64_addr(attr.btf);
+		printstrn(tcp, attr.btf, attr.btf_size);
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(attr, btf_log_buf);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, btf_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, btf_log_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, btf_log_level);
+
+		/*
+		 * btf_log_true_size field has been added
+		 * in Linux commit v6.4-rc1~132^2~87^2~19^2~7.
+		 */
+		if (len <= offsetof(struct BPF_BTF_LOAD_struct, btf_log_true_size))
+			break;
+
+		return 0;
+	} else {
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, btf_log_true_size);
+	}
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
