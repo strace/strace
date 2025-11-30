@@ -1823,6 +1823,24 @@ static struct bpf_attr_check BPF_BTF_LOAD_checks[] = {
 		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf_log_true_size),
 		.str = "btf=NULL, btf_log_buf=NULL, btf_size=0, btf_log_size=0"
 		       ", btf_log_level=0, btf_log_true_size=4207869677"
+	},
+	{ /* 3 */
+		.data = { .BPF_BTF_LOAD_data = {
+			.btf_token_fd = -1
+		} },
+		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf_token_fd),
+		.str = "btf=NULL, btf_log_buf=NULL, btf_size=0, btf_log_size=0"
+		       ", btf_log_level=0, btf_log_true_size=0, btf_flags=0"
+		       ", btf_token_fd=-1"
+	},
+	{ /* 4 */
+		.data = { .BPF_BTF_LOAD_data = {
+			.btf_flags = 0x10000
+		} },
+		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf_token_fd),
+		.str = "btf=NULL, btf_log_buf=NULL, btf_size=0, btf_log_size=0"
+		       ", btf_log_level=0, btf_log_true_size=0"
+		       ", btf_flags=BPF_F_TOKEN_FD, btf_token_fd=0" FD0_PATH
 	}
 };
 

@@ -1425,6 +1425,18 @@ BEGIN_BPF_CMD_DECODER(BPF_BTF_LOAD)
 	} else {
 		tprint_struct_next();
 		PRINT_FIELD_U(attr, btf_log_true_size);
+
+		/*
+		 * btf_flags and btf_token_fd fields have been added
+		 * in Linux commit v6.9-rc1~159^2~423^2~4^2~25.
+		 */
+		if (len <= offsetof(struct BPF_BTF_LOAD_struct, btf_flags))
+			break;
+
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, btf_flags, bpf_file_flags, "BPF_F_???");
+		tprint_struct_next();
+		PRINT_FIELD_FD(attr, btf_token_fd, tcp);
 	}
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
