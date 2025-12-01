@@ -583,4 +583,15 @@ struct BPF_TOKEN_CREATE_struct /* token_create */ {
 	sizeof(struct BPF_TOKEN_CREATE_struct)
 # define expected_BPF_TOKEN_CREATE_struct_size 8
 
+struct BPF_PROG_STREAM_READ_BY_FD_struct /* prog_stream_read */ {
+	uint64_t ATTRIBUTE_ALIGNED(8) stream_buf;
+	uint32_t stream_buf_len;
+	uint32_t stream_id;
+	uint32_t prog_fd;
+};
+
+# define BPF_PROG_STREAM_READ_BY_FD_struct_size \
+	offsetofend(struct BPF_PROG_STREAM_READ_BY_FD_struct, prog_fd)
+# define expected_BPF_PROG_STREAM_READ_BY_FD_struct_size 20
+
 #endif /* !STRACE_BPF_ATTR_H */

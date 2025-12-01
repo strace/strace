@@ -2024,6 +2024,34 @@ BEGIN_BPF_CMD_DECODER(BPF_TOKEN_CREATE)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_PROG_STREAM_READ_BY_FD)
+{
+	/*
+	 * The prog_stream_read structure and BPF_PROG_STREAM_READ_BY_FD
+	 * command were introduced by Linux commit v6.17-rc1~125^2~36^2~10.
+	 *
+	 * Print everything on exiting since stream_buf contents can only
+	 * be decoded after the syscall completes.
+	 */
+	if (entering(tcp))
+		return 0;
+
+	tprint_struct_begin();
+	tprints_field_name("prog_stream_read");
+	tprint_struct_begin();
+	tprints_field_name("stream_buf");
+	print_big_u64_addr(attr.stream_buf);
+	printstrn(tcp, attr.stream_buf, attr.stream_buf_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, stream_buf_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, stream_id);
+	tprint_struct_next();
+	PRINT_FIELD_FD(attr, prog_fd, tcp);
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -2064,6 +2092,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_LINK_DETACH),
 		BPF_CMD_ENTRY(BPF_PROG_BIND_MAP),
 		BPF_CMD_ENTRY(BPF_TOKEN_CREATE),
+		BPF_CMD_ENTRY(BPF_PROG_STREAM_READ_BY_FD),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

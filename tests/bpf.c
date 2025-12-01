@@ -93,6 +93,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_LINK_DETACH);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_BIND_MAP);
 	BPF_ATTR_DATA_FIELD(BPF_TOKEN_CREATE);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_STREAM_READ_BY_FD);
 	char char_data[256];
 };
 
@@ -2686,6 +2687,45 @@ static const struct bpf_attr_check BPF_TOKEN_CREATE_checks[] = {
 	}
 };
 
+static void
+init_BPF_PROG_STREAM_READ_BY_FD_attr(struct bpf_attr_check *check, size_t idx)
+{
+	static const char sample_data[] = "bPf\0daTum";
+
+	static char *data;
+	if (!data)
+		data = tail_memdup(sample_data, sizeof(sample_data) - 1);
+
+	struct BPF_PROG_STREAM_READ_BY_FD_struct *attr =
+		&check->data.BPF_PROG_STREAM_READ_BY_FD_data;
+	attr->stream_buf = (uintptr_t) data;
+}
+
+static struct bpf_attr_check BPF_PROG_STREAM_READ_BY_FD_checks[] = {
+	{
+		.data = { .BPF_PROG_STREAM_READ_BY_FD_data = {
+			.prog_fd = -1,
+		} },
+		.size = offsetofend(struct BPF_PROG_STREAM_READ_BY_FD_struct,
+				    prog_fd),
+		.str = "prog_stream_read={stream_buf=NULL, stream_buf_len=0"
+		       ", stream_id=0, prog_fd=-1}"
+	},
+	{
+		.data = { .BPF_PROG_STREAM_READ_BY_FD_data = {
+			.stream_buf_len = 9,
+			.stream_id = 0xdeadbeef,
+			.prog_fd = 0,
+		} },
+		.size = offsetofend(struct BPF_PROG_STREAM_READ_BY_FD_struct,
+				    prog_fd),
+		.init_fn = init_BPF_PROG_STREAM_READ_BY_FD_attr,
+		.str = "prog_stream_read={stream_buf=\"bPf\\0daTum\""
+		       ", stream_buf_len=9, stream_id=3735928559"
+		       ", prog_fd=0" FD0_PATH "}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -2734,6 +2774,7 @@ main(void)
 		CHK(BPF_LINK_DETACH),
 		CHK(BPF_PROG_BIND_MAP),
 		CHK(BPF_TOKEN_CREATE),
+		CHK(BPF_PROG_STREAM_READ_BY_FD),
 	};
 
 	page_size = get_page_size();
