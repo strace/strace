@@ -438,6 +438,9 @@ main(int ac, char **av)
 			printf(", ");
 			PRINT_FIELD_U(map_info[i], btf_value_type_id);
 		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, map_extra))
+			printf(", map_extra=%#" PRIx64, map_info[i].map_extra);
 		printf("}");
 #else /* !VERBOSE */
 		printf("%p", map_info + i);
