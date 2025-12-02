@@ -854,9 +854,13 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	/*
 	 * map_extra field was introduced by Linux commit
 	 * v5.16-rc1~159^2~2^2~20^2~4.
+	 * btf_vmlinux_id field was added before map_extra field
+	 * later by Linux commit v6.9-rc1~159^2~423^2~10^2~8.
 	 */
 	if (len <= offsetof(struct bpf_map_info_struct, map_extra))
 		goto print_bpf_map_info_end;
+	tprint_struct_next();
+	PRINT_FIELD_U(info, btf_vmlinux_id);
 	tprint_struct_next();
 	PRINT_FIELD_X(info, map_extra);
 
