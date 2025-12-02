@@ -744,6 +744,12 @@ main(int ac, char **av)
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, verified_insns))
 			printf(", verified_insns=%u", prog_info->verified_insns);
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, attach_btf_obj_id)) {
+			printf(", attach_btf_obj_id=%u",
+			       prog_info->attach_btf_obj_id);
+			printf(", attach_btf_id=%u", prog_info->attach_btf_id);
+		}
 
 		printf("}");
 # else /* !VERBOSE */

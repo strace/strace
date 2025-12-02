@@ -1169,6 +1169,18 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	PRINT_FIELD_U(info, verified_insns);
 
+	/*
+	 * attach_btf_obj_id and attach_btf_id fields were introduced
+	 * by Linux commit v6.0-rc1~141^2~163^2~30^2~6.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, attach_btf_obj_id))
+		goto print_bpf_prog_info_end;
+
+	tprint_struct_next();
+	PRINT_FIELD_U(info, attach_btf_obj_id);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, attach_btf_id);
+
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
 print_bpf_prog_info_end:

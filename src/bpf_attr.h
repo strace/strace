@@ -394,11 +394,13 @@ struct bpf_prog_info_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) run_cnt;
 	uint64_t ATTRIBUTE_ALIGNED(8) recursion_misses;
 	uint32_t verified_insns;
+	uint32_t attach_btf_obj_id;
+	uint32_t attach_btf_id;
 };
 
 # define bpf_prog_info_struct_size \
-	offsetofend(struct bpf_prog_info_struct, verified_insns)
-# define expected_bpf_prog_info_struct_size 220
+	offsetofend(struct bpf_prog_info_struct, attach_btf_id)
+# define expected_bpf_prog_info_struct_size 228
 
 struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) in_batch;

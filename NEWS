@@ -9,6 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated decoding of BPF_BTF_LOAD, BPF_MAP_CREATE, BPF_PROG_ATTACH,
     BPF_PROG_DETACH, BPF_PROG_LOAD, BPF_PROG_QUERY, and BPF_*_GET_*_ID bpf
     commands.
+  * Updated decoding of bpf_prog_info structure.
   * Updated lists of AUDIT_*, BR_*, FF_*, IFLA_*, INPUT_PROP_*, IORING_*,
     KEXEC_FILE_*, KEY_*, KVM_CAP_*, NL80211_CMD_*, RWF_*, and TEE_* constants.
 
