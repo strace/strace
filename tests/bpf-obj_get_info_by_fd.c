@@ -445,6 +445,13 @@ main(int ac, char **av)
 			printf(", ");
 			PRINT_FIELD_X(map_info[i], map_extra);
 		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, hash)) {
+			printf(", ");
+			PRINT_FIELD_X(map_info[i], hash);
+			printf(", ");
+			PRINT_FIELD_U(map_info[i], hash_size);
+		}
 		printf("}");
 #else /* !VERBOSE */
 		printf("%p", map_info + i);

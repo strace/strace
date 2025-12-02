@@ -347,11 +347,13 @@ struct bpf_map_info_struct {
 	uint32_t btf_value_type_id;
 	uint32_t btf_vmlinux_id;
 	uint64_t ATTRIBUTE_ALIGNED(8) map_extra;
+	uint64_t ATTRIBUTE_ALIGNED(8) hash;
+	uint32_t hash_size;
 };
 
 # define bpf_map_info_struct_size \
-	sizeof(struct bpf_map_info_struct)
-# define expected_bpf_map_info_struct_size 88
+	offsetofend(struct bpf_map_info_struct, hash_size)
+# define expected_bpf_map_info_struct_size 100
 
 struct bpf_prog_info_struct {
 	uint32_t type;

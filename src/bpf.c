@@ -864,6 +864,17 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	PRINT_FIELD_X(info, map_extra);
 
+	/*
+	 * hash and hash_size fields were introduced by Linux commit
+	 * v6.18-rc1~175^2~31.
+	 */
+	if (len <= offsetof(struct bpf_map_info_struct, hash))
+		goto print_bpf_map_info_end;
+	tprint_struct_next();
+	PRINT_FIELD_X(info, hash);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, hash_size);
+
 	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
 
 print_bpf_map_info_end:
