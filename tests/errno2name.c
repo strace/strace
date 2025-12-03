@@ -11,8 +11,59 @@
 
 #define CASE(x) case x: return #x
 
+/*
+ * These should never be seen by user programs, but ...
+ */
+#ifndef ERESTARTSYS
+# define ERESTARTSYS 512
+#endif
+#ifndef ERESTARTNOINTR
+# define ERESTARTNOINTR 513
+#endif
+#ifndef ERESTARTNOHAND
+# define ERESTARTNOHAND 514
+#endif
+#ifndef ENOIOCTLCMD
+# define ENOIOCTLCMD 515
+#endif
+#ifndef ERESTART_RESTARTBLOCK
+# define ERESTART_RESTARTBLOCK 516
+#endif
+#ifndef EPROBE_DEFER
+# define EPROBE_DEFER 517
+#endif
+#ifndef EOPENSTALE
+# define EOPENSTALE 518
+#endif
+#ifndef EBADHANDLE
+# define EBADHANDLE 521
+#endif
+#ifndef ENOTSYNC
+# define ENOTSYNC 522
+#endif
+#ifndef EBADCOOKIE
+# define EBADCOOKIE 523
+#endif
 #ifndef ENOTSUPP
 # define ENOTSUPP 524
+#endif
+#ifndef ETOOSMALL
+# define ETOOSMALL 525
+#endif
+#ifndef ESERVERFAULT
+# define ESERVERFAULT 526
+#endif
+#ifndef EBADTYPE
+# define EBADTYPE 527
+#endif
+#ifndef EJUKEBOX
+# define EJUKEBOX 528
+#endif
+#ifndef EIOCBQUEUED
+# define EIOCBQUEUED 529
+#endif
+#ifndef ERECALLCONFLICT
+# define ERECALLCONFLICT 530
 #endif
 
 const char *
