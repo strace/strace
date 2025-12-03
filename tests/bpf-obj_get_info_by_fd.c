@@ -98,6 +98,18 @@ print_map_create(void *attr_void, size_t size, long rc)
 			    map_extra)) {
 		printf(", map_extra=0");
 	}
+	if (size > offsetof(struct BPF_MAP_CREATE_struct,
+			    value_type_btf_obj_fd)) {
+		printf(", value_type_btf_obj_fd=0</dev/null>");
+	}
+	if (size > offsetof(struct BPF_MAP_CREATE_struct,
+			    map_token_fd)) {
+		printf(", map_token_fd=0</dev/null>");
+	}
+	if (size > offsetof(struct BPF_MAP_CREATE_struct,
+			    excl_prog_hash)) {
+		printf(", excl_prog_hash=NULL, excl_prog_hash_size=0");
+	}
 	printf("}, %zu) = ", size);
 	if (rc >= 0)
 		printf("%ld<anon_inode:bpf-map>\n", rc);
