@@ -1,7 +1,7 @@
 /*
  * Check kernel version decoding.
  *
- * Copyright (c) 2015-2023 The strace developers.
+ * Copyright (c) 2015-2025 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
