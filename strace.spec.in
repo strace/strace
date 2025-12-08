@@ -208,6 +208,9 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Sun Dec 07 2025 Dmitry V. Levin <ldv@strace.io> - 6.18-1
+- v6.17 -> v6.18 (resolves: #2341392).
+
 * Mon Sep 29 2025 Dmitry V. Levin <ldv@strace.io> - 6.17-1
 - v6.16 -> v6.17.
 
