@@ -94,10 +94,8 @@ print_mnt_id_req(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 	}
 
-	if (req.spare) {
-		tprint_struct_next();
-		PRINT_FIELD_X(req, spare);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_FD(req, mnt_ns_fd, tcp);
 
 	tprint_struct_next();
 	PRINT_FIELD_X(req, mnt_id);

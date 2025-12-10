@@ -75,41 +75,44 @@ main(void)
 
 	req->size = MNT_ID_REQ_SIZE_VER0;
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, spare=%#x, mnt_id=%#jx, param=%#jx}"
-	       ", NULL, 0, 0) = %s" INJ_STR, req->size, req->spare,
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%#jx}"
+	       ", NULL, 0, 0) = %s" INJ_STR, req->size, req->mnt_ns_fd,
 	       (uintmax_t) req->mnt_id, (uintmax_t) req->param, errstr);
 
 	req->size = MNT_ID_REQ_SIZE_VER1;
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, spare=%#x, mnt_id=%#jx, param=%#jx"
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%#jx"
 	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR, req->size,
-	       req->spare, (uintmax_t) req->mnt_id, (uintmax_t) req->param,
+	       req->mnt_ns_fd, (uintmax_t) req->mnt_id, (uintmax_t) req->param,
 	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->size = sizeof(*req);
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, spare=%#x, mnt_id=%#jx, param=%#jx"
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%#jx"
 	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR, req->size,
-	       req->spare, (uintmax_t) req->mnt_id, (uintmax_t) req->param,
+	       req->mnt_ns_fd, (uintmax_t) req->mnt_id, (uintmax_t) req->param,
 	       (uintmax_t) req->mnt_ns_id, errstr);
 
-	req->spare = 0;
+	req->mnt_ns_fd = 0;
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, mnt_id=%#jx, param=%#jx, mnt_ns_id=%#jx}"
-	       ", NULL, 0, 0) = %s" INJ_STR, req->size, (uintmax_t) req->mnt_id,
-	       (uintmax_t) req->param, (uintmax_t) req->mnt_ns_id, errstr);
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%#jx"
+	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR, req->size,
+	       req->mnt_ns_fd, (uintmax_t) req->mnt_id, (uintmax_t) req->param,
+	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->mnt_id = LSMT_ROOT;
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, mnt_id=%s, param=%#jx, mnt_ns_id=%#jx}"
-	       ", NULL, 0, 0) = %s" INJ_STR, req->size, "LSMT_ROOT",
-	       (uintmax_t) req->param, (uintmax_t) req->mnt_ns_id, errstr);
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%s, param=%#jx"
+	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR, req->size,
+	       req->mnt_ns_fd, "LSMT_ROOT", (uintmax_t) req->param,
+	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	++req->size;
 	k_listmount(req, 0, 0, 0);
-	printf("listmount({size=%u, mnt_id=%s, param=%#jx, mnt_ns_id=%#jx, ???}"
-	       ", NULL, 0, 0) = %s" INJ_STR, req->size, "LSMT_ROOT",
-	       (uintmax_t) req->param, (uintmax_t) req->mnt_ns_id, errstr);
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%s, param=%#jx"
+	       ", mnt_ns_id=%#jx, ???}, NULL, 0, 0) = %s" INJ_STR, req->size,
+	       req->mnt_ns_fd, "LSMT_ROOT", (uintmax_t) req->param,
+	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->size = sizeof(*req) + 8;
 	char *p = (char *) req - 8;
@@ -117,9 +120,10 @@ main(void)
 	fill_memory(p + sizeof(*req), 8);
 	k_listmount(p, 0, 0, 0);
 	memmove(req, p, sizeof(*req));
-	printf("listmount({size=%u, mnt_id=%s, param=%#jx, mnt_ns_id=%#jx"
-	       ", /* bytes %zu..%zu */ \"%s\"}, NULL, 0, 0) = %s" INJ_STR,
-	       req->size, "LSMT_ROOT", (uintmax_t) req->param,
+	printf("listmount({size=%u, mnt_ns_fd=%d, mnt_id=%s, param=%#jx"
+	       ", mnt_ns_id=%#jx, /* bytes %zu..%zu */ \"%s\"}, NULL, 0, 0)"
+	       " = %s" INJ_STR,
+	       req->size, req->mnt_ns_fd, "LSMT_ROOT", (uintmax_t) req->param,
 	       (uintmax_t) req->mnt_ns_id, sizeof(*req), sizeof(*req) + 7,
 	       "\\x80\\x81\\x82\\x83\\x84\\x85\\x86\\x87", errstr);
 

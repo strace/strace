@@ -116,37 +116,38 @@ test_req(void)
 	req->param = INVALID_STATMOUNT;
 
 	k_statmount(req, 0, 0, 0);
-	printf("statmount({size=%u, spare=%#x, mnt_id=%#jx, param=%#jx"
-	       " /* STATMOUNT_??? */}, NULL, 0, 0) = %s" INJ_STR,
-	       req->size, req->spare,
+	printf("statmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx"
+	       ", param=%#jx /* STATMOUNT_??? */}, NULL, 0, 0) = %s" INJ_STR,
+	       req->size, req->mnt_ns_fd,
 	       (uintmax_t) req->mnt_id, (uintmax_t) req->param, errstr);
 
 	req->size = MNT_ID_REQ_SIZE_VER1;
-	req->spare = 0;
+	req->mnt_ns_fd = 0;
 	req->param = VALID_STATMOUNT;
 
 	k_statmount(req, 0, 0, 0);
-	printf("statmount({size=%u, mnt_id=%#jx, param=%s, mnt_ns_id=%#jx}"
-	       ", NULL, 0, 0) = %s" INJ_STR,
-	       req->size, (uintmax_t) req->mnt_id, VALID_STATMOUNT_STR,
-	       (uintmax_t) req->mnt_ns_id, errstr);
+	printf("statmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%s"
+	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR,
+	       req->size, req->mnt_ns_fd, (uintmax_t) req->mnt_id,
+	       VALID_STATMOUNT_STR, (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->size = sizeof(*req);
 	req->param = ALL_STATMOUNT;
 
 	k_statmount(req, 0, 0, 0);
-	printf("statmount({size=%u, mnt_id=%#jx, param=%s, mnt_ns_id=%#jx}"
-	       ", NULL, 0, 0) = %s" INJ_STR,
-	       req->size, (uintmax_t) req->mnt_id, ALL_STATMOUNT_STR,
-	       (uintmax_t) req->mnt_ns_id, errstr);
+	printf("statmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=%s"
+	       ", mnt_ns_id=%#jx}, NULL, 0, 0) = %s" INJ_STR,
+	       req->size, req->mnt_ns_fd, (uintmax_t) req->mnt_id,
+	       ALL_STATMOUNT_STR, (uintmax_t) req->mnt_ns_id, errstr);
 
 	++req->size;
 	req->param = 0;
 
 	k_statmount(req, 0, 0, 0);
-	printf("statmount({size=%u, mnt_id=%#jx, param=0, mnt_ns_id=%#jx, ???}"
-	       ", NULL, 0, 0) = %s" INJ_STR, req->size,
-	       (uintmax_t) req->mnt_id, (uintmax_t) req->mnt_ns_id, errstr);
+	printf("statmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=0"
+	       ", mnt_ns_id=%#jx, ???}, NULL, 0, 0) = %s" INJ_STR, req->size,
+	       req->mnt_ns_fd, (uintmax_t) req->mnt_id,
+	       (uintmax_t) req->mnt_ns_id, errstr);
 
 	req->size = sizeof(*req) + 8;
 	char *p = (char *) req - 8;
@@ -155,9 +156,10 @@ test_req(void)
 
 	k_statmount(p, 0, 0, 0);
 	memmove(req, p, sizeof(*req));
-	printf("statmount({size=%u, mnt_id=%#jx, param=0, mnt_ns_id=%#jx"
-	       ", /* bytes %zu..%zu */ \"%s\"}, NULL, 0, 0) = %s" INJ_STR,
-	       req->size, (uintmax_t) req->mnt_id, (uintmax_t) req->mnt_ns_id,
+	printf("statmount({size=%u, mnt_ns_fd=%d, mnt_id=%#jx, param=0"
+	       ", mnt_ns_id=%#jx, /* bytes %zu..%zu */ \"%s\"}, NULL, 0, 0)"
+	       " = %s" INJ_STR, req->size, req->mnt_ns_fd,
+	       (uintmax_t) req->mnt_id, (uintmax_t) req->mnt_ns_id,
 	       sizeof(*req), sizeof(*req) + 7,
 	       "\\x80\\x81\\x82\\x83\\x84\\x85\\x86\\x87", errstr);
 }
