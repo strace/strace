@@ -27,7 +27,7 @@ thread(void *arg)
 	pid_t pid = getpid();
 	pid_t tid = syscall(__NR_gettid);
 
-	printf("%-5d execve(\"%s\", [\"%s\", \"0\"], NULL <pid changed to %u ...>\n"
+	printf("%-5d execve(\"%s\", [\"%s\", \"0\"], NULL <pid changed to %u ... (#1)>\n"
 	       "%-5d +++ superseded by execve in pid %u +++\n"
 	       "%-5d +++ exited with 0 +++\n",
 	       tid, argv[0], argv[0], pid, pid, tid, pid);
