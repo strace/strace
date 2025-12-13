@@ -104,7 +104,7 @@ SYS_FUNC(mount_setattr)
 				   tcp->u_arg[3],
 				   tcp->u_arg[4]);
 
-	return RVAL_DECODED | RVAL_FD;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(open_tree)
