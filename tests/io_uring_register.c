@@ -370,12 +370,12 @@ main(void)
 	probe->ops[0].flags = 0;
 	probe->ops[0].resv2 = 0xbeefface;
 
-	probe->ops[1].op = 62;
+	probe->ops[1].op = 64;
 	probe->ops[1].resv = 0;
 	probe->ops[1].flags = IO_URING_OP_SUPPORTED;
 	probe->ops[1].resv2 = 0xdeadc0de;
 
-	probe->ops[2].op = 63;
+	probe->ops[2].op = 65;
 	probe->ops[2].resv = 0xaf;
 	probe->ops[2].flags = 0xbeef;
 	probe->ops[2].resv2 = 0;
@@ -390,41 +390,41 @@ main(void)
 	       ", ops_len=%hhu, resv2=[0, %#x, 0], ops=["
 	       "{op=" XLAT_FMT_U ", resv=0xde, flags=0, resv2=0xbeefface}, "
 	       "{op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}, "
-	       "{op=63" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
+	       "{op=65" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
 	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
 	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}]}"
 #if RETVAL_INJECTED
 	       " => {last_op=" XLAT_FMT_U ", ops_len=%hhu, resv2=[0, %#x, 0], "
 	       "ops=[{op=" XLAT_FMT_U ", resv=0xde, flags=0, resv2=0xbeefface}"
 	       ", {op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}"
-	       ", {op=63" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
+	       ", {op=65" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
 	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
 	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}, ...]}"
 #endif
 	       ", 4) = %s\n",
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
 	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
-	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_PIPE),
+	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_URING_CMD128),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
 #if RETVAL_INJECTED
 	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
-	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_PIPE),
+	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_URING_CMD128),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
 #endif
 	       errstr);
 
-	probe->last_op = 63;
+	probe->last_op = 65;
 	probe->resv2[1] = 0;
 	fill_memory_ex(probe->ops, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1),
-		    0x40, 0x80);
+		       65, 0x80);
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe,
 			      DEFAULT_STRLEN + 1);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT,
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE));
 	for (size_t c = 0; c < 1 + RETVAL_INJECTED; c++) {
-		printf("%s{last_op=63" NRAW(" /* IORING_OP_??? */")
+		printf("%s{last_op=65" NRAW(" /* IORING_OP_??? */")
 		       ", ops_len=%hhu, ops=[",
 		       c ? " => " : ", ", probe->ops_len);
 		for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
@@ -494,9 +494,9 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
 		  "sqe_op=", ARG_STR(IORING_OP_NOP), true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
-		  "sqe_op=", ARG_STR(IORING_OP_PIPE), true },
+		  "sqe_op=", ARG_STR(IORING_OP_URING_CMD128), true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
-		  "sqe_op=", 63, " /* IORING_OP_??? */", false },
+		  "sqe_op=", 65, " /* IORING_OP_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
 		  "sqe_op=", 255, " /* IORING_OP_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
@@ -1247,7 +1247,7 @@ main(void)
 			       (intmax_t) sync_cancel_reg->timeout.tv_nsec);
 			if (j & 0x20)
 				printf(", opcode=" XLAT_FMT,
-				       XLAT_ARGS(IORING_OP_PIPE));
+				       XLAT_ARGS(IORING_OP_URING_CMD128));
 			else
 				printf(", opcode=%#x"
 				       NRAW(" /* IORING_OP_??? */"),

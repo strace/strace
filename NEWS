@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated decoding of struct mnt_id_req.
+  * Updated the list of IORING_OP_* constants.
 
 Noteworthy changes in release 6.18 (2025-12-07)
 ===============================================
