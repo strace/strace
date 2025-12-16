@@ -124,7 +124,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	enum {
 		STRACE_PEA_ABBREV_SIZE =
 			offsetof(struct perf_event_attr, wakeup_events),
-		STRACE_PEA_SIZE = 136,
+		STRACE_PEA_SIZE = 144,
 	};
 
 	uint32_t read_size;
@@ -381,6 +381,14 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 
 	val = attr->config3;
 	printf(", config3=%#" PRIx64, (uint64_t) val);
+
+	if (size <= 136) {
+		cutoff = 136;
+		goto end;
+	}
+
+	val = attr->config4;
+	printf(", config4=%#" PRIx64, (uint64_t) val);
 
 	cutoff = STRACE_PEA_SIZE;
 
