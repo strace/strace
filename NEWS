@@ -3,7 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated decoding of struct mnt_id_req and struct perf_event_attr.
-  * Updated the list of IORING_OP_* constants.
+  * Updated lists of BPF_* and IORING_OP_* constants.
 
 Noteworthy changes in release 6.18 (2025-12-07)
 ===============================================

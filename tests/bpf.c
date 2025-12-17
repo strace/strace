@@ -279,7 +279,7 @@ init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check, size_t idx)
 	attr->map_ifindex = ifindex_lo();
 }
 
-static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 34,
+static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 35,
 	      "The map_type for tests 1 and 2 below needs to be updated");
 static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	{
@@ -290,7 +290,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 33,
+			.map_type = 34,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
@@ -300,7 +300,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_name = "0123456789abcde",
 		} },
 		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
-		.str = "map_type=BPF_MAP_TYPE_ARENA, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_INSN_ARRAY, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 				   "|BPF_F_NUMA_NODE|BPF_F_RDONLY|BPF_F_WRONLY"
@@ -312,7 +312,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 34,
+			.map_type = 35,
 			.key_size = 0xface1e55,
 			.value_size = 0xbadc0ded,
 			.max_entries = 0xbeefcafe,
@@ -323,7 +323,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_ifindex = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
-		.str = "map_type=0x22 /* BPF_MAP_TYPE_??? */"
+		.str = "map_type=0x23 /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
 		       ", map_flags=0xffffc000 /* BPF_F_??? */"
