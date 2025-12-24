@@ -31,6 +31,19 @@ SCM_TIMESTAMPING_PKTINFO	0x3a
 #if defined __sparc__
 SCM_DEVMEM_LINEAR	0x57
 SCM_DEVMEM_DMABUF	0x58
+#elif defined __hppa__
+# ifndef STRACE_WORKAROUND_FOR_SCM_DEVMEM
+#  define STRACE_WORKAROUND_FOR_SCM_DEVMEM
+/*
+ * Linux kernel commit v6.15-rc1~160^2^2~4 changed the values of
+ * SCM_DEVMEM_LINEAR and SCM_DEVMEM_DMABUF constants introduced by commit
+ * v6.12-rc1~232^2~32^2~4.
+ */
+#  undef SCM_DEVMEM_LINEAR
+#  undef SCM_DEVMEM_DMABUF
+# endif
+SCM_DEVMEM_LINEAR	0x404e
+SCM_DEVMEM_DMABUF	0x404f
 #else
 SCM_DEVMEM_LINEAR	0x4e
 SCM_DEVMEM_DMABUF	0x4f
