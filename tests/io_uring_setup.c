@@ -77,9 +77,9 @@ main(void)
 	       "|IORING_SETUP_SINGLE_ISSUER|IORING_SETUP_DEFER_TASKRUN"
 	       "|IORING_SETUP_NO_MMAP|IORING_SETUP_REGISTERED_FD_ONLY"
 	       "|IORING_SETUP_NO_SQARRAY|IORING_SETUP_HYBRID_IOPOLL"
-	       "|IORING_SETUP_CQE_MIXED|%#x"
+	       "|IORING_SETUP_CQE_MIXED|IORING_SETUP_SQE_MIXED|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, wq_fd=%d, resv=[",
-	       1, -1U - 0x7ffff, params->sq_thread_cpu, params->sq_thread_idle,
+	       1, -1U - 0xfffff, params->sq_thread_cpu, params->sq_thread_idle,
 	       params->wq_fd);
 	for (unsigned int i = 0; i < ARRAY_SIZE(params->resv); ++i)
 		printf("%s%#x", i != 0 ? ", " : "", params->resv[i]);
