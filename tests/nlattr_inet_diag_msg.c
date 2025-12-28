@@ -488,8 +488,8 @@ main(void)
 	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS: unknown, undecoded */
 	static const struct strval16 tls_unk_attrs[] = {
 		{ ENUM_KNOWN(0, TLS_INFO_UNSPEC) },
-		{ ENUM_KNOWN(0x6, TLS_INFO_RX_NO_PAD) },
-		{ ARG_XLAT_UNKNOWN(0x7, "TLS_INFO_???") },
+		{ ENUM_KNOWN(0x7, TLS_INFO_TX_MAX_PAYLOAD_LEN) },
+		{ ARG_XLAT_UNKNOWN(0x8, "TLS_INFO_???") },
 		{ ARG_XLAT_UNKNOWN(0x1ace, "TLS_INFO_???") },
 	};
 

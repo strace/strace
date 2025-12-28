@@ -1,5 +1,8 @@
 #value_indexed
 #From include/uapi/linux/tls.h
 #Prefix TLS_
-TLS_TX	1
-TLS_RX	2
+TLS_TX			1
+TLS_RX			2
+TLS_TX_ZEROCOPY_RO	3
+TLS_RX_EXPECT_NO_PAD	4
+TLS_TX_MAX_PAYLOAD_LEN	5
