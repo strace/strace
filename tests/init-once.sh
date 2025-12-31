@@ -434,7 +434,7 @@ prog_set_subtract()
 # stdin should consist of lines in "test_name strace_args..." format.
 test_pure_prog_set()
 {
-	local expfile
+	local expfile sed_expr
 
 	expfile="$EXP"
 
@@ -457,6 +457,22 @@ test_pure_prog_set()
 
 		try_run_prog "../$t" || continue
 		run_strace $prog_args "$@" "../$t" > "$expfile"
+
+		if [ "$SIZEOF_LONG" -eq 4 ]; then
+			ldd "../$t" | grep -q 'linux-vdso.so.1' || {
+				# There are spurious calls to clock_gettime64
+				# from a combination of glibc 2.42+ needing
+				# randomness on malloc initialization and
+				# the platform lacking vDSO.
+				# Since those calls cannot be distinguished
+				# from expected calls, sanitize the whole lot.
+				sed_expr='/^clock_gettime64(CLOCK_MONOTONIC, [^=]*= 0$/d'
+				sed -i "$sed_expr" "$LOG"
+				if [ -f "$expfile" ]; then
+					sed -i "$sed_expr" "$expfile"
+				fi
+			}
+		fi
 
 		case "$STRACE_ARCH:$MIPS_ABI:$NAME" in
 			mips:o32:*creds)
