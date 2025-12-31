@@ -452,7 +452,11 @@ main(void)
 	static const size_t attr_v6_size = PERF_ATTR_SIZE_VER6;
 	static const size_t attr_v6_5_size = PERF_ATTR_SIZE_VER6 + 4;
 	static const size_t attr_v7_size = PERF_ATTR_SIZE_VER7;
-	static const size_t attr_big_size = PERF_ATTR_SIZE_VER7 + 32;
+	static const size_t attr_v7_5_size = PERF_ATTR_SIZE_VER7 + 4;
+	static const size_t attr_v8_size = PERF_ATTR_SIZE_VER8;
+	static const size_t attr_v8_5_size = PERF_ATTR_SIZE_VER8 + 4;
+	static const size_t attr_v9_size = PERF_ATTR_SIZE_VER9;
+	static const size_t attr_big_size = PERF_ATTR_SIZE_VER9 + 32;
 
 	static const struct strval64 attr_types[] = {
 		{ ARG_STR(PERF_TYPE_HARDWARE) },
@@ -604,6 +608,10 @@ main(void)
 		ATTR_REC(attr_v6_size),
 		ATTR_REC(attr_v6_5_size),
 		ATTR_REC(attr_v7_size),
+		ATTR_REC(attr_v7_5_size),
+		ATTR_REC(attr_v8_size),
+		ATTR_REC(attr_v8_5_size),
+		ATTR_REC(attr_v9_size),
 		ATTR_REC(attr_big_size),
 	};
 
