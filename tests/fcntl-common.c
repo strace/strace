@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -336,6 +337,104 @@ print_flags_getlease(long rc)
 }
 
 static void
+test_rw_hint_invalid_pointers(const int cmd, const char *const cmd_str,
+			      uint64_t *const hint_ptr)
+{
+	invoke_test_syscall(0, cmd, NULL);
+	pidns_print_leader();
+	printf("%s(0, %s, NULL) = %s\n",
+	       TEST_SYSCALL_STR, cmd_str, errstr);
+
+	char *const ptr_range_begin = (char *) hint_ptr + 1;
+	char *const ptr_range_end = (char *) (hint_ptr + 1);
+	for (char *ptr = ptr_range_begin; ptr <= ptr_range_end; ++ptr) {
+		invoke_test_syscall(0, cmd, ptr);
+		pidns_print_leader();
+		printf("%s(0, %s, %p) = %s\n",
+		       TEST_SYSCALL_STR, cmd_str, ptr, errstr);
+	}
+}
+
+static void
+test_rw_hint_pair(const int set_cmd, const char *const set_cmd_str,
+		  const int get_cmd, const char *const get_cmd_str)
+{
+	static const struct {
+		uint64_t value;
+		const char *name;
+	} hints[] = {
+		{ ARG_STR(RWH_WRITE_LIFE_NOT_SET) },
+		{ ARG_STR(RWH_WRITE_LIFE_NONE) },
+		{ ARG_STR(RWH_WRITE_LIFE_SHORT) },
+		{ ARG_STR(RWH_WRITE_LIFE_MEDIUM) },
+		{ ARG_STR(RWH_WRITE_LIFE_LONG) },
+		{ ARG_STR(RWH_WRITE_LIFE_EXTREME) },
+		{ ARG_STR(0xdeadc0de) " /* RWH_WRITE_LIFE_??? */" },
+		{ ARG_STR(0xffffffff00000000) " /* RWH_WRITE_LIFE_??? */" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, hint_ptr);
+
+	/* Test failure case with an invalid fd */
+	invoke_test_syscall(-1, get_cmd, hint_ptr);
+	pidns_print_leader();
+	printf("%s(-1, %s, %p) = %s\n",
+	       TEST_SYSCALL_STR, get_cmd_str, hint_ptr, errstr);
+
+	/* Test failure cases with a valid fd and invalid pointers */
+	test_rw_hint_invalid_pointers(set_cmd, set_cmd_str, hint_ptr);
+	test_rw_hint_invalid_pointers(get_cmd, get_cmd_str, hint_ptr);
+
+	/* Loop over all hint values, testing SET followed by GET for each */
+	for (unsigned int i = 0; i < ARRAY_SIZE(hints); i++) {
+		*hint_ptr = hints[i].value;
+
+		/* Test F_SET_* with an invalid fd */
+		invoke_test_syscall(-1, set_cmd, hint_ptr);
+		pidns_print_leader();
+		printf("%s(-1, %s, [%s]) = %s\n",
+		       TEST_SYSCALL_STR, set_cmd_str, hints[i].name, errstr);
+
+		/* Test F_SET_* with a valid fd */
+		long rc = invoke_test_syscall(0, set_cmd, hint_ptr);
+		pidns_print_leader();
+		printf("%s(0, %s, [%s]) = %s\n",
+		       TEST_SYSCALL_STR, set_cmd_str, hints[i].name, errstr);
+
+		/* If SET succeeded, test corresponding F_GET_* */
+		/* We know what value to expect because we just set it */
+		/* Note: Invalid hint values may cause SET to fail with EINVAL */
+		if (!rc) {
+			*hint_ptr = -1;
+			rc = invoke_test_syscall(0, get_cmd, hint_ptr);
+			pidns_print_leader();
+			if (rc == 0) {
+				/* Success: verify we got back what we set */
+				printf("%s(0, %s, [%s]) = 0\n",
+				       TEST_SYSCALL_STR, get_cmd_str,
+				       hints[i].name);
+			} else {
+				/* GET failed: print address */
+				printf("%s(0, %s, %p) = %s\n",
+				       TEST_SYSCALL_STR, get_cmd_str,
+				       hint_ptr, errstr);
+			}
+		}
+		/* If SET failed (e.g., invalid hint value), we don't test GET */
+	}
+}
+
+static void
+test_rw_hints(void)
+{
+	test_rw_hint_pair(ARG_STR(F_SET_RW_HINT),
+			  ARG_STR(F_GET_RW_HINT));
+
+	test_rw_hint_pair(ARG_STR(F_SET_FILE_RW_HINT),
+			  ARG_STR(F_GET_FILE_RW_HINT));
+}
+
+static void
 test_fcntl_others(void)
 {
 	static const struct fcntl_cmd_check set_checks[] = {
@@ -387,6 +486,7 @@ main(void)
 	test_f_owner_ex();
 	test_fcntl_others();
 	test_xetown();
+	test_rw_hints();
 
 	pidns_print_leader();
 	puts("+++ exited with 0 +++");
