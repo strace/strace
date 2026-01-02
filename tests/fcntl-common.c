@@ -435,6 +435,118 @@ test_rw_hints(void)
 }
 
 static void
+test_delegation_invalid_pointers(const int cmd, const char *const cmd_str,
+				 struct delegation *const deleg_ptr)
+{
+	invoke_test_syscall(0, cmd, NULL);
+	pidns_print_leader();
+	printf("%s(0, %s, NULL) = %s\n",
+	       TEST_SYSCALL_STR, cmd_str, errstr);
+
+	char *const ptr_range_begin = (char *) deleg_ptr + 1;
+	char *const ptr_range_end = (char *) (deleg_ptr + 1);
+	for (char *ptr = ptr_range_begin; ptr <= ptr_range_end; ++ptr) {
+		invoke_test_syscall(0, cmd, ptr);
+		pidns_print_leader();
+		printf("%s(0, %s, %p) = %s\n",
+		       TEST_SYSCALL_STR, cmd_str, ptr, errstr);
+	}
+}
+
+static void
+test_delegation_fields(struct delegation *const deleg,
+		       const uint32_t d_flags, const char *const d_flags_str,
+		       const uint16_t d_type, const char *const d_type_str,
+		       const uint16_t d_pad, const char *const d_pad_str)
+{
+	memset(deleg, 0, sizeof(*deleg));
+	deleg->d_flags = d_flags;
+	deleg->d_type = d_type;
+	deleg->__pad = d_pad;
+
+	/* Test F_SETDELEG with an invalid fd */
+	invoke_test_syscall(-1, F_SETDELEG, deleg);
+	pidns_print_leader();
+	printf("%s(-1, F_SETDELEG, {d_flags=%s, d_type=%s, __pad=%s}) = "
+	       "%s\n", TEST_SYSCALL_STR, d_flags_str, d_type_str, d_pad_str,
+	       errstr);
+
+	/* Test F_SETDELEG with a valid fd */
+	long rc = invoke_test_syscall(0, F_SETDELEG, deleg);
+	pidns_print_leader();
+	printf("%s(0, F_SETDELEG, {d_flags=%s, d_type=%s, __pad=%s}) = "
+	       "%s\n", TEST_SYSCALL_STR, d_flags_str, d_type_str, d_pad_str,
+	       errstr);
+
+	/* If SET succeeded, test corresponding F_GETDELEG */
+	/* Note: Invalid field values may cause SET to fail with EINVAL */
+	if (!rc) {
+		memset(deleg, 0, sizeof(*deleg));
+		rc = invoke_test_syscall(0, F_GETDELEG, deleg);
+		pidns_print_leader();
+		if (rc == 0) {
+			/* Success: assume d_type returned is the same as
+			 * what was set */
+			printf("%s(0, F_GETDELEG, "
+			       "{d_flags=0, d_type=%s, __pad=0}) = 0\n",
+			       TEST_SYSCALL_STR, d_type_str);
+		} else {
+			/* GET failed: print address */
+			printf("%s(0, F_GETDELEG, %p) = %s\n",
+			       TEST_SYSCALL_STR, deleg, errstr);
+		}
+	}
+	/* If SET failed (e.g., invalid field values), we don't test GET */
+}
+
+static void
+test_delegation(void)
+{
+	static const struct strval32 flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(0x1) },
+		{ ARG_STR(0xffffffff) },
+	};
+
+	static const struct strval16 types[] = {
+		{ ARG_STR(F_RDLCK) },
+		{ ARG_STR(F_WRLCK) },
+		{ ARG_STR(F_UNLCK) },
+		{ ARG_STR(0xffff) " /* F_??? */" },
+	};
+
+	static const struct strval16 pads[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(0x1) },
+		{ ARG_STR(0xffff) },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct delegation, deleg);
+
+	/* Test failure case with an invalid fd */
+	invoke_test_syscall(-1, F_GETDELEG, deleg);
+	pidns_print_leader();
+	printf("%s(-1, F_GETDELEG, %p) = %s\n",
+	       TEST_SYSCALL_STR, deleg, errstr);
+
+	/* Test failure cases with a valid fd and invalid pointers */
+	test_delegation_invalid_pointers(F_SETDELEG, "F_SETDELEG", deleg);
+	test_delegation_invalid_pointers(F_GETDELEG, "F_GETDELEG", deleg);
+
+	/* Test all combinations of d_flags, d_type, and __pad */
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); i++) {
+		for (unsigned int j = 0; j < ARRAY_SIZE(types); j++) {
+			for (unsigned int k = 0; k < ARRAY_SIZE(pads); k++) {
+				test_delegation_fields(deleg,
+					flags[i].val, flags[i].str,
+					types[j].val, types[j].str,
+					pads[k].val, pads[k].str);
+			}
+		}
+	}
+}
+
+static void
 test_fcntl_others(void)
 {
 	static const struct fcntl_cmd_check set_checks[] = {
@@ -487,6 +599,7 @@ main(void)
 	test_fcntl_others();
 	test_xetown();
 	test_rw_hints();
+	test_delegation();
 
 	pidns_print_leader();
 	puts("+++ exited with 0 +++");
