@@ -28,6 +28,7 @@
 #include "xlat/uring_restriction_opcodes.h"
 #include "xlat/uring_napi_ops.h"
 #include "xlat/uring_napi_tracking_strategies.h"
+#include "xlat/uring_msg_ring_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -865,6 +866,64 @@ print_ioring_register_clone_buffers(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_sqe sqe;
+
+	if (umove_or_printaddr(tcp, addr, &sqe))
+		return;
+
+	CHECK_TYPE_SIZE(struct io_uring_sqe, 64);
+
+	tprint_struct_begin();
+
+	PRINT_FIELD_XVAL_U(sqe, opcode, uring_ops, "IORING_OP_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(sqe, flags, uring_sqe_flags, "IOSQE_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(sqe, ioprio);
+	tprint_struct_next();
+	PRINT_FIELD_FD(sqe, fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, off);
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, addr);
+	tprint_struct_next();
+	PRINT_FIELD_U(sqe, len);
+	tprint_struct_next();
+	if (sqe.opcode == IORING_OP_MSG_RING) {
+		PRINT_FIELD_FLAGS(sqe, msg_ring_flags, uring_msg_ring_flags,
+				 "IORING_MSG_RING_???");
+	} else {
+		PRINT_FIELD_X(sqe, rw_flags);
+	}
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, user_data);
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, buf_index);
+	tprint_struct_next();
+	PRINT_FIELD_U(sqe, personality);
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, file_index);
+	tprint_struct_next();
+	PRINT_FIELD_X(sqe, optval);
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_send_msg_ring(struct tcb *tcp, const kernel_ulong_t addr,
+				    const unsigned int nargs)
+{
+	if (nargs == 1)
+		print_io_uring_sqe(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -974,6 +1033,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_CLONE_BUFFERS:
 		rc = print_ioring_register_clone_buffers(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_SEND_MSG_RING:
+		rc = print_ioring_register_send_msg_ring(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

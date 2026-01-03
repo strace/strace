@@ -1624,6 +1624,102 @@ main(void)
 		printf("}, 1) = %s\n", errstr);
 	}
 
+	/* IORING_REGISTER_SEND_MSG_RING */
+	static const struct strval32 send_msg_ring_ops =
+		{ ARG_STR(IORING_REGISTER_SEND_MSG_RING) };
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sqe, sqe);
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, 0, 0xdeadbeef);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       0xdeadbeef, errstr);
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       sqe + 1, errstr);
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       sqe, errstr);
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 2);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 2) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       sqe, errstr);
+
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_MSG_RING;
+	sqe->flags = IOSQE_FIXED_FILE;
+	sqe->fd = fd_null;
+	sqe->addr = IORING_MSG_DATA;
+	sqe->len = 0xdeadbeef;
+	sqe->msg_ring_flags = IORING_MSG_RING_CQE_SKIP;
+	sqe->user_data = 0xfacefeedcafebabeULL;
+	sqe->file_index = 0x1234;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=" XLAT_FMT
+	       ", ioprio=0, fd=%u<%s>, off=0, addr=%#llx"
+	       ", len=%u, msg_ring_flags=" XLAT_FMT
+	       ", user_data=%#llx, buf_index=0, personality=0"
+	       ", file_index=%#x, optval=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_MSG_RING),
+	       XLAT_ARGS(IOSQE_FIXED_FILE),
+	       fd_null, path_null,
+	       (unsigned long long) sqe->addr,
+	       sqe->len,
+	       XLAT_ARGS(IORING_MSG_RING_CQE_SKIP),
+	       (unsigned long long) sqe->user_data,
+	       sqe->file_index,
+	       errstr);
+
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_NOP;
+	sqe->flags = IOSQE_IO_DRAIN;
+	sqe->fd = fd_full;
+	sqe->off = 0x123456789abcdef0ULL;
+	sqe->addr = 0xfedcba9876543210ULL;
+	sqe->len = 0xcafebabe;
+	sqe->rw_flags = 0xdeadface;
+	sqe->user_data = 0xbadc0dedbeefcafeULL;
+	sqe->buf_index = 0x5678;
+	sqe->personality = 0x9abc;
+	sqe->file_index = 0xdef0;
+	sqe->optval = 0x1111222233334444ULL;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=" XLAT_FMT
+	       ", ioprio=0, fd=%u<%s>, off=%#llx, addr=%#llx"
+	       ", len=%u, rw_flags=%#x, user_data=%#llx"
+	       ", buf_index=%#x, personality=%u"
+	       ", file_index=%#x, optval=%#llx}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_NOP),
+	       XLAT_ARGS(IOSQE_IO_DRAIN),
+	       fd_full, path_full,
+	       (unsigned long long) sqe->off,
+	       (unsigned long long) sqe->addr,
+	       sqe->len,
+	       sqe->rw_flags,
+	       (unsigned long long) sqe->user_data,
+	       sqe->buf_index,
+	       sqe->personality,
+	       sqe->file_index,
+	       (unsigned long long) sqe->optval,
+	       errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
