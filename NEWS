@@ -3,8 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated decoding of struct mnt_id_req and struct perf_event_attr.
-  * Updated lists of BPF_*, ETHTOOL_*, ETH_P_*, IORING_*, KVM_*, TLS_*, V4L2_*,
-    and *_MAGIC constants.
+  * Updated lists of ABS_*, BPF_*, ETHTOOL_*, ETH_P_*, IORING_*, KVM_*, TLS_*,
+    V4L2_*, and *_MAGIC constants.
 
 Noteworthy changes in release 6.18 (2025-12-07)
 ===============================================
