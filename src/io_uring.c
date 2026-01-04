@@ -29,6 +29,8 @@
 #include "xlat/uring_napi_ops.h"
 #include "xlat/uring_napi_tracking_strategies.h"
 #include "xlat/uring_msg_ring_flags.h"
+#include "xlat/uring_zcrx_reg_flags.h"
+#include "xlat/uring_zcrx_area_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -924,6 +926,85 @@ print_ioring_register_send_msg_ring(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_zcrx_offsets(struct tcb *tcp,
+			    const struct io_uring_zcrx_offsets *const offsets)
+{
+	tprint_struct_begin();
+
+	PRINT_FIELD_U(*offsets, head);
+	tprint_struct_next();
+	PRINT_FIELD_U(*offsets, tail);
+	tprint_struct_next();
+	PRINT_FIELD_U(*offsets, rqes);
+
+	if (offsets->__resv2) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*offsets, __resv2);
+	}
+
+	if (!IS_ARRAY_ZERO(offsets->__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*offsets, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static void
+print_io_uring_zcrx_ifq_reg(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_zcrx_ifq_reg arg;
+
+	CHECK_TYPE_SIZE(struct io_uring_zcrx_ifq_reg, 96);
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+
+	PRINT_FIELD_U(arg, if_idx);
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, if_rxq);
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, rq_entries);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(arg, flags, uring_zcrx_reg_flags, "ZCRX_REG_???");
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(arg, area_ptr);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(arg, region_ptr);
+	tprint_struct_next();
+	tprints_field_name("offsets");
+	print_io_uring_zcrx_offsets(tcp, &arg.offsets);
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, zcrx_id);
+
+	if (arg.__resv2) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, __resv2);
+	}
+
+	if (!IS_ARRAY_ZERO(arg.__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_zcrx_ifq(struct tcb *tcp, const kernel_ulong_t addr,
+				const unsigned int nargs)
+{
+	if (nargs == 1)
+		print_io_uring_zcrx_ifq_reg(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -1036,6 +1117,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_SEND_MSG_RING:
 		rc = print_ioring_register_send_msg_ring(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_ZCRX_IFQ:
+		rc = print_ioring_register_zcrx_ifq(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

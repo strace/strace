@@ -1720,6 +1720,90 @@ main(void)
 	       (unsigned long long) sqe->optval,
 	       errstr);
 
+	/* IORING_REGISTER_ZCRX_IFQ */
+	static const struct strval32 zcrx_ifq_ops =
+		{ ARG_STR(IORING_REGISTER_ZCRX_IFQ) };
+
+	sys_io_uring_register(fd_null, zcrx_ifq_ops.val, 0, 2);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, 2) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
+	       errstr);
+
+	sys_io_uring_register(fd_null, zcrx_ifq_ops.val, 0, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
+	       errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_zcrx_ifq_reg, zcrx_ifq);
+
+	sys_io_uring_register(fd_null, zcrx_ifq_ops.val, zcrx_ifq + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
+	       zcrx_ifq + 1, errstr);
+
+	memset(zcrx_ifq, 0, sizeof(*zcrx_ifq));
+	zcrx_ifq->if_idx = 0x1234;
+	zcrx_ifq->if_rxq = 0x5678;
+	zcrx_ifq->rq_entries = 0x9abc;
+	zcrx_ifq->flags = ZCRX_REG_IMPORT;
+	zcrx_ifq->area_ptr = 0xdeadbeefcafebabeULL;
+	zcrx_ifq->region_ptr = 0xfacefeedbadc0dedULL;
+	zcrx_ifq->offsets.head = 0x1111;
+	zcrx_ifq->offsets.tail = 0x2222;
+	zcrx_ifq->offsets.rqes = 0x3333;
+	zcrx_ifq->zcrx_id = 0x4444;
+
+	sys_io_uring_register(fd_null, zcrx_ifq_ops.val, zcrx_ifq, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {if_idx=%u, if_rxq=%u, rq_entries=%u"
+	       ", flags=" XLAT_FMT
+	       ", area_ptr=%#llx, region_ptr=%#llx"
+	       ", offsets={head=%u, tail=%u, rqes=%u}"
+	       ", zcrx_id=%u}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
+	       zcrx_ifq->if_idx, zcrx_ifq->if_rxq, zcrx_ifq->rq_entries,
+	       XLAT_ARGS(ZCRX_REG_IMPORT),
+	       (unsigned long long) zcrx_ifq->area_ptr,
+	       (unsigned long long) zcrx_ifq->region_ptr,
+	       zcrx_ifq->offsets.head, zcrx_ifq->offsets.tail,
+	       zcrx_ifq->offsets.rqes,
+	       zcrx_ifq->zcrx_id,
+	       errstr);
+
+	memset(zcrx_ifq, 0, sizeof(*zcrx_ifq));
+	zcrx_ifq->if_idx = 0xaaaa;
+	zcrx_ifq->offsets.__resv2 = 0xbbbb;
+	zcrx_ifq->__resv2 = 0xcccc;
+	zcrx_ifq->offsets.__resv[0] = 0xddddddddddddddddULL;
+	zcrx_ifq->offsets.__resv[1] = 0xeeeeeeeeeeeeeeeeULL;
+	zcrx_ifq->__resv[0] = 0x1111111111111111ULL;
+	zcrx_ifq->__resv[1] = 0x2222222222222222ULL;
+	zcrx_ifq->__resv[2] = 0x3333333333333333ULL;
+
+	sys_io_uring_register(fd_null, zcrx_ifq_ops.val, zcrx_ifq, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {if_idx=%u, if_rxq=0, rq_entries=0, flags=0"
+	       ", area_ptr=NULL, region_ptr=NULL"
+	       ", offsets={head=0, tail=0, rqes=0, __resv2=%#x"
+	       ", __resv=[%#llx, %#llx]}"
+	       ", zcrx_id=0, __resv2=%#x"
+	       ", __resv=[%#llx, %#llx, %#llx]}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
+	       zcrx_ifq->if_idx,
+	       zcrx_ifq->offsets.__resv2,
+	       (unsigned long long) zcrx_ifq->offsets.__resv[0],
+	       (unsigned long long) zcrx_ifq->offsets.__resv[1],
+	       zcrx_ifq->__resv2,
+	       (unsigned long long) zcrx_ifq->__resv[0],
+	       (unsigned long long) zcrx_ifq->__resv[1],
+	       (unsigned long long) zcrx_ifq->__resv[2],
+	       errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
