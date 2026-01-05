@@ -1005,6 +1005,62 @@ print_ioring_register_zcrx_ifq(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_params_input(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_params params;
+
+	if (umove_or_printaddr(tcp, addr, &params))
+		return;
+
+	CHECK_TYPE_SIZE(struct io_uring_params, 120);
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(params, sq_entries);
+	tprint_struct_next();
+	PRINT_FIELD_U(params, cq_entries);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(params, flags, uring_setup_flags,
+			  "IORING_SETUP_???");
+
+	/* Print user_addr fields if non-zero (only meaningful if
+	 * IORING_SETUP_NO_MMAP was set during original io_uring_setup(),
+	 * but we can't know that from the register call alone) */
+	if (params.sq_off.user_addr) {
+		tprint_struct_next();
+		tprints_field_name("sq_off");
+		tprint_struct_begin();
+		PRINT_FIELD_X(params.sq_off, user_addr);
+		tprint_struct_end();
+	}
+	if (params.cq_off.user_addr) {
+		tprint_struct_next();
+		tprints_field_name("cq_off");
+		tprint_struct_begin();
+		PRINT_FIELD_X(params.cq_off, user_addr);
+		tprint_struct_end();
+	}
+
+	if (!IS_ARRAY_ZERO(params.resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(params, resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_resize_rings(struct tcb *tcp, const kernel_ulong_t addr,
+				    const unsigned int nargs)
+{
+	if (nargs == 1)
+		print_io_uring_params_input(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -1120,6 +1176,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_ZCRX_IFQ:
 		rc = print_ioring_register_zcrx_ifq(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_RESIZE_RINGS:
+		rc = print_ioring_register_resize_rings(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

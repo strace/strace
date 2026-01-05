@@ -1804,6 +1804,100 @@ main(void)
 	       (unsigned long long) zcrx_ifq->__resv[2],
 	       errstr);
 
+	/* IORING_REGISTER_RESIZE_RINGS */
+	static const struct strval32 resize_rings_ops =
+		{ ARG_STR(IORING_REGISTER_RESIZE_RINGS) };
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_params, params);
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, 0, 0xdeadbeef);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       0xdeadbeef, errstr);
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params + 1, errstr);
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params, errstr);
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 2);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 2) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params, errstr);
+
+	memset(params, 0, sizeof(*params));
+	params->sq_entries = 256;
+	params->cq_entries = 512;
+	params->flags = IORING_SETUP_CQSIZE;
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {sq_entries=%u, cq_entries=%u, flags=" XLAT_FMT "}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params->sq_entries, params->cq_entries,
+	       XLAT_ARGS(IORING_SETUP_CQSIZE),
+	       errstr);
+
+	memset(params, 0, sizeof(*params));
+	params->sq_entries = 128;
+	params->cq_entries = 256;
+	params->flags = IORING_SETUP_CLAMP;
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {sq_entries=%u, cq_entries=%u, flags=" XLAT_FMT "}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params->sq_entries, params->cq_entries,
+	       XLAT_ARGS(IORING_SETUP_CLAMP),
+	       errstr);
+
+	memset(params, 0, sizeof(*params));
+	params->sq_entries = 128;
+	params->cq_entries = 256;
+	params->flags = IORING_SETUP_CQSIZE;
+	params->sq_off.user_addr = 0xdeadbeefcafebabeULL;
+	params->cq_off.user_addr = 0xfedcba9876543210ULL;
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {sq_entries=%u, cq_entries=%u, flags=" XLAT_FMT
+	       ", sq_off={user_addr=%#llx}, cq_off={user_addr=%#llx}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params->sq_entries, params->cq_entries,
+	       XLAT_ARGS(IORING_SETUP_CQSIZE),
+	       (unsigned long long) params->sq_off.user_addr,
+	       (unsigned long long) params->cq_off.user_addr,
+	       errstr);
+
+	memset(params, 0, sizeof(*params));
+	params->sq_entries = 64;
+	params->cq_entries = 128;
+	params->resv[0] = 0xdeadbeef;
+	params->resv[1] = 0xcafebabe;
+	params->resv[2] = 0x12345678;
+
+	sys_io_uring_register(fd_null, resize_rings_ops.val, params, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {sq_entries=%u, cq_entries=%u, flags=0"
+	       ", resv=[%#x, %#x, %#x]}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(resize_rings_ops.val, resize_rings_ops.str),
+	       params->sq_entries, params->cq_entries,
+	       params->resv[0], params->resv[1], params->resv[2],
+	       errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
