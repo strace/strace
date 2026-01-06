@@ -1898,6 +1898,89 @@ main(void)
 	       params->resv[0], params->resv[1], params->resv[2],
 	       errstr);
 
+	/* IORING_REGISTER_MEM_REGION */
+	static const struct strval32 mem_region_ops =
+		{ ARG_STR(IORING_REGISTER_MEM_REGION) };
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_mem_region_reg, mem_region);
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, 0, 0xdeadbeef);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       0xdeadbeef, errstr);
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       mem_region + 1, errstr);
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       mem_region, errstr);
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 2);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 2) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       mem_region, errstr);
+
+	memset(mem_region, 0, sizeof(*mem_region));
+	mem_region->region_uptr = 0;
+	mem_region->flags = 0;
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {region_uptr=NULL, flags=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       errstr);
+
+	memset(mem_region, 0, sizeof(*mem_region));
+	mem_region->region_uptr = 0xdeadbeefcafebabeULL;
+	mem_region->flags = 0;
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {region_uptr=%#llx, flags=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       (unsigned long long) mem_region->region_uptr,
+	       errstr);
+
+	memset(mem_region, 0, sizeof(*mem_region));
+	mem_region->region_uptr = 0xfedcba9876543210ULL;
+	mem_region->flags = IORING_MEM_REGION_REG_WAIT_ARG;
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {region_uptr=%#llx, flags=" XLAT_FMT "}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       (unsigned long long) mem_region->region_uptr,
+	       XLAT_ARGS(IORING_MEM_REGION_REG_WAIT_ARG),
+	       errstr);
+
+	memset(mem_region, 0, sizeof(*mem_region));
+	mem_region->region_uptr = 0x1234567890abcdefULL;
+	mem_region->flags = 0;
+	mem_region->__resv[0] = 0xdeadbeef;
+	mem_region->__resv[1] = 0xcafebabe;
+
+	sys_io_uring_register(fd_null, mem_region_ops.val, mem_region, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {region_uptr=%#llx, flags=0"
+	       ", __resv=[%#llx, %#llx]}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(mem_region_ops.val, mem_region_ops.str),
+	       (unsigned long long) mem_region->region_uptr,
+	       (unsigned long long) mem_region->__resv[0],
+	       (unsigned long long) mem_region->__resv[1],
+	       errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

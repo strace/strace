@@ -5,8 +5,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of F_GET_RW_HINT, F_SET_RW_HINT, F_GET_FILE_RW_HINT,
     F_SET_FILE_RW_HINT, F_GETDELEG, and F_SETDELEG fcntl commands.
   * Implemented decoding of IORING_REGISTER_SEND_MSG_RING,
-    IORING_REGISTER_ZCRX_IFQ, and IORING_REGISTER_RESIZE_RINGS opcodes
-    of io_uring_register syscall.
+    IORING_REGISTER_ZCRX_IFQ, IORING_REGISTER_RESIZE_RINGS, and
+    IORING_REGISTER_MEM_REGION opcodes of io_uring_register syscall.
   * Updated decoding of struct mnt_id_req and struct perf_event_attr.
   * Updated lists of ABS_*, BPF_*, ETHTOOL_*, ETH_P_*, IORING_*, KVM_*, PERF_*,
     TLS_*, V4L2_*, and *_MAGIC constants.

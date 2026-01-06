@@ -31,6 +31,7 @@
 #include "xlat/uring_msg_ring_flags.h"
 #include "xlat/uring_zcrx_reg_flags.h"
 #include "xlat/uring_zcrx_area_flags.h"
+#include "xlat/uring_mem_region_reg_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1061,6 +1062,43 @@ print_ioring_register_resize_rings(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_mem_region_reg(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_mem_region_reg arg;
+
+	CHECK_TYPE_SIZE(struct io_uring_mem_region_reg, 32);
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+
+	PRINT_FIELD_ADDR64(arg, region_uptr);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(arg, flags, uring_mem_region_reg_flags,
+			  "IORING_MEM_REGION_REG_???");
+
+	if (!IS_ARRAY_ZERO(arg.__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_ioring_register_mem_region(struct tcb *tcp, const kernel_ulong_t addr,
+				 const unsigned int nargs)
+{
+	if (nargs == 1)
+		print_io_uring_mem_region_reg(tcp, addr);
+	else
+		printaddr(addr);
+
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -1179,6 +1217,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_RESIZE_RINGS:
 		rc = print_ioring_register_resize_rings(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_MEM_REGION:
+		rc = print_ioring_register_mem_region(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
