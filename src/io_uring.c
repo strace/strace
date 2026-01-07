@@ -11,6 +11,7 @@
 #include "kernel_time_types.h"
 #define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
+#include <linux/io_uring/query.h>
 
 #include "xlat/uring_async_cancel_flags.h"
 #include "xlat/uring_clone_buffers_flags.h"
@@ -32,6 +33,7 @@
 #include "xlat/uring_zcrx_reg_flags.h"
 #include "xlat/uring_zcrx_area_flags.h"
 #include "xlat/uring_mem_region_reg_flags.h"
+#include "xlat/uring_query_ops.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1099,6 +1101,181 @@ print_ioring_register_mem_region(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_io_uring_query_opcode(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_query_opcode opcode;
+
+	if (umove_or_printaddr(tcp, addr, &opcode))
+		return;
+
+	CHECK_TYPE_SIZE(struct io_uring_query_opcode, 48);
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(opcode, nr_request_opcodes);
+	tprint_struct_next();
+	PRINT_FIELD_U(opcode, nr_register_opcodes);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(opcode, feature_flags, uring_setup_features,
+			  "IORING_FEAT_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(opcode, ring_setup_flags, uring_setup_flags,
+			  "IORING_SETUP_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(opcode, enter_flags, uring_enter_flags,
+			  "IORING_ENTER_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(opcode, sqe_flags, uring_sqe_flags,
+			  "IOSQE_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(opcode, nr_query_opcodes);
+
+	if (opcode.__pad) {
+		tprint_struct_next();
+		PRINT_FIELD_X(opcode, __pad);
+	}
+
+	tprint_struct_end();
+}
+
+static void
+print_io_uring_query_zcrx(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_query_zcrx zcrx;
+
+	if (umove_or_printaddr(tcp, addr, &zcrx))
+		return;
+
+	CHECK_TYPE_SIZE(struct io_uring_query_zcrx, 40);
+
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(zcrx, register_flags, uring_zcrx_reg_flags,
+			  "ZCRX_REG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(zcrx, area_flags, uring_zcrx_area_flags,
+			  "IORING_ZCRX_AREA_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(zcrx, nr_ctrl_opcodes);
+	tprint_struct_next();
+	PRINT_FIELD_U(zcrx, rq_hdr_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(zcrx, rq_hdr_alignment);
+
+	if (zcrx.__resv1) {
+		tprint_struct_next();
+		PRINT_FIELD_X(zcrx, __resv1);
+	}
+
+	if (zcrx.__resv2) {
+		tprint_struct_next();
+		PRINT_FIELD_X(zcrx, __resv2);
+	}
+
+	tprint_struct_end();
+}
+
+static void
+print_io_uring_query_scq(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_query_scq scq;
+
+	if (umove_or_printaddr(tcp, addr, &scq))
+		return;
+
+	CHECK_TYPE_SIZE(struct io_uring_query_scq, 16);
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(scq, hdr_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(scq, hdr_alignment);
+	tprint_struct_end();
+}
+
+static void
+print_io_uring_query_list(struct tcb *tcp, kernel_ulong_t addr)
+{
+#define IO_MAX_QUERY_ENTRIES 1000
+	struct io_uring_query_hdr hdr;
+	CHECK_TYPE_SIZE(hdr, 40);
+
+	unsigned int count = 0;
+
+	for (;;) {
+		if (umove_or_printaddr(tcp, addr, &hdr))
+			break;
+
+		if (count >= IO_MAX_QUERY_ENTRIES ||
+		    sequence_truncation_needed(tcp, count + 1)) {
+			printaddr(addr);
+			tprintf_comment("...");
+			break;
+		}
+
+		tprint_struct_begin();
+		++count;
+
+		/* Print all fields of current entry (except next_entry) */
+		PRINT_FIELD_ADDR64(hdr, query_data);
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(hdr, query_op, uring_query_ops,
+				 "IO_URING_QUERY_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(hdr, size);
+		tprint_struct_next();
+		PRINT_FIELD_D(hdr, result);
+
+		if (!IS_ARRAY_ZERO(hdr.__resv)) {
+			tprint_struct_next();
+			PRINT_FIELD_ARRAY(hdr, __resv, tcp, print_xint_array_member);
+		}
+
+		/* Decode query_data if present */
+		if (hdr.query_data && hdr.size > 0) {
+			tprint_struct_next();
+			tprints_field_name("query_data");
+			switch (hdr.query_op) {
+			case IO_URING_QUERY_OPCODES:
+				print_io_uring_query_opcode(tcp, hdr.query_data);
+				break;
+			case IO_URING_QUERY_ZCRX:
+				print_io_uring_query_zcrx(tcp, hdr.query_data);
+				break;
+			case IO_URING_QUERY_SCQ:
+				print_io_uring_query_scq(tcp, hdr.query_data);
+				break;
+			default:
+				printaddr(hdr.query_data);
+				break;
+			}
+		}
+
+		/* Handle next_entry field */
+		tprint_struct_next();
+		tprints_field_name("next_entry");
+
+		addr = (kernel_ulong_t) hdr.next_entry;
+	}
+
+	/* Close any remaining open structures */
+	while (count > 0) {
+		tprint_struct_end();
+		--count;
+	}
+}
+
+static int
+print_ioring_register_query(struct tcb *tcp, const kernel_ulong_t addr,
+			    const unsigned int nargs)
+{
+	if (nargs != 0) {
+		printaddr(addr);
+		return RVAL_DECODED;
+	}
+
+	print_io_uring_query_list(tcp, addr);
+	return RVAL_DECODED;
+}
+
+static void
 print_io_uring_register_opcode(struct tcb *tcp, const unsigned int opcode,
 			       const unsigned int flags)
 {
@@ -1220,6 +1397,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_MEM_REGION:
 		rc = print_ioring_register_mem_region(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_QUERY:
+		rc = print_ioring_register_query(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
