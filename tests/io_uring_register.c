@@ -2345,6 +2345,147 @@ test_IORING_REGISTER_QUERY(int fd_null)
 	printf(", 0) = %s\n", errstr);
 }
 
+static void
+test_IORING_REGISTER_ZCRX_CTRL(int fd_null, int fd_full)
+{
+	static const struct strval32 zcrx_ctrl_ops =
+		{ ARG_STR(IORING_REGISTER_ZCRX_CTRL) };
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct zcrx_ctrl, ctrl);
+
+	/* Test 1: Invalid nargs (non-zero) */
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 0xdeadbeef);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl, 0xdeadbeef, errstr);
+
+	/* Test 2: NULL pointer for arg */
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, NULL, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       errstr);
+
+	/* Test 3: Invalid (non-readable) pointer for arg */
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl + 1, errstr);
+
+	/* Test 4: Basic FLUSH_RQ operation */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 0x12345678;
+	ctrl->op = ZCRX_CTRL_FLUSH_RQ;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+	       ", zc_flush={}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_FLUSH_RQ),
+	       errstr);
+
+	/* Test 5: Basic EXPORT operation */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 0x87654321;
+	ctrl->op = ZCRX_CTRL_EXPORT;
+	ctrl->zc_export.zcrx_fd = fd_full;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+#if RETVAL_INJECTED
+	       ", zc_export={zcrx_fd=%u<%s>}"
+#endif
+	       "}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_EXPORT),
+#if RETVAL_INJECTED
+	       fd_full, path_full,
+#endif
+	       errstr);
+
+	/* Test 6: Non-zero reserved fields in main structure */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 1;
+	ctrl->op = ZCRX_CTRL_FLUSH_RQ;
+	ctrl->__resv[0] = 0xdeadbeefcafebabeULL;
+	ctrl->__resv[1] = 0x1234567890abcdefULL;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+	       ", __resv=[%#llx, %#llx], zc_flush={}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_FLUSH_RQ),
+	       (unsigned long long) ctrl->__resv[0],
+	       (unsigned long long) ctrl->__resv[1],
+	       errstr);
+
+	/* Test 7: Non-zero reserved fields in zc_flush */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 1;
+	ctrl->op = ZCRX_CTRL_FLUSH_RQ;
+	ctrl->zc_flush.__resv[0] = 0x1111111111111111ULL;
+	ctrl->zc_flush.__resv[5] = 0x5555555555555555ULL;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+	       ", zc_flush={"
+	       "__resv=[%#llx, 0, 0, 0, 0, %#llx]}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_FLUSH_RQ),
+	       (unsigned long long) ctrl->zc_flush.__resv[0],
+	       (unsigned long long) ctrl->zc_flush.__resv[5],
+	       errstr);
+
+	/* Test 8: Non-zero reserved fields in zc_export */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 1;
+	ctrl->op = ZCRX_CTRL_EXPORT;
+	ctrl->zc_export.zcrx_fd = 99;
+	ctrl->zc_export.__resv1[0] = 0xdeadbeef;
+	ctrl->zc_export.__resv1[10] = 0xcafebabe;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT "%s}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_EXPORT),
+#if RETVAL_INJECTED
+	       ", zc_export={zcrx_fd=99, __resv1=[0xdeadbeef, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xcafebabe]}",
+#else
+	       "",
+#endif
+	       errstr);
+
+	/* Test 9: Unknown opcode */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 1;
+	ctrl->op = 0xdeadbeef;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=%#x" NRAW(" /* ZCRX_CTRL_??? */") "}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id, ctrl->op,
+	       errstr);
+}
+
 int
 main(void)
 {
@@ -2465,6 +2606,7 @@ main(void)
 	test_IORING_REGISTER_RESIZE_RINGS(fd_null);
 	test_IORING_REGISTER_MEM_REGION(fd_null);
 	test_IORING_REGISTER_QUERY(fd_null);
+	test_IORING_REGISTER_ZCRX_CTRL(fd_null, fd_full);
 
 	puts("+++ exited with 0 +++");
 	return 0;

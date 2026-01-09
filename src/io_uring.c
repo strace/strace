@@ -34,6 +34,7 @@
 #include "xlat/uring_zcrx_area_flags.h"
 #include "xlat/uring_mem_region_reg_flags.h"
 #include "xlat/uring_query_ops.h"
+#include "xlat/uring_zcrx_ctrl_ops.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1008,6 +1009,118 @@ print_ioring_register_zcrx_ifq(struct tcb *tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_zcrx_ctrl_flush_rq(struct tcb *tcp,
+			 const struct zcrx_ctrl_flush_rq *const flush)
+{
+	tprint_struct_begin();
+
+	/* All fields are reserved, only print if non-zero */
+	if (!IS_ARRAY_ZERO(flush->__resv)) {
+		PRINT_FIELD_ARRAY(*flush, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static void
+print_zcrx_ctrl_export(struct tcb *tcp,
+		      const struct zcrx_ctrl_export *const export)
+{
+	tprint_struct_begin();
+
+	/* zcrx_fd is an output field: kernel fills it with new fd on output */
+	PRINT_FIELD_FD(*export, zcrx_fd, tcp);
+
+	/* Reserved fields only printed if non-zero */
+	if (!IS_ARRAY_ZERO(export->__resv1)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*export, __resv1, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
+static int
+print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct zcrx_ctrl arg;
+
+	/* Compile-time size check - catches ABI mismatches */
+	CHECK_TYPE_SIZE(struct zcrx_ctrl, 72);
+
+	if (exiting(tcp)) {
+		/*
+		 * We only get here if op == ZCRX_CTRL_EXPORT,
+		 * other ops return RVAL_DECODED on entry.
+		 */
+		if (tfetch_obj(tcp, addr, &arg)) {
+			tprint_struct_next();
+			tprints_field_name("zc_export");
+			print_zcrx_ctrl_export(tcp, &arg.zc_export);
+		}
+		tprint_struct_end();
+		return RVAL_DECODED;
+	}
+
+	/* On entry, print input fields */
+	/* Copy structure from tracee's memory */
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return RVAL_DECODED;  /* Invalid address, already printed */
+
+	/* On entry, print input fields */
+	tprint_struct_begin();
+
+	/* zcrx_id: ZCRX resource identifier */
+	PRINT_FIELD_U(arg, zcrx_id);
+
+	/* op: Control operation type */
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(arg, op, uring_zcrx_ctrl_ops, "ZCRX_CTRL_???");
+	/* If op is unknown, prints as hex with "ZCRX_CTRL_???" fallback */
+
+	/* Reserved fields: only print if non-zero */
+	if (!IS_ARRAY_ZERO(arg.__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, __resv, tcp, print_xint_array_member);
+	}
+
+	/* Union member: decode based on op value */
+	switch (arg.op) {
+	case ZCRX_CTRL_FLUSH_RQ:
+		tprint_struct_next();
+		tprints_field_name("zc_flush");
+		print_zcrx_ctrl_flush_rq(tcp, &arg.zc_flush);
+		/* No output fields, nothing to decode on exit */
+		tprint_struct_end();
+		return RVAL_DECODED;
+
+	case ZCRX_CTRL_EXPORT:
+		/* On entry, skip zc_export (zcrx_fd is 0, no meaningful input) */
+		/* Don't close structure - it will be closed on exit after adding zc_export */
+		/* Return 0 to indicate we need to decode on exit */
+		return 0;
+
+	default:
+		/* Unknown opcode - skip union printing */
+		tprint_struct_end();
+		/* Unknown opcode, no output fields to decode on exit */
+		return RVAL_DECODED;
+	}
+}
+
+static int
+print_ioring_register_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr,
+				const unsigned int nargs)
+{
+	if (nargs != 1) {
+		printaddr(addr);  /* Invalid nargs, just print address */
+		return RVAL_DECODED;
+	}
+
+	return print_io_uring_zcrx_ctrl(tcp, addr);
+}
+
+static void
 print_io_uring_params_input(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_params params;
@@ -1391,6 +1504,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_ZCRX_IFQ:
 		rc = print_ioring_register_zcrx_ifq(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_ZCRX_CTRL:
+		rc = print_ioring_register_zcrx_ctrl(tcp, arg, nargs);
 		break;
 	case IORING_REGISTER_RESIZE_RINGS:
 		rc = print_ioring_register_resize_rings(tcp, arg, nargs);
