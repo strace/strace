@@ -145,6 +145,34 @@ SYS_FUNC(io_uring_setup)
 	return RVAL_DECODED | RVAL_FD;
 }
 
+static void
+print_io_uring_getevents_arg(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_getevents_arg arg;
+
+	CHECK_TYPE_SIZE(struct io_uring_getevents_arg, 24);
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+
+	tprints_field_name("sigmask");
+	print_sigset_addr_len(tcp, arg.sigmask, arg.sigmask_sz);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, sigmask_sz);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, min_wait_usec);
+
+	tprint_struct_next();
+	tprints_field_name("ts");
+	print_timespec64(tcp, arg.ts);
+
+	tprint_struct_end();
+}
+
 SYS_FUNC(io_uring_enter)
 {
 	const int fd = tcp->u_arg[0];
@@ -170,13 +198,40 @@ SYS_FUNC(io_uring_enter)
 	tprints_arg_next_name("flags");
 	printflags(uring_enter_flags, flags, "IORING_ENTER_???");
 
-	/* sigset */
-	tprints_arg_next_name("sigset");
-	print_sigset_addr_len(tcp, sigset_addr, sigset_size);
+	/*
+	 * Conditional decoding of arguments 4 and 5 based on flags.
+	 * Note: IORING_ENTER_EXT_ARG and IORING_ENTER_EXT_ARG_REG are mutually
+	 * exclusive.  If both are set, kernel returns -EINVAL, but for backward
+	 * compatibility with existing tests, decode as traditional sigset.
+	 */
+	if ((flags & IORING_ENTER_EXT_ARG_REG) &&
+	    !(flags & IORING_ENTER_EXT_ARG)) {
+		/*
+		 * Registered wait region case: arg[4] is a byte offset,
+		 * not a pointer.
+		 */
+		tprints_arg_next_name("arg");
+		PRINT_VAL_U(sigset_addr);
+		tprints_arg_next_name("argsz");
+		PRINT_VAL_U(sigset_size);
+	} else if ((flags & IORING_ENTER_EXT_ARG) &&
+		   !(flags & IORING_ENTER_EXT_ARG_REG)) {
+		/*
+		 * Extended argument case: arg[4] is pointer to
+		 * io_uring_getevents_arg.
+		 */
+		tprints_arg_next_name("arg");
+		print_io_uring_getevents_arg(tcp, sigset_addr);
+		tprints_arg_next_name("argsz");
+		PRINT_VAL_U(sigset_size);
+	} else {
+		/* Traditional sigset case. */
+		tprints_arg_next_name("sigset");
+		print_sigset_addr_len(tcp, sigset_addr, sigset_size);
 
-	/* sigsetsize */
-	tprints_arg_next_name("sigsetsize");
-	PRINT_VAL_U(sigset_size);
+		tprints_arg_next_name("sigsetsize");
+		PRINT_VAL_U(sigset_size);
+	}
 
 	return RVAL_DECODED;
 }

@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "kernel_timespec.h"
 #include "scno.h"
 
 #include <fcntl.h>
@@ -16,6 +17,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
+#include <linux/io_uring.h>
 
 static const char *errstr;
 
@@ -52,6 +57,8 @@ main(void)
 
 	const unsigned int size = get_sigset_size();
 	void *const sigmask = tail_alloc(size);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_getevents_arg, arg);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_timespec64_t, ts);
 	sigset_t mask;
 
 	memset(&mask, -1, sizeof(mask));
@@ -62,6 +69,7 @@ main(void)
 
 	const unsigned int to_submit = 0xdeadbeef;
 	const unsigned int min_complete = 0xcafef00d;
+	const unsigned long offset = (unsigned long) 0xdefacedfacefeedULL;
 
 	sys_io_uring_enter(fd, to_submit, min_complete, -1U, sigmask, size);
 	printf("io_uring_enter(%u<%s>, %u, %u"
@@ -74,6 +82,39 @@ main(void)
 	       "|%#x, %s, %u) = %s\n",
 	       fd, path, to_submit, min_complete, -1U - 255U,
 	       "~[HUP KILL STOP]", size, errstr);
+
+	/* Test IORING_ENTER_EXT_ARG */
+	memset(arg, 0, sizeof(*arg));
+	arg->sigmask = (uintptr_t) sigmask;
+	arg->sigmask_sz = size;
+	arg->min_wait_usec = 0xdeadc0de;
+	arg->ts = (uintptr_t) ts;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xfacefed1facefed2ULL;
+        ts->tv_nsec = (typeof(ts->tv_nsec)) 0xfacefed3facefed4ULL;
+
+	sys_io_uring_enter(fd, to_submit, min_complete,
+			   IORING_ENTER_GETEVENTS | IORING_ENTER_EXT_ARG,
+			   arg, sizeof(*arg));
+	const char *expected_sigmask = "~[HUP KILL STOP]";
+	printf("io_uring_enter(%u<%s>, %u, %u"
+	       ", IORING_ENTER_GETEVENTS|IORING_ENTER_EXT_ARG"
+	       ", {sigmask=%s, sigmask_sz=%u, min_wait_usec=%u"
+	       ", ts={tv_sec=%lld, tv_nsec=%llu}}"
+	       ", %zu) = %s\n",
+	       fd, path, to_submit, min_complete,
+	       expected_sigmask, arg->sigmask_sz, arg->min_wait_usec,
+	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
+	       sizeof(*arg), errstr);
+
+	/* Test IORING_ENTER_EXT_ARG_REG */
+	sys_io_uring_enter(fd, to_submit, min_complete,
+			   IORING_ENTER_GETEVENTS | IORING_ENTER_EXT_ARG_REG,
+			   (void *) offset, sizeof(struct io_uring_reg_wait));
+	printf("io_uring_enter(%u<%s>, %u, %u"
+	       ", IORING_ENTER_GETEVENTS|IORING_ENTER_EXT_ARG_REG"
+	       ", %lu, %zu) = %s\n",
+	       fd, path, to_submit, min_complete,
+	       offset, sizeof(struct io_uring_reg_wait), errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
