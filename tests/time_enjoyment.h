@@ -35,6 +35,8 @@ enjoy_time(uint64_t cputime_limit)
 
 		for (size_t j = 0; j < NUM_USER_ITERS; ++j)
 			++dummy;
+
+		ts.tv_nsec = dummy;
 	}
 
 	/* Enjoying my system time */
