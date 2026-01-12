@@ -205,6 +205,7 @@ libstrace_a_SOURCES =	\
 	list.h		\
 	listen.c	\
 	listmount.c	\
+	listns.c	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\

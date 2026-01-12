@@ -567,6 +567,8 @@ linkat--secontext_full_mismatch	--secontext=full,mismatch -e trace=linkat
 linkat--secontext_mismatch	--secontext=mismatch -e trace=linkat
 listmount	-a26
 listmount-success --inject=listmount:retval=42 -a26 --trace=listmount
+listns	-a23
+listns-success --inject=listns:retval=42 -a23 --trace=listns
 listxattrat	-a34
 listxattrat-P	-a34 --trace=listxattrat -P /dev/full
 listxattrat-y	-a34 --trace=listxattrat -y

@@ -1,0 +1,11 @@
+#unconditional
+#From include/uapi/linux/nsfs.h
+#Pattern *_NS
+TIME_NS
+MNT_NS
+CGROUP_NS
+UTS_NS
+IPC_NS
+USER_NS
+PID_NS
+NET_NS

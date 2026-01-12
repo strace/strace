@@ -54,3 +54,4 @@
 [BASE_NR + 467] = { 5,	TD|TF,		SEN(open_tree_attr),		"open_tree_attr"},
 [BASE_NR + 468] = { 5,	TD|TF,		SEN(file_getattr),		"file_getattr"	},
 [BASE_NR + 469] = { 5,	TD|TF,		SEN(file_setattr),		"file_setattr"	},
+[BASE_NR + 470] = { 4,	0,		SEN(listns),			"listns"	},

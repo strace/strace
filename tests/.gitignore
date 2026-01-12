@@ -548,6 +548,8 @@ linkat
 list_sigaction_signum
 listmount
 listmount-success
+listns
+listns-success
 listxattrat
 listxattrat-P
 listxattrat-y

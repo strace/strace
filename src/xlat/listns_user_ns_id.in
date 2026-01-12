@@ -1,0 +1,5 @@
+#unconditional
+#val_type uint64_t
+#From include/uapi/linux/nsfs.h
+#Prefix LISTNS_
+LISTNS_CURRENT_USER

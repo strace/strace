@@ -373,6 +373,8 @@ link
 linkat
 listmount
 listmount-success
+listns
+listns-success
 listxattrat
 listxattrat-P
 listxattrat-y

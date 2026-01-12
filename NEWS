@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of listns syscall.
   * Implemented decoding of F_GET_RW_HINT, F_SET_RW_HINT, F_GET_FILE_RW_HINT,
     F_SET_FILE_RW_HINT, F_GETDELEG, and F_SETDELEG fcntl commands.
   * Implemented decoding of extended argument structures for io_uring_enter
