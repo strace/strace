@@ -359,10 +359,7 @@ static void
 test_rw_hint_pair(const int set_cmd, const char *const set_cmd_str,
 		  const int get_cmd, const char *const get_cmd_str)
 {
-	static const struct {
-		uint64_t value;
-		const char *name;
-	} hints[] = {
+	static const struct strval64 hints[] = {
 		{ ARG_STR(RWH_WRITE_LIFE_NOT_SET) },
 		{ ARG_STR(RWH_WRITE_LIFE_NONE) },
 		{ ARG_STR(RWH_WRITE_LIFE_SHORT) },
@@ -387,29 +384,29 @@ test_rw_hint_pair(const int set_cmd, const char *const set_cmd_str,
 
 	/* Loop over all hint values, testing SET followed by GET for each */
 	for (unsigned int i = 0; i < ARRAY_SIZE(hints); i++) {
-		*hint_ptr = hints[i].value;
+		*hint_ptr = hints[i].val;
 
 		/* Test F_SET_* with an invalid fd */
 		invoke_test_syscall(-1, set_cmd, hint_ptr);
 		pidns_print_leader();
 		printf("%s(-1, %s, [%s]) = %s\n",
-		       TEST_SYSCALL_STR, set_cmd_str, hints[i].name, errstr);
+		       TEST_SYSCALL_STR, set_cmd_str, hints[i].str, errstr);
 
 		/* Test F_SET_* with a valid fd */
 		long rc = invoke_test_syscall(0, set_cmd, hint_ptr);
 		pidns_print_leader();
 		printf("%s(0, %s, [%s]) = %s\n",
-		       TEST_SYSCALL_STR, set_cmd_str, hints[i].name, errstr);
+		       TEST_SYSCALL_STR, set_cmd_str, hints[i].str, errstr);
 
 		/*
 		 * If F_SET_* succeeded, test corresponding F_GET_*.
-		 * We know what value to expect because we just set it.
+		 * We know what val to expect because we just set it.
 		 * Invalid hint values usually cause F_SET_* to fail.
 		 * If they don't, e.g. before Linux kernel commit
-		 * v6.9-rc1~12^2~16, F_GET_* would return a truncated value,
+		 * v6.9-rc1~12^2~16, F_GET_* would return a truncated val,
 		 * in that case we skip the corresponding F_GET_ invocation.
 		 */
-		if (rc == 0 && hints[i].value == (uint32_t) hints[i].value) {
+		if (rc == 0 && hints[i].val == (uint32_t) hints[i].val) {
 			*hint_ptr = -1;
 			rc = invoke_test_syscall(0, get_cmd, hint_ptr);
 			pidns_print_leader();
@@ -417,7 +414,7 @@ test_rw_hint_pair(const int set_cmd, const char *const set_cmd_str,
 				/* Success: verify we got back what we set */
 				printf("%s(0, %s, [%s]) = 0\n",
 				       TEST_SYSCALL_STR, get_cmd_str,
-				       hints[i].name);
+				       hints[i].str);
 			} else {
 				/* GET failed: print address */
 				printf("%s(0, %s, %p) = %s\n",
