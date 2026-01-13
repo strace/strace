@@ -401,10 +401,15 @@ test_rw_hint_pair(const int set_cmd, const char *const set_cmd_str,
 		printf("%s(0, %s, [%s]) = %s\n",
 		       TEST_SYSCALL_STR, set_cmd_str, hints[i].name, errstr);
 
-		/* If SET succeeded, test corresponding F_GET_* */
-		/* We know what value to expect because we just set it */
-		/* Note: Invalid hint values may cause SET to fail with EINVAL */
-		if (!rc) {
+		/*
+		 * If F_SET_* succeeded, test corresponding F_GET_*.
+		 * We know what value to expect because we just set it.
+		 * Invalid hint values usually cause F_SET_* to fail.
+		 * If they don't, e.g. before Linux kernel commit
+		 * v6.9-rc1~12^2~16, F_GET_* would return a truncated value,
+		 * in that case we skip the corresponding F_GET_ invocation.
+		 */
+		if (rc == 0 && hints[i].value == (uint32_t) hints[i].value) {
 			*hint_ptr = -1;
 			rc = invoke_test_syscall(0, get_cmd, hint_ptr);
 			pidns_print_leader();
