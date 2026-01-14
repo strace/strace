@@ -19,11 +19,6 @@
 
 #include "pidns.h"
 
-struct op_str {
-	unsigned int op;
-	const char *str;
-};
-
 #ifdef INJECT_RETVAL
 # define NUM_SKIP 256
 # define INJ_STR " (INJECTED)"
