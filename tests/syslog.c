@@ -43,10 +43,7 @@ printstr(const char *s, int cmd, long size)
 int
 main(void)
 {
-	static const struct cmd_str {
-		unsigned int cmd;
-		const char *str;
-	} no_args[] = {
+	static const struct strval32 no_args[] = {
 		{ 0,  "0 /* SYSLOG_ACTION_CLOSE */" },
 		{ 1,  "1 /* SYSLOG_ACTION_OPEN */" },
 #ifdef RETVAL_INJECTED
@@ -58,7 +55,7 @@ main(void)
 		{ 9,  "9 /* SYSLOG_ACTION_SIZE_UNREAD */" },
 		{ 10, "10 /* SYSLOG_ACTION_SIZE_BUFFER */" },
 	};
-	static const struct cmd_str two_args[] = {
+	static const struct strval32 two_args[] = {
 		{ 0xfeedbeef, "-17973521 /* SYSLOG_ACTION_??? */" },
 		{ -1U, "-1 /* SYSLOG_ACTION_??? */" },
 #ifdef RETVAL_INJECTED
@@ -70,7 +67,7 @@ main(void)
 		{ 11, "11 /* SYSLOG_ACTION_??? */" },
 		{ (1U << 31) - 1, "2147483647 /* SYSLOG_ACTION_??? */" },
 	};
-	static const struct cmd_str levels[] = {
+	static const struct strval32 levels[] = {
 		{ 0xfeedbeef, "-17973521 /* LOGLEVEL_??? */" },
 		{ -1U, "-1 /* LOGLEVEL_??? */" },
 		{ 0, "0 /* LOGLEVEL_EMERG */" },
@@ -90,32 +87,32 @@ main(void)
 	fill_memory(buf, buf_size);
 
 	for (size_t i = 0; i < ARRAY_SIZE(no_args); i++) {
-		rc = syscall(__NR_syslog, high | no_args[i].cmd, addr, -1);
+		rc = syscall(__NR_syslog, high | no_args[i].val, addr, -1);
 		printf("syslog(%s) = %s" RET_SFX "\n",
 		no_args[i].str, sprintrc(rc));
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(two_args); i++) {
-		rc = syscall(__NR_syslog, high | two_args[i].cmd, NULL, -1);
+		rc = syscall(__NR_syslog, high | two_args[i].val, NULL, -1);
 		printf("syslog(%s, NULL, -1) = %s" RET_SFX "\n",
 		       two_args[i].str, sprintrc(rc));
 
 #ifdef RETVAL_INJECTED
 		/* Avoid valid commands with a bogus address */
-		if (!valid_cmd(two_args[i].cmd))
+		if (!valid_cmd(two_args[i].val))
 #endif
 		{
-			rc = syscall(__NR_syslog, high | two_args[i].cmd, addr,
+			rc = syscall(__NR_syslog, high | two_args[i].val, addr,
 				     -1);
 			printf("syslog(%s, %#llx, -1) = %s" RET_SFX "\n",
 			       two_args[i].str, (unsigned long long) addr,
 			       sprintrc(rc));
 
-			rc = syscall(__NR_syslog, two_args[i].cmd, addr, 0);
+			rc = syscall(__NR_syslog, two_args[i].val, addr, 0);
 
 			printf("syslog(%s, %s, 0) = %s" RET_SFX "\n",
 			       two_args[i].str,
-			       !rc && valid_cmd(two_args[i].cmd)
+			       !rc && valid_cmd(two_args[i].val)
 				   && (sizeof(kernel_ulong_t) == sizeof(void *))
 				      ? "\"\""
 				      : (sizeof(addr) == 8)
@@ -123,19 +120,19 @@ main(void)
 			       sprintrc(rc));
 		}
 
-		rc = syscall(__NR_syslog, two_args[i].cmd, buf, buf_size);
+		rc = syscall(__NR_syslog, two_args[i].val, buf, buf_size);
 		const char *errstr = sprintrc(rc);
 
 		printf("syslog(%s, ", two_args[i].str);
-		if (rc >= 0 && valid_cmd(two_args[i].cmd))
-			printstr(buf, two_args[i].cmd, rc);
+		if (rc >= 0 && valid_cmd(two_args[i].val))
+			printstr(buf, two_args[i].val, rc);
 		else
 			printf("%p", buf);
 		printf(", %zu) = %s" RET_SFX "\n", buf_size, errstr);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(levels); i++) {
-		rc = syscall(__NR_syslog, high | 8, addr, levels[i].cmd);
+		rc = syscall(__NR_syslog, high | 8, addr, levels[i].val);
 		printf("syslog(8 /* SYSLOG_ACTION_CONSOLE_LEVEL */, %#llx, %s)"
 		       " = %s" RET_SFX "\n",
 		       (unsigned long long) addr, levels[i].str, sprintrc(rc));
