@@ -1592,6 +1592,7 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 		{ ARG_STR(IORING_REGISTER_SEND_MSG_RING) };
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sqe, sqe);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_attr_pi, attr_pi);
 
 	sys_io_uring_register(fd_null, send_msg_ring_ops.val, 0, 0xdeadbeef);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u) = %s\n",
@@ -1681,6 +1682,97 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	       sqe->personality,
 	       sqe->file_index,
 	       (unsigned long long) sqe->optval,
+	       errstr);
+
+	/* Test attr_ptr with PI flag set */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_READ;
+	sqe->fd = fd_null;
+	sqe->attr_type_mask = IORING_RW_ATTR_FLAG_PI;
+	sqe->attr_ptr = (unsigned long) attr_pi;
+
+	attr_pi->flags = 0x1234;
+	attr_pi->app_tag = 0x5678;
+	attr_pi->len = 0x9abcdef0;
+	attr_pi->addr = 0xfacefeeddeadbeefULL;
+	attr_pi->seed = 0xcafef00dbadc0dedULL;
+	attr_pi->rsvd = 0x0;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=%u<%s>"
+	       ", off=0, addr=0, len=0, rw_flags=0, user_data=0"
+	       ", buf_index=0, personality=0, file_index=0"
+	       ", attr_type_mask=" XLAT_FMT ", attr_ptr={flags=0x1234"
+	       ", app_tag=0x5678, len=%u, addr=%#llx"
+	       ", seed=%#llx, rsvd=0}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_READ),
+	       fd_null, path_null,
+	       XLAT_ARGS(IORING_RW_ATTR_FLAG_PI),
+	       attr_pi->len,
+	       (unsigned long long) attr_pi->addr,
+	       (unsigned long long) attr_pi->seed,
+	       errstr);
+
+	/* Test attr_ptr with PI flag set but NULL pointer */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_READ;
+	sqe->fd = fd_null;
+	sqe->attr_type_mask = IORING_RW_ATTR_FLAG_PI;
+	sqe->attr_ptr = 0;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=%u<%s>"
+	       ", off=0, addr=0, len=0, rw_flags=0, user_data=0"
+	       ", buf_index=0, personality=0, file_index=0"
+	       ", attr_type_mask=" XLAT_FMT ", attr_ptr=NULL}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_READ),
+	       fd_null, path_null,
+	       XLAT_ARGS(IORING_RW_ATTR_FLAG_PI),
+	       errstr);
+
+	/* Test optval backward compatibility (attr_type_mask is zero) */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_READ;
+	sqe->fd = fd_null;
+	sqe->attr_type_mask = 0;
+	sqe->optval = 0xdeadbeefcafebabeULL;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=%u<%s>"
+	       ", off=0, addr=0, len=0, rw_flags=0, user_data=0"
+	       ", buf_index=0, personality=0, file_index=0"
+	       ", optval=0xdeadbeefcafebabe}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_READ),
+	       fd_null, path_null,
+	       errstr);
+
+	/* Test attr_type_mask with non-PI flag */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_READ;
+	sqe->fd = fd_null;
+	sqe->attr_type_mask = 0x2;  /* Some future flag, not PI */
+	sqe->attr_ptr = 0x1234567890abcdefULL;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=%u<%s>"
+	       ", off=0, addr=0, len=0, rw_flags=0, user_data=0"
+	       ", buf_index=0, personality=0, file_index=0"
+	       ", attr_type_mask=0x2" NRAW(" /* IORING_RW_ATTR_FLAG_??? */")
+	       ", attr_ptr=0x1234567890abcdef}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_READ),
+	       fd_null, path_null,
 	       errstr);
 }
 
