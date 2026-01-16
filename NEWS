@@ -13,6 +13,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     syscall when IORING_ENTER_EXT_ARG or IORING_ENTER_EXT_ARG_REG flags are set.
   * Implemented decoding of attr_ptr and attr_type_mask fields of
     struct io_uring_sqe for io_uring_register syscall.
+  * Implemented opcode-specific decoding of flags union field of
+    struct io_uring_sqe for io_uring_register syscall.
   * Updated decoding of struct mnt_id_req and struct perf_event_attr.
   * Updated lists of ABS_*, BPF_*, ETHTOOL_*, ETH_P_*, IORING_*, KVM_*, PERF_*,
     TLS_*, V4L2_*, and *_MAGIC constants.

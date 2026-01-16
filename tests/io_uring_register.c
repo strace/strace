@@ -1654,7 +1654,7 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	sqe->off = 0x123456789abcdef0ULL;
 	sqe->addr = 0xfedcba9876543210ULL;
 	sqe->len = 0xcafebabe;
-	sqe->rw_flags = 0xdeadface;
+	sqe->nop_flags = 0xdeadface;
 	sqe->user_data = 0xbadc0dedbeefcafeULL;
 	sqe->buf_index = 0x5678;
 	sqe->personality = 0x9abc;
@@ -1665,7 +1665,7 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	printf("io_uring_register(%u<%s>, " XLAT_FMT
 	       ", {opcode=" XLAT_FMT_U ", flags=" XLAT_FMT
 	       ", ioprio=0, fd=%u<%s>, off=%#llx, addr=%#llx"
-	       ", len=%u, rw_flags=%#x, user_data=%#llx"
+	       ", len=%u, nop_flags=" XLAT_FMT ", user_data=%#llx"
 	       ", buf_index=%#x, personality=%u"
 	       ", file_index=%#x, optval=%#llx}, 1) = %s\n",
 	       fd_null, path_null,
@@ -1676,7 +1676,7 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	       (unsigned long long) sqe->off,
 	       (unsigned long long) sqe->addr,
 	       sqe->len,
-	       sqe->rw_flags,
+	       XLAT_ARGS(IORING_NOP_FILE|IORING_NOP_FIXED_FILE|IORING_NOP_FIXED_BUFFER|0xdeadfac0),
 	       (unsigned long long) sqe->user_data,
 	       sqe->buf_index,
 	       sqe->personality,
@@ -1773,6 +1773,24 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
 	       XLAT_ARGS(IORING_OP_READ),
 	       fd_null, path_null,
+	       errstr);
+
+	/* Test flags union helper: NOP with flags */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_NOP;
+	sqe->fd = -1;
+	sqe->nop_flags = IORING_NOP_INJECT_RESULT | IORING_NOP_CQE32;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=-1"
+	       ", off=0, addr=0, len=0, nop_flags=" XLAT_FMT
+	       ", user_data=0, buf_index=0, personality=0"
+	       ", file_index=0, optval=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_NOP),
+	       XLAT_ARGS(IORING_NOP_INJECT_RESULT|IORING_NOP_CQE32),
 	       errstr);
 }
 

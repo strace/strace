@@ -36,6 +36,7 @@
 #include "xlat/uring_query_ops.h"
 #include "xlat/uring_zcrx_ctrl_ops.h"
 #include "xlat/uring_rw_attr_flags.h"
+#include "xlat/uring_nop_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -968,6 +969,12 @@ static void
 print_io_uring_sqe_flags_union(const struct io_uring_sqe *sqe)
 {
 	switch (sqe->opcode) {
+	case IORING_OP_NOP:
+	case IORING_OP_NOP128:
+		PRINT_FIELD_FLAGS(*sqe, nop_flags, uring_nop_flags,
+				 "IORING_NOP_???");
+		break;
+
 	case IORING_OP_MSG_RING:
 		PRINT_FIELD_FLAGS(*sqe, msg_ring_flags, uring_msg_ring_flags,
 				 "IORING_MSG_RING_???");
