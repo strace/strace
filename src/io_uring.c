@@ -965,6 +965,25 @@ print_io_uring_attr_ptr(struct tcb *tcp, const uint64_t addr,
 }
 
 static void
+print_io_uring_sqe_flags_union(const struct io_uring_sqe *sqe)
+{
+	switch (sqe->opcode) {
+	case IORING_OP_MSG_RING:
+		PRINT_FIELD_FLAGS(*sqe, msg_ring_flags, uring_msg_ring_flags,
+				 "IORING_MSG_RING_???");
+		break;
+
+	default:
+		/*
+		 * For other opcodes, use rw_flags (default).
+		 * This will be extended as we add support for more opcodes.
+		 */
+		PRINT_FIELD_X(*sqe, rw_flags);
+		break;
+	}
+}
+
+static void
 print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_sqe sqe;
@@ -990,12 +1009,7 @@ print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(sqe, len);
 	tprint_struct_next();
-	if (sqe.opcode == IORING_OP_MSG_RING) {
-		PRINT_FIELD_FLAGS(sqe, msg_ring_flags, uring_msg_ring_flags,
-				 "IORING_MSG_RING_???");
-	} else {
-		PRINT_FIELD_X(sqe, rw_flags);
-	}
+	print_io_uring_sqe_flags_union(&sqe);
 	tprint_struct_next();
 	PRINT_FIELD_X(sqe, user_data);
 	tprint_struct_next();
