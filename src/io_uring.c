@@ -37,6 +37,7 @@
 #include "xlat/uring_zcrx_ctrl_ops.h"
 #include "xlat/uring_rw_attr_flags.h"
 #include "xlat/uring_nop_flags.h"
+#include "xlat/uring_fixed_fd_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -975,15 +976,27 @@ print_io_uring_sqe_flags_union(const struct io_uring_sqe *sqe)
 				 "IORING_NOP_???");
 		break;
 
+	case IORING_OP_FIXED_FD_INSTALL:
+		PRINT_FIELD_FLAGS(*sqe, install_fd_flags, uring_fixed_fd_flags,
+				 "IORING_FIXED_FD_???");
+		break;
+
 	case IORING_OP_MSG_RING:
 		PRINT_FIELD_FLAGS(*sqe, msg_ring_flags, uring_msg_ring_flags,
 				 "IORING_MSG_RING_???");
 		break;
 
+	case IORING_OP_PIPE:
+		/*
+		 * PIPE flags are in the union, but no flags are currently
+		 * defined in the kernel header.  Fall through to default
+		 * to print as hex (same as rw_flags since they're in the
+		 * same union).
+		 */
+		ATTRIBUTE_FALLTHROUGH;
 	default:
 		/*
 		 * For other opcodes, use rw_flags (default).
-		 * This will be extended as we add support for more opcodes.
 		 */
 		PRINT_FIELD_X(*sqe, rw_flags);
 		break;

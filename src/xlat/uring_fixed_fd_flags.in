@@ -1,0 +1,4 @@
+#unconditional
+#From include/uapi/linux/io_uring.h
+#Prefix IORING_FIXED_FD_
+IORING_FIXED_FD_NO_CLOEXEC
