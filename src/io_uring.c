@@ -1004,6 +1004,17 @@ print_io_uring_sqe_flags_union(const struct io_uring_sqe *sqe)
 }
 
 static void
+print_io_uring_sqe_ioprio(const struct io_uring_sqe *sqe)
+{
+	/*
+	 * For now, print ioprio as numeric value for all opcodes.
+	 * This will be extended to decode flags for send/recv/accept
+	 * operations.
+	 */
+	PRINT_FIELD_U(*sqe, ioprio);
+}
+
+static void
 print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_sqe sqe;
@@ -1019,7 +1030,7 @@ print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sqe, flags, uring_sqe_flags, "IOSQE_???");
 	tprint_struct_next();
-	PRINT_FIELD_U(sqe, ioprio);
+	print_io_uring_sqe_ioprio(&sqe);
 	tprint_struct_next();
 	PRINT_FIELD_FD(sqe, fd, tcp);
 	tprint_struct_next();
