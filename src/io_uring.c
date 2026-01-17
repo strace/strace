@@ -39,6 +39,7 @@
 #include "xlat/uring_nop_flags.h"
 #include "xlat/uring_fixed_fd_flags.h"
 #include "xlat/uring_accept_flags.h"
+#include "xlat/uring_recvsend_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1016,11 +1017,24 @@ print_io_uring_sqe_ioprio(const struct io_uring_sqe *sqe)
 				  "IORING_ACCEPT_???");
 		break;
 
+	case IORING_OP_SEND:
+	case IORING_OP_SENDMSG:
+	case IORING_OP_SEND_ZC:
+	case IORING_OP_SENDMSG_ZC:
+	case IORING_OP_RECV:
+	case IORING_OP_RECVMSG:
+	case IORING_OP_RECV_ZC:
+		/*
+		 * For send/recv operations, ioprio contains flags.
+		 */
+		PRINT_FIELD_FLAGS(*sqe, ioprio, uring_recvsend_flags,
+				  "IORING_RECVSEND_???");
+		break;
+
 	default:
 		/*
 		 * For other operations, ioprio contains the actual
-		 * ioprio value.  This will be extended for send/recv
-		 * operations.
+		 * ioprio value.
 		 */
 		PRINT_FIELD_U(*sqe, ioprio);
 		break;
