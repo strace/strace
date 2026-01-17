@@ -38,6 +38,7 @@
 #include "xlat/uring_rw_attr_flags.h"
 #include "xlat/uring_nop_flags.h"
 #include "xlat/uring_fixed_fd_flags.h"
+#include "xlat/uring_accept_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1006,12 +1007,24 @@ print_io_uring_sqe_flags_union(const struct io_uring_sqe *sqe)
 static void
 print_io_uring_sqe_ioprio(const struct io_uring_sqe *sqe)
 {
-	/*
-	 * For now, print ioprio as numeric value for all opcodes.
-	 * This will be extended to decode flags for send/recv/accept
-	 * operations.
-	 */
-	PRINT_FIELD_U(*sqe, ioprio);
+	switch (sqe->opcode) {
+	case IORING_OP_ACCEPT:
+		/*
+		 * For accept operations, ioprio contains flags.
+		 */
+		PRINT_FIELD_FLAGS(*sqe, ioprio, uring_accept_flags,
+				  "IORING_ACCEPT_???");
+		break;
+
+	default:
+		/*
+		 * For other operations, ioprio contains the actual
+		 * ioprio value.  This will be extended for send/recv
+		 * operations.
+		 */
+		PRINT_FIELD_U(*sqe, ioprio);
+		break;
+	}
 }
 
 static void

@@ -1811,6 +1811,26 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	       fd_null, path_null,
 	       XLAT_ARGS(IORING_FIXED_FD_NO_CLOEXEC),
 	       errstr);
+
+	/* Test ioprio helper: ACCEPT with flags */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_ACCEPT;
+	sqe->fd = fd_null;
+	sqe->ioprio = IORING_ACCEPT_MULTISHOT | IORING_ACCEPT_POLL_FIRST;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0"
+	       ", ioprio=" XLAT_FMT ", fd=%u<%s>"
+	       ", off=0, addr=0, len=0, rw_flags=0"
+	       ", user_data=0, buf_index=0, personality=0"
+	       ", file_index=0, optval=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_ACCEPT),
+	       XLAT_ARGS(IORING_ACCEPT_MULTISHOT|IORING_ACCEPT_POLL_FIRST),
+	       fd_null, path_null,
+	       errstr);
 }
 
 static void
