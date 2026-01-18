@@ -1041,6 +1041,19 @@ print_io_uring_sqe_ioprio(const struct io_uring_sqe *sqe)
 	}
 }
 
+static bool
+is_128_byte_sqe(const struct io_uring_sqe *sqe)
+{
+	switch (sqe->opcode) {
+	case IORING_OP_NOP128:
+	case IORING_OP_URING_CMD128:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
 static void
 print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 {
@@ -1121,6 +1134,26 @@ print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 		tprints_field_name("optval");
 		PRINT_VAL_X(sqe.optval);
 		break;
+	}
+
+	/*
+	 * For 128-byte SQEs, decode the cmd[] array (64 bytes starting
+	 * at offset 64).
+	 *
+	 * Error handling: If reading the cmd[] array fails, print_array
+	 * will print the address gracefully. The base 64-byte structure
+	 * is already decoded, so cmd[] failure doesn't affect it.
+	 * print_array with tfetch_mem handles partial reads gracefully,
+	 * printing what it can if only partial data is available.
+	 */
+	if (is_128_byte_sqe(&sqe)) {
+		const kernel_ulong_t cmd_addr = addr + 64;
+		uint8_t cmd_buf;
+
+		tprint_struct_next();
+		tprints_field_name("cmd");
+		print_array(tcp, cmd_addr, 64, &cmd_buf, sizeof(cmd_buf),
+			    tfetch_mem, print_xint_array_member, NULL);
 	}
 
 	tprint_struct_end();

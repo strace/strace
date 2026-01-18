@@ -1593,6 +1593,11 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sqe, sqe);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_attr_pi, attr_pi);
+	TAIL_ALLOC_OBJECT_CONST_PTR(union {
+		struct io_uring_sqe sqe;
+		uint8_t sqe_128[128];
+	}, sqe_union_ptr);
+	struct io_uring_sqe *const sqe_128 = &sqe_union_ptr->sqe;
 
 	sys_io_uring_register(fd_null, send_msg_ring_ops.val, 0, 0xdeadbeef);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u) = %s\n",
@@ -1871,6 +1876,38 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 	       XLAT_ARGS(IORING_RECV_MULTISHOT|IORING_RECVSEND_FIXED_BUF),
 	       fd_null, path_null,
 	       errstr);
+
+	static const struct {
+		uint32_t val;
+		const char *str;
+		const char *flags_str;
+	} sqe_128_opcodes[] = {
+		{ ARG_STR(IORING_OP_NOP128), "nop_flags" },
+		{ ARG_STR(IORING_OP_URING_CMD128), "rw_flags" },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(sqe_128_opcodes); ++i) {
+		memset(sqe_union_ptr, 0, sizeof(*sqe_union_ptr));
+		sqe_128->opcode = sqe_128_opcodes[i].val;
+		sqe_128->fd = -1;
+		/* Set cmd[] array data (bytes 64-127) */
+		fill_memory_ex(&sqe_union_ptr->sqe_128[64], 64, 0x10, 16);
+
+		sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe_128, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0, fd=-1"
+		       ", off=0, addr=0, len=0, %s=0, user_data=0"
+		       ", buf_index=0, personality=0, file_index=0, optval=0"
+		       ", cmd=[0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17"
+		       ", 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f"
+		       ", 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17"
+		       ", 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f"
+		       ", ...]}, 1) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+		       XLAT_SEL(sqe_128_opcodes[i].val, sqe_128_opcodes[i].str),
+		       sqe_128_opcodes[i].flags_str,
+		       errstr);
+	}
 }
 
 static void
