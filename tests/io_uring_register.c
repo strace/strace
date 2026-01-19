@@ -15,6 +15,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 #include "kernel_time_types.h"
@@ -1908,6 +1909,109 @@ test_IORING_REGISTER_SEND_MSG_RING(int fd_null, int fd_full)
 		       sqe_128_opcodes[i].flags_str,
 		       errstr);
 	}
+
+	static const struct strval32 socket_ops[] = {
+		{ ARG_STR(SOCKET_URING_OP_SIOCINQ) },
+		{ ARG_STR(SOCKET_URING_OP_SIOCOUTQ) },
+		{ ARG_STR(SOCKET_URING_OP_GETSOCKOPT) },
+		{ ARG_STR(SOCKET_URING_OP_SETSOCKOPT) },
+		{ ARG_STR(SOCKET_URING_OP_TX_TIMESTAMP) },
+		{ ARG_STR(SOCKET_URING_OP_GETSOCKNAME) },
+	};
+	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+	unsigned long inode = sock_fd >= 0 ? inode_of_sockfd(sock_fd) : 0;
+
+	for (size_t i = 0; inode && i < ARRAY_SIZE(socket_ops); ++i) {
+		/* Test socket operation with IORING_OP_URING_CMD.  */
+		memset(sqe, 0, sizeof(*sqe));
+		sqe->opcode = IORING_OP_URING_CMD;
+		sqe->fd = sock_fd;
+		sqe->off = socket_ops[i].val;
+
+		sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0"
+		       ", fd=%d<socket:[%lu]>, off=" XLAT_FMT_U
+		       ", addr=0, len=0, rw_flags=0, user_data=0"
+		       ", buf_index=0, personality=0, file_index=0, optval=0}"
+		       ", 1) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+		       XLAT_ARGS(IORING_OP_URING_CMD),
+		       sock_fd, inode,
+		       XLAT_SEL(socket_ops[i].val, socket_ops[i].str),
+		       errstr);
+
+		/* Test socket operation with IORING_OP_URING_CMD128.  */
+		memset(sqe_union_ptr, 0, sizeof(*sqe_union_ptr));
+		sqe_128->opcode = IORING_OP_URING_CMD128;
+		sqe_128->fd = sock_fd;
+		sqe_128->off = socket_ops[i].val;
+		fill_memory_ex(&sqe_union_ptr->sqe_128[64], 64, 0x20, 16);
+
+		sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe_128, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0"
+		       ", fd=%d<socket:[%lu]>, off=" XLAT_FMT_U
+		       ", addr=0, len=0, rw_flags=0, user_data=0"
+		       ", buf_index=0, personality=0, file_index=0, optval=0"
+		       ", cmd=[0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27"
+		       ", 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f"
+		       ", 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27"
+		       ", 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f"
+		       ", ...]}, 1) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+		       XLAT_ARGS(IORING_OP_URING_CMD128),
+		       sock_fd, inode,
+		       XLAT_SEL(socket_ops[i].val, socket_ops[i].str),
+		       errstr);
+	}
+
+	if (sock_fd >= 0)
+		close(sock_fd);
+
+	/* Test IORING_OP_URING_CMD with non-socket fd.  */
+	memset(sqe, 0, sizeof(*sqe));
+	sqe->opcode = IORING_OP_URING_CMD;
+	sqe->fd = fd_null;
+	sqe->off = 0xfacefeed;
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0"
+	       ", fd=%u<%s>, off=%#x, addr=0, len=0, rw_flags=0"
+	       ", user_data=0, buf_index=0, personality=0"
+	       ", file_index=0, optval=0}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_URING_CMD),
+	       fd_null, path_null, 0xfacefeed,
+	       errstr);
+
+	/* Test IORING_OP_URING_CMD128 with non-socket fd.  */
+	memset(sqe_union_ptr, 0, sizeof(*sqe_union_ptr));
+	sqe_128->opcode = IORING_OP_URING_CMD128;
+	sqe_128->fd = fd_null;
+	sqe_128->off = 0xfacefeed;
+	fill_memory_ex(&sqe_union_ptr->sqe_128[64], 64, 0x30, 16);
+
+	sys_io_uring_register(fd_null, send_msg_ring_ops.val, sqe_128, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {opcode=" XLAT_FMT_U ", flags=0, ioprio=0"
+	       ", fd=%u<%s>, off=%#x, addr=0, len=0, rw_flags=0"
+	       ", user_data=0, buf_index=0, personality=0"
+	       ", file_index=0, optval=0"
+	       ", cmd=[0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37"
+	       ", 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f"
+	       ", 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37"
+	       ", 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f"
+	       ", ...]}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(send_msg_ring_ops.val, send_msg_ring_ops.str),
+	       XLAT_ARGS(IORING_OP_URING_CMD128),
+	       fd_null, path_null, 0xfacefeed,
+	       errstr);
 }
 
 static void

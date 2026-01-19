@@ -40,6 +40,7 @@
 #include "xlat/uring_fixed_fd_flags.h"
 #include "xlat/uring_accept_flags.h"
 #include "xlat/uring_recvsend_flags.h"
+#include "xlat/uring_socket_ops.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -1054,6 +1055,35 @@ is_128_byte_sqe(const struct io_uring_sqe *sqe)
 	}
 }
 
+static bool
+is_op_cmd_sqe(const struct io_uring_sqe *sqe)
+{
+	switch (sqe->opcode) {
+	case IORING_OP_URING_CMD:
+	case IORING_OP_URING_CMD128:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+static void
+print_io_uring_sqe_off(struct tcb *tcp, const struct io_uring_sqe *sqe)
+{
+	if (is_op_cmd_sqe(sqe) && getfdinode(tcp, sqe->fd)) {
+		/*
+		 * For IORING_OP_URING_CMD or IORING_OP_URING_CMD128 with
+		 * a socket fd, print off as a socket operation.
+		 */
+		PRINT_FIELD_XVAL_U(*sqe, off, uring_socket_ops,
+				   "SOCKET_URING_OP_???");
+	} else {
+		/* Not a socket or not URING_CMD/URING_CMD128, print as offset */
+		PRINT_FIELD_X(*sqe, off);
+	}
+}
+
 static void
 print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 {
@@ -1074,7 +1104,7 @@ print_io_uring_sqe(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_FD(sqe, fd, tcp);
 	tprint_struct_next();
-	PRINT_FIELD_X(sqe, off);
+	print_io_uring_sqe_off(tcp, &sqe);
 	tprint_struct_next();
 	PRINT_FIELD_X(sqe, addr);
 	tprint_struct_next();
