@@ -12,9 +12,10 @@
 . "${srcdir=.}/init.sh"
 
 # The legacy API is broken on riscv64 with kernel 6.11+
+# The same change was also backported into the 6.6 stable tree
 # https://github.com/strace/strace/issues/315
 [ "$(uname -m)" != "riscv64" ] ||
-    require_max_kernel_version_or_skip 6.11
+    require_max_kernel_version_or_skip 6.6.49
 
 check_prog grep
 $STRACE -d -enone / > /dev/null 2> "$LOG" ||:
