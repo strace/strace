@@ -169,6 +169,12 @@ process_file()
 
 		__EOF__
 
+		case "$uname_m" in
+			riscv*)
+				touch "$tmpdir/asm/cpufeature-macros.h"
+				;;
+		esac
+
 	# Soft pre-include workarounds for some processed files.  Fragile.
 	case "$f" in
 		*asm/amigayle.h)
