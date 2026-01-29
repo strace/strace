@@ -82,6 +82,7 @@
 { "asm/opal-prd.h", "OPAL_PRD_GET_INFO", _IOC_READ, 0x6f01, 0x20 },
 { "asm/opal-prd.h", "OPAL_PRD_SCOM_READ", _IOC_READ, 0x6f02, 0x20 },
 { "asm/opal-prd.h", "OPAL_PRD_SCOM_WRITE", _IOC_WRITE, 0x6f03, 0x20 },
+{ "asm/papr-hvpipe.h", "PAPR_HVPIPE_IOC_CREATE_HANDLE", _IOC_WRITE, 0xb209, 0x04 },
 { "asm/papr-indices.h", "PAPR_DYNAMIC_INDICATOR_IOC_SET", _IOC_WRITE, 0xb205, 0x58 },
 { "asm/papr-indices.h", "PAPR_DYNAMIC_SENSOR_IOC_GET", _IOC_READ|_IOC_WRITE, 0xb204, 0x58 },
 { "asm/papr-indices.h", "PAPR_INDICES_IOC_GET", _IOC_WRITE, 0xb203, 0x58 },
