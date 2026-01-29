@@ -471,10 +471,11 @@ test_no_device(void)
 		}
 	}
 
-	/* PTP_SYS_OFFSET_PRECISE{,2} */
+	/* PTP_SYS_OFFSET_PRECISE{,2,_CYCLES} */
 	static const struct strval32 ioc_soprec[] = {
 		{ ARG_STR(PTP_SYS_OFFSET_PRECISE) },
 		{ ARG_STR(PTP_SYS_OFFSET_PRECISE2) },
+		{ ARG_STR(PTP_SYS_OFFSET_PRECISE_CYCLES) },
 	};
 	static const struct ptp_clock_time ts_vecs[] = {
 		{ 0, 123456789 },
@@ -551,10 +552,11 @@ test_no_device(void)
 		}
 	}
 
-	/* PTP_SYS_OFFSET_EXTENDED{,2} */
+	/* PTP_SYS_OFFSET_EXTENDED{,2,_CYCLES} */
 	static const struct strval32 ioc_soext[] = {
 		{ ARG_STR(PTP_SYS_OFFSET_EXTENDED) },
 		{ ARG_STR(PTP_SYS_OFFSET_EXTENDED2) },
+		{ ARG_STR(PTP_SYS_OFFSET_EXTENDED_CYCLES) },
 	};
 	static const struct strval32 clock_names[] = {
 		{ ARG_STR(CLOCK_REALTIME) },

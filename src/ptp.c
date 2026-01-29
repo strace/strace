@@ -272,11 +272,13 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	case PTP_SYS_OFFSET_PRECISE:
-	case PTP_SYS_OFFSET_PRECISE2: {
+	case PTP_SYS_OFFSET_PRECISE2:
+	case PTP_SYS_OFFSET_PRECISE_CYCLES: {
 		struct ptp_sys_offset_precise sysoff;
 		CHECK_TYPE_SIZE(sysoff.rsv, sizeof(unsigned int) * 4);
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_PRECISE, 64);
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_PRECISE2, 64);
+		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_PRECISE_CYCLES, 64);
 
 		if (entering(tcp))
 			return 0;
@@ -299,11 +301,13 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	case PTP_SYS_OFFSET_EXTENDED:
-	case PTP_SYS_OFFSET_EXTENDED2: {
+	case PTP_SYS_OFFSET_EXTENDED2:
+	case PTP_SYS_OFFSET_EXTENDED_CYCLES: {
 		struct ptp_sys_offset_extended sysoff;
 		CHECK_TYPE_SIZE(sysoff.rsv, sizeof(unsigned int) * 2);
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_EXTENDED, 1216);
 		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_EXTENDED2, 1216);
+		CHECK_IOCTL_SIZE(PTP_SYS_OFFSET_EXTENDED_CYCLES, 1216);
 
 		if (entering(tcp)) {
 			tprints_arg_next_name("argp");
