@@ -401,6 +401,14 @@ process_file()
 				s/^\(#define .*,\)$/\1 \\/p
 				s/^\([[:space:]]\+[^),]\+)\),$/\1/p' >> "$tmpdir/$f"
 			;;
+		*linux/gpib_ioctl.h)
+			sed -E '/^enum gpib_ioctl/,/^};/d' < "$s" > "$tmpdir/$f"
+			sed -En '/^enum gpib_ioctl/,/^};/ s/^[[:space:]].*/&/p' < "$s" |
+			sed -n 's/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*_\(IO\|IOW\|IOR\|IOWR\|IOC\)[[:space:]]*(/#define \1 _\2(/
+				s/^\(#define .*)\),$/\1/p
+				s/^\(#define .*,\)$/\1 \\/p
+				s/^\([[:space:]]\+[^),]\+)\),$/\1/p' >> "$tmpdir/$f"
+			;;
 		*linux/dma-buf.h)
 			# Filter out duplicates.
 			sed '/\<DMA_BUF_SET_NAME\>/d' < "$s" > "$tmpdir/$f"
