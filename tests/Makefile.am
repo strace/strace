@@ -696,6 +696,8 @@ MISC_TESTS = \
 	status-none-threads.test \
 	status-successful-threads.test \
 	status-unfinished-threads.test \
+	strace--color-no-tty.test \
+	strace--color-tty.test \
 	strace--argv0.test \
 	strace--syscall-limit.test \
 	strace--syscall-limit--seccomp-bpf.test \

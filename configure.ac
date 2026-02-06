@@ -713,6 +713,21 @@ case "$ac_cv_search_mq_open" in
 esac
 AC_SUBST(mq_LIBS)
 
+termcap_LIBS=""
+AC_CHECK_HEADERS([termcap.h], [
+	saved_LIBS="$LIBS"
+	AC_SEARCH_LIBS([tgetnum], [tinfo ncurses termcap])
+	LIBS="$saved_LIBS"
+	if test "$ac_cv_search_tgetnum" != no; then
+		AC_DEFINE([HAVE_TGETNUM], [1],
+			  [Define to 1 if the system provides tgetnum])
+		case "$ac_cv_search_tgetnum" in
+			-l*) termcap_LIBS="$ac_cv_search_tgetnum" ;;
+		esac
+	fi
+])
+AC_SUBST(termcap_LIBS)
+
 AC_CHECK_TOOL([READELF], [readelf])
 
 st_STACKTRACE

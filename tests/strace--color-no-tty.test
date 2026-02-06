@@ -1,0 +1,101 @@
+#!/bin/sh -efu
+#
+# Check --color, STRACE_COLORS, and NO_COLOR handling.
+#
+# Copyright (c) 2026 Jonas Jelten <jj@sft.lol>
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../getpid > /dev/null
+run_prog ../chdir > /dev/null
+
+csi="$(printf '\033\\[')"
+
+unset STRACE_COLORS
+unset NO_COLOR
+
+TERM=linux
+export TERM
+
+LOG=log.color-default
+EXP=exp.color-default
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-empty-spec
+EXP=exp.color-empty-spec
+STRACE_COLORS=''
+export STRACE_COLORS
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-empty-value
+EXP=exp.color-empty-value
+STRACE_COLORS='syscall='
+export STRACE_COLORS
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-custom
+EXP=exp.color-custom
+STRACE_COLORS=' SyScAlL = 1;31 : unknown = 1;36 '
+export STRACE_COLORS
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' ".*${csi}1;31mgetpid.*${csi}0m.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-invalid
+EXP=exp.color-invalid
+STRACE_COLORS='syscall=1;31;foo'
+export STRACE_COLORS
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' \
+	".*${csi}33mgetpid.*${csi}0m.*" \
+	"!.*${csi}1;31mgetpid.*" \
+	> "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-multi
+EXP=exp.color-multi
+STRACE_COLORS='syscall=93:syscall=1;31:argval=1;32:punct=1;34'
+export STRACE_COLORS
+run_strace --trace=chdir --color=always ../chdir > /dev/null
+printf '%s\n' \
+	".*${csi}1;31mchdir.*" \
+	".*${csi}1;34m\\(.*" \
+	".*${csi}1;32m\".*" \
+	> "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-never
+EXP=exp.color-never
+# STRACE_COLORS remains set
+run_strace --trace=getpid --color=never ../getpid > /dev/null
+printf '%s\n' "!.*${csi}.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+LOG=log.color-auto-nocolor
+EXP=exp.color-auto-nocolor
+NO_COLOR=1
+export NO_COLOR
+STRACE_COLORS='syscall=1;31'
+export STRACE_COLORS
+run_strace --trace=getpid --color=auto ../getpid > /dev/null
+printf '%s\n' "!.*${csi}.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+unset STRACE_COLORS
+
+LOG=log.color-always
+EXP=exp.color-always
+# NO_COLOR remains set
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+unset NO_COLOR

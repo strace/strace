@@ -10,6 +10,7 @@
  */
 
 #include "defs.h"
+#include "color.h"
 #include "xstring.h"
 #include <stdarg.h>
 
@@ -48,6 +49,17 @@ static void
 print_xlat_val(uint64_t val, enum xlat_style style)
 {
 	tprints_string(sprint_xlat_val(val, style));
+}
+
+static void
+tprints_xlat_const(const char *str)
+{
+	if (!str || !*str)
+		return;
+
+	tprint_color_seq(COLOR_CONST);
+	tprints_string(str);
+	tprint_color_seq(COLOR_ARGVAL);
 }
 
 static int
@@ -244,7 +256,7 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
-				tprints_string(str);
+				tprints_xlat_const(str);
 			}
 
 			goto printxvals_ex_end;
@@ -450,7 +462,10 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 					tprint_flags_or();
 				else if (need_comment)
 					tprint_comment_begin();
-				tprints_string(xlat->data[idx].str);
+				if (need_comment)
+					tprints_string(xlat->data[idx].str);
+				else
+					tprints_xlat_const(xlat->data[idx].str);
 				flags &= ~v;
 			}
 			if (!flags)
@@ -495,7 +510,7 @@ print_xlat_ex(const uint64_t val, const char *str, uint32_t style)
 				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
-				tprints_string(str);
+				tprints_xlat_const(str);
 			}
 			break;
 		}

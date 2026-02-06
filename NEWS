@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented optional colorized trace output.
   * Implemented decoding of UDMABUF_CREATE and UDMABUF_CREATE_LIST ioctl
     commands.
 
