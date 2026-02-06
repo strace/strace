@@ -811,6 +811,21 @@ m4_foreach([pers], [M32, MX32], dnl
 st_MPERS([m32], [aarch64|powerpc64|s390x|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
 
+AC_ARG_ENABLE([colors],
+	[AS_HELP_STRING([--enable-colors=yes|no],
+		[whether to enable colorized output, default is yes.])],
+	[case "$enableval" in
+		yes|no) enable_colors="$enableval" ;;
+		*) AC_MSG_ERROR([bad value $enableval for enable-colors option.
+Valid options are: yes, no.])
+		;;
+	 esac],
+	[enable_colors=yes])
+AM_CONDITIONAL([ENABLE_COLORS], [test x$enable_colors = xyes])
+AS_IF([test x$enable_colors = xyes],
+	[AC_DEFINE([ENABLE_COLORS], 1,
+		[Define to enable colorized output support.])])
+
 AC_ARG_ENABLE([install-tests],
 	[AS_HELP_STRING([--enable-install-tests=yes|no],
 		[whether to install tests into libexec/strace,
