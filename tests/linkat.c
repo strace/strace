@@ -190,6 +190,8 @@ main(void)
 	int dfd_old = get_dir_fd(".");
 	char *cwd = get_fd_path(dfd_old);
 
+	if (*sample_1_secontext)
+		(void) reset_secontext_file(".");
 	errno = 0;
 	mangle_secontext_field(".", SECONTEXT_TYPE, "default_t",
 						    "user_home_t");
