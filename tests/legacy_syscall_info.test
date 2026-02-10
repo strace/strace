@@ -4,7 +4,7 @@
 # and return value when modern ptrace API was not available yet.
 #
 # Copyright (c) 2017-2021 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2021-2025 The strace developers.
+# Copyright (c) 2021-2026 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later

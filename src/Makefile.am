@@ -4,7 +4,7 @@
 # Copyright (c) 2006-2016 Dmitry V. Levin <ldv@strace.io>
 # Copyright (c) 2008-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
-# Copyright (c) 2002-2025 The strace developers.
+# Copyright (c) 2002-2026 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

@@ -2,7 +2,7 @@
  * Check decoding of prctl PR_SCHED_CORE operation.
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>.
- * Copyright (c) 2021-2025 The strace developers.
+ * Copyright (c) 2021-2026 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

@@ -1,7 +1,7 @@
 /*
  * Check decoding of linux/fs.h 0x15 ioctl commands.
  *
- * Copyright (c) 2020-2025 The strace developers.
+ * Copyright (c) 2020-2026 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

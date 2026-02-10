@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2015-2025 The strace developers.
+# Copyright (c) 2015-2026 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
