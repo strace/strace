@@ -194,9 +194,9 @@ main(int argc, const char *argv[])
 
 	/* FS_IOC_GETLBMD_CAP */
 
-#define	VALID_LBMD_FLAGS	0x3
+#define VALID_LBMD_FLAGS	0x3
 #define VALID_LBMD_FLAGS_STR	"LBMD_PI_CAP_INTEGRITY|LBMD_PI_CAP_REFTAG"
-#define	INVALID_LBMD_FLAGS	0xfffffffc
+#define INVALID_LBMD_FLAGS	0xfffffffc
 
 #define VALID_LBMD_TYPE		0x1
 #define VALID_LBMD_TYPE_STR	"LBMD_PI_CSUM_IP"

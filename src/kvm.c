@@ -530,7 +530,7 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 	tprint_struct_next();
 	PRINT_FIELD_0X(*state, apic_base);
 
-#define DECODE_UNION(...)			\
+# define DECODE_UNION(...)			\
 	do {					\
 		tprint_struct_next();		\
 		tprint_union_begin();		\

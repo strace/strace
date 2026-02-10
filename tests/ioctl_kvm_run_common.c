@@ -97,11 +97,11 @@ __asm__(
 	"code_size:			\n"
 	"	.short . - code		\n"
 	".size code_size, . - code_size	\n"
-#ifdef __x86_64__
+# ifdef __x86_64__
 	".code64			\n"
-#else
+# else
 	".code32			\n"
-#endif
+# endif
 	);
 
 static void
