@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: check
         run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
@@ -34,6 +36,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: install dependencies
         run: ci/install-dependencies.sh
       - name: build check
@@ -141,6 +144,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set environment variables
         env:
