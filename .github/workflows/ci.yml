@@ -54,7 +54,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [ubuntu-22.04, ubuntu-24.04]
-        cc: [gcc-14, gcc-13, gcc-12, gcc-11, gcc-10, gcc-9, clang-18, clang-17, clang-16, clang-15, clang-14, musl-gcc]
+        cc: [gcc-14, gcc-13, gcc-12, gcc-11, gcc-10, gcc-9, clang-19, clang-18, clang-17, clang-16, clang-15, clang-14, musl-gcc]
         target: [x86, x86_64]
         variant: [kheaders, nostacktrace, libdw, libunwind]
         exclude:
@@ -97,6 +97,9 @@ jobs:
           - target: x86_64
             variant: nostacktrace
             cc: clang-18
+          - target: x86_64
+            variant: nostacktrace
+            cc: clang-19
           # musl-gcc only (x86_64, nostacktrace)
           - cc: musl-gcc
             target: x86
@@ -118,7 +121,7 @@ jobs:
             cc: gcc-11
           - runner: ubuntu-24.04
             cc: musl-gcc
-          # ubuntu-24.04 only for: gcc-12..14, clang-14..18
+          # ubuntu-24.04 only for: gcc-12..14, clang-14..19
           - runner: ubuntu-22.04
             cc: gcc-12
           - runner: ubuntu-22.04
@@ -135,6 +138,8 @@ jobs:
             cc: clang-17
           - runner: ubuntu-22.04
             cc: clang-18
+          - runner: ubuntu-22.04
+            cc: clang-19
     name: Build ${{ matrix.cc }}-${{ matrix.target }}-${{ matrix.variant }}
     runs-on: ${{ matrix.runner }}
     env:
