@@ -2,6 +2,8 @@ name: CI
 
 on: [push, pull_request]
 
+permissions: {}
+
 env:
   SLEEP_A_BIT: sleep 0.2
   VERBOSE: 1
