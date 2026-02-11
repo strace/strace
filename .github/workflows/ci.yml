@@ -14,6 +14,7 @@ env:
 
 jobs:
   whitespace-errors:
+    name: Check for whitespace errors
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -21,6 +22,7 @@ jobs:
         run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
   coverage: # the longest of all build jobs
+    name: Check coverage
     runs-on: ubuntu-24.04
     env:
       CHECK: coverage

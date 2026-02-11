@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   lint:
+    name: Differential ShellCheck
     runs-on: ubuntu-latest
 
     permissions:
@@ -31,7 +32,7 @@ jobs:
           fetch-depth: 0
 
       - id: ShellCheck
-        name: Differential ShellCheck
+        name: Run the check
         uses: redhat-plumbers-in-action/differential-shellcheck@v5
         with:
           severity: warning
