@@ -761,6 +761,7 @@ check_SCRIPTS = \
 	strace-kk-p.test \
 	strace-kk.test \
 	syntax.sh \
+	syscall-success.sh \
 	# end of check_SCRIPTS
 
 check_DATA = \
