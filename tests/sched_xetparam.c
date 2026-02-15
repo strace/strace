@@ -28,13 +28,13 @@ main(void)
 
 	long rc = syscall(__NR_sched_getparam, pid, param);
 	pidns_print_leader();
-	printf("sched_getparam(%d%s, [%d]) = %ld\n",
+	printf("sched_getparam(%d%s, {sched_priority=%d}) = %ld\n",
 	       pid, pid_str, param->sched_priority, rc);
 
 	param->sched_priority = -1;
 	rc = syscall(__NR_sched_setparam, pid, param);
 	pidns_print_leader();
-	printf("sched_setparam(%d%s, [%d]) = %s\n",
+	printf("sched_setparam(%d%s, {sched_priority=%d}) = %s\n",
 	       pid, pid_str,
 	       param->sched_priority, sprintrc(rc));
 

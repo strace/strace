@@ -85,18 +85,20 @@ main(void)
 	rc = syscall(__NR_sched_setscheduler, pid, 0xfaceda7a, param);
 	pidns_print_leader();
 	printf("sched_setscheduler(%d%s, %#x" NRAW(" /* SCHED_??? */")
-	       ", [%d]) = %s\n",
+	       ", {sched_priority=%d}) = %s\n",
 	       pid, pid_str, 0xfaceda7a,
 	       param->sched_priority, sprintrc(rc));
 
 	rc = syscall(__NR_sched_setscheduler, -1, SCHED_RR, param);
 	pidns_print_leader();
-	printf("sched_setscheduler(-1, " XLAT_FMT ", [%d]) = %s\n",
+	printf("sched_setscheduler(-1, " XLAT_FMT ", {sched_priority=%d})"
+	       " = %s\n",
 	       XLAT_ARGS(SCHED_RR), param->sched_priority, sprintrc(rc));
 
 	rc = syscall(__NR_sched_setscheduler, pid, 0x43218765, param);
 	pidns_print_leader();
-	printf("sched_setscheduler(%d%s, " XLAT_FMT ", [%d]) = %s\n",
+	printf("sched_setscheduler(%d%s, " XLAT_FMT ", {sched_priority=%d})"
+	       " = %s\n",
 	       pid, pid_str, XLAT_ARGS(SCHED_RESET_ON_FORK|0x3218765),
 	       param->sched_priority, sprintrc(rc));
 
@@ -105,7 +107,8 @@ main(void)
 	rc = syscall(__NR_sched_setscheduler, pid,
 		     SCHED_RESET_ON_FORK | SCHED_OTHER, param);
 	pidns_print_leader();
-	printf("sched_setscheduler(%d%s, " XLAT_FMT ", [0]) = %s\n",
+	printf("sched_setscheduler(%d%s, " XLAT_FMT ", {sched_priority=0})"
+	       " = %s\n",
 	       pid, pid_str, XLAT_ARGS(SCHED_RESET_ON_FORK|SCHED_OTHER),
 	       sprintrc(rc));
 

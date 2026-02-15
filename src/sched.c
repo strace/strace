@@ -56,6 +56,19 @@ print_policy(const int policy)
 		      policy_str ? XLAT_STYLE_DEFAULT : PXF_DEFAULT_STR);
 }
 
+static void
+print_sched_param(struct tcb * const tcp, const kernel_ulong_t addr)
+{
+	struct sched_param param;
+
+	if (umove_or_printaddr(tcp, addr, &param))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_D(param, sched_priority);
+	tprint_struct_end();
+}
+
 SYS_FUNC(sched_getscheduler)
 {
 	if (entering(tcp)) {
@@ -81,7 +94,7 @@ SYS_FUNC(sched_setscheduler)
 
 	/* param */
 	tprints_arg_next_name("param");
-	printnum_int(tcp, tcp->u_arg[2], "%d");
+	print_sched_param(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -95,7 +108,7 @@ SYS_FUNC(sched_getparam)
 	} else {
 		/* param */
 		tprints_arg_next_name("param");
-		printnum_int(tcp, tcp->u_arg[1], "%d");
+		print_sched_param(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -108,7 +121,7 @@ SYS_FUNC(sched_setparam)
 
 	/* param */
 	tprints_arg_next_name("param");
-	printnum_int(tcp, tcp->u_arg[1], "%d");
+	print_sched_param(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
