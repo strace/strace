@@ -65,7 +65,7 @@ main(void)
 #endif
 	}
 	pidns_print_leader();
-	printf("sched_getscheduler(%d%s) = %ld",
+	printf("sched_getscheduler(%d%s) = %#lx",
 	       pid, pid_str, rc);
 	if (rof != NULL || scheduler != NULL) {
 		fputs(" (", stdout);

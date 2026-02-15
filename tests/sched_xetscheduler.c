@@ -59,7 +59,7 @@ main(void)
 
 	long rc = syscall(__NR_sched_getscheduler, pid);
 	pidns_print_leader();
-	printf("sched_getscheduler(%d%s) = %ld (%s%s)\n",
+	printf("sched_getscheduler(%d%s) = %#lx (%s%s)\n",
 	       pid, pid_str, rc,
 	       rc & SCHED_RESET_ON_FORK ? "SCHED_RESET_ON_FORK|" : "",
 	       scheduler_str(rc & ~SCHED_RESET_ON_FORK));
@@ -111,7 +111,7 @@ main(void)
 
 	rc = syscall(__NR_sched_getscheduler, pid);
 	pidns_print_leader();
-	printf("sched_getscheduler(%d%s) = %ld (%s%s)\n",
+	printf("sched_getscheduler(%d%s) = %#lx (%s%s)\n",
 	       pid, pid_str, rc,
 	       rc & SCHED_RESET_ON_FORK ? "SCHED_RESET_ON_FORK|" : "",
 	       scheduler_str(rc & ~SCHED_RESET_ON_FORK));

@@ -64,7 +64,7 @@ SYS_FUNC(sched_getscheduler)
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprint_policy(tcp->u_rval);
-		return RVAL_STR;
+		return RVAL_HEX | RVAL_STR;
 	}
 	return 0;
 }
