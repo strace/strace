@@ -4,4 +4,7 @@ sched_rr_get_interval	-a31
 sched_get_priority_mxx	-a33
 sched_xetattr	-a29
 sched_xetscheduler	-a22
+sched_xetscheduler-Xabbrev	-a22 -Xabbrev
+sched_xetscheduler-Xraw	-a22 -Xraw
+sched_xetscheduler-Xverbose	-a22 -Xverbose
 sched_yield	-a14

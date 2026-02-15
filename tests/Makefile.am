@@ -385,10 +385,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	rt_sigqueueinfo--pidns-translation \
 	rt_tgsigqueueinfo--pidns-translation \
 	run_expect_termsig \
+	sched_getscheduler-success \
 	sched_xetaffinity--pidns-translation \
 	sched_xetattr--pidns-translation \
 	sched_xetparam--pidns-translation \
 	sched_xetscheduler--pidns-translation \
+	sched_xetscheduler--pidns-translation-Xabbrev \
+	sched_xetscheduler--pidns-translation-Xraw \
+	sched_xetscheduler--pidns-translation-Xverbose \
 	scm_rights \
 	seccomp-filter-v \
 	seccomp-strict \

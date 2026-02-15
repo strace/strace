@@ -751,6 +751,9 @@ sched_xetaffinity
 sched_xetattr
 sched_xetparam
 sched_xetscheduler
+sched_xetscheduler-Xabbrev
+sched_xetscheduler-Xraw
+sched_xetscheduler-Xverbose
 sched_yield
 scm_credentials
 scm_pidfd

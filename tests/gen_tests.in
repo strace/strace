@@ -1027,6 +1027,7 @@ s390_sthyi	-a47
 s390_sthyi-v	-e trace=s390_sthyi -a47 -v
 sched	test_trace_expr 'times|times-.*' -e/sched
 sched_get_priority_mxx	-a33 -e trace=sched_get_priority_min,sched_get_priority_max
+sched_getscheduler-success		+syscall-success.sh INJECT_SYSCALL=sched_getscheduler INJECT_RETVALS="0 1 2 3 4 5 6 7 8 0x210fedcb 0x40000000 0x40000001 0x40000002 0x40000003 0x40000004 0x40000005 0x40000006 0x40000007 0x40000008 0x6543210f" -a22 -e trace=sched_getscheduler
 sched_rr_get_interval	-a31
 sched_xetaffinity	-a28 -e trace=sched_getaffinity,sched_setaffinity
 sched_xetaffinity--pidns-translation	test_pidns -a28 -e trace=sched_getaffinity,sched_setaffinity
@@ -1035,7 +1036,13 @@ sched_xetattr--pidns-translation	test_pidns -a29 -e trace=sched_getattr,sched_se
 sched_xetparam	-a23 -e trace=sched_getparam,sched_setparam
 sched_xetparam--pidns-translation	test_pidns -a23 -e trace=sched_getparam,sched_setparam
 sched_xetscheduler	-a22 -e trace=sched_getscheduler,sched_setscheduler
+sched_xetscheduler-Xabbrev	-a22 -e trace=sched_getscheduler,sched_setscheduler -Xabbrev
+sched_xetscheduler-Xraw		-a22 -e trace=sched_getscheduler,sched_setscheduler -Xraw
+sched_xetscheduler-Xverbose	-a22 -e trace=sched_getscheduler,sched_setscheduler -Xverbose
 sched_xetscheduler--pidns-translation	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler
+sched_xetscheduler--pidns-translation-Xabbrev	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler -Xabbrev
+sched_xetscheduler--pidns-translation-Xraw	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler -Xraw
+sched_xetscheduler--pidns-translation-Xverbose	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler -Xverbose
 sched_yield	-a14
 scm_credentials	--trace=recvmsg
 scm_pidfd	--trace=recvmsg -y

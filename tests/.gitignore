@@ -1036,6 +1036,7 @@ s390_runtime_instr
 s390_sthyi
 s390_sthyi-v
 sched_get_priority_mxx
+sched_getscheduler-success
 sched_rr_get_interval
 sched_xetaffinity
 sched_xetaffinity--pidns-translation
@@ -1044,7 +1045,13 @@ sched_xetattr--pidns-translation
 sched_xetparam
 sched_xetparam--pidns-translation
 sched_xetscheduler
+sched_xetscheduler-Xabbrev
+sched_xetscheduler-Xraw
+sched_xetscheduler-Xverbose
 sched_xetscheduler--pidns-translation
+sched_xetscheduler--pidns-translation-Xabbrev
+sched_xetscheduler--pidns-translation-Xraw
+sched_xetscheduler--pidns-translation-Xverbose
 sched_yield
 scm_credentials
 scm_pidfd
