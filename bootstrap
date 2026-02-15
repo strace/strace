@@ -32,6 +32,7 @@ for m in m32 mx32; do
 		fname="${f##*/}"
 		case "$fname" in
 		Makefile*) continue;;
+		*.[oa]) continue;;
 		*--secontext.c)
 			sed "s/HAVE_SELINUX_RUNTIME/HAVE_${m_upper}_SELINUX_RUNTIME/" \
 			    "$f" > $tests/"$fname"
