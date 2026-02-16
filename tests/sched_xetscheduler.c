@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define XLAT_MACROS_ONLY
+# include "xlat/schedulers.h"
+#undef XLAT_MACROS_ONLY
+
 static const char *
 scheduler_str(long rc)
 {
@@ -23,26 +27,16 @@ scheduler_str(long rc)
 		return "SCHED_FIFO";
 	case SCHED_RR:
 		return "SCHED_RR";
-#ifdef SCHED_BATCH
 	case SCHED_BATCH:
 		return "SCHED_BATCH";
-#endif
-#ifdef SCHED_IDLE
 	case SCHED_IDLE:
 		return "SCHED_IDLE";
-#endif
-#ifdef SCHED_ISO
 	case SCHED_ISO:
 		return "SCHED_ISO";
-#endif
-#ifdef SCHED_DEADLINE
 	case SCHED_DEADLINE:
 		return "SCHED_DEADLINE";
-#endif
-#ifdef SCHED_EXT
 	case SCHED_EXT:
 		return "SCHED_EXT";
-#endif
 	}
 
 	return "SCHED_OTHER";
@@ -76,18 +70,22 @@ main(void)
 	       pid, pid_str, XLAT_ARGS(SCHED_FIFO), sprintrc(rc));
 
 	rc = syscall(__NR_sched_setscheduler, pid,
-		     SCHED_RESET_ON_FORK | SCHED_FIFO, param + 1);
+		     SCHED_RESET_ON_FORK | SCHED_EXT, param + 1);
 	pidns_print_leader();
 	printf("sched_setscheduler(%d%s, " XLAT_FMT ", %p) = %s\n",
-	       pid, pid_str, XLAT_ARGS(SCHED_RESET_ON_FORK|SCHED_FIFO),
+	       pid, pid_str, XLAT_ARGS(SCHED_RESET_ON_FORK|SCHED_EXT),
 	       param + 1, sprintrc(rc));
 
-	rc = syscall(__NR_sched_setscheduler, pid, 0xfaceda7a, param);
-	pidns_print_leader();
-	printf("sched_setscheduler(%d%s, %#x" NRAW(" /* SCHED_??? */")
-	       ", {sched_priority=%d}) = %s\n",
-	       pid, pid_str, 0xfaceda7a,
-	       param->sched_priority, sprintrc(rc));
+	static const unsigned int unknown_scheds[] = { 0x8, 0xfaceda7a, };
+	for (size_t i = 0; i < ARRAY_SIZE(unknown_scheds); i++) {
+		rc = syscall(__NR_sched_setscheduler, pid, unknown_scheds[i],
+			     param);
+		pidns_print_leader();
+		printf("sched_setscheduler(%d%s, %#x" NRAW(" /* SCHED_??? */")
+		       ", {sched_priority=%d}) = %s\n",
+		       pid, pid_str, unknown_scheds[i],
+		       param->sched_priority, sprintrc(rc));
+	}
 
 	rc = syscall(__NR_sched_setscheduler, -1, SCHED_RR, param);
 	pidns_print_leader();
