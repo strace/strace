@@ -39,7 +39,11 @@
 #include "xlat/rtnl_ifla_ext_filter_flags.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
 #include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
+#include "xlat/rtnl_ifla_info_data_macvlan_attrs.h"
 #include "xlat/rtnl_ifla_info_data_tun_attrs.h"
+#include "xlat/rtnl_ifla_macvlan_flags.h"
+#include "xlat/rtnl_ifla_macvlan_modes.h"
+#include "xlat/rtnl_ifla_macvlan_macaddr_modes.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_proto_down_reason_attrs.h"
 #include "xlat/rtnl_ifla_vf_info_attrs.h"
@@ -594,6 +598,75 @@ DECL_NLA(linkinfo_data_bridge)
 	return true;
 }
 
+static bool
+decode_ifla_macvlan_mode(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = rtnl_ifla_macvlan_modes,
+		.dflt = "MACVLAN_MODE_???",
+		.size = 4,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static bool
+decode_ifla_macvlan_flags(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = rtnl_ifla_macvlan_flags,
+		.dflt = "MACVLAN_FLAG_???",
+		.size = 2,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static bool
+decode_ifla_macvlan_macaddr_mode(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = rtnl_ifla_macvlan_macaddr_modes,
+		.dflt = "MACVLAN_MACADDR_???",
+		.size = 4,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t ifla_info_data_macvlan_nla_decoders[] = {
+	[IFLA_MACVLAN_UNSPEC]			= NULL,
+	[IFLA_MACVLAN_MODE]			= decode_ifla_macvlan_mode,
+	[IFLA_MACVLAN_FLAGS]			= decode_ifla_macvlan_flags,
+	[IFLA_MACVLAN_MACADDR_MODE]		= decode_ifla_macvlan_macaddr_mode,
+	[IFLA_MACVLAN_MACADDR]			= NULL,
+	[IFLA_MACVLAN_MACADDR_DATA]		= NULL,
+	[IFLA_MACVLAN_MACADDR_COUNT]		= decode_nla_u32,
+	[IFLA_MACVLAN_BC_QUEUE_LEN]		= decode_nla_u32,
+	[IFLA_MACVLAN_BC_QUEUE_LEN_USED]	= decode_nla_u32,
+	[IFLA_MACVLAN_BC_CUTOFF]		= decode_nla_s32,
+};
+
+static
+DECL_NLA(linkinfo_data_macvlan)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_macvlan_attrs,
+		      "IFLA_MACVLAN_???",
+		      ARRSZ_PAIR(ifla_info_data_macvlan_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
 static
 DECL_NLA(tun_type)
 {
@@ -638,6 +711,8 @@ DECL_NLA(linkinfo_data)
 
 	if (!strcmp(ctx->kind, "bridge"))
 		func = decode_nla_linkinfo_data_bridge;
+	else if (!strcmp(ctx->kind, "macvlan"))
+		func = decode_nla_linkinfo_data_macvlan;
 	else if (!strcmp(ctx->kind, "tun"))
 		func = decode_nla_linkinfo_data_tun;
 
