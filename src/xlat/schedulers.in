@@ -1,10 +1,21 @@
 #From include/uapi/linux/sched.h
 #Prefix SCHED_
-SCHED_OTHER
-SCHED_FIFO
-SCHED_RR
-SCHED_BATCH
-SCHED_ISO
-SCHED_IDLE
-SCHED_DEADLINE
-SCHED_EXT
+#value_indexed
+/*
+ * While Linux uses SCHED_NORMAL instead of POSIX-defined SCHED_OTHER
+ * for the default scheduling policy, only the latter is defined
+ * in libc headers.
+ */
+SCHED_OTHER	0
+SCHED_FIFO	1
+SCHED_RR	2
+SCHED_BATCH	3
+/*
+ * SCHED_ISO is not defined in the mainline kernel, only in -ck1/-bfs patchsets,
+ * but present in glibc headers and is used in some userspace programs,
+ * like schedtool.
+ */
+SCHED_ISO	4
+SCHED_IDLE	5
+SCHED_DEADLINE	6
+SCHED_EXT	7
