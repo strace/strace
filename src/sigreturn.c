@@ -16,7 +16,7 @@
 #endif
 
 /* The following function might be unused, hence the inline qualifier.  */
-static inline void
+static inline void __attribute__((unused))
 print_sigmask_addr_size(const void *const addr, const unsigned int size)
 {
 	tprint_struct_begin();
