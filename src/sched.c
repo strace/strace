@@ -10,7 +10,7 @@
 
 #include "defs.h"
 
-#include <sched.h>
+#include <linux/sched.h>
 #include <linux/sched/types.h>
 
 #include "xstring.h"
@@ -59,7 +59,9 @@ print_policy(const int policy)
 static void
 print_sched_param(struct tcb * const tcp, const kernel_ulong_t addr)
 {
-	struct sched_param param;
+	struct strace_sched_param {
+		int sched_priority;
+	} param;
 
 	if (umove_or_printaddr(tcp, addr, &param))
 		return;
