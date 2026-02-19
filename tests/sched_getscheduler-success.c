@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define XLAT_MACROS_ONLY
+# include "xlat/schedulers.h"
+#undef XLAT_MACROS_ONLY
+
 int
 main(void)
 {
@@ -29,40 +33,30 @@ main(void)
 			  ? "SCHED_RESET_ON_FORK|" : NULL;
 	const char *scheduler = NULL;
 	switch (rc & ~SCHED_RESET_ON_FORK) {
-		case SCHED_FIFO:
-			scheduler = "SCHED_FIFO";
-			break;
-		case SCHED_RR:
-			scheduler = "SCHED_RR";
-			break;
-		case SCHED_OTHER:
-			scheduler = "SCHED_OTHER";
-			break;
-#ifdef SCHED_BATCH
-		case SCHED_BATCH:
-			scheduler = "SCHED_BATCH";
-			break;
-#endif
-#ifdef SCHED_IDLE
-		case SCHED_IDLE:
-			scheduler = "SCHED_IDLE";
-			break;
-#endif
-#ifdef SCHED_ISO
-		case SCHED_ISO:
-			scheduler = "SCHED_ISO";
-			break;
-#endif
-#ifdef SCHED_DEADLINE
-		case SCHED_DEADLINE:
-			scheduler = "SCHED_DEADLINE";
-			break;
-#endif
-#ifdef SCHED_EXT
-		case SCHED_EXT:
-			scheduler = "SCHED_EXT";
-			break;
-#endif
+	case SCHED_FIFO:
+		scheduler = "SCHED_FIFO";
+		break;
+	case SCHED_RR:
+		scheduler = "SCHED_RR";
+		break;
+	case SCHED_OTHER:
+		scheduler = "SCHED_OTHER";
+		break;
+	case SCHED_BATCH:
+		scheduler = "SCHED_BATCH";
+		break;
+	case SCHED_IDLE:
+		scheduler = "SCHED_IDLE";
+		break;
+	case SCHED_ISO:
+		scheduler = "SCHED_ISO";
+		break;
+	case SCHED_DEADLINE:
+		scheduler = "SCHED_DEADLINE";
+		break;
+	case SCHED_EXT:
+		scheduler = "SCHED_EXT";
+		break;
 	}
 	pidns_print_leader();
 	printf("sched_getscheduler(%d%s) = %#lx",
