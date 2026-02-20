@@ -29,6 +29,7 @@
 #include <sys/prctl.h>
 
 #include "kill_save_errno.h"
+#include "color.h"
 #include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
@@ -78,6 +79,13 @@ static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NON_ASCII,		"non-ascii" },
 	{ HEXSTR_ALL,			"all" },
 };
+#ifdef ENABLE_COLORS
+static const struct xlat_data color_mode_str[] = {
+	{ COLOR_AUTO,  "auto" },
+	{ COLOR_NEVER, "never" },
+	{ COLOR_ALWAYS, "always" },
+};
+#endif
 unsigned int xflag;
 bool debug_flag;
 bool Tflag;
@@ -363,6 +371,14 @@ Filtering:\n\
 Output format:\n\
   -a COLUMN, --columns=COLUMN\n\
                  alignment COLUMN for printing syscall results (default %d)\n\
+"
+#ifdef ENABLE_COLORS
+"\
+  --color[=WHEN]\n\
+                 colorize output; WHEN is auto, always, or never (default auto)\n\
+"
+#endif
+"\
   -e abbrev=SET, --abbrev=SET\n\
                  abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
@@ -746,15 +762,16 @@ outf_perror(const struct tcb * const tcp)
 
 ATTRIBUTE_FORMAT((printf, 1, 0))
 static void
-tvprintf(const char *const fmt, va_list args)
+tvprintf(const char *fmt, va_list args)
 {
 	if (current_tcp) {
 		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			/* very unlikely due to vfprintf buffering */
 			outf_perror(current_tcp);
-		} else
+		} else {
 			current_tcp->curcol += n;
+		}
 	}
 }
 
@@ -2349,7 +2366,9 @@ init(int argc, char *argv[])
 		GETOPT_ARGV0,
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
 		GETOPT_ALWAYS_SHOW_PID,
-
+#ifdef ENABLE_COLORS
+		GETOPT_COLOR,
+#endif
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
@@ -2417,7 +2436,9 @@ init(int argc, char *argv[])
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
-
+#ifdef ENABLE_COLORS
+		{ "color",		optional_argument, 0, GETOPT_COLOR },
+#endif
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2437,7 +2458,6 @@ init(int argc, char *argv[])
 		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
 		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
-
 		{ 0, 0, 0, 0 }
 	};
 
@@ -2719,6 +2739,17 @@ init(int argc, char *argv[])
 		case GETOPT_ALWAYS_SHOW_PID:
 			always_show_pid = true;
 			break;
+#ifdef ENABLE_COLORS
+		case GETOPT_COLOR:
+			color_mode = find_arg_val(
+				optarg ?: "auto",
+				color_mode_str,
+				COLOR_AUTO, -1ULL
+			);
+			if (color_mode < COLOR_NEVER)
+				error_opt_arg(c, lopt, optarg);
+			break;
+#endif
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
@@ -3097,6 +3128,9 @@ init(int argc, char *argv[])
 		setvbuf(shared_log, NULL, _IOLBF, 0);
 	}
 
+#ifdef ENABLE_COLORS
+	color_init(shared_log, output_separately);
+#endif
 	/*
 	 * argv[0]	-pPID	-oFILE	Default interactive setting
 	 * yes		*	0	INTR_WHILE_WAIT

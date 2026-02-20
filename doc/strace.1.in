@@ -1110,6 +1110,55 @@ option.
 Opens the file provided in the
 .B \-o
 option in append mode.
+.if '@ENABLE_COLORS_TRUE@'#' .TP
+.if '@ENABLE_COLORS_TRUE@'#' .BR \-\-color
+.if '@ENABLE_COLORS_TRUE@'#' This build does not support colorized output; the \-\-color option is unavailable and STRACE_COLORS is ignored.
+.if '@ENABLE_COLORS_FALSE@'#' .TP
+.if '@ENABLE_COLORS_FALSE@'#' .BR \-\-color [= \fIwhen\fR ]
+.if '@ENABLE_COLORS_FALSE@'#' Colorize the trace output.
+.if '@ENABLE_COLORS_FALSE@'#' The default for \fIwhen\fR is
+.if '@ENABLE_COLORS_FALSE@'#' .BR auto ,
+.if '@ENABLE_COLORS_FALSE@'#' which enables color only when stderr is a terminal.
+.if '@ENABLE_COLORS_FALSE@'#' If the
+.if '@ENABLE_COLORS_FALSE@'#' .B NO_COLOR
+.if '@ENABLE_COLORS_FALSE@'#' environment variable is set, color is disabled unless
+.if '@ENABLE_COLORS_FALSE@'#' .BR \-\-color=always
+.if '@ENABLE_COLORS_FALSE@'#' is specified.
+.if '@ENABLE_COLORS_FALSE@'#' The
+.if '@ENABLE_COLORS_FALSE@'#' .I when
+.if '@ENABLE_COLORS_FALSE@'#' parameter can be one of
+.if '@ENABLE_COLORS_FALSE@'#' .BR auto ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR always ,
+.if '@ENABLE_COLORS_FALSE@'#' or
+.if '@ENABLE_COLORS_FALSE@'#' .BR never .
+.if '@ENABLE_COLORS_FALSE@'#' Custom color schemes can be specified with the
+.if '@ENABLE_COLORS_FALSE@'#' .B STRACE_COLORS
+.if '@ENABLE_COLORS_FALSE@'#' environment variable, for example:
+.if '@ENABLE_COLORS_FALSE@'#' .br
+.if '@ENABLE_COLORS_FALSE@'#' .RS
+.if '@ENABLE_COLORS_FALSE@'#' STRACE_COLORS="syscall=93:argname=37:argval=95:constant=1;96:comment=96:punct=37:retval=92:error=91"
+.if '@ENABLE_COLORS_FALSE@'#' .RE
+.if '@ENABLE_COLORS_FALSE@'#' .IP
+.if '@ENABLE_COLORS_FALSE@'#' The format of this value is
+.if '@ENABLE_COLORS_FALSE@'#' .BR key=value :
+.if '@ENABLE_COLORS_FALSE@'#' pairs separated by
+.if '@ENABLE_COLORS_FALSE@'#' .B :
+.if '@ENABLE_COLORS_FALSE@'#' with semicolon-separated SGR codes as values.
+.if '@ENABLE_COLORS_FALSE@'#' .IP
+.if '@ENABLE_COLORS_FALSE@'#' Recognized color keys:
+.if '@ENABLE_COLORS_FALSE@'#' .BR syscall ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR argname ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR argval ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR constant ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR comment ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR punct ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR retval ,
+.if '@ENABLE_COLORS_FALSE@'#' .BR error .
+.if '@ENABLE_COLORS_FALSE@'#' .IP
+.if '@ENABLE_COLORS_FALSE@'#' When color is enabled and output is a tty, strace queries the terminal
+.if '@ENABLE_COLORS_FALSE@'#' background using OSC 11 via
+.if '@ENABLE_COLORS_FALSE@'#' .IR /dev/tty
+.if '@ENABLE_COLORS_FALSE@'#' (the current terminal), and chooses a light or dark default palette based on the reply's luminance.
 .TP
 .B \-q
 .TQ

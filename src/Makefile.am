@@ -87,6 +87,8 @@ libstrace_a_SOURCES =	\
 	chmod.c		\
 	clone.c		\
 	close_range.c	\
+	color.c		\
+	color.h		\
 	copy_file_range.c \
 	count.c		\
 	counter_ioctl.c	\
