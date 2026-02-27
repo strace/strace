@@ -522,8 +522,20 @@ static const char *
 get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 			       const enum sock_proto proto)
 {
-	const char *details = get_sockaddr_by_inode_lookup(tcp, inode, proto);
+	return get_sockaddr_by_inode_lookup(tcp, inode, proto);
+}
 
+/* Given an inode number of a socket, return its protocol details.  */
+const char *
+get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
+		      const unsigned long inode)
+{
+	const char *details = get_sockaddr_by_inode_cached(inode);
+	if (details)
+		return details;
+
+	const enum sock_proto proto = getfdproto(tcp, fd);
+	details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
 	if (details)
 		return details;
 
@@ -537,16 +549,6 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 		return str = NULL;
 
 	return str;
-}
-
-/* Given an inode number of a socket, return its protocol details.  */
-const char *
-get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
-		      const unsigned long inode)
-{
-	const char *details = get_sockaddr_by_inode_cached(inode);
-	return details ? details :
-		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd));
 }
 
 /*
