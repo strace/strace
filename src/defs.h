@@ -330,6 +330,8 @@ struct tcb {
 
 # define PROC_COMM_LEN 16
 	char comm[PROC_COMM_LEN];
+
+	int pidfd;		/* -1 if not available. */
 };
 
 /* TCB flags */
