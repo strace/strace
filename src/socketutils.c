@@ -24,6 +24,8 @@
 # define UNIX_PATH_MAX sizeof_field(struct sockaddr_un, sun_path)
 #endif
 
+#include <sys/syscall.h>
+
 #include "xstring.h"
 
 #define XLAT_MACROS_ONLY
@@ -419,6 +421,11 @@ static const struct {
 				  const char *proto_name);
 	int family;
 	int proto;
+
+	char * (*const get_via_sockname)(struct tcb *, int family, int protocol,
+					 const struct sockaddr *nameaddr, socklen_t nameaddrlen,
+					 const struct sockaddr *pperaddr, socklen_t peeraddrlen,
+					 const char *proto_name);
 } protocols[] = {
 	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
 	[SOCK_PROTO_UNIX_STREAM]= { "UNIX-STREAM", unix_get,	AF_UNIX},
@@ -525,6 +532,51 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 	return get_sockaddr_by_inode_lookup(tcp, inode, proto);
 }
 
+
+static const char *
+get_sockaddr_via_pidfd(struct tcb *tcp, const unsigned long inode,
+		       const enum sock_proto proto, int fd)
+{
+	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
+	    !protocols[proto].get_via_sockname)
+		return NULL;
+
+	int sock = -1;
+#ifdef SYS_pidfd_getfd
+	sock = syscall(SYS_pidfd_getfd, tcp->pidfd, fd, 0);
+#endif
+	if (sock < 0)
+		return NULL;
+
+	struct sockaddr nameaddr;
+	struct sockaddr *nameaddrp = &nameaddr;
+	socklen_t nameaddrlen = sizeof(nameaddr);
+	if (getsockname(sock, nameaddrp, &nameaddrlen) < 0) {
+		nameaddrp = NULL;
+		nameaddrlen = 0;
+	}
+
+	struct sockaddr peeraddr;
+	struct sockaddr *peeraddrp = &peeraddr;
+	socklen_t peeraddrlen = sizeof(peeraddr);
+	if (getpeername(sock, &nameaddr, &nameaddrlen) < 0) {
+		peeraddrp = NULL;
+		peeraddrlen = 0;
+	}
+
+	close(sock);
+
+	char *details = protocols[proto].get_via_sockname(tcp,
+							  protocols[proto].family,
+							  protocols[proto].proto,
+							  nameaddrp, nameaddrlen,
+							  peeraddrp, peeraddrlen,
+							  protocols[proto].name);
+	if (details)
+		cache_inode_details(inode, details);
+	return details;
+}
+
 /* Given an inode number of a socket, return its protocol details.  */
 const char *
 get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
@@ -536,6 +588,10 @@ get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 
 	const enum sock_proto proto = getfdproto(tcp, fd);
 	details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
+	if (details)
+		return details;
+
+	details = get_sockaddr_via_pidfd(tcp, inode, proto, fd);
 	if (details)
 		return details;
 
