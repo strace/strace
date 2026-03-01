@@ -159,19 +159,7 @@ struct sockaddr_qrtr {
 };
 #endif
 
-#ifdef HAVE_LINUX_IF_XDP_H
-# include <linux/if_xdp.h>
-#endif
-
-#ifndef HAVE_STRUCT_SOCKADDR_XDP
-struct sockaddr_xdp {
-	uint16_t sxdp_family;
-	uint16_t sxdp_flags;
-	uint32_t sxdp_ifindex;
-	uint32_t sxdp_queue_id;
-	uint32_t sxdp_shared_umem_fd;
-};
-#endif
+#include <linux/if_xdp.h>
 
 #include "xlat.h"
 #include "xlat/addrfams.h"

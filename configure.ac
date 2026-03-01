@@ -444,7 +444,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	gcov.h
 	iconv.h
 	linux/if_alg.h
-	linux/if_xdp.h
 	linux/nfc.h
 	linux/qrtr.h
 	linux/rxrpc.h
@@ -563,10 +562,6 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <netinet/in.h>
 #include <linux/if_alg.h>])
 
-AC_CHECK_TYPES(m4_normalize([
-	struct sockaddr_xdp
-]),,, [#include <netinet/in.h>
-#include <linux/if_xdp.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct tcp_diag_md5sig
