@@ -149,16 +149,7 @@ struct sockaddr_vm {
 # define SVM_ZERO_FIRST	svm_zero[0]
 #endif
 
-#ifdef HAVE_LINUX_QRTR_H
-# include <linux/qrtr.h>
-#else
-struct sockaddr_qrtr {
-	uint16_t sq_family;
-	uint32_t sq_node;
-	uint32_t sq_port;
-};
-#endif
-
+#include <linux/qrtr.h>
 #include <linux/if_xdp.h>
 
 #include "xlat.h"
