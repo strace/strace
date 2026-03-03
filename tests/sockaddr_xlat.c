@@ -121,33 +121,10 @@ struct sockaddr_nfc_llcp {
 };
 #endif
 
-#ifdef HAVE_LINUX_VM_SOCKETS_H
-# include <linux/vm_sockets.h>
-#endif
-
-#ifdef HAVE_STRUCT_SOCKADDR_VM
-# ifdef HAVE_STRUCT_SOCKADDR_VM_SVM_FLAGS
-#  define SVM_FLAGS		svm_flags
-#  define SVM_ZERO		svm_zero
-#  define SVM_ZERO_FIRST	svm_zero[0]
-# else
-#  define SVM_FLAGS		svm_zero[0]
-#  define SVM_ZERO		svm_zero + 1
-#  define SVM_ZERO_FIRST	svm_zero[1]
-# endif
-#else
-struct sockaddr_vm {
-	uint16_t  svm_family;
-	uint16_t svm_reserved1;
-	uint32_t svm_port;
-	uint32_t svm_cid;
-	uint8_t svm_flags;
-	uint8_t svm_zero[sizeof(struct sockaddr) - 13];
-};
-# define SVM_FLAGS	svm_flags
-# define SVM_ZERO	svm_zero
-# define SVM_ZERO_FIRST	svm_zero[0]
-#endif
+#include <linux/vm_sockets.h>
+#define SVM_FLAGS		svm_flags
+#define SVM_ZERO		svm_zero
+#define SVM_ZERO_FIRST	svm_zero[0]
 
 #include <linux/qrtr.h>
 #include <linux/if_xdp.h>
