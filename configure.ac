@@ -444,7 +444,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	gcov.h
 	iconv.h
 	linux/if_alg.h
-	linux/nfc.h
 	linux/rxrpc.h
 	mqueue.h
 	netinet/sctp.h

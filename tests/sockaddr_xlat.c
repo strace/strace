@@ -98,29 +98,7 @@ struct sockaddr_alg_new {
 };
 #endif
 
-#ifdef HAVE_LINUX_NFC_H
-# include <linux/nfc.h>
-#else
-struct sockaddr_nfc {
-	uint16_t sa_family;
-	uint32_t dev_idx;
-	uint32_t target_idx;
-	uint32_t nfc_protocol;
-};
-
-# define NFC_LLCP_MAX_SERVICE_NAME 63
-struct sockaddr_nfc_llcp {
-	uint16_t sa_family;
-	uint32_t dev_idx;
-	uint32_t target_idx;
-	uint32_t nfc_protocol;
-	uint8_t dsap;
-	uint8_t ssap;
-	char service_name[NFC_LLCP_MAX_SERVICE_NAME];
-	size_t service_name_len;
-};
-#endif
-
+#include <linux/nfc.h>
 #include <linux/vm_sockets.h>
 #define SVM_FLAGS		svm_flags
 #define SVM_ZERO		svm_zero
