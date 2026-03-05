@@ -72,30 +72,9 @@ struct sockaddr_ieee802154 {
 };
 /* End of include/net/af_ieee802154.h copy-paste */
 
-#ifdef HAVE_LINUX_IF_ALG_H
-# include <linux/if_alg.h>
-#else
-struct sockaddr_alg {
-	uint16_t salg_family;
-	uint8_t salg_type[14];
-	uint32_t salg_feat;
-	uint32_t salg_mask;
-	uint8_t salg_name[64];
-};
-#endif
-
+#include <linux/if_alg.h>
 #ifndef CRYPTO_ALG_KERN_DRIVER_ONLY
 # define CRYPTO_ALG_KERN_DRIVER_ONLY 0x1000
-#endif
-
-#ifndef HAVE_STRUCT_SOCKADDR_ALG_NEW
-struct sockaddr_alg_new {
-	uint16_t salg_family;
-	uint8_t salg_type[14];
-	uint32_t salg_feat;
-	uint32_t salg_mask;
-	uint8_t salg_name[];
-};
 #endif
 
 #include <linux/nfc.h>

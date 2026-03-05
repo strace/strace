@@ -443,7 +443,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
-	linux/if_alg.h
 	linux/rxrpc.h
 	mqueue.h
 	netinet/sctp.h
@@ -548,12 +547,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct kvm_run.immediate_exit,
 	struct kvm_run.flags
 ]),,, [#include <linux/kvm.h>])
-
-AC_CHECK_TYPES(m4_normalize([
-	struct sockaddr_alg_new
-]),,, [#include <netinet/in.h>
-#include <linux/if_alg.h>])
-
 
 AC_CHECK_TYPES(m4_normalize([
 	struct tcp_diag_md5sig
