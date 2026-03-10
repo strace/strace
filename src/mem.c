@@ -13,6 +13,7 @@
 
 #include "defs.h"
 #include <linux/mman.h>
+#include <linux/rseq.h>
 #include <sys/mman.h>
 
 unsigned long
@@ -558,3 +559,61 @@ SYS_FUNC(subpage_prot)
 	return RVAL_DECODED;
 }
 #endif
+
+#include "xlat/rseq_flags.h"
+#include "xlat/rseq_cpu_id_state.h"
+#include "xlat/rseq_cs_flags.h"
+
+static void
+decode_rseq(struct tcb *const tcp)
+{
+	struct rseq rseq;
+	if (umove_or_printaddr(tcp, tcp->u_arg[0], &rseq))
+		return;
+
+	tprint_struct_begin();
+	tprints_field_name("cpu_id_start");
+	PRINT_VAL_U(rseq.cpu_id_start);
+
+	tprint_struct_next();
+	tprints_field_name("cpu_id");
+	printflags64(rseq_cpu_id_state, rseq.cpu_id, NULL);
+
+	tprint_struct_next();
+	tprints_field_name("rseq_cs");
+	PRINT_VAL_X(rseq.rseq_cs);
+
+	tprint_struct_next();
+	tprints_field_name("flags");
+	printflags64(rseq_cs_flags, rseq.flags, "RSEQ_CS_??");
+
+	tprint_struct_next();
+	tprints_field_name("node_id");
+	PRINT_VAL_U(rseq.node_id);
+
+	tprint_struct_next();
+	tprints_field_name("mm_cid");
+	PRINT_VAL_U(rseq.mm_cid);
+	tprint_struct_end();
+}
+
+SYS_FUNC(rseq)
+{
+	kernel_ulong_t len = tcp->u_arg[1];
+	kernel_ulong_t flags = tcp->u_arg[2];
+	kernel_ulong_t sig = tcp->u_arg[3];
+
+	tprints_arg_name("rseq");
+	decode_rseq(tcp);
+
+	tprints_arg_next_name("length");
+	PRINT_VAL_U(len);
+
+	tprints_arg_next_name("flags");
+	printflags64(rseq_flags, flags, "RSEQ_??");
+
+	tprints_arg_next_name("sig");
+	PRINT_VAL_X(sig);
+
+	return RVAL_DECODED;
+}

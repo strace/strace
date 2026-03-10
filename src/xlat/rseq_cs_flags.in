@@ -1,0 +1,9 @@
+#enum
+#include <linux/rseq.h>
+#From include/uapi/linux/rseq.h
+#Prefix RSEQ_CS_FLAG_
+RSEQ_CS_FLAG_NO_RESTART_ON_PREEMPT      0x01
+RSEQ_CS_FLAG_NO_RESTART_ON_SIGNAL       0x02
+RSEQ_CS_FLAG_NO_RESTART_ON_MIGRATE      0x04
+RSEQ_CS_FLAG_SLICE_EXT_AVAILABLE        0x10
+RSEQ_CS_FLAG_SLICE_EXT_ENABLED          0x20
