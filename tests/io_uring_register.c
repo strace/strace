@@ -2058,7 +2058,7 @@ test_IORING_REGISTER_ZCRX_IFQ(int fd_null)
 	       ", flags=" XLAT_FMT
 	       ", area_ptr=%#llx, region_ptr=%#llx"
 	       ", offsets={head=%u, tail=%u, rqes=%u}"
-	       ", zcrx_id=%u}, 1) = %s\n",
+	       ", zcrx_id=%u, rx_buf_len=0}, 1) = %s\n",
 	       fd_null, path_null,
 	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
 	       zcrx_ifq->if_idx, zcrx_ifq->if_rxq, zcrx_ifq->rq_entries,
@@ -2073,9 +2073,9 @@ test_IORING_REGISTER_ZCRX_IFQ(int fd_null)
 	memset(zcrx_ifq, 0, sizeof(*zcrx_ifq));
 	zcrx_ifq->if_idx = 0xaaaa;
 	zcrx_ifq->offsets.__resv2 = 0xbbbb;
-	zcrx_ifq->__resv2 = 0xcccc;
 	zcrx_ifq->offsets.__resv[0] = 0xddddddddddddddddULL;
 	zcrx_ifq->offsets.__resv[1] = 0xeeeeeeeeeeeeeeeeULL;
+	zcrx_ifq->rx_buf_len = 0xcccc;
 	zcrx_ifq->__resv[0] = 0x1111111111111111ULL;
 	zcrx_ifq->__resv[1] = 0x2222222222222222ULL;
 	zcrx_ifq->__resv[2] = 0x3333333333333333ULL;
@@ -2086,7 +2086,7 @@ test_IORING_REGISTER_ZCRX_IFQ(int fd_null)
 	       ", area_ptr=NULL, region_ptr=NULL"
 	       ", offsets={head=0, tail=0, rqes=0, __resv2=%#x"
 	       ", __resv=[%#llx, %#llx]}"
-	       ", zcrx_id=0, __resv2=%#x"
+	       ", zcrx_id=0, rx_buf_len=%u"
 	       ", __resv=[%#llx, %#llx, %#llx]}, 1) = %s\n",
 	       fd_null, path_null,
 	       XLAT_SEL(zcrx_ifq_ops.val, zcrx_ifq_ops.str),
@@ -2094,7 +2094,7 @@ test_IORING_REGISTER_ZCRX_IFQ(int fd_null)
 	       zcrx_ifq->offsets.__resv2,
 	       (unsigned long long) zcrx_ifq->offsets.__resv[0],
 	       (unsigned long long) zcrx_ifq->offsets.__resv[1],
-	       zcrx_ifq->__resv2,
+	       zcrx_ifq->rx_buf_len,
 	       (unsigned long long) zcrx_ifq->__resv[0],
 	       (unsigned long long) zcrx_ifq->__resv[1],
 	       (unsigned long long) zcrx_ifq->__resv[2],
