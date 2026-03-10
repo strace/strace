@@ -179,8 +179,8 @@ count_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	unsigned int m = counts[*a_int].calls;
-	unsigned int n = counts[*b_int].calls;
+	uint64_t m = counts[*a_int].calls;
+	uint64_t n = counts[*b_int].calls;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -190,8 +190,8 @@ error_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	unsigned int m = counts[*a_int].errors;
-	unsigned int n = counts[*b_int].errors;
+	uint64_t m = counts[*a_int].errors;
+	uint64_t n = counts[*b_int].errors;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
