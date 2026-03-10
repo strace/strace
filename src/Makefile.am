@@ -322,6 +322,7 @@ libstrace_a_SOURCES =	\
 	regset.c	\
 	renameat.c	\
 	resource.c	\
+	rseq.c		\
 	retval.c	\
 	retval.h	\
 	riscv.c		\
