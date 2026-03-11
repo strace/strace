@@ -2373,8 +2373,8 @@ test_IORING_REGISTER_QUERY(int fd_null)
 	printf("io_uring_register(%u<%s>, " XLAT_FMT
 	       ", {query_data=%p, query_op=" XLAT_FMT ", size=%u, result=0"
 	       ", query_data={register_flags=" XLAT_FMT ", area_flags=" XLAT_FMT
-	       ", nr_ctrl_opcodes=%u, rq_hdr_size=%u, rq_hdr_alignment=%u}"
-	       ", next_entry=NULL}, 0) = %s\n",
+	       ", nr_ctrl_opcodes=%u, features=0, rq_hdr_size=%u"
+	       ", rq_hdr_alignment=%u}, next_entry=NULL}, 0) = %s\n",
 	       fd_null, path_null,
 	       XLAT_SEL(query_ops.val, query_ops.str),
 	       zcrx_data,
@@ -2490,8 +2490,8 @@ test_IORING_REGISTER_QUERY(int fd_null)
 	       ", sqe_flags=0, nr_query_opcodes=0}, next_entry="
 	       "{query_data=%p, query_op=" XLAT_FMT ", size=%u, result=0"
 	       ", query_data={register_flags=0, area_flags=0"
-	       ", nr_ctrl_opcodes=%u, rq_hdr_size=0, rq_hdr_alignment=0}"
-	       ", next_entry=NULL}}, 0) = %s\n",
+	       ", nr_ctrl_opcodes=%u, features=0, rq_hdr_size=0"
+	       ", rq_hdr_alignment=0}, next_entry=NULL}}, 0) = %s\n",
 	       fd_null, path_null,
 	       XLAT_SEL(query_ops.val, query_ops.str),
 	       opcode_data2,
@@ -2570,22 +2570,22 @@ test_IORING_REGISTER_QUERY(int fd_null)
 	hdr->result = 0;
 
 	memset(zcrx_data, 0, sizeof(*zcrx_data));
-	zcrx_data->__resv1 = 0xdeadbeef;
+	zcrx_data->features = 0xdeadbeef;
 	zcrx_data->__resv2 = 0xcafebabe12345678ULL;
 
 	sys_io_uring_register(fd_null, query_ops.val, hdr, 0);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT
 	       ", {query_data=%p, query_op=" XLAT_FMT ", size=%u, result=0"
 	       ", query_data={register_flags=0, area_flags=0"
-	       ", nr_ctrl_opcodes=0, rq_hdr_size=0"
-	       ", rq_hdr_alignment=0, __resv1=%#x, __resv2=%#llx}"
+	       ", nr_ctrl_opcodes=0, features=%#x, rq_hdr_size=0"
+	       ", rq_hdr_alignment=0, __resv2=%#llx}"
 	       ", next_entry=NULL}, 0) = %s\n",
 	       fd_null, path_null,
 	       XLAT_SEL(query_ops.val, query_ops.str),
 	       zcrx_data,
 	       XLAT_ARGS(IO_URING_QUERY_ZCRX),
 	       (unsigned int) sizeof(*zcrx_data),
-	       zcrx_data->__resv1,
+	       zcrx_data->features,
 	       (unsigned long long) zcrx_data->__resv2,
 	       errstr);
 

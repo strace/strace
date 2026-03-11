@@ -1538,14 +1538,11 @@ print_io_uring_query_zcrx(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(zcrx, nr_ctrl_opcodes);
 	tprint_struct_next();
+	PRINT_FIELD_X(zcrx, features);
+	tprint_struct_next();
 	PRINT_FIELD_U(zcrx, rq_hdr_size);
 	tprint_struct_next();
 	PRINT_FIELD_U(zcrx, rq_hdr_alignment);
-
-	if (zcrx.__resv1) {
-		tprint_struct_next();
-		PRINT_FIELD_X(zcrx, __resv1);
-	}
 
 	if (zcrx.__resv2) {
 		tprint_struct_next();
