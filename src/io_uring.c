@@ -32,6 +32,7 @@
 #include "xlat/uring_msg_ring_flags.h"
 #include "xlat/uring_zcrx_reg_flags.h"
 #include "xlat/uring_zcrx_area_flags.h"
+#include "xlat/uring_zcrx_feature_flags.h"
 #include "xlat/uring_mem_region_reg_flags.h"
 #include "xlat/uring_query_ops.h"
 #include "xlat/uring_zcrx_ctrl_ops.h"
@@ -1254,11 +1255,8 @@ print_io_uring_zcrx_ifq_reg(struct tcb *tcp, const kernel_ulong_t addr)
 	print_io_uring_zcrx_offsets(tcp, &arg.offsets);
 	tprint_struct_next();
 	PRINT_FIELD_U(arg, zcrx_id);
-
-	if (arg.__resv2) {
-		tprint_struct_next();
-		PRINT_FIELD_X(arg, __resv2);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, rx_buf_len);
 
 	if (!IS_ARRAY_ZERO(arg.__resv)) {
 		tprint_struct_next();
@@ -1544,11 +1542,9 @@ print_io_uring_query_zcrx(struct tcb *tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U(zcrx, rq_hdr_size);
 	tprint_struct_next();
 	PRINT_FIELD_U(zcrx, rq_hdr_alignment);
-
-	if (zcrx.__resv1) {
-		tprint_struct_next();
-		PRINT_FIELD_X(zcrx, __resv1);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(zcrx, features, uring_zcrx_feature_flags,
+			  "ZCRX_FEATURE_???");
 
 	if (zcrx.__resv2) {
 		tprint_struct_next();
