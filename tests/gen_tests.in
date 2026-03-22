@@ -474,6 +474,7 @@ ioctl_termios-v	+ioctl.test -v
 ioctl_tiocm	+ioctl.test
 ioctl_ubi	+ioctl.test
 ioctl_ubi-success	+ioctl-success.sh -a24
+ioctl_udmabuf	+ioctl.test -y
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
 ioctl_v4l2-Xabbrev	+ioctl.test -Xabbrev

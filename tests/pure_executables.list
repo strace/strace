@@ -304,6 +304,7 @@ ioctl_termios
 ioctl_termios-v
 ioctl_tiocm
 ioctl_ubi
+ioctl_udmabuf
 ioctl_uffdio
 ioctl_v4l2
 ioctl_v4l2-Xabbrev
