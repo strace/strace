@@ -1,0 +1,6 @@
+#enum
+#include <linux/rseq.h>
+#From include/uapi/linux/rseq.h
+#Prefix RSEQ_FLAG_
+RSEQ_FLAG_UNREGISTER			0x1
+RSEQ_FLAG_SLICE_EXT_DEFAULT_ON		0x2

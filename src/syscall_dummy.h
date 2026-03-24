@@ -16,7 +16,6 @@
 # endif
 
 /* still unfinished */
-# define sys_rseq		printargs
 # define sys_vm86		printargs
 # define sys_vm86old		printargs
 

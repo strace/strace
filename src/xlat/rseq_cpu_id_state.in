@@ -1,0 +1,6 @@
+#enum
+#include <linux/rseq.h>
+#From include/uapi/linux/rseq.h
+#Prefix RSEQ_CPU_
+RSEQ_CPU_ID_UNINITIALIZED		-1
+RSEQ_CPU_ID_REGISTRATION_FAILED		-2
