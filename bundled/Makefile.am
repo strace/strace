@@ -137,6 +137,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/tls.h \
 	linux/include/uapi/linux/typelimits.h \
 	linux/include/uapi/linux/types.h \
+	linux/include/uapi/linux/udmabuf.h \
 	linux/include/uapi/linux/unix_diag.h \
 	linux/include/uapi/linux/userfaultfd.h \
 	linux/include/uapi/linux/utsname.h \
