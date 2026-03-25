@@ -330,6 +330,8 @@ struct tcb {
 
 # define PROC_COMM_LEN 16
 	char comm[PROC_COMM_LEN];
+
+	int pidfd;		/* -1 if not available. */
 };
 
 /* TCB flags */
@@ -509,6 +511,7 @@ enum sock_proto {
 	SOCK_PROTO_PINGv6,
 	SOCK_PROTO_RAWv6,
 	SOCK_PROTO_NETLINK,
+	SOCK_PROTO_L2CAP,
 };
 extern enum sock_proto get_proto_by_name(const char *);
 extern int get_family_by_proto(enum sock_proto proto);
