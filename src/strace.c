@@ -29,6 +29,7 @@
 #include <sys/prctl.h>
 
 #include "kill_save_errno.h"
+#include "color.h"
 #include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
@@ -77,6 +78,11 @@ static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
 	{ HEXSTR_NON_ASCII,		"non-ascii" },
 	{ HEXSTR_ALL,			"all" },
+};
+static const struct xlat_data color_mode_str[] = {
+	{ COLOR_AUTO,	"auto" },
+	{ COLOR_NEVER,	"never" },
+	{ COLOR_ALWAYS,	"always" },
 };
 unsigned int xflag;
 bool debug_flag;
@@ -363,6 +369,8 @@ Filtering:\n\
 Output format:\n\
   -a COLUMN, --columns=COLUMN\n\
                  alignment COLUMN for printing syscall results (default %d)\n\
+  --color[=WHEN]\n\
+                 colorize output; WHEN is auto, always, or never (default auto)\n\
   -e abbrev=SET, --abbrev=SET\n\
                  abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
@@ -2349,7 +2357,7 @@ init(int argc, char *argv[])
 		GETOPT_ARGV0,
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
 		GETOPT_ALWAYS_SHOW_PID,
-
+		GETOPT_COLOR,
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
@@ -2417,7 +2425,7 @@ init(int argc, char *argv[])
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
-
+		{ "color",		required_argument, 0, GETOPT_COLOR },
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2437,7 +2445,6 @@ init(int argc, char *argv[])
 		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
 		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
-
 		{ 0, 0, 0, 0 }
 	};
 
@@ -2719,6 +2726,15 @@ init(int argc, char *argv[])
 		case GETOPT_ALWAYS_SHOW_PID:
 			always_show_pid = true;
 			break;
+		case GETOPT_COLOR: {
+			int color_mode_raw =
+				(int) find_arg_val(optarg, color_mode_str,
+						   -1, -1);
+			if (color_mode_raw < 0)
+				error_opt_arg(c, lopt, optarg);
+			color_mode = (enum color_mode_t) color_mode_raw;
+			break;
+		}
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
@@ -3096,6 +3112,8 @@ init(int argc, char *argv[])
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
 		setvbuf(shared_log, NULL, _IOLBF, 0);
 	}
+
+	color_init(shared_log, output_separately);
 
 	/*
 	 * argv[0]	-pPID	-oFILE	Default interactive setting
