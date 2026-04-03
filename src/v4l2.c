@@ -1147,6 +1147,36 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static int
+print_v4l2_querymenu(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct v4l2_querymenu qm;
+
+	if (entering(tcp)) {
+		tprints_arg_next_name("argp");
+		if (umove_or_printaddr(tcp, arg, &qm))
+			return RVAL_IOCTL_DECODED;
+
+		tprint_struct_begin();
+		PRINT_FIELD_V4L2_CID(qm, id, false);
+		tprint_struct_next();
+		PRINT_FIELD_U(qm, index);
+
+		return 0;
+	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &qm)) {
+		tprint_struct_end_value_changed_struct_begin();
+		PRINT_FIELD_CSTRING(qm, name);
+		tprint_struct_next();
+		PRINT_FIELD_D(qm, value);
+	}
+
+	tprint_struct_end();
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
 print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct v4l2_query_ext_ctrl c;
@@ -1652,6 +1682,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_CREATE_BUFS: /* RW */
 		return print_v4l2_create_buffers(tcp, arg);
+
+	case VIDIOC_QUERYMENU: /* RW */
+		return print_v4l2_querymenu(tcp, arg);
 
 	default:
 		return RVAL_DECODED;
