@@ -19,10 +19,15 @@
 #include <linux/rtnetlink.h>
 #include <linux/genetlink.h>
 
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/l2cap.h>
+
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
 # define UNIX_PATH_MAX sizeof_field(struct sockaddr_un, sun_path)
 #endif
+
+#include <sys/syscall.h>
 
 #include "xstring.h"
 
@@ -412,6 +417,88 @@ netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
+static int
+l2ap_make_addrstr(char ** str, const char *proto_name,
+		  struct sockaddr_l2 *nameaddr, struct sockaddr_l2 *peeraddr)
+{
+	if (nameaddr && peeraddr)
+		return asprintf(str, "%s:[%u/%02x:%02x:%02x:%02x:%02x:%02x->%u/%02x:%02x:%02x:%02x:%02x:%02x]",
+				proto_name,
+				(unsigned int)nameaddr->l2_bdaddr_type,
+				nameaddr->l2_bdaddr.b[0],
+				nameaddr->l2_bdaddr.b[1],
+				nameaddr->l2_bdaddr.b[2],
+				nameaddr->l2_bdaddr.b[3],
+				nameaddr->l2_bdaddr.b[4],
+				nameaddr->l2_bdaddr.b[5],
+				(unsigned int)peeraddr->l2_bdaddr_type,
+				peeraddr->l2_bdaddr.b[0],
+				peeraddr->l2_bdaddr.b[1],
+				peeraddr->l2_bdaddr.b[2],
+				peeraddr->l2_bdaddr.b[3],
+				peeraddr->l2_bdaddr.b[4],
+				peeraddr->l2_bdaddr.b[5]);
+
+	if (nameaddr)
+		return asprintf(str, "%s:[%u/%02x:%02x:%02x:%02x:%02x:%02x->]",
+				proto_name,
+				(unsigned int)nameaddr->l2_bdaddr_type,
+				nameaddr->l2_bdaddr.b[0],
+				nameaddr->l2_bdaddr.b[1],
+				nameaddr->l2_bdaddr.b[2],
+				nameaddr->l2_bdaddr.b[3],
+				nameaddr->l2_bdaddr.b[4],
+				nameaddr->l2_bdaddr.b[5]);
+
+	if (peeraddr)
+		return asprintf(str, "%s:[->%u/%02x:%02x:%02x:%02x:%02x:%02x]",
+				proto_name,
+				(unsigned int)peeraddr->l2_bdaddr_type,
+				peeraddr->l2_bdaddr.b[0],
+				peeraddr->l2_bdaddr.b[1],
+				peeraddr->l2_bdaddr.b[2],
+				peeraddr->l2_bdaddr.b[3],
+				peeraddr->l2_bdaddr.b[4],
+				peeraddr->l2_bdaddr.b[5]);
+
+	return -1;
+}
+
+static char *
+bluetooth_get(struct tcb *, int family, int protocol,
+	      const struct sockaddr *nameaddr, socklen_t nameaddrlen,
+	      const struct sockaddr *peeraddr, socklen_t peeraddrlen,
+	      const char *proto_name)
+{
+	char *str = NULL;
+
+	if (!nameaddr)
+		return NULL;
+
+	if (nameaddr->sa_family != AF_BLUETOOTH)
+		return NULL;
+
+	switch (protocol) {
+	case BTPROTO_L2CAP:
+		if (sizeof (struct sockaddr_l2) != (size_t)nameaddrlen)
+			nameaddr = NULL;
+		if (sizeof (struct sockaddr_l2) != (size_t)peeraddrlen)
+			peeraddr = NULL;
+		if (nameaddr == NULL && peeraddr == NULL)
+			return NULL;
+
+		if (l2ap_make_addrstr(&str, proto_name,
+				      ((struct sockaddr_l2 *)nameaddr),
+				      ((struct sockaddr_l2 *)peeraddr)) < 0)
+			return NULL;
+		break;
+	default:
+		break;
+	}
+
+	return str;
+}
+
 static const struct {
 	const char *const name;
 	const char * (*const get)(struct tcb *, int fd, int family,
@@ -419,6 +506,11 @@ static const struct {
 				  const char *proto_name);
 	int family;
 	int proto;
+
+	char * (*const get_via_sockname)(struct tcb *, int family, int protocol,
+					 const struct sockaddr *nameaddr, socklen_t nameaddrlen,
+					 const struct sockaddr *pperaddr, socklen_t peeraddrlen,
+					 const char *proto_name);
 } protocols[] = {
 	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
 	[SOCK_PROTO_UNIX_STREAM]= { "UNIX-STREAM", unix_get,	AF_UNIX},
@@ -460,6 +552,8 @@ static const struct {
 	[SOCK_PROTO_RAWv6]	=
 		{ "RAWv6",	inet_get, AF_INET6, IPPROTO_RAW },
 	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
+	[SOCK_PROTO_L2CAP]	=
+		{ "L2CAP",	NULL, AF_BLUETOOTH, BTPROTO_L2CAP, bluetooth_get },
 };
 
 enum sock_proto
@@ -522,8 +616,69 @@ static const char *
 get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 			       const enum sock_proto proto)
 {
-	const char *details = get_sockaddr_by_inode_lookup(tcp, inode, proto);
+	return get_sockaddr_by_inode_lookup(tcp, inode, proto);
+}
 
+
+static const char *
+get_sockaddr_via_pidfd(struct tcb *tcp, const unsigned long inode,
+		       const enum sock_proto proto, int fd)
+{
+	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
+	    !protocols[proto].get_via_sockname)
+		return NULL;
+
+	int sock = -1;
+#ifdef SYS_pidfd_getfd
+	sock = syscall(SYS_pidfd_getfd, tcp->pidfd, fd, 0);
+#endif
+	if (sock < 0)
+		return NULL;
+
+	struct sockaddr nameaddr;
+	struct sockaddr *nameaddrp = &nameaddr;
+	socklen_t nameaddrlen = sizeof(nameaddr);
+	if (getsockname(sock, nameaddrp, &nameaddrlen) < 0) {
+		nameaddrp = NULL;
+		nameaddrlen = 0;
+	}
+
+	struct sockaddr peeraddr;
+	struct sockaddr *peeraddrp = &peeraddr;
+	socklen_t peeraddrlen = sizeof(peeraddr);
+	if (getpeername(sock, &nameaddr, &nameaddrlen) < 0) {
+		peeraddrp = NULL;
+		peeraddrlen = 0;
+	}
+
+	close(sock);
+
+	char *details = protocols[proto].get_via_sockname(tcp,
+							  protocols[proto].family,
+							  protocols[proto].proto,
+							  nameaddrp, nameaddrlen,
+							  peeraddrp, peeraddrlen,
+							  protocols[proto].name);
+	if (details)
+		cache_inode_details(inode, details);
+	return details;
+}
+
+/* Given an inode number of a socket, return its protocol details.  */
+const char *
+get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
+		      const unsigned long inode)
+{
+	const char *details = get_sockaddr_by_inode_cached(inode);
+	if (details)
+		return details;
+
+	const enum sock_proto proto = getfdproto(tcp, fd);
+	details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
+	if (details)
+		return details;
+
+	details = get_sockaddr_via_pidfd(tcp, inode, proto, fd);
 	if (details)
 		return details;
 
@@ -537,16 +692,6 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 		return str = NULL;
 
 	return str;
-}
-
-/* Given an inode number of a socket, return its protocol details.  */
-const char *
-get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
-		      const unsigned long inode)
-{
-	const char *details = get_sockaddr_by_inode_cached(inode);
-	return details ? details :
-		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd));
 }
 
 /*

@@ -27,6 +27,7 @@
 #include <locale.h>
 #include <sys/utsname.h>
 #include <sys/prctl.h>
+#include <sys/syscall.h>
 
 #include "kill_save_errno.h"
 #include "exitkill.h"
@@ -1067,6 +1068,12 @@ alloctcb(int pid)
 #ifdef ENABLE_SECONTEXT
 			tcp->last_dirfd = AT_FDCWD;
 #endif
+#ifdef SYS_pidfd_open
+			tcp->pidfd = syscall(SYS_pidfd_open, pid, 0);
+#else
+			tcp->pidfd = -1;
+#endif
+
 			nprocs++;
 			debug_msg("new tcb for pid %d, active tcbs:%d",
 				  tcp->pid, nprocs);
@@ -1163,6 +1170,9 @@ droptcb(struct tcb *tcp)
 		set_current_tcp(NULL);
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
+
+	if (tcp->pidfd >= 0)
+		close(tcp->pidfd);
 
 	list_remove(&tcp->wait_list);
 
