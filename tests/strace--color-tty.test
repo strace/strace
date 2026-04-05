@@ -1,0 +1,34 @@
+#!/bin/sh -efu
+#
+# Check --color=auto with a tty.
+#
+# Copyright (c) 2026 Dmitry V. Levin <ldv@strace.io>
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+unset STRACE_COLORS
+unset NO_COLOR
+
+TERM=linux
+export TERM
+
+check_prog script
+run_prog ../getpid > /dev/null
+
+csi="$(printf '\033\\[')"
+printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
+cmd="$STRACE --trace=getpid ../getpid > /dev/null"
+set -- script -q -e -c "$cmd" /dev/null
+"$@" > "$LOG" ||
+	dump_log_and_fail_with "$* failed with code $?"
+match_grep "$LOG" "$EXP"
+
+TERM=dumb
+printf '%s\n' "!.*${csi}.*" > "$EXP"
+"$@" > "$LOG" ||
+	dump_log_and_fail_with "$* failed with code $?"
+match_grep "$LOG" "$EXP"

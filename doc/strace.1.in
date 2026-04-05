@@ -1111,6 +1111,53 @@ Opens the file provided in the
 .B \-o
 option in append mode.
 .TP
+.BR \-\-color = \fIwhen\fR
+Colorize the trace output.
+The default is
+.BR \-\-color = auto ,
+which enables color only when the trace output stream is a terminal
+(by default stderr; see
+.BR \-o )
+that supports at least 8 colors.  If the
+.B NO_COLOR
+environment variable is set, color is disabled unless
+.BR \-\-color = always
+is specified.
+The
+.I when
+parameter can be one of
+.BR auto ,
+.BR always ,
+or
+.BR never .
+Custom color schemes can be specified with the
+.B STRACE_COLORS
+environment variable, for example:
+.br
+.RS
+STRACE_COLORS="syscall=1;33:argname=39:argval=35:const=1;36:comment=36:punct=0:retval=32:error=31"
+.RE
+.IP
+The format of this value is
+.BR key = \fIvalue\fR
+pairs separated by
+.B :
+with semicolon-separated SGR codes as values.
+.IP
+The default palette uses standard ANSI colors (SGR 30\(en37) and bold
+attributes rather than bright colors (SGR 90\(en97), so that terminal
+color themes can adapt them for both dark and light backgrounds.
+.IP
+Recognized color keys are:
+.BR syscall ,
+.BR argname ,
+.BR argval ,
+.BR const ,
+.BR comment ,
+.BR punct ,
+.BR retval ,
+.BR error .
+.TP
 .B \-q
 .TQ
 .B \-\-quiet
