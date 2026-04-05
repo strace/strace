@@ -3590,7 +3590,8 @@ print_event_exit(struct tcb *tcp)
 		tprints_string("<unfinished ...>");
 	}
 
-	tprints_string(") ");
+	tprint_arg_end();
+	tprint_space();
 	tabto();
 	tprint_sysret_begin();
 	tprints_sysret_next("retval");
