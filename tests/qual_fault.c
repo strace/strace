@@ -117,8 +117,7 @@ main(int argc, char *argv[])
 			err = ENOSYS;
 	}
 
-	errno = err;
-	errstr = errno2name();
+	errstr = errno2name(err);
 
 	int first = atoi(argv[3]);
 	int last = atoi(argv[4]);

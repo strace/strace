@@ -363,7 +363,7 @@ void check_overflowuid(const int);
 void check_overflowgid(const int);
 
 /* Translate errno to its name. */
-const char *errno2name(void);
+const char *errno2name(int errnum);
 
 /* Translate signal number to its name. */
 const char *signal2name(int);

@@ -8,6 +8,7 @@
 
 #include "tests.h"
 #include <stdio.h>
+#include <errno.h>
 
 enum sprintrc_fmt {
 	SPRINTRC_FMT_RAW,
@@ -39,7 +40,7 @@ sprintrc_ex(long rc, enum sprintrc_fmt fmt)
 		return "0";
 
 	int ret = (rc == -1)
-		? snprintf(buf, sizeof(buf), formats[fmt], errno2name())
+		? snprintf(buf, sizeof(buf), formats[fmt], errno2name(errno))
 		: snprintf(buf, sizeof(buf), "%ld", rc);
 
 	if (ret < 0)

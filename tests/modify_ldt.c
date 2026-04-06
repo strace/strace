@@ -35,7 +35,7 @@ printrc(long rc)
 
 		if (err > 0 && err < 0x1000) {
 			errno = err;
-			printf(" %s (%m)", errno2name());
+			printf(" %s (%m)", errno2name(err));
 		}
 	}
 	else

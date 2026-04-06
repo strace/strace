@@ -102,15 +102,13 @@ print_status_array(const int *const status, const unsigned long count)
 		if (status[i] >= 0) {
 			printf("%d", status[i]);
 		} else {
-#if !XLAT_RAW
-			errno = -status[i];
-#endif
 #if XLAT_RAW
 			printf("%d", status[i]);
 #elif XLAT_VERBOSE
-			printf("%d /* -%s */", status[i], errno2name());
+			printf("%d /* -%s */",
+			       status[i], errno2name(-status[i]));
 #else
-			printf("-%s", errno2name());
+			printf("-%s", errno2name(-status[i]));
 #endif
 		}
 	}

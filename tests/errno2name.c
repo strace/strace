@@ -67,9 +67,9 @@
 #endif
 
 const char *
-errno2name(void)
+errno2name(int errnum)
 {
-	switch (errno) {
+	switch (errnum) {
 	/* names taken from linux/errnoent.h */
 #ifdef E2BIG
 	CASE(E2BIG);
@@ -513,6 +513,6 @@ errno2name(void)
 	CASE(EXFULL);
 #endif
 	default:
-		perror_msg_and_fail("unknown errno %d", errno);
+		perror_msg_and_fail("unknown errno %d", errnum);
 	}
 }
