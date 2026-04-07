@@ -363,8 +363,7 @@ run_strace_match_diff()
 		set -- "$@" "$arg"
 	done
 
-	run_prog > /dev/null
-	args="$prog_args"
+	run_prog $prog_args > /dev/null
 	run_strace "$@" $args > "$EXP"
 	sed -n "$sed_cmd" < "$LOG" > "$OUT"
 	filter_vdso_calls "../$NAME" "$OUT" "$EXP"
