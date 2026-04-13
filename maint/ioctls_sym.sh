@@ -120,6 +120,9 @@ process_file()
 		#ifndef NULL
 		# define NULL ((void*)0)
 		#endif
+		#ifndef __force
+		# define __force
+		#endif
 		#ifndef __user
 		# define __user
 		#endif
