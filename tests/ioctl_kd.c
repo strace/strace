@@ -970,7 +970,7 @@ main(int argc, char *argv[])
 		(kernel_ulong_t) 0xdeadbeefbadc0dedULL;
 
 	static const uint32_t unknown_ioctls[] = {
-		0xfffffff1, 0xc0007fff, 0xfffb800c, 0xfff8c000,
+		0xfffffff1, 0xc0007f7f, 0xfffb800c, 0xfff8c000,
 		0xffffffff, 0xffffffff, 0xffffffff, 0xf3ffffff,
 	};
 
