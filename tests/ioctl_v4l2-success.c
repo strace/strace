@@ -7,6 +7,7 @@
 
 #include "tests.h"
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1734,6 +1735,43 @@ main(int argc, char **argv)
 			memset(qextc->reserved, 0, sizeof(qextc->reserved));
 		}
 	}
+
+	/* VIDIOC_QUERYMENU */
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_querymenu, qmenu);
+	fill_memory32(qmenu, sizeof(*qmenu));
+
+	ioctl(-1, VIDIOC_QUERYMENU, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU), inject_retval);
+
+	ioctl(-1, VIDIOC_QUERYMENU, (char *) qmenu + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU),
+	       (char *) qmenu + 1, inject_retval);
+
+	static const char qmenu_name[] = "Aperture Priority Mode";
+
+	int64_t qmenu_value;
+	memcpy(&qmenu_value, qmenu_name, sizeof(qmenu_value));
+
+	qmenu->id = V4L2_CID_EXPOSURE_AUTO;
+	strcpy((char *) qmenu->name, qmenu_name);
+
+	ioctl(-1, VIDIOC_QUERYMENU, qmenu);
+	printf("ioctl(-1, %s, {"
+	       "id=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_CID_EXPOSURE_AUTO") VERB(" */") ", "
+	       "index=%u"
+	       "} => {"
+	       "name=\"%s\", "
+	       "value=%" PRId64
+	       "}) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU),
+	       NABBR(qmenu->id,)
+	       qmenu->index,
+	       qmenu_name,
+	       qmenu_value,
+	       inject_retval
+	);
 
 	puts("+++ exited with 0 +++");
 
