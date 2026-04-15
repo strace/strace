@@ -1009,6 +1009,7 @@ rename	-a35
 renameat
 renameat2
 request_key	-a33 -s12
+rseq	-a20 -q "QUIRK:START-OF-TEST-OUTPUT-REGEX:, 0, 0xfacefed1)"
 riscv_flush_icache	-a34
 rmdir	-a22
 rt_sigpending	-a20
