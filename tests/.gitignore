@@ -630,6 +630,7 @@ mq_sendrecv
 mq_sendrecv-read
 mq_sendrecv-write
 mseal
+rseq
 msg_control
 msg_control-v
 msg_name
