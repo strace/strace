@@ -19,9 +19,14 @@ export TERM
 check_prog script
 run_prog ../getpid > /dev/null
 
+cmd="../getpid > /dev/null"
+set -- script -q -e -c "$cmd" /dev/null
+"$@" ||
+	framework_skip_ "$* failed with code $?"
+
 csi="$(printf '\033\\[')"
 printf '%s\n' ".*${csi}33mgetpid.*${csi}0m.*" > "$EXP"
-cmd="$STRACE --trace=getpid ../getpid > /dev/null"
+cmd="$STRACE --trace=getpid $cmd"
 set -- script -q -e -c "$cmd" /dev/null
 "$@" > "$LOG" ||
 	dump_log_and_fail_with "$* failed with code $?"
