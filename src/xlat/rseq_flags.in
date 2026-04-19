@@ -1,0 +1,5 @@
+#unconditional
+#From include/uapi/linux/rseq.h
+#Prefix RSEQ_FLAG_
+RSEQ_FLAG_UNREGISTER
+RSEQ_FLAG_SLICE_EXT_DEFAULT_ON

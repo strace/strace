@@ -118,6 +118,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/qrtr.h \
 	linux/include/uapi/linux/quota.h \
 	linux/include/uapi/linux/rtnetlink.h \
+	linux/include/uapi/linux/rseq.h \
 	linux/include/uapi/linux/sched.h \
 	linux/include/uapi/linux/sched/types.h \
 	linux/include/uapi/linux/seccomp.h \
