@@ -26,6 +26,12 @@ case "${TARGET-}" in
 		;;
 esac
 
+case "${LIBC-}" in
+	musl)
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-mpers=check"
+		;;
+esac
+
 case "${STACKTRACE-}" in
 	libdw|libunwind)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-$STACKTRACE"

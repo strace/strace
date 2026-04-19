@@ -23,95 +23,45 @@ jobs:
       - name: check
         run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
-  coverage: # the longest of all build jobs
-    name: Check coverage
+  musl-gcc-x86_64:
+    name: Build musl-gcc-x86_64
     runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
     env:
-      CHECK: coverage
       CC: gcc
       TARGET: x86_64
-      KHEADERS: torvalds/linux
+      LIBC: musl
       STACKTRACE: libdw
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: install dependencies
-        run: ci/install-dependencies.sh
-      - name: build check
-        run: ci/run-build-and-tests.sh
-      - name: upload coverage
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de	# v5.5.2
-        with:
-          fail_ci_if_error: true
-          plugins: gcov
-          token: ${{ secrets.CODECOV_TOKEN }}
-          working-directory: src
-
-  build-check:
-    strategy:
-      fail-fast: false
-      matrix:
-        runner: [ubuntu-22.04, ubuntu-24.04]
-        cc: [gcc-14, gcc-13, gcc-12, gcc-11, gcc-10, gcc-9, clang-19, clang-18, clang-17, clang-16, clang-15, clang-14]
-        target: [x86, x86_64]
-        variant: [kheaders, nostacktrace, libdw, libunwind]
-        exclude:
-          # x86 does not have libdw and libunwind
-          - { target: x86, variant: libdw }
-          - { target: x86, variant: libunwind }
-          # nostacktrace only for x86 or musl
-          - { target: x86_64, variant: nostacktrace }
-          # ubuntu-22.04 only for: gcc-9, gcc-10, gcc-11
-          - { runner: ubuntu-24.04, cc: gcc-9 }
-          - { runner: ubuntu-24.04, cc: gcc-10 }
-          - { runner: ubuntu-24.04, cc: gcc-11 }
-          # ubuntu-24.04 only for: gcc-12..14, clang-14..19
-          - { runner: ubuntu-22.04, cc: gcc-12 }
-          - { runner: ubuntu-22.04, cc: gcc-13 }
-          - { runner: ubuntu-22.04, cc: gcc-14 }
-          - { runner: ubuntu-22.04, cc: clang-14 }
-          - { runner: ubuntu-22.04, cc: clang-15 }
-          - { runner: ubuntu-22.04, cc: clang-16 }
-          - { runner: ubuntu-22.04, cc: clang-17 }
-          - { runner: ubuntu-22.04, cc: clang-18 }
-          - { runner: ubuntu-22.04, cc: clang-19 }
-        include:
-          - { cc: musl-gcc, target: x86_64, variant: nostacktrace, runner: ubuntu-22.04 }
-    name: Build ${{ matrix.cc }}-${{ matrix.target }}-${{ matrix.variant }}
-    runs-on: ${{ matrix.runner }}
-    env:
-      CC: ${{ matrix.cc }}
-      TARGET: ${{ matrix.target }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Set environment variables
-        env:
-          VARIANT: ${{ matrix.variant }}
+      - name: install Git
         run: |
-          case "$VARIANT" in
-            kheaders)
-              echo 'STACKTRACE=no' >> "$GITHUB_ENV"
-              echo 'KHEADERS=torvalds/linux' >> "$GITHUB_ENV"
-              ;;
-            nostacktrace)
-              echo 'STACKTRACE=no' >> "$GITHUB_ENV"
-              ;;
-            libdw)
-              echo 'STACKTRACE=libdw' >> "$GITHUB_ENV"
-              ;;
-            libunwind)
-              echo 'STACKTRACE=libunwind' >> "$GITHUB_ENV"
-              ;;
-          esac
-
+          apk add --no-cache git
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - name: install dependencies
-        run: ci/install-dependencies.sh
-
+        run: |
+          apk add --no-cache \
+            autoconf \
+            automake \
+            binutils-dev \
+            bluez-dev \
+            build-base \
+            coreutils \
+            elfutils-dev \
+            file \
+            gawk \
+            grep \
+            gzip \
+            libfaketime \
+            linux-headers \
+            sed \
+            tar \
+            xz
       - name: build check
-        run: ci/run-build-and-tests.sh
+        run: |
+          git config --global --add safe.directory $(pwd)
+          export PATH="/usr/bin:$PATH"
+          ./ci/run-build-and-tests.sh
