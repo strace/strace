@@ -598,4 +598,18 @@ struct BPF_PROG_STREAM_READ_BY_FD_struct /* prog_stream_read */ {
 	offsetofend(struct BPF_PROG_STREAM_READ_BY_FD_struct, prog_fd)
 # define expected_BPF_PROG_STREAM_READ_BY_FD_struct_size 20
 
+struct bpf_prog_assoc_struct_ops {
+	uint32_t map_fd;
+	uint32_t prog_fd;
+	uint32_t flags;
+};
+
+struct BPF_PROG_ASSOC_STRUCT_OPS_struct {
+	struct bpf_prog_assoc_struct_ops prog_assoc_struct_ops;
+};
+
+# define BPF_PROG_ASSOC_STRUCT_OPS_struct_size \
+	offsetofend(struct BPF_PROG_ASSOC_STRUCT_OPS_struct, prog_assoc_struct_ops)
+# define expected_BPF_PROG_ASSOC_STRUCT_OPS_struct_size 12
+
 #endif /* !STRACE_BPF_ATTR_H */

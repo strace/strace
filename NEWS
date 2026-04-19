@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented optional colorized trace output.
   * Implemented decoding of rseq syscall.
+  * Implemented decoding of BPF_PROG_ASSOC_STRUCT_OPS bpf command.
   * Implemented decoding of UDMABUF_CREATE, UDMABUF_CREATE_LIST,
     and VIDIOC_QUERYMENU ioctl commands.
   * Updated lists of ioctl commands from Linux 7.0.

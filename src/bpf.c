@@ -2088,6 +2088,31 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_STREAM_READ_BY_FD)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
+static void
+print_prog_assoc_struct_ops(struct tcb *const tcp,
+			    const struct bpf_prog_assoc_struct_ops *const assoc)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_FD(*assoc, map_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_FD(*assoc, prog_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_X(*assoc, flags);
+	tprint_struct_end();
+}
+
+BEGIN_BPF_CMD_DECODER(BPF_PROG_ASSOC_STRUCT_OPS)
+{
+	/*
+	 * The prog_assoc_struct_ops structure and BPF_PROG_ASSOC_STRUCT_OPS
+	 * command were introduced by Linux commit v7.0-rc1~196^2~109^2~4.
+	 */
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_TCB_PTR(attr, prog_assoc_struct_ops, tcp,
+				print_prog_assoc_struct_ops);
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -2129,6 +2154,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_PROG_BIND_MAP),
 		BPF_CMD_ENTRY(BPF_TOKEN_CREATE),
 		BPF_CMD_ENTRY(BPF_PROG_STREAM_READ_BY_FD),
+		BPF_CMD_ENTRY(BPF_PROG_ASSOC_STRUCT_OPS),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

@@ -94,6 +94,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_PROG_BIND_MAP);
 	BPF_ATTR_DATA_FIELD(BPF_TOKEN_CREATE);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_STREAM_READ_BY_FD);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_ASSOC_STRUCT_OPS);
 	char char_data[256];
 };
 
@@ -2698,6 +2699,33 @@ static const struct bpf_attr_check BPF_TOKEN_CREATE_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_PROG_ASSOC_STRUCT_OPS_checks[] = {
+	{
+		.data = { .BPF_PROG_ASSOC_STRUCT_OPS_data = {
+			.prog_assoc_struct_ops = {
+				.map_fd = -1,
+				.prog_fd = -2,
+				.flags = 0
+			}
+		} },
+		.size = offsetofend(struct BPF_PROG_ASSOC_STRUCT_OPS_struct,
+				    prog_assoc_struct_ops),
+		.str = "prog_assoc_struct_ops={map_fd=-1, prog_fd=-2, flags=0}"
+	},
+	{
+		.data = { .BPF_PROG_ASSOC_STRUCT_OPS_data = {
+			.prog_assoc_struct_ops = {
+				.map_fd = -1,
+				.prog_fd = -2,
+				.flags = -1U,
+			}
+		} },
+		.size = offsetofend(struct BPF_PROG_ASSOC_STRUCT_OPS_struct,
+				    prog_assoc_struct_ops),
+		.str = "prog_assoc_struct_ops={map_fd=-1, prog_fd=-2, flags=0xffffffff}"
+	}
+};
+
 static void
 init_BPF_PROG_STREAM_READ_BY_FD_attr(struct bpf_attr_check *check, size_t idx)
 {
@@ -2786,6 +2814,7 @@ main(void)
 		CHK(BPF_PROG_BIND_MAP),
 		CHK(BPF_TOKEN_CREATE),
 		CHK(BPF_PROG_STREAM_READ_BY_FD),
+		CHK(BPF_PROG_ASSOC_STRUCT_OPS),
 	};
 
 	page_size = get_page_size();
