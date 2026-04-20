@@ -1809,9 +1809,13 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	/* TODO: prog type == BPF_PROG_TYPE_TRACING */
 	case BPF_TRACE_FENTRY:
 	case BPF_TRACE_FEXIT:
+	case BPF_TRACE_FSESSION:
 	case BPF_MODIFY_RETURN:
 	case BPF_LSM_MAC:
-		/* Introduced in Linux commit v5.19-rc1~159^2~4^2~37^2~2 */
+		/*
+		 * Introduced in Linux commit v5.19-rc1~159^2~4^2~37^2~2 .
+		 * BPF_TRACE_FSESSION in Linux commit v7.0-rc1~196^2~34^2~12 .
+		 */
 		tprint_struct_next();
 		tprints_field_name("tracing");
 		tprint_struct_begin();
