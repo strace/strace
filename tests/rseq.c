@@ -120,6 +120,7 @@ main(void)
 	memset(rseq, 0, sizeof(*rseq));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct rseq_cs, cs);
 	fill_memory(cs, sizeof(*cs));
+	cs->flags = 0x37;
 	rseq->rseq_cs = (uintptr_t) cs;
 	k_rseq(rseq, RSEQ_TEST_MIN, RSEQ_FLAG_UNREGISTER, ++sig);
 	printf("rseq({cpu_id_start=%u, cpu_id=%u"
@@ -130,7 +131,11 @@ main(void)
 	       ", __reserved=0}, %u, RSEQ_FLAG_UNREGISTER, %#x) = %s\n",
 	       rseq->cpu_id_start, rseq->cpu_id,
 	       cs->version,
-	       "RSEQ_CS_FLAG_NO_RESTART_ON_MIGRATE|0x87868580",
+	       "RSEQ_CS_FLAG_NO_RESTART_ON_PREEMPT"
+	        "|RSEQ_CS_FLAG_NO_RESTART_ON_SIGNAL"
+		"|RSEQ_CS_FLAG_NO_RESTART_ON_MIGRATE"
+		"|RSEQ_CS_FLAG_SLICE_EXT_AVAILABLE"
+		"|RSEQ_CS_FLAG_SLICE_EXT_ENABLED",
 	       (uintmax_t) cs->start_ip,
 	       (uintmax_t) cs->post_commit_offset,
 	       (uintmax_t) cs->abort_ip,
