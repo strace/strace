@@ -296,6 +296,15 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+static void
+print_bpf_map_xxx_flags(const uint64_t flags, const struct xlat *const xlat)
+{
+	if (flags)
+		printflags64(xlat, flags, "BPF_???");
+	else
+		printxval64(xlat, flags, "BPF_???");
+}
+
 BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
 {
 	tprint_struct_begin();
@@ -308,7 +317,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
 	if (len <= offsetof(struct BPF_MAP_LOOKUP_ELEM_struct, flags))
 		break;
 	tprint_struct_next();
-	PRINT_FIELD_FLAGS(attr, flags, bpf_map_lookup_elem_flags, "BPF_???");
+	PRINT_FIELD_OBJ_VAL(attr, flags, print_bpf_map_xxx_flags,
+			    bpf_map_lookup_elem_flags);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -323,7 +333,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(attr, value);
 	tprint_struct_next();
-	PRINT_FIELD_XVAL(attr, flags, bpf_map_update_elem_flags, "BPF_???");
+	PRINT_FIELD_OBJ_VAL(attr, flags, print_bpf_map_xxx_flags,
+			    bpf_map_update_elem_flags);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -1560,8 +1571,9 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
 		tprint_struct_next();
-		PRINT_FIELD_FLAGS(attr, elem_flags,
-				  bpf_map_lookup_elem_flags, "BPF_???");
+		PRINT_FIELD_OBJ_VAL(attr, elem_flags,
+				    print_bpf_map_xxx_flags,
+				    bpf_map_lookup_elem_flags);
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 
@@ -1602,8 +1614,9 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
 		tprint_struct_next();
-		PRINT_FIELD_FLAGS(attr, elem_flags,
-				  bpf_map_lookup_elem_flags, "BPF_???");
+		PRINT_FIELD_OBJ_VAL(attr, elem_flags,
+				    print_bpf_map_xxx_flags,
+				    bpf_map_update_elem_flags);
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 
@@ -1640,8 +1653,9 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
 		tprint_struct_next();
-		PRINT_FIELD_FLAGS(attr, elem_flags,
-				  bpf_map_lookup_elem_flags, "BPF_???");
+		PRINT_FIELD_OBJ_VAL(attr, elem_flags,
+				    print_bpf_map_xxx_flags,
+				    bpf_map_lookup_elem_flags);
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 

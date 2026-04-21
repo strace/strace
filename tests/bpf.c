@@ -582,8 +582,17 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
 		.data = { .BPF_MAP_LOOKUP_ELEM_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, map_fd),
 		.str = "map_fd=-1, key=NULL, value=NULL"
-	},
-	{
+	}, {
+		.data = { .BPF_MAP_LOOKUP_ELEM_data = {
+			.map_fd = -1,
+			.key = 0xdeadbeef,
+			.value = 0xbadc0ded,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, flags),
+		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=BPF_ANY"
+	}, {
 		.data = { .BPF_MAP_LOOKUP_ELEM_data = {
 			.map_fd = -1,
 			.key = 0xdeadbeef,
@@ -593,6 +602,16 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
 		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, flags),
 		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
 		       ", flags=BPF_F_LOCK"
+	}, {
+		.data = { .BPF_MAP_LOOKUP_ELEM_data = {
+			.map_fd = -1,
+			.key = 0xdeadbeef,
+			.value = 0xbadc0ded,
+			.flags = -1ULL & ~4
+		} },
+		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, flags),
+		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=0xfffffffffffffffb /* BPF_??? */"
 	}
 };
 
@@ -603,8 +622,17 @@ static const struct bpf_attr_check BPF_MAP_UPDATE_ELEM_checks[] = {
 		.data = { .BPF_MAP_UPDATE_ELEM_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, map_fd),
 		.str = "map_fd=-1, key=NULL, value=NULL, flags=BPF_ANY"
-	},
-	{
+	}, {
+		.data = { .BPF_MAP_UPDATE_ELEM_data = {
+			.map_fd = -1,
+			.key = 0xdeadbeef,
+			.value = 0xbadc0ded,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, flags),
+		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=BPF_ANY"
+	}, {
 		.data = { .BPF_MAP_UPDATE_ELEM_data = {
 			.map_fd = -1,
 			.key = 0xdeadbeef,
@@ -614,6 +642,26 @@ static const struct bpf_attr_check BPF_MAP_UPDATE_ELEM_checks[] = {
 		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, flags),
 		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
 		       ", flags=BPF_EXIST"
+	}, {
+		.data = { .BPF_MAP_UPDATE_ELEM_data = {
+			.map_fd = -1,
+			.key = 0xdeadbeef,
+			.value = 0xbadc0ded,
+			.flags = 7
+		} },
+		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, flags),
+		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=BPF_F_LOCK|BPF_EXIST|BPF_NOEXIST"
+	}, {
+		.data = { .BPF_MAP_UPDATE_ELEM_data = {
+			.map_fd = -1,
+			.key = 0xdeadbeef,
+			.value = 0xbadc0ded,
+			.flags = -1ULL & ~7
+		} },
+		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, flags),
+		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=0xfffffffffffffff8 /* BPF_??? */"
 	}
 };
 
@@ -1918,8 +1966,7 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_BATCH_checks[] = {
 		.str = "batch={in_batch=NULL, out_batch=NULL, keys=NULL"
 		       ", values=NULL, count=0, map_fd=-1, elem_flags=BPF_ANY"
 		       ", flags=0}"
-	},
-	{
+	}, {
 		.data = { .BPF_MAP_LOOKUP_BATCH_data = {
 			.in_batch = 0xfacefeed,
 			.out_batch = 0xbadc0ded,
@@ -1934,6 +1981,22 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_BATCH_checks[] = {
 		.str = "batch={in_batch=0xfacefeed, out_batch=0xbadc0ded"
 		       ", keys=0xdeadf00d, values=0xfffffffe, count=3"
 		       ", map_fd=-1, elem_flags=BPF_F_LOCK, flags=0x4}"
+	}, {
+		.data = { .BPF_MAP_LOOKUP_BATCH_data = {
+			.in_batch = 0xfacefeed,
+			.out_batch = 0xbadc0ded,
+			.keys = 0xdeadf00d,
+			.values = 0xfffffffe,
+			.count = 3,
+			.map_fd = -1,
+			.elem_flags = -1ULL,
+			.flags = 0xff
+		} },
+		.size = offsetofend(struct BPF_MAP_LOOKUP_BATCH_struct, flags),
+		.str = "batch={in_batch=0xfacefeed, out_batch=0xbadc0ded"
+		       ", keys=0xdeadf00d, values=0xfffffffe, count=3, map_fd=-1"
+		       ", elem_flags=BPF_F_LOCK|0xfffffffffffffffb"
+		       ", flags=0xff}"
 	}
 };
 
@@ -1943,8 +2006,7 @@ static const struct bpf_attr_check BPF_MAP_UPDATE_BATCH_checks[] = {
 		.size = offsetofend(struct BPF_MAP_UPDATE_BATCH_struct, map_fd ),
 		.str = "batch={keys=NULL, values=NULL, count=0, map_fd=-1"
 		       ", elem_flags=BPF_ANY, flags=0}"
-	},
-	{
+	}, {
 		.data = { .BPF_MAP_UPDATE_BATCH_data = {
 			.keys = 0xdeadf00d,
 			.values = 0xfffffffe,
@@ -1956,6 +2018,21 @@ static const struct bpf_attr_check BPF_MAP_UPDATE_BATCH_checks[] = {
 		.size = offsetofend(struct BPF_MAP_UPDATE_BATCH_struct, flags),
 		.str = "batch={keys=0xdeadf00d, values=0xfffffffe, count=3"
 		       ", map_fd=-1, elem_flags=BPF_F_LOCK, flags=0x4}"
+	}, {
+		.data = { .BPF_MAP_UPDATE_BATCH_data = {
+			.keys = 0xdeadf00d,
+			.values = 0xfffffffe,
+			.count = 3,
+			.map_fd = -1,
+			.elem_flags = -1ULL,
+			.flags = 0xff
+		} },
+		.size = offsetofend(struct BPF_MAP_UPDATE_BATCH_struct, flags),
+		.str = "batch={keys=0xdeadf00d, values=0xfffffffe, count=3"
+		       ", map_fd=-1"
+		       ", elem_flags=BPF_F_LOCK|BPF_EXIST"
+				"|BPF_NOEXIST|0xfffffffffffffff8"
+		       ", flags=0xff}"
 	}
 };
 
