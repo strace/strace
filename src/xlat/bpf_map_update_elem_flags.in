@@ -1,6 +1,8 @@
 #From include/uapi/linux/bpf.h
 #Prefix BPF_
 /* higher-valued bits and mutual modes first, BPF_ANY(0) last */
+BPF_F_ALL_CPUS	16
+BPF_F_CPU	8
 BPF_F_LOCK	4
 BPF_EXIST	2
 BPF_NOEXIST	1
