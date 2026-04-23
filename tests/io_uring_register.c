@@ -406,9 +406,9 @@ test_IORING_REGISTER_RESTRICTIONS(int fd_null)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_REGISTER_ZCRX_CTRL), true },
+		  "register_op=", ARG_STR(IORING_REGISTER_BPF_FILTER), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 37, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 38, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -2847,7 +2847,7 @@ main(void)
 	const int *const arg_fds = tail_memdup(fds, sizeof(fds));
 
 	/* Invalid opcode */
-	static const unsigned int invalid_ops[] = { 0x7fffffffU, 37 };
+	static const unsigned int invalid_ops[] = { 0x7fffffffU, 38 };
 	static const struct strval32 op_flags[] = {
 		{ ARG_STR(IORING_REGISTER_USE_REGISTERED_RING) },
 	};
