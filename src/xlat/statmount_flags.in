@@ -1,0 +1,4 @@
+#unconditional
+#From include/uapi/linux/mount.h
+#Prefix STATMOUNT_
+STATMOUNT_BY_FD

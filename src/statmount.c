@@ -7,6 +7,7 @@
 
 #include "defs.h"
 #include <linux/mount.h>
+#include "xlat/statmount_flags.h"
 #include "xlat/statmount_mask.h"
 #include "xlat/statmount_sb_flags.h"
 #include "xlat/statmount_mnt_propagation.h"
@@ -292,7 +293,7 @@ SYS_FUNC(statmount)
 	PRINT_VAL_U(bufsize);
 
 	tprints_arg_next_name("flags");
-	PRINT_VAL_X(flags);
+	printflags(statmount_flags, flags, "STATMOUNT_???");
 
 	return 0;
 }

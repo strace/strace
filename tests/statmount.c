@@ -92,8 +92,9 @@ test_req(void)
 	const void *const bad_req = req + 1;
 
 	k_statmount(bad_req, 0, bad, -1U);
-	printf("statmount(%p, NULL, %ju, %#x) = %s" INJ_STR,
-	       bad_req, (uintmax_t) bad, -1U, errstr);
+	printf("statmount(%p, NULL, %ju, %s|%#x) = %s" INJ_STR,
+	       bad_req, (uintmax_t) bad, "STATMOUNT_BY_FD",
+	       -1U & ~STATMOUNT_BY_FD, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(typeof(req->size), req_size);
 	const void *const bad_size = (void *) req_size + 1;
@@ -171,8 +172,9 @@ test_stm_bad(void)
 	const void *const bad_stm = (void *) stm + 1;
 
 	k_statmount(0, bad_stm, bad, -1U);
-	printf("statmount(NULL, %p, %ju, %#x) = %s" INJ_STR,
-	       bad_stm, (uintmax_t) bad, -1U, errstr);
+	printf("statmount(NULL, %p, %ju, %s|%#x) = %s" INJ_STR,
+	       bad_stm, (uintmax_t) bad, "STATMOUNT_BY_FD",
+	       -1U & ~STATMOUNT_BY_FD, errstr);
 
 	k_statmount(0, stm, sizeof(stm->size) - 1, 0);
 	printf("statmount(NULL, %p, %u, 0) = %s" INJ_STR,
@@ -649,6 +651,9 @@ main(void)
 {
 	k_statmount(0, 0, 0, 0);
 	printf("statmount(NULL, NULL, 0, 0) = %s" INJ_STR, errstr);
+
+	k_statmount(0, 0, 0, STATMOUNT_BY_FD);
+	printf("statmount(NULL, NULL, 0, STATMOUNT_BY_FD) = %s" INJ_STR, errstr);
 
 	test_req();
 	test_stm_bad();
