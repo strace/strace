@@ -8,7 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of BPF_PROG_ASSOC_STRUCT_OPS bpf command.
   * Implemented decoding of UDMABUF_CREATE, UDMABUF_CREATE_LIST,
     and VIDIOC_QUERYMENU ioctl commands.
-  * Updated lists of BPF_*, BTRFS_*, FS_*, IORING_REGISTER_*, KEY_*,
+  * Updated lists of BPF_*, BTRFS_*, FS_*, IORING_*, KEY_*,
     and NT_* constants.
   * Updated lists of ioctl commands from Linux 7.0.
 
