@@ -59,7 +59,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct mount_attr, attr);
 	struct mount_attr *const attr_big = tail_alloc(sizeof(*attr_big) + 8);
 	static const struct strval32 valid_flags =
-		{ ARG_STR(OPEN_TREE_CLONE|OPEN_TREE_CLOEXEC|AT_SYMLINK_NOFOLLOW|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE) };
+		{ ARG_STR(OPEN_TREE_CLONE|OPEN_TREE_NAMESPACE|OPEN_TREE_CLOEXEC|AT_SYMLINK_NOFOLLOW|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE) };
         const unsigned int dfd = 9;
 
 	k_open_tree_attr(-1, 0, AT_SYMLINK_NOFOLLOW, efault, -1U);

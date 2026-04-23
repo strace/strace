@@ -78,10 +78,10 @@ main(void)
 	k_open_tree(-1, empty, -1);
 #ifndef PATH_TRACING
 	printf("open_tree(-1, \"\", %s|%#x) = %s\n",
-	       "OPEN_TREE_CLONE|OPEN_TREE_CLOEXEC"
+	       "OPEN_TREE_CLONE|OPEN_TREE_NAMESPACE|OPEN_TREE_CLOEXEC"
 	       "|AT_SYMLINK_NOFOLLOW|AT_NO_AUTOMOUNT"
 	       "|AT_EMPTY_PATH|AT_RECURSIVE",
-	       -1U & ~0x9901 & ~O_CLOEXEC,
+	       -1U & ~0x9903 & ~O_CLOEXEC,
 	       errstr);
 #endif
 
