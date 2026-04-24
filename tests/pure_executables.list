@@ -731,6 +731,7 @@ renameat
 renameat2
 request_key
 rseq
+rseq_slice_yield
 riscv_flush_icache
 rmdir
 rt_sigaction

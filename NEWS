@@ -3,7 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented optional colorized trace output.
-  * Implemented decoding of rseq syscall.
+  * Implemented decoding of rseq and rseq_slice_yield syscalls.
   * Implemented decoding of BPF_TRACE_FSESSION bpf attach type.
   * Implemented decoding of BPF_PROG_ASSOC_STRUCT_OPS bpf command.
   * Implemented decoding of UDMABUF_CREATE, UDMABUF_CREATE_LIST,

@@ -93,6 +93,7 @@
 # define sys_munlockall		printargs
 # define sys_pause		printargs
 # define sys_printargs		printargs
+# define sys_rseq_slice_yield	printargs
 # define sys_sched_yield		printargs
 # define sys_setsid		printargs
 # define sys_setup		printargs

@@ -631,6 +631,7 @@ mq_sendrecv-read
 mq_sendrecv-write
 mseal
 rseq
+rseq_slice_yield
 msg_control
 msg_control-v
 msg_name
