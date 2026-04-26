@@ -22,11 +22,6 @@
 static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 #define counts (countv[current_personality])
 
-static const struct timespec zero_ts;
-static const struct timespec max_ts = {
-	(time_t) (long long) (zero_extend_signed_to_ull((time_t) -1ULL) >> 1),
-	999999999 };
-
 static struct timespec overhead;
 
 
@@ -94,7 +89,7 @@ void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
 	if (!scno_in_range(tcp->scno))
-		count_unknown(tcp->scno, max_ts);
+		count_unknown(tcp->scno);
 
 	if (!counts) {
 		counts = xcalloc(nsyscalls, sizeof(*counts));
@@ -102,7 +97,7 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 		for (size_t i = 0; i < nsyscalls; i++)
 			counts[i].time_min = max_ts;
 	}
-	struct call_counts *cc = &counts[tcp->scno];
+	struct call_counts *cc;
 
 	if (scno_in_range(tcp->scno))
 		cc = &counts[tcp->scno];
@@ -309,7 +304,6 @@ call_summary_pers(FILE *outf)
 	double percent;
 
 	size_t sc_name_max = 0;
-
 
 	/* sort, calculate statistics */
 	indices = xcalloc(nsyscalls, sizeof(indices[0]));

@@ -21,7 +21,7 @@ struct unknown_call_bucket {
 static struct unknown_call_bucket *unknown_counts;
 
 static void
-unknown_init(struct timespec time_max)
+unknown_init(void)
 {
 	unknown_counts = xmalloc(sizeof(*unknown_counts));
 
@@ -31,10 +31,8 @@ unknown_init(struct timespec time_max)
 					sizeof(*unknown_counts->entries));
 
 	for (size_t i = 0; i < UNKNOWN_COUNTS_ENTRIES; i++)
-		unknown_counts->entries->call_counts.time_min = time_max;
+		unknown_counts->entries->call_counts.time_min = max_ts;
 }
-
-
 
 static void
 unknown_insert(kernel_ulong_t scno)
@@ -44,6 +42,9 @@ unknown_insert(kernel_ulong_t scno)
 		unknown_counts->entries = xreallocarray(unknown_counts->entries, 
 							sizeof(*unknown_counts->entries),
 							unknown_counts->cap);
+
+		for (size_t i = unknown_counts->len; i < unknown_counts->cap; i++)
+			unknown_counts->entries[i].call_counts.time_min = max_ts;
 	}
 
 	unknown_counts->entries[unknown_counts->len].scno = scno;
@@ -74,10 +75,11 @@ struct unknown_call_counts
         return &unknown_counts->entries[idx];
 }
 
-void count_unknown(kernel_ulong_t scno, struct timespec time_max)
+void
+count_unknown(kernel_ulong_t scno)
 {
         if (!unknown_counts)
-                unknown_init(time_max);
+                unknown_init();
 
         if (!get_unknown_by_scno(scno))
                 unknown_insert(scno);

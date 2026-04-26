@@ -25,7 +25,12 @@ struct unknown_call_counts {
 	struct call_counts call_counts;
 };
 
+static const struct timespec zero_ts;
+static const struct timespec max_ts = {
+	(time_t) (long long) (zero_extend_signed_to_ull((time_t) -1ULL) >> 1),
+	999999999 };
+
 struct unknown_call_counts *get_unknown_by_scno(kernel_ulong_t scno);
 struct unknown_call_counts *get_unknown_by_idx(size_t idx);
 
-void count_unknown(kernel_ulong_t scno, struct timespec time_max);
+void count_unknown(kernel_ulong_t scno);
