@@ -24,6 +24,20 @@ static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 
 static struct timespec overhead;
 
+struct summary_stats {
+	struct timespec tv_cum;
+	const struct timespec *tv_min;
+	const struct timespec *tv_min_max;
+	const struct timespec *tv_max;
+	const struct timespec *tv_avg_max;
+	uint64_t call_cum;
+	uint64_t error_cum;
+
+	double float_tv_cum;
+	double percent;
+
+	size_t sc_name_max;
+};
 
 enum count_summary_columns {
 	CSC_NONE,
@@ -287,23 +301,37 @@ num_chars(const char *fmt, ...)
 }
 
 static void
+calc_summary_stats(struct summary_stats *stats, struct call_counts *cc, const char *sys_name)
+{
+	ts_add(&stats->tv_cum, &stats->tv_cum, &cc->time);
+	stats->tv_min = ts_min(stats->tv_min, &cc->time_min);
+	stats->tv_min_max = ts_max(stats->tv_min_max, &cc->time_min);
+	stats->tv_max = ts_max(stats->tv_max, &cc->time_max);
+	stats->call_cum += cc->calls;
+	stats->error_cum += cc->errors;
+
+	ts_div(&cc->time_avg, &cc->time, cc->calls);
+	stats->tv_avg_max = ts_max(stats->tv_avg_max, &cc->time_avg);
+
+	stats->sc_name_max = MAX(stats->sc_name_max, strlen(sys_name));
+}
+
+static void
 call_summary_pers(FILE *outf)
 {
 	unsigned int *indices;
 	size_t last_column = 0;
 
-	struct timespec tv_cum = zero_ts;
-	const struct timespec *tv_min = &max_ts;
-	const struct timespec *tv_min_max = &zero_ts;
-	const struct timespec *tv_max = &zero_ts;
-	const struct timespec *tv_avg_max = &zero_ts;
-	uint64_t call_cum = 0;
-	uint64_t error_cum = 0;
-
-	double float_tv_cum;
-	double percent;
-
-	size_t sc_name_max = 0;
+	struct summary_stats stats = {
+		.tv_cum      = zero_ts,
+		.tv_min      = &max_ts,
+		.tv_min_max  = &zero_ts,
+		.tv_max      = &zero_ts,
+		.tv_avg_max  = &zero_ts,
+		.call_cum    = 0,
+		.error_cum   = 0,
+		.sc_name_max = 0
+	};
 
 	/* sort, calculate statistics */
 	indices = xcalloc(nsyscalls, sizeof(indices[0]));
@@ -312,19 +340,17 @@ call_summary_pers(FILE *outf)
 		if (counts[i].calls == 0)
 			continue;
 
-		ts_add(&tv_cum, &tv_cum, &counts[i].time);
-		tv_min = ts_min(tv_min, &counts[i].time_min);
-		tv_min_max = ts_max(tv_min_max, &counts[i].time_min);
-		tv_max = ts_max(tv_max, &counts[i].time_max);
-		call_cum += counts[i].calls;
-		error_cum += counts[i].errors;
-
-		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
-		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
-
-		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
+		calc_summary_stats(&stats, &counts[i], sysent[i].sys_name);
 	}
-	float_tv_cum = ts_float(&tv_cum);
+
+	for (size_t i = 0; i < get_unknown_bucket_size(); ++i) {
+		struct unknown_call_counts *ucc = get_unknown_by_idx(i);
+		struct call_counts *cc = &ucc->call_counts;
+
+		calc_summary_stats(&stats, cc, ucc->sys_name);
+	}
+
+	stats.float_tv_cum = ts_float(&stats.tv_cum);
 
 	if (sortfun)
 		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
@@ -354,17 +380,17 @@ call_summary_pers(FILE *outf)
 #define W_(c_, v_) [c_] = MAX(cdesc[c_].sz, (v_))
 	unsigned int cwidths[CSC_MAX] = {
 		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
-		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
+		W_(CSC_TIME_TOTAL, num_chars("%.6f", stats.float_tv_cum)),
 		W_(CSC_TIME_MIN,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_min_max->tv_sec)),
+					     (int64_t) stats.tv_min_max->tv_sec)),
 		W_(CSC_TIME_MAX,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_max->tv_sec)),
+					     (int64_t) stats.tv_max->tv_sec)),
 		W_(CSC_TIME_AVG,   num_chars("%" PRId64 ,
-					     (uint64_t) (ts_float(tv_avg_max)
+					     (uint64_t) (ts_float(stats.tv_avg_max)
 							 * 1e6))),
-		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
-		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
-		W_(CSC_SC_NAME,    sc_name_max + 1),
+		W_(CSC_CALLS,      num_chars("%" PRIu64, stats.call_cum)),
+		W_(CSC_ERRORS,     num_chars("%" PRIu64, stats.error_cum)),
+		W_(CSC_SC_NAME,    stats.sc_name_max + 1),
 	};
 #undef W_
 
@@ -430,10 +456,10 @@ call_summary_pers(FILE *outf)
 			continue;
 
 		float_syscall_time = ts_float(&cc->time);
-		percent = (100.0 * float_syscall_time);
+		stats.percent = (100.0 * float_syscall_time);
 		/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
-		if (percent != 0.0)
-			   percent /= float_tv_cum;
+		if (stats.percent != 0.0)
+			   stats.percent /= stats.float_tv_cum;
 
 		for (size_t i = 0; i <= last_column; ++i) {
 			const size_t c = columns[i];
@@ -441,7 +467,7 @@ call_summary_pers(FILE *outf)
 				fputc(' ', outf);
 
 			switch (c) {
-			PC_(CSC_TIME_100S,  percent);
+			PC_(CSC_TIME_100S,  stats.percent);
 			PC_(CSC_TIME_TOTAL, float_syscall_time);
 			PC_(CSC_TIME_MIN,   ts_float(&cc->time_min));
 			PC_(CSC_TIME_MAX,   ts_float(&cc->time_max));
@@ -476,12 +502,12 @@ call_summary_pers(FILE *outf)
 
 		switch (c) {
 		PC_(CSC_TIME_100S, 100.0);
-		PC_(CSC_TIME_TOTAL, float_tv_cum);
-		PC_(CSC_TIME_MIN, ts_float(tv_min));
-		PC_(CSC_TIME_MAX, ts_float(tv_max));
-		PC_(CSC_TIME_AVG, (uint64_t) (float_tv_cum / call_cum * 1e6));
-		PC_(CSC_CALLS, call_cum);
-		PC_(CSC_ERRORS, error_cum);
+		PC_(CSC_TIME_TOTAL, stats.float_tv_cum);
+		PC_(CSC_TIME_MIN, ts_float(stats.tv_min));
+		PC_(CSC_TIME_MAX, ts_float(stats.tv_max));
+		PC_(CSC_TIME_AVG, (uint64_t) (stats.float_tv_cum / stats.call_cum * 1e6));
+		PC_(CSC_CALLS, stats.call_cum);
+		PC_(CSC_ERRORS, stats.error_cum);
 		PC_(CSC_SC_NAME, "total");
 		}
 	}

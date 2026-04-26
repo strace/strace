@@ -84,3 +84,9 @@ count_unknown(kernel_ulong_t scno)
         if (!get_unknown_by_scno(scno))
                 unknown_insert(scno);
 }
+
+size_t
+get_unknown_bucket_size(void)
+{
+	return unknown_counts ? unknown_counts->len : 0;
+}

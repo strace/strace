@@ -34,3 +34,5 @@ struct unknown_call_counts *get_unknown_by_scno(kernel_ulong_t scno);
 struct unknown_call_counts *get_unknown_by_idx(size_t idx);
 
 void count_unknown(kernel_ulong_t scno);
+
+size_t get_unknown_bucket_size(void);
