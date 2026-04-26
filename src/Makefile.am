@@ -91,6 +91,7 @@ libstrace_a_SOURCES =	\
 	color.h		\
 	copy_file_range.c \
 	count.c		\
+	count.h		\
 	counter_ioctl.c	\
 	defs.h		\
 	delay.c		\
@@ -412,6 +413,7 @@ libstrace_a_SOURCES =	\
 	umask.c		\
 	umount.c	\
 	uname.c		\
+	unknown_count.c \
 	upeek.c		\
 	upoke.c		\
 	userfaultfd.c	\

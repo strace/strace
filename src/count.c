@@ -15,18 +15,9 @@
  */
 
 #include "defs.h"
+#include "count.h"
 
 #include <stdarg.h>
-
-/* Per-syscall stats structure */
-struct call_counts {
-	/* time may be total latency or system time */
-	struct timespec time;
-	struct timespec time_min;
-	struct timespec time_max;
-	struct timespec time_avg;
-	uint64_t calls, errors;
-};
 
 static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 #define counts (countv[current_personality])
@@ -103,7 +94,7 @@ void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
 	if (!scno_in_range(tcp->scno))
-		return;
+		count_unknown(tcp->scno, max_ts);
 
 	if (!counts) {
 		counts = xcalloc(nsyscalls, sizeof(*counts));
@@ -112,6 +103,11 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 			counts[i].time_min = max_ts;
 	}
 	struct call_counts *cc = &counts[tcp->scno];
+
+	if (scno_in_range(tcp->scno))
+		cc = &counts[tcp->scno];
+	else
+		cc = &get_unknown_by_scno(tcp->scno)->call_counts;
 
 	cc->calls++;
 	if (syserror(tcp))
