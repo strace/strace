@@ -1,7 +1,7 @@
 /*
  * Check decoding of open_tree_attr syscall.
  *
- * Copyright (c) 2019-2025 The strace developers.
+ * Copyright (c) 2019-2026 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
