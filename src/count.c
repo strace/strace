@@ -319,7 +319,12 @@ calc_summary_stats(struct summary_stats *stats, struct call_counts *cc, const ch
 static void
 call_summary_pers(FILE *outf)
 {
+	/*
+	 * unknown system calls start at index nsyscalls
+	 * and their index may differ from their number
+	 */
 	unsigned int *indices;
+	size_t indices_size = nsyscalls + get_unknown_bucket_size();
 	size_t last_column = 0;
 
 	struct summary_stats stats = {
@@ -333,8 +338,8 @@ call_summary_pers(FILE *outf)
 		.sc_name_max = 0
 	};
 
-	/* sort, calculate statistics */
-	indices = xcalloc(nsyscalls, sizeof(indices[0]));
+	/* sort, calculate statistics (for known syscalls) */
+	indices = xcalloc(indices_size, sizeof(indices[0]));
 	for (size_t i = 0; i < nsyscalls; ++i) {
 		indices[i] = i;
 		if (counts[i].calls == 0)
@@ -343,15 +348,24 @@ call_summary_pers(FILE *outf)
 		calc_summary_stats(&stats, &counts[i], sysent[i].sys_name);
 	}
 
+	/* for unknown syscalls */
 	for (size_t i = 0; i < get_unknown_bucket_size(); ++i) {
 		struct unknown_call_counts *ucc = get_unknown_by_idx(i);
 		struct call_counts *cc = &ucc->call_counts;
+
+		indices[nsyscalls + i] = ucc->scno;
 
 		calc_summary_stats(&stats, cc, ucc->sys_name);
 	}
 
 	stats.float_tv_cum = ts_float(&stats.tv_cum);
 
+	/*
+	 * TODO: extend sorting functions for unknown syscalls.
+	 *
+	 * Existing sorting functions works with counts array,
+	 * ignoring all unknown syscalls that stores in unknown bucket.
+	 */
 	if (sortfun)
 		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
 
@@ -447,10 +461,20 @@ call_summary_pers(FILE *outf)
 	}
 
 	/* data output */
-	for (size_t j = 0; j < nsyscalls; ++j) {
+	for (size_t j = 0; j < indices_size; ++j) {
 		unsigned int idx = indices[j];
-		struct call_counts *cc = &counts[idx];
+		struct call_counts *cc;
+		const char *sys_name;
 		double float_syscall_time;
+
+		if (scno_in_range(idx)) {
+			cc = &counts[idx];
+			sys_name = sysent[idx].sys_name;
+		} else {
+			struct unknown_call_counts *ucc = get_unknown_by_scno(idx);
+			cc = &ucc->call_counts;
+			sys_name = ucc->sys_name;
+		}
 
 		if (cc->calls == 0)
 			continue;
@@ -475,7 +499,7 @@ call_summary_pers(FILE *outf)
 			    (uint64_t) (ts_float(&cc->time_avg) * 1e6));
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
-			PC_(CSC_SC_NAME,    sysent[idx].sys_name);
+			PC_(CSC_SC_NAME,    sys_name);
 			}
 		}
 
