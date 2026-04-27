@@ -67,6 +67,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/input.h \
 	linux/include/uapi/linux/io_uring.h \
 	linux/include/uapi/linux/io_uring/query.h \
+	linux/include/uapi/linux/io_uring/zcrx.h \
 	linux/include/uapi/linux/ioam6_genl.h \
 	linux/include/uapi/linux/ip_vs.h \
 	linux/include/uapi/linux/kcmp.h \
