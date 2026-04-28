@@ -46,9 +46,10 @@ main(void)
 	static const struct strval32 flags[] = {
 		{ ARG_STR(0) },
 		{ 1, "FSMOUNT_CLOEXEC" },
-		{ 2, "0x2 /* FSMOUNT_??? */" },
-		{ 0xfffffffe, "0xfffffffe /* FSMOUNT_??? */" },
-		{ -1, "FSMOUNT_CLOEXEC|0xfffffffe" }
+		{ 2, "FSMOUNT_NAMESPACE" },
+		{ 4, "0x4 /* FSMOUNT_??? */" },
+		{ 0xfffffffc, "0xfffffffc /* FSMOUNT_??? */" },
+		{ -1, "FSMOUNT_CLOEXEC|FSMOUNT_NAMESPACE|0xfffffffc" }
 	},
 	attrs[] = {
 		{ ARG_STR(0) },

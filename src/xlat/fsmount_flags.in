@@ -2,3 +2,4 @@
 #From include/uapi/linux/mount.h
 #Prefix FSMOUNT_
 FSMOUNT_CLOEXEC
+FSMOUNT_NAMESPACE
