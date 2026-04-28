@@ -101,16 +101,30 @@ static const struct {
 
 static struct call_counts *get_syscall_cc(kernel_ulong_t scno)
 {
-	return scno_in_range(scno) 
-		? &counts[scno] 
-		: &get_unknown_by_scno(scno)->call_counts;
+	if (scno_in_range(scno))
+		return &counts[scno];
+
+	struct unknown_call_counts *ucc = get_unknown_by_scno(scno);
+	if (!ucc)
+		error_msg_and_die("failed to get unknown syscall"
+				  "counts by %lx number", 
+				  scno);
+
+	return &ucc->call_counts;
 }
 
 static const char *get_syscall_name(kernel_ulong_t scno)
 {
-	return scno_in_range(scno) 
-		? sysent[scno].sys_name 
-		: get_unknown_by_scno(scno)->sys_name;
+	if (scno_in_range(scno))
+		return sysent[scno].sys_name;
+
+	struct unknown_call_counts *ucc = get_unknown_by_scno(scno);
+	if (!ucc)
+		error_msg_and_die("failed to get unknown syscall"
+				  "name by %lx number", 
+				  scno);
+
+	return ucc->sys_name;
 }
 
 void
