@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ===============================================
 
 * Improvements
+  * Updated lists of CLONE_* constants.
 
 Noteworthy changes in release 7.0 (2026-04-26)
 ==============================================

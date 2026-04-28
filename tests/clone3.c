@@ -427,20 +427,21 @@ main(int argc, char *argv[])
 	       ", %zu) = %s" INJ_STR,
 	       sizeof(*arg) + 16, sprintrc(rc));
 
-	arg->flags = 0xface3eefbeefc0de;
+	arg->flags = 0xface3effbeefc0de;
 	arg->exit_signal = 0x1e55c0de;
 	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags=%s, child_tid=NULL, exit_signal=508936414"
 	       ", stack=NULL, stack_size=0, tls=NULL}, 64) = %s" INJ_STR,
-	       XLAT_KNOWN(0xface3eefbeefc0de, "CLONE_VFORK|CLONE_PARENT"
+	       XLAT_KNOWN(0xface3effbeefc0de, "CLONE_VFORK|CLONE_PARENT"
 	       "|CLONE_THREAD|CLONE_NEWNS|CLONE_SYSVSEM|CLONE_SETTLS"
 	       "|CLONE_CHILD_CLEARTID|CLONE_UNTRACED|CLONE_NEWCGROUP"
 	       "|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWPID|CLONE_IO"
 	       "|CLONE_NEWTIME|CLONE_CLEAR_SIGHAND|CLONE_INTO_CGROUP"
-	       "|0xface3eec0040005e"),
+	       "|CLONE_AUTOREAP|CLONE_NNP|CLONE_PIDFD_AUTOKILL"
+	       "|CLONE_EMPTY_MNTNS|0xface3ec00040005e"),
 	       sprintrc(rc));
 
-	arg->flags = 0xdec0deac0040007fULL;
+	arg->flags = 0xffffffc00040007fULL;
 	arg->exit_signal = 250;
 	arg->stack = 0xface1e55beeff00dULL;
 	arg->stack_size = 0xcaffeedefacedca7ULL;
@@ -448,7 +449,7 @@ main(int argc, char *argv[])
 	printf("clone3({flags=%s, exit_signal=250"
 	       ", stack=0xface1e55beeff00d, stack_size=0xcaffeedefacedca7}, 64)"
 	       " = %s" INJ_STR,
-	       XLAT_UNKNOWN(0xdec0deac0040007f, "CLONE_???"),
+	       XLAT_UNKNOWN(0xffffffc00040007f, "CLONE_???"),
 	       sprintrc(rc));
 
 	arg->exit_signal = SIGCHLD;
