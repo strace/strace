@@ -99,6 +99,20 @@ static const struct {
 	{ "nothing",      CSC_NONE       },
 };
 
+static struct call_counts *get_syscall_cc(kernel_ulong_t scno)
+{
+	return scno_in_range(scno) 
+		? &counts[scno] 
+		: &get_unknown_by_scno(scno)->call_counts;
+}
+
+static const char *get_syscall_name(kernel_ulong_t scno)
+{
+	return scno_in_range(scno) 
+		? sysent[scno].sys_name 
+		: get_unknown_by_scno(scno)->sys_name;
+}
+
 void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
@@ -111,12 +125,7 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 		for (size_t i = 0; i < nsyscalls; i++)
 			counts[i].time_min = max_ts;
 	}
-	struct call_counts *cc;
-
-	if (scno_in_range(tcp->scno))
-		cc = &counts[tcp->scno];
-	else
-		cc = &get_unknown_by_scno(tcp->scno)->call_counts;
+	struct call_counts *cc = get_syscall_cc(tcp->scno);
 
 	cc->calls++;
 	if (syserror(tcp))
@@ -145,28 +154,29 @@ time_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	return -ts_cmp(&counts[*a_int].time, &counts[*b_int].time);
+	return -ts_cmp(&get_syscall_cc(*a_int)->time,
+		       &get_syscall_cc(*b_int)->time);
 }
 
 static int
 min_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_min,
-		       &counts[*((unsigned int *) b)].time_min);
+	return -ts_cmp(&get_syscall_cc(*(unsigned int *)a)->time_min,
+		       &get_syscall_cc(*(unsigned int *)b)->time_min);
 }
 
 static int
 max_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_max,
-		       &counts[*((unsigned int *) b)].time_max);
+	return -ts_cmp(&get_syscall_cc(*(unsigned int *)a)->time_max,
+		       &get_syscall_cc(*(unsigned int *)b)->time_max);
 }
 
 static int
 avg_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_avg,
-		       &counts[*((unsigned int *) b)].time_avg);
+	return -ts_cmp(&get_syscall_cc(*(unsigned int *)a)->time_avg,
+		       &get_syscall_cc(*(unsigned int *)b)->time_avg);
 }
 
 static int
@@ -174,8 +184,8 @@ syscall_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	const char *a_name = sysent[*a_int].sys_name;
-	const char *b_name = sysent[*b_int].sys_name;
+	const char *a_name = get_syscall_name(*a_int);
+	const char *b_name = get_syscall_name(*b_int);
 	return strcmp(a_name ? a_name : "", b_name ? b_name : "");
 }
 
@@ -184,8 +194,8 @@ count_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	uint64_t m = counts[*a_int].calls;
-	uint64_t n = counts[*b_int].calls;
+	uint64_t m = get_syscall_cc(*a_int)->calls;
+	uint64_t n = get_syscall_cc(*b_int)->calls;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -195,8 +205,8 @@ error_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
 	const unsigned int *b_int = b;
-	uint64_t m = counts[*a_int].errors;
-	uint64_t n = counts[*b_int].errors;
+	uint64_t m = get_syscall_cc(*a_int)->errors;
+	uint64_t n = get_syscall_cc(*b_int)->errors;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -360,14 +370,8 @@ call_summary_pers(FILE *outf)
 
 	stats.float_tv_cum = ts_float(&stats.tv_cum);
 
-	/*
-	 * TODO: extend sorting functions for unknown syscalls.
-	 *
-	 * Existing sorting functions works with counts array,
-	 * ignoring all unknown syscalls that stores in unknown bucket.
-	 */
 	if (sortfun)
-		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
+		qsort((void *) indices, indices_size, sizeof(indices[0]), sortfun);
 
 	enum column_flags {
 		CF_L = 1 << 0, /* Left-aligned column */
@@ -463,18 +467,9 @@ call_summary_pers(FILE *outf)
 	/* data output */
 	for (size_t j = 0; j < indices_size; ++j) {
 		unsigned int idx = indices[j];
-		struct call_counts *cc;
-		const char *sys_name;
+		struct call_counts *cc = get_syscall_cc(idx);
+		const char *sys_name = get_syscall_name(idx);
 		double float_syscall_time;
-
-		if (scno_in_range(idx)) {
-			cc = &counts[idx];
-			sys_name = sysent[idx].sys_name;
-		} else {
-			struct unknown_call_counts *ucc = get_unknown_by_scno(idx);
-			cc = &ucc->call_counts;
-			sys_name = ucc->sys_name;
-		}
 
 		if (cc->calls == 0)
 			continue;
