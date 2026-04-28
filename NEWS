@@ -3,7 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, LANDLOCK_*, NETDEV_*,
-    and NL80211_* constants.
+    NL80211_*, and PIDFD_* constants.
 
 Noteworthy changes in release 7.0 (2026-04-26)
 ==============================================
