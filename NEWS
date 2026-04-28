@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of CLONE_* and FSMOUNT_* constants.
+  * Updated lists of CLONE_*, FSMOUNT_*, and KT_* constants.
 
 Noteworthy changes in release 7.0 (2026-04-26)
 ==============================================

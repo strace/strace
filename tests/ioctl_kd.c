@@ -224,8 +224,12 @@ check_kbdent(unsigned int c, const char *s)
 		{ ARG_STR(0xe0b) NRAW(" /* K(KT_BRL, 0xb) */") },
 		{ ARG_STR(0xeff) NRAW(" /* K(KT_BRL, 0xff) */") },
 
-		{ ARG_STR(0xf00) NRAW(" /* K(0xf, 0) */") },
-		{ ARG_STR(0xfed) NRAW(" /* K(0xf, 0xed) */") },
+		{ ARG_STR(0xf0c) NRAW(" /* K(KT_CSI, 0xc) */") },
+		{ ARG_STR(0xfff) NRAW(" /* K(KT_CSI, 0xff) */") },
+
+		{ ARG_STR(0x1000) NRAW(" /* K(0x10, 0) */") },
+		{ ARG_STR(0x10ed) NRAW(" /* K(0x10, 0xed) */") },
+
 		{ ARG_STR(0xf00d) NRAW(" /* K(0xf0, 0xd) */") },
 	};
 
