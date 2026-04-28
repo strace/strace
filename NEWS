@@ -2,7 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, and LANDLOCK_* constants.
+  * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, LANDLOCK_*, and NETDEV_*
+    constants.
 
 Noteworthy changes in release 7.0 (2026-04-26)
 ==============================================
