@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of IFLA_BR_FDB_N_LEARNED, IFLA_BR_FDB_MAX_LEARNED,
+    and IFLA_BR_STP_MODE netlink attributes.
   * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, LANDLOCK_*, NETDEV_*,
     NL80211_*, and PIDFD_* constants.
 

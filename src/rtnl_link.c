@@ -38,6 +38,7 @@
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_ext_filter_flags.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
+#include "xlat/rtnl_br_stp_mode.h"
 #include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
 #include "xlat/rtnl_ifla_info_data_tun_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
@@ -532,6 +533,21 @@ decode_ifla_br_mcast_qstate(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_ifla_br_stp_mode(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = rtnl_br_stp_mode,
+		.dflt = "BR_STP_MODE_???",
+		.size = sizeof(uint32_t),
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_UNSPEC]			= NULL,
 	[IFLA_BR_FORWARD_DELAY]			= decode_nla_clock_t,
@@ -581,6 +597,9 @@ static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_VLAN_STATS_PER_PORT]		= decode_nla_u8,
 	[IFLA_BR_MULTI_BOOLOPT]			= decode_ifla_br_boolopt,
 	[IFLA_BR_MCAST_QUERIER_STATE]		= decode_ifla_br_mcast_qstate,
+	[IFLA_BR_FDB_N_LEARNED]			= decode_nla_u32,
+	[IFLA_BR_FDB_MAX_LEARNED]		= decode_nla_u32,
+	[IFLA_BR_STP_MODE]			= decode_ifla_br_stp_mode,
 };
 
 static
