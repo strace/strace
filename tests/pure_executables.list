@@ -733,6 +733,7 @@ request_key
 rseq
 rseq_slice_yield
 riscv_flush_icache
+riscv_hwprobe
 rmdir
 rt_sigaction
 rt_sigpending
