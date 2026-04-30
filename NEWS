@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ===============================================
 
 * Improvements
+  * Updated decoding of sched_getattr syscall.
   * Implemented decoding of IFLA_BR_FDB_N_LEARNED, IFLA_BR_FDB_MAX_LEARNED,
     and IFLA_BR_STP_MODE netlink attributes.
   * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, LANDLOCK_*, NETDEV_*,

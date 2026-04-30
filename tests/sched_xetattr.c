@@ -50,6 +50,7 @@ main(void)
 		(kernel_ulong_t) 0xdefacedcafef00dULL;
 	static const kernel_ulong_t bogus_flags =
 		(kernel_ulong_t) 0xdefaceddeadc0deULL;
+	static const unsigned int bogus_getattr_flags = -2U;
 
 	const int pid = getpid();
 	const char *pid_str = pidns_pid2str(PT_TGID);
@@ -71,16 +72,35 @@ main(void)
 	pidns_print_leader();
 	printf("sched_getattr(%d, NULL, 0, 0) = %s\n", (int) bogus_pid, errstr);
 
-	sys_sched_getattr(-1U, (unsigned long) attr, bogus_size, bogus_flags);
+	sys_sched_getattr(-1U, (unsigned long) attr, bogus_size, 0);
 	pidns_print_leader();
-	printf("sched_getattr(-1, %p, %s%u, %u) = %s\n",
+	printf("sched_getattr(-1, %p, %s%u, 0) = %s\n",
 	       attr,
 #if defined __arm64__ || defined __aarch64__
 	       "0xdefaced<<32|",
 #else
 	       "",
 #endif
-	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
+	       (unsigned) bogus_size, errstr);
+
+	sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_SIZE_VER0, 1);
+	pidns_print_leader();
+	printf("sched_getattr(0, %p, %u, %s) = %s\n",
+	       attr, (unsigned) SCHED_ATTR_SIZE_VER0,
+	       "SCHED_GETATTR_FLAG_DL_DYNAMIC", errstr);
+
+	sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_SIZE_VER0, -1U);
+	pidns_print_leader();
+	printf("sched_getattr(0, %p, %u, %s|%#x) = %s\n",
+	       attr, (unsigned) SCHED_ATTR_SIZE_VER0,
+	       "SCHED_GETATTR_FLAG_DL_DYNAMIC", bogus_getattr_flags, errstr);
+
+	sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_SIZE_VER0,
+			  bogus_getattr_flags);
+	pidns_print_leader();
+	printf("sched_getattr(0, %p, %u, %#x /* %s */) = %s\n",
+	       attr, (unsigned) SCHED_ATTR_SIZE_VER0,
+	       bogus_getattr_flags, "SCHED_GETATTR_FLAG_???", errstr);
 
 	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_SIZE_VER0, 0);
 	pidns_print_leader();
