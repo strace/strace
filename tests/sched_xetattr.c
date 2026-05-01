@@ -283,7 +283,7 @@ main(void)
 	       "sched_flags=%#" PRI__x64 " /* SCHED_FLAG_??? */, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
 	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
-	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
+	       "sched_util_min=%u, sched_util_max=%u, ...}, %#x) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_policy,
@@ -327,7 +327,7 @@ main(void)
 	       "SCHED_FLAG_DL_OVERRUN|0x80, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
 	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
-	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
+	       "sched_util_min=%u, sched_util_max=%u, ...}, %#x) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_policy,
@@ -365,7 +365,7 @@ main(void)
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_KEEP_POLICY|0x80, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
-	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 "}, %u)"
+	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 "}, %#x)"
 	       " = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
@@ -402,7 +402,7 @@ main(void)
 	       "|SCHED_FLAG_UTIL_CLAMP_MAX|0x80, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRI__u64 ", "
 	       "sched_deadline=%" PRI__u64 ", sched_period=%" PRI__u64 ", "
-	       "sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
+	       "sched_util_min=%u, sched_util_max=%u}, %#x) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_policy,
@@ -435,7 +435,7 @@ main(void)
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
 	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_flags=SCHED_FLAG_KEEP_PARAMS"
-	       "|0xcaffee80, sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
+	       "|0xcaffee80, sched_util_min=%u, sched_util_max=%u}, %#x) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_util_min,

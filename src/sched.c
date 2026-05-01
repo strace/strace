@@ -268,7 +268,7 @@ SYS_FUNC(sched_setattr)
 
 		/* flags */
 		tprints_arg_next_name("flags");
-		PRINT_VAL_U((unsigned int) tcp->u_arg[2]);
+		PRINT_VAL_X((unsigned int) tcp->u_arg[2]);
 	}
 
 	return 0;
