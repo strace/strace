@@ -99,7 +99,8 @@ static const struct {
 	{ "nothing",      CSC_NONE       },
 };
 
-static struct call_counts *get_syscall_cc(kernel_ulong_t scno)
+static struct call_counts *
+get_syscall_cc(kernel_ulong_t scno)
 {
 	if (scno_in_range(scno))
 		return &counts[scno];
@@ -113,7 +114,8 @@ static struct call_counts *get_syscall_cc(kernel_ulong_t scno)
 	return &ucc->call_counts;
 }
 
-static const char *get_syscall_name(kernel_ulong_t scno)
+static const char *
+get_syscall_name(kernel_ulong_t scno)
 {
 	if (scno_in_range(scno))
 		return sysent[scno].sys_name;

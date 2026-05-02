@@ -53,8 +53,8 @@ unknown_insert(kernel_ulong_t scno)
 	unknown_counts->len++;
 }
 
-struct unknown_call_counts
-*get_unknown_by_scno(kernel_ulong_t scno)
+struct unknown_call_counts *
+get_unknown_by_scno(kernel_ulong_t scno)
 {
 	for (size_t i = 0; i < unknown_counts->len; i++)
 		if (unknown_counts->entries[i].scno == scno)
@@ -63,8 +63,8 @@ struct unknown_call_counts
 	return NULL;
 }
 
-struct unknown_call_counts
-*get_unknown_by_idx(size_t idx)
+struct unknown_call_counts *
+get_unknown_by_idx(size_t idx)
 {
         if (!unknown_counts)
                 return NULL;
