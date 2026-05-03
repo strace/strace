@@ -699,6 +699,10 @@ MISC_TESTS = \
 	strace--color-no-tty.test \
 	strace--color-tty.test \
 	strace--argv0.test \
+	asinfo.test \
+	asinfo-multi.test \
+	asinfo-errors.test \
+	asinfo-list.test \
 	strace--syscall-limit.test \
 	strace--syscall-limit--seccomp-bpf.test \
 	strace--tips-full.test \
