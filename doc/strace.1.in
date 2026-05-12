@@ -1508,6 +1508,23 @@ Maximum observed call duration.
 .BR avg\-time " (or " time\-avg )
 Average call duration.
 .TQ
+.BR wall\-total " (or " total\-wall )
+Total wall-clock time consumed by a specific system call.  Always wall-clock,
+regardless of the
+.B \-w
+option, allowing it to be displayed alongside
+.B total\-time
+in a single run.
+.TQ
+.BR wall\-min " (or " min\-wall )
+Minimum observed wall-clock call duration.
+.TQ
+.BR wall\-max " (or " max\-wall )
+Maximum observed wall-clock call duration.
+.TQ
+.BR wall\-avg " (or " avg\-wall )
+Average wall-clock call duration.
+.TQ
 .BR calls " (or " count )
 Call count.
 .TQ

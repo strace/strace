@@ -25,6 +25,10 @@ struct call_counts {
 	struct timespec time_min;
 	struct timespec time_max;
 	struct timespec time_avg;
+	struct timespec wall_time;
+	struct timespec wall_time_min;
+	struct timespec wall_time_max;
+	struct timespec wall_time_avg;
 	uint64_t calls, errors;
 };
 
@@ -49,6 +53,10 @@ enum count_summary_columns {
 	CSC_CALLS,
 	CSC_ERRORS,
 	CSC_SC_NAME,
+	CSC_TIME_WALL_TOTAL,
+	CSC_TIME_WALL_MIN,
+	CSC_TIME_WALL_MAX,
+	CSC_TIME_WALL_AVG,
 
 	CSC_MAX,
 };
@@ -95,6 +103,22 @@ static const struct {
 	{ "syscall",      CSC_SC_NAME    },
 	{ "syscall_name", CSC_SC_NAME    },
 	{ "syscall-name", CSC_SC_NAME    },
+	{ "wall_total",   CSC_TIME_WALL_TOTAL },
+	{ "wall-total",   CSC_TIME_WALL_TOTAL },
+	{ "total_wall",   CSC_TIME_WALL_TOTAL },
+	{ "total-wall",   CSC_TIME_WALL_TOTAL },
+	{ "wall_min",     CSC_TIME_WALL_MIN   },
+	{ "wall-min",     CSC_TIME_WALL_MIN   },
+	{ "min_wall",     CSC_TIME_WALL_MIN   },
+	{ "min-wall",     CSC_TIME_WALL_MIN   },
+	{ "wall_max",     CSC_TIME_WALL_MAX   },
+	{ "wall-max",     CSC_TIME_WALL_MAX   },
+	{ "max_wall",     CSC_TIME_WALL_MAX   },
+	{ "max-wall",     CSC_TIME_WALL_MAX   },
+	{ "wall_avg",     CSC_TIME_WALL_AVG   },
+	{ "wall-avg",     CSC_TIME_WALL_AVG   },
+	{ "avg_wall",     CSC_TIME_WALL_AVG   },
+	{ "avg-wall",     CSC_TIME_WALL_AVG   },
 	{ "none",         CSC_NONE       },
 	{ "nothing",      CSC_NONE       },
 };
@@ -108,8 +132,10 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	if (!counts) {
 		counts = xcalloc(nsyscalls, sizeof(*counts));
 
-		for (size_t i = 0; i < nsyscalls; i++)
+		for (size_t i = 0; i < nsyscalls; i++) {
 			counts[i].time_min = max_ts;
+			counts[i].wall_time_min = max_ts;
+		}
 	}
 	struct call_counts *cc = &counts[tcp->scno];
 
@@ -133,6 +159,16 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	ts_add(&cc->time, &cc->time, wts_nonneg);
 	cc->time_min = *ts_min(&cc->time_min, wts_nonneg);
 	cc->time_max = *ts_max(&cc->time_max, wts_nonneg);
+
+	struct timespec wall_wts;
+	ts_sub(&wall_wts, syscall_exiting_ts, &tcp->etime);
+	ts_sub(&wall_wts, &wall_wts, &overhead);
+
+	const struct timespec *wall_wts_nonneg = ts_max(&wall_wts, &zero_ts);
+
+	ts_add(&cc->wall_time, &cc->wall_time, wall_wts_nonneg);
+	cc->wall_time_min = *ts_min(&cc->wall_time_min, wall_wts_nonneg);
+	cc->wall_time_max = *ts_max(&cc->wall_time_max, wall_wts_nonneg);
 }
 
 static int
@@ -162,6 +198,35 @@ avg_time_cmp(const void *a, const void *b)
 {
 	return -ts_cmp(&counts[*((unsigned int *) a)].time_avg,
 		       &counts[*((unsigned int *) b)].time_avg);
+}
+
+static int
+wall_time_cmp(const void *a, const void *b)
+{
+	const unsigned int *a_int = a;
+	const unsigned int *b_int = b;
+	return -ts_cmp(&counts[*a_int].wall_time, &counts[*b_int].wall_time);
+}
+
+static int
+wall_min_time_cmp(const void *a, const void *b)
+{
+	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_min,
+		       &counts[*((unsigned int *) b)].wall_time_min);
+}
+
+static int
+wall_max_time_cmp(const void *a, const void *b)
+{
+	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_max,
+		       &counts[*((unsigned int *) b)].wall_time_max);
+}
+
+static int
+wall_avg_time_cmp(const void *a, const void *b)
+{
+	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_avg,
+		       &counts[*((unsigned int *) b)].wall_time_avg);
 }
 
 static int
@@ -203,14 +268,18 @@ void
 set_sortby(const char *sortby)
 {
 	static const sort_func sort_fns[CSC_MAX] = {
-		[CSC_TIME_100S]  = time_cmp,
-		[CSC_TIME_TOTAL] = time_cmp,
-		[CSC_TIME_MIN]   = min_time_cmp,
-		[CSC_TIME_MAX]   = max_time_cmp,
-		[CSC_TIME_AVG]   = avg_time_cmp,
-		[CSC_CALLS]      = count_cmp,
-		[CSC_ERRORS]     = error_cmp,
-		[CSC_SC_NAME]    = syscall_cmp,
+		[CSC_TIME_100S]       = time_cmp,
+		[CSC_TIME_TOTAL]      = time_cmp,
+		[CSC_TIME_MIN]        = min_time_cmp,
+		[CSC_TIME_MAX]        = max_time_cmp,
+		[CSC_TIME_AVG]        = avg_time_cmp,
+		[CSC_CALLS]           = count_cmp,
+		[CSC_ERRORS]          = error_cmp,
+		[CSC_SC_NAME]         = syscall_cmp,
+		[CSC_TIME_WALL_TOTAL] = wall_time_cmp,
+		[CSC_TIME_WALL_MIN]   = wall_min_time_cmp,
+		[CSC_TIME_WALL_MAX]   = wall_max_time_cmp,
+		[CSC_TIME_WALL_AVG]   = wall_avg_time_cmp,
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(column_aliases); ++i) {
@@ -306,10 +375,16 @@ call_summary_pers(FILE *outf)
 	const struct timespec *tv_min_max = &zero_ts;
 	const struct timespec *tv_max = &zero_ts;
 	const struct timespec *tv_avg_max = &zero_ts;
+	struct timespec tv_wall_cum = zero_ts;
+	const struct timespec *tv_wall_min = &max_ts;
+	const struct timespec *tv_wall_min_max = &zero_ts;
+	const struct timespec *tv_wall_max = &zero_ts;
+	const struct timespec *tv_wall_avg_max = &zero_ts;
 	uint64_t call_cum = 0;
 	uint64_t error_cum = 0;
 
 	double float_tv_cum;
+	double float_tv_wall_cum;
 	double percent;
 
 	size_t sc_name_max = 0;
@@ -326,15 +401,25 @@ call_summary_pers(FILE *outf)
 		tv_min = ts_min(tv_min, &counts[i].time_min);
 		tv_min_max = ts_max(tv_min_max, &counts[i].time_min);
 		tv_max = ts_max(tv_max, &counts[i].time_max);
+		ts_add(&tv_wall_cum, &tv_wall_cum, &counts[i].wall_time);
+		tv_wall_min = ts_min(tv_wall_min, &counts[i].wall_time_min);
+		tv_wall_min_max = ts_max(tv_wall_min_max,
+					 &counts[i].wall_time_min);
+		tv_wall_max = ts_max(tv_wall_max, &counts[i].wall_time_max);
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 
 		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
 		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
+		ts_div(&counts[i].wall_time_avg, &counts[i].wall_time,
+		       counts[i].calls);
+		tv_wall_avg_max = ts_max(tv_wall_avg_max,
+					 &counts[i].wall_time_avg);
 
 		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
 	}
 	float_tv_cum = ts_float(&tv_cum);
+	float_tv_wall_cum = ts_float(&tv_wall_cum);
 
 	if (sortfun)
 		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
@@ -349,15 +434,26 @@ call_summary_pers(FILE *outf)
 		const char *last_fmt;
 		uint32_t flags;
 	} cdesc[] = {
-		[CSC_TIME_100S]  = { ARRSZ_PAIR("% time") - 1,   "%1$*2$.2f" },
-		[CSC_TIME_MIN]   = { ARRSZ_PAIR("shortest") - 1, "%1$*2$.6f" },
-		[CSC_TIME_MAX]   = { ARRSZ_PAIR("longest") - 1,  "%1$*2$.6f" },
+		[CSC_TIME_100S]       = { ARRSZ_PAIR("% time") - 1,
+					  "%1$*2$.2f" },
+		[CSC_TIME_MIN]        = { ARRSZ_PAIR("shortest") - 1,
+					  "%1$*2$.6f" },
+		[CSC_TIME_MAX]        = { ARRSZ_PAIR("longest") - 1,
+					  "%1$*2$.6f" },
 		/* Historical field sizes are preserved */
-		[CSC_TIME_TOTAL] = { "seconds",    11, "%1$*2$.6f" },
-		[CSC_TIME_AVG]   = { "usecs/call", 11, "%1$*2$" PRIu64 },
-		[CSC_CALLS]      = { "calls",       9, "%1$*2$" PRIu64 },
-		[CSC_ERRORS]     = { "errors",      9, "%1$*2$.0" PRIu64 },
-		[CSC_SC_NAME]    = { "syscall",    16, "%1$-*2$s", "%1$s", CF_L },
+		[CSC_TIME_TOTAL]      = { "seconds",    11, "%1$*2$.6f" },
+		[CSC_TIME_AVG]        = { "usecs/call", 11, "%1$*2$" PRIu64 },
+		[CSC_CALLS]           = { "calls",       9, "%1$*2$" PRIu64 },
+		[CSC_ERRORS]          = { "errors",      9,
+					  "%1$*2$.0" PRIu64 },
+		[CSC_SC_NAME]         = { "syscall",    16, "%1$-*2$s",
+					  "%1$s", CF_L },
+		[CSC_TIME_WALL_TOTAL] = { "wall-total", 11, "%1$*2$.6f" },
+		[CSC_TIME_WALL_MIN]   = { ARRSZ_PAIR("wall-min") - 1,
+					  "%1$*2$.6f" },
+		[CSC_TIME_WALL_MAX]   = { ARRSZ_PAIR("wall-max") - 1,
+					  "%1$*2$.6f" },
+		[CSC_TIME_WALL_AVG]   = { "wall-avg",   11, "%1$*2$" PRIu64 },
 	};
 
 	/* calculate column widths */
@@ -375,6 +471,17 @@ call_summary_pers(FILE *outf)
 		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
 		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
 		W_(CSC_SC_NAME,    sc_name_max + 1),
+		W_(CSC_TIME_WALL_TOTAL,
+		   num_chars("%.6f", float_tv_wall_cum)),
+		W_(CSC_TIME_WALL_MIN,
+		   num_chars("%" PRId64 ".000000",
+			     (int64_t) tv_wall_min_max->tv_sec)),
+		W_(CSC_TIME_WALL_MAX,
+		   num_chars("%" PRId64 ".000000",
+			     (int64_t) tv_wall_max->tv_sec)),
+		W_(CSC_TIME_WALL_AVG,
+		   num_chars("%" PRId64,
+			     (uint64_t) (ts_float(tv_wall_avg_max) * 1e6))),
 	};
 #undef W_
 
@@ -427,6 +534,10 @@ call_summary_pers(FILE *outf)
 		FC_(CSC_CALLS);
 		FC_(CSC_ERRORS);
 		FC_(CSC_SC_NAME);
+		FC_(CSC_TIME_WALL_TOTAL);
+		FC_(CSC_TIME_WALL_MIN);
+		FC_(CSC_TIME_WALL_MAX);
+		FC_(CSC_TIME_WALL_AVG);
 		}
 	}
 
@@ -460,6 +571,11 @@ call_summary_pers(FILE *outf)
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
 			PC_(CSC_SC_NAME,    sysent[idx].sys_name);
+			PC_(CSC_TIME_WALL_TOTAL, ts_float(&cc->wall_time));
+			PC_(CSC_TIME_WALL_MIN,   ts_float(&cc->wall_time_min));
+			PC_(CSC_TIME_WALL_MAX,   ts_float(&cc->wall_time_max));
+			PC_(CSC_TIME_WALL_AVG,
+			    (uint64_t) (ts_float(&cc->wall_time_avg) * 1e6));
 			}
 		}
 
@@ -493,6 +609,11 @@ call_summary_pers(FILE *outf)
 		PC_(CSC_CALLS, call_cum);
 		PC_(CSC_ERRORS, error_cum);
 		PC_(CSC_SC_NAME, "total");
+		PC_(CSC_TIME_WALL_TOTAL, float_tv_wall_cum);
+		PC_(CSC_TIME_WALL_MIN, ts_float(tv_wall_min));
+		PC_(CSC_TIME_WALL_MAX, ts_float(tv_wall_max));
+		PC_(CSC_TIME_WALL_AVG,
+		    (uint64_t) (float_tv_wall_cum / call_cum * 1e6));
 		}
 	}
 	fputc('\n', outf);

@@ -33,6 +33,8 @@ GENERIC=' *[^ ]+ +0\.0[^n]*nanosleep *'
 WALLCLOCK=' *[^ ]+ +(1\.[01]|0\.99)[^n]*nanosleep *'
 WALLCLOCK1='100\.00 +(1\.[01]|0\.99)[^n]*nanosleep'
 HALFCLOCK=' *[^ ]+ +0\.[567][^n]*nanosleep *'
+WALL_COL=' *(1\.[01]|0\.99)[^n]*nanosleep *'
+WALL_AFTER_CPU=' *0\.[0-9]+ +(1\.[01]|0\.99)[^n]*nanosleep *'
 
 grep_log "$GENERIC"	-c
 grep_log "$GENERIC"	-c -O1
@@ -49,5 +51,10 @@ grep_log "$HALFCLOCK"	-cw -O4.5e-1s -enanosleep
 grep_log "$HALFCLOCK"	-cw --summary-syscall-overhead=4.5e-1s -enanosleep
 grep_log "$HALFCLOCK"	-cw -O456789012ns -enanosleep
 grep_log "$HALFCLOCK"	-cw --summary-syscall-overhead=456789012ns -enanosleep
+grep_log "$WALL_AFTER_CPU"	-c -Utime-total,wall-total,calls,name
+grep_log "$WALL_COL"	-c -Uwall-total,calls,name
+grep_log "$WALL_COL"	-c -Uwall-min,calls,name -enanosleep
+grep_log "$WALL_COL"	-c -Uwall-max,calls,name -enanosleep
+grep_log "$WALL_COL"	-c -Swall-total -Uwall-total,calls,name -enanosleep
 
 exit 0
