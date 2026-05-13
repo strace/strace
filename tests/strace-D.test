@@ -16,12 +16,12 @@ run_prog_skip_if_failed \
 
 get_parent_pid()
 {
-	sed '/^PPid:[[:space:]]*/!d;s///'
+	get_prefix_value 'PPid:[[:space:]]*'
 }
 
 get_tracer_pid()
 {
-	sed '/^TracerPid:[[:space:]]*/!d;s///'
+	get_prefix_value 'TracerPid:[[:space:]]*'
 }
 
 set -- ../print_ppid_tracerpid

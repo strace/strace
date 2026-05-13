@@ -18,9 +18,9 @@ run_prog_skip_if_failed \
 status_file=/proc/self/status
 get_tracer_pid()
 {
-	sed '/^TracerPid:[[:space:]]*/!d;s///' "$@"
+	get_prefix_value 'TracerPid:[[:space:]]*'
 }
-[ "$(get_tracer_pid "$status_file")" -ge 0 ] ||
+[ "$(get_tracer_pid < "$status_file")" -ge 0 ] ||
         framework_skip_ "$status_file is not available"
 
 run_prog ../sleep 0
@@ -40,7 +40,7 @@ test_D()
 	tracee_pid=$!
 
 	# Wait for the tracer to start tracing.
-	while tracer_pid="$(get_tracer_pid "/proc/$tracee_pid/status")"; do
+	while tracer_pid="$(get_tracer_pid < "/proc/$tracee_pid/status")"; do
 		[ "$tracer_pid" = 0 ] ||
 			break
 		$SLEEP_A_BIT

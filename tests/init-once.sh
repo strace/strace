@@ -38,6 +38,16 @@ sed_slash_escape()
 	printf "%s" "$*" | sed 's/[/]/\\&/g'
 }
 
+# Usage: get_prefix_value PREFIX_REGEXP
+# Print the value from the first ^PREFIX_REGEXP line in the standard input.
+get_prefix_value()
+{
+	local prefix="$1"
+
+	check_prog sed
+	sed '/^'"$prefix"'/!d;s///;q'
+}
+
 # Calculate an integer approximation of the square root of $1:
 # returns 0 and prints the largest number the square of which is no greater
 # than $1 if $1 is non-negative, returns 1 and prints nothing otherwise.
