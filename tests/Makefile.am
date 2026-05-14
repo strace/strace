@@ -415,6 +415,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	signal_receive \
 	signal_receive--pidns-translation \
 	sleep \
+	sleep-timing \
 	so_peercred--pidns-translation \
 	sockopt-sol_socket-success \
 	sockopt-sol_socket-success-Xabbrev \
@@ -643,7 +644,6 @@ MISC_TESTS = \
 	bexecve.test \
 	clone_ptrace.test \
 	count-f.test \
-	count.test \
 	delay.test \
 	detach-running.test \
 	detach-sleeping.test \
@@ -718,6 +718,9 @@ MISC_TESTS = \
 	strace-S.test \
 	strace-T_upper.test \
 	strace-V.test \
+	strace-c-wall-col.test \
+	strace-c.test \
+	strace-cw.test \
 	strace-ff.test \
 	strace-log-merge-error.test \
 	strace-log-merge-suffix.test \

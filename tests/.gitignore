@@ -1143,6 +1143,7 @@ sigprocmask
 sigreturn
 sigsuspend
 sleep
+sleep-timing
 so_error
 so_linger
 so_peercred

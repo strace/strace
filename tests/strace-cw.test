@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# Check whether -c and -w options work.
+#
+# Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
+# Copyright (c) 2014-2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../sleep-timing 0 "$TIMING_FILE"
+check_prog grep
+
+parse_strace_cw_time()
+{
+	local val
+
+	check_prog sed
+
+	# s//\1 prints the address's first capture group (seconds column).
+	val=$(LC_ALL=C sed -n \
+		'/^[[:space:]]*[0-9][0-9.]*[[:space:]]\+\([0-9][0-9.]*\)[[:space:]].*nanosleep$/{
+			s//\1/p
+			q
+		}' "$LOG")
+
+	[ -n "$val" ] ||
+		fail_ "nanosleep summary line not found in \"$LOG\""
+	echo "$val"
+}
+
+grep_log()
+{
+	local overhead requested program strace_t
+
+	overhead="$1"; shift
+
+	run_strace -cw "$@" ../sleep-timing 1 "$TIMING_FILE"
+
+	grep nanosleep "$LOG" > /dev/null ||
+		framework_skip_ 'sleep-timing does not use nanosleep'
+
+	read_sleep_timing_pair requested program
+
+	strace_t=$(parse_strace_cw_time)
+	timing_compare_cw "$requested" "$program" "$strace_t" "$overhead" ||
+		timing_fail "$requested" "$program" "$strace_t" "$overhead" \
+			"overhead=$overhead" \
+			"$STRACE $args summary time mismatch"
+}
+
+grep_log 0
+grep_log 0                       -O1
+grep_log 0           -enanosleep
+grep_log 0           -enanosleep -O1
+grep_log 0.45        -enanosleep -O4.5e2ms
+grep_log 0.45        -enanosleep --summary-syscall-overhead=4.5e2ms
+grep_log 0.45        -enanosleep -O4.5e-1s
+grep_log 0.45        -enanosleep --summary-syscall-overhead=4.5e-1s
+grep_log 0.456789012 -enanosleep -O456789012ns
+grep_log 0.456789012 -enanosleep --summary-syscall-overhead=456789012ns

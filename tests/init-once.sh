@@ -312,6 +312,363 @@ match_grep()
 	}
 }
 
+# Timing comparison helpers (sleep-timing vs strace -T/-r/-cw).
+TIMING_FILE="timing"
+TIMING_ABS_TOL=0.2
+TIMING_REL_TOL=0.05
+TIMING_ABS_MIN=0.1
+
+# Usage: timing_quant_slack STRACE_OPT
+# Print extra timing slack for STRACE_OPT precision (rounding/truncation).
+timing_quant_slack()
+{
+	case "$1" in
+		*=ms|*--syscall-times=ms|*--relative-timestamps=ms)
+			echo 0.001 ;;
+		*=ns|*--syscall-times=ns|*--relative-timestamps=ns)
+			echo 0 ;;
+		*) echo 0.01 ;;
+	esac
+}
+
+# Usage: read_sleep_timing
+# Read $TIMING_FILE; print REQUESTED_SEC and NANOSLEEP_SEC on one line.
+# Return 1 if the file is missing, incomplete, or the observed sleep
+# is shorter than requested by $TIMING_ABS_MIN.
+read_sleep_timing()
+{
+	local requested nanosleep
+
+	[ -f "$TIMING_FILE" ] || {
+		warn_ "timing file \"$TIMING_FILE\" not found"
+		return 1
+	}
+
+	check_prog gawk
+
+	requested=$(get_prefix_value 'requested_sec=' < "$TIMING_FILE")
+	nanosleep=$(get_prefix_value 'nanosleep_sec=' < "$TIMING_FILE")
+
+	[ -n "$requested" ] && [ -n "$nanosleep" ] || {
+		warn_ "timing file \"$TIMING_FILE\" is incomplete"
+		return 1
+	}
+
+	gawk -v req="$requested" -v ns="$nanosleep" \
+		-v min="$TIMING_ABS_MIN" 'BEGIN {
+		if (ns + min < req)
+			exit 1
+	}' || {
+		warn_ "observed sleep shorter than requested" \
+			"(requested=$requested nanosleep=$nanosleep)"
+		return 1
+	}
+
+	printf '%s %s\n' "$requested" "$nanosleep"
+}
+
+# Usage: read_sleep_timing_pair VAR_REQUESTED VAR_NANOSLEEP
+# Set the named variables to timing file contents; fail the test on error.
+read_sleep_timing_pair()
+{
+	local _timing var_requested var_nanosleep
+
+	[ $# -eq 2 ] ||
+		fail_ 'usage: read_sleep_timing_pair' \
+			'VAR_REQUESTED VAR_NANOSLEEP'
+
+	var_requested=$1
+	var_nanosleep=$2
+
+	_timing=$(read_sleep_timing) ||
+		fail_ "failed to read sleep timing from \"$TIMING_FILE\""
+
+	set -- $_timing
+	eval "$var_requested=\$1; $var_nanosleep=\$2"
+}
+
+# Usage: compare_timing_fp STRACE_VAL PROGRAM_VAL QUANT_SLACK
+# Fail unless |STRACE_VAL - PROGRAM_VAL| is within tolerance.
+compare_timing_fp()
+{
+	[ $# -eq 3 ] ||
+		fail_ 'usage: compare_timing_fp' \
+			'STRACE_VAL PROGRAM_VAL QUANT_SLACK'
+
+	local strace_val="$1"
+	local program_val="$2"
+	local quant_slack="$3"
+
+	check_prog gawk
+
+	gawk -v s="$strace_val" \
+	     -v p="$program_val" \
+	     -v abs="$TIMING_ABS_TOL" \
+	     -v rel="$TIMING_REL_TOL" \
+	     -v quant="$quant_slack" \
+		'BEGIN {
+		diff = s - p
+		if (diff < 0)
+			diff = -diff
+		tol = abs + 0
+		if (rel * p > tol)
+			tol = rel * p
+		tol += quant + 0
+		if (diff > tol) {
+			printf "timing mismatch (fp): strace=%g program=%g diff=%g tolerance=%g\n",
+				s, p, diff, tol > "/dev/stderr"
+			exit 1
+		}
+	}'
+}
+
+# Usage: compare_timing_sec STRACE_VAL PROGRAM_VAL
+# Fail unless STRACE_VAL (whole seconds from strace) matches PROGRAM_VAL
+# within TIMING_ABS_TOL/TIMING_REL_TOL, allowing truncation of sub-second part.
+compare_timing_sec()
+{
+	[ $# -eq 2 ] ||
+		fail_ 'usage: compare_timing_sec STRACE_VAL PROGRAM_VAL'
+
+	local strace_val="$1"
+	local program_val="$2"
+
+	check_prog gawk
+
+	gawk -v s="$strace_val" \
+	     -v p="$program_val" \
+	     -v abs="$TIMING_ABS_TOL" \
+	     -v rel="$TIMING_REL_TOL" \
+		'BEGIN {
+		if (s !~ /^[0-9]+$/) {
+			printf "timing mismatch (sec): strace value %s is not an integer\n",
+				s > "/dev/stderr"
+			exit 1
+		}
+		s += 0
+		lo = int(p - 1e-6)
+		hi = int(p + abs + rel * p + 1e-6)
+		if (s < lo || s > hi) {
+			printf "timing mismatch (sec): strace=%g program=%g allowed [%d,%d]\n",
+				s, p, lo, hi > "/dev/stderr"
+			exit 1
+		}
+	}'
+}
+
+# Usage: timing_strace_matches_requested REQUESTED_SEC STRACE_VAL STRACE_OPT
+# Return 0 if STRACE_VAL matches REQUESTED_SEC within tolerance for STRACE_OPT.
+timing_strace_matches_requested()
+{
+	[ $# -eq 3 ] ||
+		fail_ 'usage: timing_strace_matches_requested' \
+			'REQUESTED_SEC STRACE_VAL STRACE_OPT'
+
+	local requested_val="$1"
+	local strace_val="$2"
+	local opt="$3"
+
+	case "$opt" in
+		*=s|*--syscall-times=s|*--relative-timestamps=s)
+			compare_timing_sec "$strace_val" "$requested_val" ;;
+		*)
+			compare_timing_fp "$strace_val" "$requested_val" \
+				"$(timing_quant_slack "$opt")" ;;
+	esac
+}
+
+# Usage: timing_scheduling_waiver \
+# 	REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL OVERHEAD STRACE_OPT
+# Return 0 if NANOSLEEP_SEC exceeds STRACE_VAL because the tracee bracket
+# includes post-syscall scheduling delay while strace timed the syscall
+# at REQUESTED_SEC.
+timing_scheduling_waiver()
+{
+	[ $# -eq 5 ] ||
+		fail_ 'usage: timing_scheduling_waiver' \
+			'REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL' \
+			'OVERHEAD STRACE_OPT'
+
+	local requested="$1"
+	local program_t="$2"
+	local strace_t="$3"
+	local overhead="$4"
+	local opt="$5"
+	local requested_adj
+
+	check_prog gawk
+
+	gawk -v s="$strace_t" -v p="$program_t" \
+		'BEGIN { if (p <= s) exit 1 }' ||
+		return 1
+
+	requested_adj=$(gawk -v r="$requested" -v o="$overhead" \
+		'BEGIN { print r - o }')
+	timing_strace_matches_requested "$requested_adj" "$strace_t" "$opt"
+}
+
+# Usage: timing_compare_cw REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL OVERHEAD
+# Compare -c/-cw wall-clock summary time to NANOSLEEP_SEC - OVERHEAD.
+timing_compare_cw()
+{
+	[ $# -eq 4 ] ||
+		fail_ 'usage: timing_compare_cw' \
+			'REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL OVERHEAD'
+
+	local requested="$1"
+	local program_t="$2"
+	local strace_t="$3"
+	local overhead="$4"
+	local expected
+
+	check_prog gawk
+
+	expected=$(gawk -v p="$program_t" -v o="$overhead" \
+		'BEGIN { print p - o }')
+
+	compare_timing_fp "$strace_t" "$expected" 0.01 &&
+		return 0
+	timing_scheduling_waiver "$requested" "$program_t" "$strace_t" \
+		"$overhead" '-cw' &&
+		return 0
+	compare_timing_fp "$strace_t" "$expected" 0.01
+}
+
+# Usage: timing_compare_sleep \
+# 	REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL OVERHEAD STRACE_OPT
+# Compare STRACE_VAL to NANOSLEEP_SEC - OVERHEAD using the check suited
+# to STRACE_OPT.
+timing_compare_sleep()
+{
+	[ $# -eq 5 ] ||
+		fail_ 'usage: timing_compare_sleep' \
+			'REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL' \
+			'OVERHEAD STRACE_OPT'
+
+	local requested="$1"
+	local program_t="$2"
+	local strace_t="$3"
+	local overhead="$4"
+	local opt="$5"
+	local expected
+	local quant
+
+	check_prog gawk
+
+	expected=$(gawk -v p="$program_t" -v o="$overhead" \
+		'BEGIN { print p - o }')
+
+	case "$opt" in
+		*=s|*--syscall-times=s|*--relative-timestamps=s)
+			compare_timing_sec "$strace_t" "$expected" &&
+				return 0
+			timing_scheduling_waiver "$requested" "$program_t" \
+				"$strace_t" "$overhead" "$opt" &&
+				return 0
+			compare_timing_sec "$strace_t" "$expected"
+			;;
+		*)
+			quant=$(timing_quant_slack "$opt")
+			compare_timing_fp "$strace_t" "$expected" "$quant" &&
+				return 0
+			timing_scheduling_waiver "$requested" "$program_t" \
+				"$strace_t" "$overhead" "$opt" &&
+				return 0
+			compare_timing_fp "$strace_t" "$expected" "$quant"
+			;;
+	esac
+}
+
+# Usage: timing_fail \
+# 	REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL OVERHEAD OPTION ERROR_MESSAGE
+# Print timing diagnostics and fail with ERROR_MESSAGE.
+timing_fail()
+{
+	[ $# -eq 6 ] ||
+		fail_ 'usage: timing_fail' \
+			'REQUESTED_SEC NANOSLEEP_SEC STRACE_VAL' \
+			'OVERHEAD OPTION ERROR_MESSAGE'
+
+	cat >&2 <<EOF
+requested_sec=$1 nanosleep_sec=$2
+strace=$3 overhead=$4 option=$5
+EOF
+	dump_log_and_fail_with "$6"
+}
+
+# Usage: parse_strace_T_time
+# Print the <elapsed> time from the nanosleep line in $LOG.
+parse_strace_T_time()
+{
+	local val
+
+	check_prog sed
+
+	val=$(LC_ALL=C sed -n \
+		'/nanosleep({.*) = 0 </{s/.*<\([0-9.]*\)>.*/\1/p;q}' "$LOG")
+
+	[ -n "$val" ] ||
+		fail_ "nanosleep -T time not found in \"$LOG\""
+	echo "$val"
+}
+
+# Usage: parse_strace_r_exit_time
+# Print the relative timestamp from the chdir(".") line in $LOG.
+parse_strace_r_exit_time()
+{
+	local val
+
+	check_prog sed
+
+	# s//\1 prints the address's first capture group.
+	val=$(LC_ALL=C sed -n \
+		'/^[[:space:]]*\([0-9][0-9.]*\)[[:space:]]chdir("\.")[[:space:]]\+= 0$/{
+			s//\1/p
+			q
+		}' "$LOG")
+
+	[ -n "$val" ] ||
+		fail_ "relative chdir time not found in \"$LOG\""
+	echo "$val"
+}
+
+# Usage: check_strace_syscall_time STRACE_OPT
+# Compare -T/--syscall-times nanosleep duration in $LOG to sleep-timing output.
+check_strace_syscall_time()
+{
+	[ $# -eq 1 ] ||
+		fail_ 'usage: check_strace_syscall_time STRACE_OPT'
+
+	local opt="$1"
+	local requested program strace_t
+
+	read_sleep_timing_pair requested program
+
+	strace_t=$(parse_strace_T_time)
+	timing_compare_sleep "$requested" "$program" "$strace_t" 0 "$opt" ||
+		timing_fail "$requested" "$program" "$strace_t" 0 "$opt" \
+			"$STRACE $args syscall time mismatch"
+}
+
+# Usage: check_strace_relative_exit_time STRACE_OPT
+# Compare -r/--relative-timestamps on the post-sleep chdir line in $LOG
+# (delta since the prior traced chdir) to sleep-timing output.
+check_strace_relative_exit_time()
+{
+	[ $# -eq 1 ] ||
+		fail_ 'usage: check_strace_relative_exit_time STRACE_OPT'
+
+	local opt="$1"
+	local requested program strace_t
+
+	read_sleep_timing_pair requested program
+
+	strace_t=$(parse_strace_r_exit_time)
+	timing_compare_sleep "$requested" "$program" "$strace_t" 0 "$opt" ||
+		timing_fail "$requested" "$program" "$strace_t" 0 "$opt" \
+			"$STRACE $args relative exit time mismatch"
+}
+
 # Usage: filter_vdso_calls test_program actual_file [expected_file]
 # There are spurious calls to clock_gettime64
 # from a combination of glibc 2.42+ needing

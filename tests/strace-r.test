@@ -11,6 +11,7 @@
 
 r_opt="${1:--r}"
 
-run_prog ../sleep 0
-run_strace "${r_opt}" -eexecve ../sleep 1
+run_prog ../sleep-timing 0 "$TIMING_FILE"
+run_strace "${r_opt}" -echdir ../sleep-timing 1 "$TIMING_FILE"
 match_grep
+check_strace_relative_exit_time "${r_opt}"

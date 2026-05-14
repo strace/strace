@@ -1,0 +1,142 @@
+#!/bin/sh
+#
+# Check whether -c works with wall-* column aliases.
+#
+# Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
+# Copyright (c) 2014-2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../sleep-timing 0 "$TIMING_FILE"
+check_prog grep
+
+# Usage: parse_strace_summary_nanosleep_field FIELD
+# Print FIELD-th column from the nanosleep row of a -c summary in $LOG.
+parse_strace_summary_nanosleep_field()
+{
+	local val
+
+	[ $# -eq 1 ] ||
+		fail_ 'usage: parse_strace_summary_nanosleep_field FIELD'
+
+	check_prog awk
+
+	val=$(awk -v f="$1" '/nanosleep$/ { print $f; exit }' "$LOG")
+	[ -n "$val" ] ||
+		fail_ "nanosleep summary field $1 not found in \"$LOG\""
+	echo "$val"
+}
+
+# Usage: wall_col_to_sec COL VALUE
+# Convert a wall column value to seconds (wall-avg is usecs/call).
+wall_col_to_sec()
+{
+	[ $# -eq 2 ] ||
+		fail_ 'usage: wall_col_to_sec COL VALUE'
+
+	[ "$1" = avg ] ||
+		{ echo "$2"; return; }
+
+	gawk -v w="$2" 'BEGIN { print w / 1e6 }'
+}
+
+# Usage: grep_log_cpu COL OVERHEAD STRACE_OPTS...
+grep_log_cpu()
+{
+	local col overhead cpu_col_name wall_col_name cpu_t wall_t
+	local requested program
+	[ $# -ge 2 ] ||
+		fail_ 'usage: grep_log_cpu COL OVERHEAD STRACE_OPTS...'
+	col="$1"; shift
+	overhead="$1"; shift
+	cpu_col_name="time-$col"
+	wall_col_name="wall-$col"
+
+	run_strace -c "$@" ../sleep-timing 1 "$TIMING_FILE"
+
+	grep nanosleep "$LOG" > /dev/null ||
+		framework_skip_ 'sleep-timing does not use nanosleep'
+
+	read_sleep_timing_pair requested program
+
+	cpu_t=$(parse_strace_summary_nanosleep_field 1)
+	wall_t=$(parse_strace_summary_nanosleep_field 2)
+	cpu_t=$(wall_col_to_sec "$col" "$cpu_t")
+	wall_t=$(wall_col_to_sec "$col" "$wall_t")
+	compare_timing_fp "$cpu_t" 0 0.01 ||
+		timing_fail "$requested" "$program" "$cpu_t" 0 "$cpu_col_name" \
+			"$STRACE $args $cpu_col_name column time mismatch"
+	timing_compare_cw "$requested" "$program" "$wall_t" "$overhead" ||
+		timing_fail "$requested" "$program" "$wall_t" "$overhead" \
+			"$wall_col_name" \
+			"$STRACE $args $wall_col_name column time mismatch"
+}
+
+# Usage: grep_log_wall COL OVERHEAD STRACE_OPTS...
+grep_log_wall()
+{
+	local col overhead col_name wall_t requested program
+	[ $# -ge 2 ] ||
+		fail_ 'usage: grep_log_wall COL OVERHEAD STRACE_OPTS...'
+	col="$1"; shift
+	overhead="$1"; shift
+	col_name="wall-$col"
+
+	run_strace -c "$@" ../sleep-timing 1 "$TIMING_FILE"
+
+	grep nanosleep "$LOG" > /dev/null ||
+		framework_skip_ 'sleep-timing does not use nanosleep'
+
+	read_sleep_timing_pair requested program
+
+	wall_t=$(parse_strace_summary_nanosleep_field "1")
+	wall_t=$(wall_col_to_sec "$col" "$wall_t")
+	timing_compare_cw "$requested" "$program" "$wall_t" "$overhead" ||
+		timing_fail "$requested" "$program" "$wall_t" "$overhead" \
+			"$col_name" \
+			"$STRACE $args wall-column time mismatch"
+}
+
+# Usage: grep_log_wall_w OVERHEAD STRACE_OPTS...
+# With -w, time-total is wall-clock too and must equal wall-total.
+grep_log_wall_w()
+{
+	local overhead time_t wall_t requested program
+	[ $# -ge 1 ] ||
+		fail_ 'usage: grep_log_wall_w OVERHEAD STRACE_OPTS...'
+	overhead="$1"; shift
+
+	run_strace -cw "$@" ../sleep-timing 1 "$TIMING_FILE"
+
+	grep nanosleep "$LOG" > /dev/null ||
+		framework_skip_ 'sleep-timing does not use nanosleep'
+
+	read_sleep_timing_pair requested program
+
+	time_t=$(parse_strace_summary_nanosleep_field 1)
+	wall_t=$(parse_strace_summary_nanosleep_field 2)
+	[ "$time_t" = "$wall_t" ] ||
+		fail_ "time-total ($time_t) != wall-total ($wall_t): $STRACE $args"
+	timing_compare_cw "$requested" "$program" "$time_t" "$overhead" ||
+		timing_fail "$requested" "$program" "$time_t" "$overhead" \
+			"time-total/wall-total" \
+			"$STRACE $args wall-clock column time mismatch"
+}
+
+grep_log_cpu  total 0    -Utime-total,wall-total,calls,name
+grep_log_cpu  avg   0    -Utime-avg,wall-avg,calls,name -enanosleep
+grep_log_cpu  total 0.45 -Utime-total,wall-total,calls,name -enanosleep -O4.5e2ms
+
+grep_log_wall total 0    -Uwall-total,calls,name
+grep_log_wall min   0    -Uwall-min,calls,name -enanosleep
+grep_log_wall max   0    -Uwall-max,calls,name -enanosleep
+grep_log_wall avg   0    -Uwall-avg,calls,name -enanosleep
+grep_log_wall total 0    -Swall-total -Uwall-total,calls,name -enanosleep
+grep_log_wall total 0.45 -Uwall-total,calls,name -enanosleep -O4.5e2ms
+
+grep_log_wall_w 0    -Utime-total,wall-total,calls,name -enanosleep
+grep_log_wall_w 0    -Utime-total,wall-total,calls,name -enanosleep -O1
+grep_log_wall_w 0.45 -Utime-total,wall-total,calls,name -enanosleep -O4.5e2ms
