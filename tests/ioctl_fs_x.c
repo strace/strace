@@ -115,19 +115,16 @@ main(int argc, const char *argv[])
 		}
 	}
 
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} null_arg_cmds[] = {
+	static const struct strval32 null_arg_cmds[] = {
 		{ ARG_STR(FITRIM) },
 		{ ARG_STR(FS_IOC_FSSETXATTR) },
 		{ ARG_STR(FS_IOC_FSGETXATTR) },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(null_arg_cmds); ++i) {
-		do_ioctl(null_arg_cmds[i].cmd, 0);
+		do_ioctl(null_arg_cmds[i].val, 0);
 		printf("ioctl(-1, " XLAT_FMT ", NULL) = %s\n",
-		       XLAT_SEL(null_arg_cmds[i].cmd, null_arg_cmds[i].str),
+		       XLAT_SEL(null_arg_cmds[i].val, null_arg_cmds[i].str),
 		       errstr);
 	}
 
