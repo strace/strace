@@ -51,6 +51,21 @@ decode_fsxattr(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 }
 
+#include "xlat/fs_shutdown_flags.h"
+
+static void
+decode_fs_shutdown(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	uint32_t flags;
+
+	if (umove_or_printaddr(tcp, arg, &flags))
+		return;
+
+	tprint_indirect_begin();
+	printxval(fs_shutdown_flags, flags, "FS_SHUTDOWN_FLAGS_???");
+	tprint_indirect_end();
+}
+
 int
 fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
@@ -71,6 +86,11 @@ fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 	case FS_IOC_FSSETXATTR:
 		tprints_arg_next_name("arg");
 		decode_fsxattr(tcp, arg, false);
+		break;
+
+	case FS_IOC_SHUTDOWN:
+		tprints_arg_next_name("argp");
+		decode_fs_shutdown(tcp, arg);
 		break;
 
 	/* No arguments */
