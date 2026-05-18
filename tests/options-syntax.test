@@ -216,7 +216,7 @@ check_e "Requested path \"///\" resolved into \"/\"
 $STRACE_EXE: Requested path \"/.\" resolved into \"/\"
 $STRACE_EXE: -q and -e quiet/--quiet cannot be provided simultaneously" -q --quiet -P /// -P/. .
 
-for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
+for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg wall_total wall-total total_wall total-wall wall_min wall-min min_wall min-wall wall_max wall-max max_wall max-wall wall_avg wall-avg avg_wall avg-wall calls count error errors name syscall syscall_name syscall-name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
 	if [ "$i" != none ] && [ "$i" != nothing ]; then
@@ -224,7 +224,7 @@ for i in time time_percent time-percent time_total time-total total_time total-t
 		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 	fi
 done
-for i in time,time_total,avg_time,calls,errors,name time_percent,total_time,time_avg,count,error,syscall_name; do
+for i in time,time_total,avg_time,calls,errors,name time_percent,total_time,time_avg,count,error,syscall_name time-total,wall-total,calls,name wall-total,wall-avg,calls,name; do
 	check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 done
