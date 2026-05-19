@@ -42,6 +42,8 @@ static const struct timespec max_ts = {
 
 static struct timespec overhead;
 
+static bool summary_wall_columns;
+static bool summary_sortby_wall;
 
 enum count_summary_columns {
 	CSC_NONE,
@@ -60,6 +62,18 @@ enum count_summary_columns {
 
 	CSC_MAX,
 };
+
+static bool
+summary_needs_wall(void)
+{
+	return summary_wall_columns || summary_sortby_wall;
+}
+
+static bool
+column_is_wall(uint8_t column)
+{
+	return column >= CSC_TIME_WALL_TOTAL && column <= CSC_TIME_WALL_AVG;
+}
 
 static uint8_t columns[CSC_MAX] = {
 	CSC_TIME_100S,
@@ -130,11 +144,14 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 		return;
 
 	if (!counts) {
+		const bool wall = summary_needs_wall();
+
 		counts = xcalloc(nsyscalls, sizeof(*counts));
 
 		for (size_t i = 0; i < nsyscalls; i++) {
 			counts[i].time_min = max_ts;
-			counts[i].wall_time_min = max_ts;
+			if (wall)
+				counts[i].wall_time_min = max_ts;
 		}
 	}
 	struct call_counts *cc = &counts[tcp->scno];
@@ -160,11 +177,19 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	cc->time_min = *ts_min(&cc->time_min, wts_nonneg);
 	cc->time_max = *ts_max(&cc->time_max, wts_nonneg);
 
-	struct timespec wall_wts;
-	ts_sub(&wall_wts, syscall_exiting_ts, &tcp->etime);
-	ts_sub(&wall_wts, &wall_wts, &overhead);
+	if (!summary_needs_wall())
+		return;
 
-	const struct timespec *wall_wts_nonneg = ts_max(&wall_wts, &zero_ts);
+	struct timespec wall_wts;
+	const struct timespec *wall_wts_nonneg;
+
+	if (count_wallclock) {
+		wall_wts_nonneg = wts_nonneg;
+	} else {
+		ts_sub(&wall_wts, syscall_exiting_ts, &tcp->etime);
+		ts_sub(&wall_wts, &wall_wts, &overhead);
+		wall_wts_nonneg = ts_max(&wall_wts, &zero_ts);
+	}
 
 	ts_add(&cc->wall_time, &cc->wall_time, wall_wts_nonneg);
 	cc->wall_time_min = *ts_min(&cc->wall_time_min, wall_wts_nonneg);
@@ -282,9 +307,14 @@ set_sortby(const char *sortby)
 		[CSC_TIME_WALL_AVG]   = wall_avg_time_cmp,
 	};
 
+	summary_sortby_wall = false;
+
 	for (size_t i = 0; i < ARRAY_SIZE(column_aliases); ++i) {
 		if (!strcmp(column_aliases[i].name, sortby)) {
-			sortfun = sort_fns[column_aliases[i].column];
+			const uint8_t column = column_aliases[i].column;
+
+			sortfun = sort_fns[column];
+			summary_sortby_wall = column_is_wall(column);
 			return;
 		}
 	}
@@ -300,6 +330,7 @@ set_count_summary_columns(const char *s)
 	size_t cur = 0;
 
 	memset(columns, 0, sizeof(columns));
+	summary_wall_columns = false;
 
 	for (;;) {
 		bool found = false;
@@ -344,6 +375,13 @@ set_count_summary_columns(const char *s)
 	 */
 	if (!visible[CSC_SC_NAME])
 		columns[cur++] = CSC_SC_NAME;
+
+	for (size_t i = 0; i < ARRAY_SIZE(columns) && columns[i]; ++i) {
+		if (column_is_wall(columns[i])) {
+			summary_wall_columns = true;
+			break;
+		}
+	}
 }
 
 int
@@ -401,25 +439,28 @@ call_summary_pers(FILE *outf)
 		tv_min = ts_min(tv_min, &counts[i].time_min);
 		tv_min_max = ts_max(tv_min_max, &counts[i].time_min);
 		tv_max = ts_max(tv_max, &counts[i].time_max);
-		ts_add(&tv_wall_cum, &tv_wall_cum, &counts[i].wall_time);
-		tv_wall_min = ts_min(tv_wall_min, &counts[i].wall_time_min);
-		tv_wall_min_max = ts_max(tv_wall_min_max,
-					 &counts[i].wall_time_min);
-		tv_wall_max = ts_max(tv_wall_max, &counts[i].wall_time_max);
+		if (summary_needs_wall()) {
+			ts_add(&tv_wall_cum, &tv_wall_cum, &counts[i].wall_time);
+			tv_wall_min = ts_min(tv_wall_min, &counts[i].wall_time_min);
+			tv_wall_min_max = ts_max(tv_wall_min_max,
+						 &counts[i].wall_time_min);
+			tv_wall_max = ts_max(tv_wall_max,
+					     &counts[i].wall_time_max);
+			ts_div(&counts[i].wall_time_avg, &counts[i].wall_time,
+			       counts[i].calls);
+			tv_wall_avg_max = ts_max(tv_wall_avg_max,
+						 &counts[i].wall_time_avg);
+		}
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 
 		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
 		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
-		ts_div(&counts[i].wall_time_avg, &counts[i].wall_time,
-		       counts[i].calls);
-		tv_wall_avg_max = ts_max(tv_wall_avg_max,
-					 &counts[i].wall_time_avg);
 
 		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
 	}
 	float_tv_cum = ts_float(&tv_cum);
-	float_tv_wall_cum = ts_float(&tv_wall_cum);
+	float_tv_wall_cum = summary_needs_wall() ? ts_float(&tv_wall_cum) : 0;
 
 	if (sortfun)
 		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
