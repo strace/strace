@@ -138,10 +138,10 @@ run_checks(const int nproc, const int delay_enter, const int delay_exit)
 		if (WIFEXITED(status)) {
 			int es = WEXITSTATUS(status);
 
-			fprintf(stderr, "pid %d exit status %d", pid, es);
+			fprintf(stderr, "pid %d exit status %d\n", pid, es);
 			rc |= es;
 		} else {
-			fprintf(stderr, "pid %d wait status %#x", pid, status);
+			fprintf(stderr, "pid %d wait status %#x\n", pid, status);
 			rc |= BAD_OTHER;
 		}
 	}
