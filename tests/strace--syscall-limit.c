@@ -44,7 +44,6 @@ write_status(const char *name, int value)
 		perror_msg_and_fail("fprintf: %s", name);
 	if (fclose(fp))
 		perror_msg_and_fail("fclose: %s", name);
-	fflush(stdout);
 	return value;
 }
 
@@ -144,6 +143,8 @@ main(void)
 	printf("--------- ----------------\n");
 	printf("%9d %s\n", TOTAL_CNT, "total");
 #endif /* PRINT_STATS */
+
+	fflush(stdout);
 
 	return write_status("parent_status",
 			    WIFEXITED(status) ? WEXITSTATUS(status) : 1);
