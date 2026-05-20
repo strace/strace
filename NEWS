@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented wall-clock-aware columns (wall-total, wall-min, wall-max,
     wall-avg) for the -c/--summary-only report, allowing wall-clock and
     system CPU times to be displayed side by side in a single run.
+  * Included out-of-range syscalls in the -c/--summary-only report.
   * Updated decoding of sched_getattr syscall.
   * Implemented decoding of FS_IOC_SHUTDOWN, PIDFD_GET_INFO, and
     PIDFD_GET_*_NAMESPACE ioctl commands.

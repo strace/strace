@@ -15,6 +15,7 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 #include <stdarg.h>
 
@@ -137,11 +138,138 @@ static const struct {
 	{ "nothing",      CSC_NONE       },
 };
 
+/* Per-unknown syscall stats structure */
+struct unknown_call_counts {
+	kernel_ulong_t scno;
+	char sys_name[sizeof("syscall_0x") + sizeof(kernel_ulong_t) * 2];
+	struct call_counts call_counts;
+};
+
+struct unknown_call_bucket {
+	size_t len;
+	size_t cap;
+	struct unknown_call_counts *entries;
+};
+
+#define UNKNOWN_COUNTS_ENTRIES 16
+
+static struct unknown_call_bucket *unknown_countv[SUPPORTED_PERSONALITIES];
+#define unknown_counts (unknown_countv[current_personality])
+
+static void
+unknown_init_slot(struct call_counts *cc)
+{
+	cc->time_min = max_ts;
+
+	if (summary_needs_wall())
+		cc->wall_time_min = max_ts;
+}
+
+static void
+unknown_init(void)
+{
+	if (unknown_counts)
+		return;
+
+	unknown_counts = xmalloc(sizeof(*unknown_counts));
+
+	unknown_counts->len = 0;
+	unknown_counts->cap = UNKNOWN_COUNTS_ENTRIES;
+	unknown_counts->entries = xcalloc(UNKNOWN_COUNTS_ENTRIES,
+					  sizeof(*unknown_counts->entries));
+
+	for (size_t i = 0; i < UNKNOWN_COUNTS_ENTRIES; i++)
+		unknown_init_slot(&unknown_counts->entries[i].call_counts);
+}
+
+static struct unknown_call_counts *
+get_unknown_by_scno(kernel_ulong_t scno)
+{
+	if (!unknown_counts)
+		return NULL;
+
+	for (size_t i = 0; i < unknown_counts->len; i++)
+		if (unknown_counts->entries[i].scno == scno)
+			return &unknown_counts->entries[i];
+
+	return NULL;
+}
+
+static struct unknown_call_counts *
+get_unknown_by_idx(size_t idx)
+{
+	if (!unknown_counts)
+		return NULL;
+
+	if (idx >= unknown_counts->len)
+		return NULL;
+
+	return &unknown_counts->entries[idx];
+}
+
+static size_t
+get_unknown_bucket_size(void)
+{
+	return unknown_counts ? unknown_counts->len : 0;
+}
+
+static struct call_counts *
+get_syscall_cc(kernel_ulong_t scno)
+{
+	if (scno_in_range(scno))
+		return &counts[scno];
+
+	struct unknown_call_counts *ucc = get_unknown_by_scno(scno);
+	if (!ucc)
+		error_msg_and_die("failed to get unknown syscall"
+				  " counts by %#" PRI_klx " number", scno);
+
+	return &ucc->call_counts;
+}
+
+static const char *
+get_syscall_name(kernel_ulong_t scno)
+{
+	if (scno_in_range(scno))
+		return sysent[scno].sys_name;
+
+	struct unknown_call_counts *ucc = get_unknown_by_scno(scno);
+	if (!ucc)
+		error_msg_and_die("failed to get unknown syscall"
+				  " name by %#" PRI_klx " number", scno);
+
+	return ucc->sys_name;
+}
+
+static void
+unknown_insert(kernel_ulong_t scno)
+{
+	if (get_unknown_by_scno(scno))
+		return;
+
+	unknown_init();
+
+	if (unknown_counts->len == unknown_counts->cap) {
+		unknown_counts->cap *= 2;
+		unknown_counts->entries = xreallocarray(unknown_counts->entries,
+							unknown_counts->cap,
+							sizeof(*unknown_counts->entries));
+
+		for (size_t i = unknown_counts->len; i < unknown_counts->cap; i++)
+			unknown_init_slot(&unknown_counts->entries[i].call_counts);
+	}
+
+	unknown_counts->entries[unknown_counts->len].scno = scno;
+	xsprintf(unknown_counts->entries[unknown_counts->len].sys_name,
+		 "syscall_%#" PRI_klx, shuffle_scno(scno));
+	unknown_counts->len++;
+}
+
 void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
 	if (!scno_in_range(tcp->scno))
-		return;
+		unknown_insert(tcp->scno);
 
 	if (!counts) {
 		const bool wall = summary_needs_wall();
@@ -154,7 +282,7 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 				counts[i].wall_time_min = max_ts;
 		}
 	}
-	struct call_counts *cc = &counts[tcp->scno];
+	struct call_counts *cc = get_syscall_cc(tcp->scno);
 
 	cc->calls++;
 	if (syserror(tcp))
@@ -199,78 +327,101 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 static int
 time_cmp(const void *a, const void *b)
 {
-	const unsigned int *a_int = a;
-	const unsigned int *b_int = b;
-	return -ts_cmp(&counts[*a_int].time, &counts[*b_int].time);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->time,
+		       &get_syscall_cc(*b_k)->time);
 }
 
 static int
 min_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_min,
-		       &counts[*((unsigned int *) b)].time_min);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->time_min,
+		       &get_syscall_cc(*b_k)->time_min);
 }
 
 static int
 max_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_max,
-		       &counts[*((unsigned int *) b)].time_max);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->time_max,
+		       &get_syscall_cc(*b_k)->time_max);
 }
 
 static int
 avg_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].time_avg,
-		       &counts[*((unsigned int *) b)].time_avg);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->time_avg,
+		       &get_syscall_cc(*b_k)->time_avg);
 }
 
 static int
 wall_time_cmp(const void *a, const void *b)
 {
-	const unsigned int *a_int = a;
-	const unsigned int *b_int = b;
-	return -ts_cmp(&counts[*a_int].wall_time, &counts[*b_int].wall_time);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->wall_time,
+		       &get_syscall_cc(*b_k)->wall_time);
 }
 
 static int
 wall_min_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_min,
-		       &counts[*((unsigned int *) b)].wall_time_min);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->wall_time_min,
+		       &get_syscall_cc(*b_k)->wall_time_min);
 }
 
 static int
 wall_max_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_max,
-		       &counts[*((unsigned int *) b)].wall_time_max);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->wall_time_max,
+		       &get_syscall_cc(*b_k)->wall_time_max);
 }
 
 static int
 wall_avg_time_cmp(const void *a, const void *b)
 {
-	return -ts_cmp(&counts[*((unsigned int *) a)].wall_time_avg,
-		       &counts[*((unsigned int *) b)].wall_time_avg);
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+
+	return -ts_cmp(&get_syscall_cc(*a_k)->wall_time_avg,
+		       &get_syscall_cc(*b_k)->wall_time_avg);
 }
 
 static int
 syscall_cmp(const void *a, const void *b)
 {
-	const unsigned int *a_int = a;
-	const unsigned int *b_int = b;
-	const char *a_name = sysent[*a_int].sys_name;
-	const char *b_name = sysent[*b_int].sys_name;
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+	const char *a_name = get_syscall_name(*a_k);
+	const char *b_name = get_syscall_name(*b_k);
+
 	return strcmp(a_name ? a_name : "", b_name ? b_name : "");
 }
 
 static int
 count_cmp(const void *a, const void *b)
 {
-	const unsigned int *a_int = a;
-	const unsigned int *b_int = b;
-	uint64_t m = counts[*a_int].calls;
-	uint64_t n = counts[*b_int].calls;
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+	uint64_t m = get_syscall_cc(*a_k)->calls;
+	uint64_t n = get_syscall_cc(*b_k)->calls;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -278,10 +429,10 @@ count_cmp(const void *a, const void *b)
 static int
 error_cmp(const void *a, const void *b)
 {
-	const unsigned int *a_int = a;
-	const unsigned int *b_int = b;
-	uint64_t m = counts[*a_int].errors;
-	uint64_t n = counts[*b_int].errors;
+	const kernel_ulong_t *a_k = a;
+	const kernel_ulong_t *b_k = b;
+	uint64_t m = get_syscall_cc(*a_k)->errors;
+	uint64_t n = get_syscall_cc(*b_k)->errors;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -402,68 +553,105 @@ num_chars(const char *fmt, ...)
 	return (unsigned int) MAX(ret, 0);
 }
 
+struct summary_stats {
+	struct timespec tv_cum;
+	const struct timespec *tv_min;
+	const struct timespec *tv_min_max;
+	const struct timespec *tv_max;
+	const struct timespec *tv_avg_max;
+	struct timespec tv_wall_cum;
+	const struct timespec *tv_wall_min;
+	const struct timespec *tv_wall_min_max;
+	const struct timespec *tv_wall_max;
+	const struct timespec *tv_wall_avg_max;
+	uint64_t call_cum;
+	uint64_t error_cum;
+	double float_tv_cum;
+	double float_tv_wall_cum;
+	size_t sc_name_max;
+};
+
+static void
+calc_summary_stats(struct summary_stats *stats, struct call_counts *cc, const char *sys_name)
+{
+	ts_add(&stats->tv_cum, &stats->tv_cum, &cc->time);
+	stats->tv_min = ts_min(stats->tv_min, &cc->time_min);
+	stats->tv_min_max = ts_max(stats->tv_min_max, &cc->time_min);
+	stats->tv_max = ts_max(stats->tv_max, &cc->time_max);
+	if (summary_needs_wall()) {
+		ts_add(&stats->tv_wall_cum, &stats->tv_wall_cum, &cc->wall_time);
+		stats->tv_wall_min = ts_min(stats->tv_wall_min, &cc->wall_time_min);
+		stats->tv_wall_min_max = ts_max(stats->tv_wall_min_max,
+						&cc->wall_time_min);
+		stats->tv_wall_max = ts_max(stats->tv_wall_max,
+					&cc->wall_time_max);
+		ts_div(&cc->wall_time_avg, &cc->wall_time,
+			cc->calls);
+		stats->tv_wall_avg_max = ts_max(stats->tv_wall_avg_max,
+						&cc->wall_time_avg);
+	}
+	stats->call_cum += cc->calls;
+	stats->error_cum += cc->errors;
+
+	ts_div(&cc->time_avg, &cc->time, cc->calls);
+	stats->tv_avg_max = ts_max(stats->tv_avg_max, &cc->time_avg);
+
+	stats->sc_name_max = MAX(stats->sc_name_max, strlen(sys_name));
+}
+
 static void
 call_summary_pers(FILE *outf)
 {
-	unsigned int *indices;
+	/*
+	 * unknown system calls start at index nsyscalls
+	 * and their index may differ from their number
+	 */
+	kernel_ulong_t *indices;
+	size_t indices_size = nsyscalls + get_unknown_bucket_size();
 	size_t last_column = 0;
 
-	struct timespec tv_cum = zero_ts;
-	const struct timespec *tv_min = &max_ts;
-	const struct timespec *tv_min_max = &zero_ts;
-	const struct timespec *tv_max = &zero_ts;
-	const struct timespec *tv_avg_max = &zero_ts;
-	struct timespec tv_wall_cum = zero_ts;
-	const struct timespec *tv_wall_min = &max_ts;
-	const struct timespec *tv_wall_min_max = &zero_ts;
-	const struct timespec *tv_wall_max = &zero_ts;
-	const struct timespec *tv_wall_avg_max = &zero_ts;
-	uint64_t call_cum = 0;
-	uint64_t error_cum = 0;
+	struct summary_stats stats = {
+		.tv_cum      	 = zero_ts,
+		.tv_min      	 = &max_ts,
+		.tv_min_max  	 = &zero_ts,
+		.tv_max      	 = &zero_ts,
+		.tv_avg_max  	 = &zero_ts,
+		.tv_wall_cum 	 = zero_ts,
+		.tv_wall_min 	 = &max_ts,
+		.tv_wall_min_max = &zero_ts,
+		.tv_wall_max 	 = &zero_ts,
+		.tv_wall_avg_max = &zero_ts,
+		.call_cum    	 = 0,
+		.error_cum   	 = 0,
+		.sc_name_max 	 = 0
+	};
 
-	double float_tv_cum;
-	double float_tv_wall_cum;
-	double percent;
-
-	size_t sc_name_max = 0;
-
-
-	/* sort, calculate statistics */
-	indices = xcalloc(nsyscalls, sizeof(indices[0]));
+	/* sort, calculate statistics (for known syscalls) */
+	indices = xcalloc(indices_size, sizeof(indices[0]));
 	for (size_t i = 0; i < nsyscalls; ++i) {
 		indices[i] = i;
 		if (counts[i].calls == 0)
 			continue;
 
-		ts_add(&tv_cum, &tv_cum, &counts[i].time);
-		tv_min = ts_min(tv_min, &counts[i].time_min);
-		tv_min_max = ts_max(tv_min_max, &counts[i].time_min);
-		tv_max = ts_max(tv_max, &counts[i].time_max);
-		if (summary_needs_wall()) {
-			ts_add(&tv_wall_cum, &tv_wall_cum, &counts[i].wall_time);
-			tv_wall_min = ts_min(tv_wall_min, &counts[i].wall_time_min);
-			tv_wall_min_max = ts_max(tv_wall_min_max,
-						 &counts[i].wall_time_min);
-			tv_wall_max = ts_max(tv_wall_max,
-					     &counts[i].wall_time_max);
-			ts_div(&counts[i].wall_time_avg, &counts[i].wall_time,
-			       counts[i].calls);
-			tv_wall_avg_max = ts_max(tv_wall_avg_max,
-						 &counts[i].wall_time_avg);
-		}
-		call_cum += counts[i].calls;
-		error_cum += counts[i].errors;
-
-		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
-		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
-
-		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
+		calc_summary_stats(&stats, &counts[i], sysent[i].sys_name);
 	}
-	float_tv_cum = ts_float(&tv_cum);
-	float_tv_wall_cum = summary_needs_wall() ? ts_float(&tv_wall_cum) : 0;
+
+	/* for unknown syscalls */
+	for (size_t i = 0; i < get_unknown_bucket_size(); ++i) {
+		struct unknown_call_counts *ucc = get_unknown_by_idx(i);
+		struct call_counts *cc = &ucc->call_counts;
+
+		indices[nsyscalls + i] = ucc->scno;
+
+		calc_summary_stats(&stats, cc, ucc->sys_name);
+	}
+
+	stats.float_tv_cum = ts_float(&stats.tv_cum);
+	stats.float_tv_wall_cum = summary_needs_wall()
+				  ? ts_float(&stats.tv_wall_cum) : 0;
 
 	if (sortfun)
-		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
+		qsort((void *) indices, indices_size, sizeof(indices[0]), sortfun);
 
 	enum column_flags {
 		CF_L = 1 << 0, /* Left-aligned column */
@@ -501,28 +689,28 @@ call_summary_pers(FILE *outf)
 #define W_(c_, v_) [c_] = MAX(cdesc[c_].sz, (v_))
 	unsigned int cwidths[CSC_MAX] = {
 		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
-		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
+		W_(CSC_TIME_TOTAL, num_chars("%.6f", stats.float_tv_cum)),
 		W_(CSC_TIME_MIN,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_min_max->tv_sec)),
+					     (int64_t) stats.tv_min_max->tv_sec)),
 		W_(CSC_TIME_MAX,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_max->tv_sec)),
+					     (int64_t) stats.tv_max->tv_sec)),
 		W_(CSC_TIME_AVG,   num_chars("%" PRId64 ,
-					     (uint64_t) (ts_float(tv_avg_max)
+					     (uint64_t) (ts_float(stats.tv_avg_max)
 							 * 1e6))),
-		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
-		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
-		W_(CSC_SC_NAME,    sc_name_max + 1),
+		W_(CSC_CALLS,      num_chars("%" PRIu64, stats.call_cum)),
+		W_(CSC_ERRORS,     num_chars("%" PRIu64, stats.error_cum)),
+		W_(CSC_SC_NAME,    stats.sc_name_max + 1),
 		W_(CSC_TIME_WALL_TOTAL,
-		   num_chars("%.6f", float_tv_wall_cum)),
+		   num_chars("%.6f", stats.float_tv_wall_cum)),
 		W_(CSC_TIME_WALL_MIN,
 		   num_chars("%" PRId64 ".000000",
-			     (int64_t) tv_wall_min_max->tv_sec)),
+			     (int64_t) stats.tv_wall_min_max->tv_sec)),
 		W_(CSC_TIME_WALL_MAX,
 		   num_chars("%" PRId64 ".000000",
-			     (int64_t) tv_wall_max->tv_sec)),
+			     (int64_t) stats.tv_wall_max->tv_sec)),
 		W_(CSC_TIME_WALL_AVG,
 		   num_chars("%" PRId64,
-			     (uint64_t) (ts_float(tv_wall_avg_max) * 1e6))),
+			     (uint64_t) (ts_float(stats.tv_wall_avg_max) * 1e6))),
 	};
 #undef W_
 
@@ -583,10 +771,12 @@ call_summary_pers(FILE *outf)
 	}
 
 	/* data output */
-	for (size_t j = 0; j < nsyscalls; ++j) {
-		unsigned int idx = indices[j];
-		struct call_counts *cc = &counts[idx];
+	for (size_t j = 0; j < indices_size; ++j) {
+		kernel_ulong_t idx = indices[j];
+		struct call_counts *cc = get_syscall_cc(idx);
+		const char *sys_name = get_syscall_name(idx);
 		double float_syscall_time;
+		double percent;
 
 		if (cc->calls == 0)
 			continue;
@@ -595,7 +785,7 @@ call_summary_pers(FILE *outf)
 		percent = (100.0 * float_syscall_time);
 		/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
 		if (percent != 0.0)
-			   percent /= float_tv_cum;
+			percent /= stats.float_tv_cum;
 
 		for (size_t i = 0; i <= last_column; ++i) {
 			const size_t c = columns[i];
@@ -611,7 +801,7 @@ call_summary_pers(FILE *outf)
 			    (uint64_t) (ts_float(&cc->time_avg) * 1e6));
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
-			PC_(CSC_SC_NAME,    sysent[idx].sys_name);
+			PC_(CSC_SC_NAME,    sys_name);
 			PC_(CSC_TIME_WALL_TOTAL, ts_float(&cc->wall_time));
 			PC_(CSC_TIME_WALL_MIN,   ts_float(&cc->wall_time_min));
 			PC_(CSC_TIME_WALL_MAX,   ts_float(&cc->wall_time_max));
@@ -643,18 +833,18 @@ call_summary_pers(FILE *outf)
 
 		switch (c) {
 		PC_(CSC_TIME_100S, 100.0);
-		PC_(CSC_TIME_TOTAL, float_tv_cum);
-		PC_(CSC_TIME_MIN, ts_float(tv_min));
-		PC_(CSC_TIME_MAX, ts_float(tv_max));
-		PC_(CSC_TIME_AVG, (uint64_t) (float_tv_cum / call_cum * 1e6));
-		PC_(CSC_CALLS, call_cum);
-		PC_(CSC_ERRORS, error_cum);
+		PC_(CSC_TIME_TOTAL, stats.float_tv_cum);
+		PC_(CSC_TIME_MIN, ts_float(stats.tv_min));
+		PC_(CSC_TIME_MAX, ts_float(stats.tv_max));
+		PC_(CSC_TIME_AVG, (uint64_t) (stats.float_tv_cum / stats.call_cum * 1e6));
+		PC_(CSC_CALLS, stats.call_cum);
+		PC_(CSC_ERRORS, stats.error_cum);
 		PC_(CSC_SC_NAME, "total");
-		PC_(CSC_TIME_WALL_TOTAL, float_tv_wall_cum);
-		PC_(CSC_TIME_WALL_MIN, ts_float(tv_wall_min));
-		PC_(CSC_TIME_WALL_MAX, ts_float(tv_wall_max));
+		PC_(CSC_TIME_WALL_TOTAL, stats.float_tv_wall_cum);
+		PC_(CSC_TIME_WALL_MIN, ts_float(stats.tv_wall_min));
+		PC_(CSC_TIME_WALL_MAX, ts_float(stats.tv_wall_max));
 		PC_(CSC_TIME_WALL_AVG,
-		    (uint64_t) (float_tv_wall_cum / call_cum * 1e6));
+		    (uint64_t) (stats.float_tv_wall_cum / stats.call_cum * 1e6));
 		}
 	}
 	fputc('\n', outf);
