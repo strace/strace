@@ -74,7 +74,7 @@ kd_unimap(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 
 		if (get)
 			return 0;
-	} else {
+	} else if (val.entry_ct != (uint16_t) get_tcb_priv_ulong(tcp)) {
 		tprint_value_changed();
 		PRINT_VAL_U(val.entry_ct);
 	}

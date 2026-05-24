@@ -529,11 +529,9 @@ check_xetkeycode(unsigned int c, const char *s)
 		memcpy(tail_arg, args + i, sizeof(args[i]));
 
 		sys_ioctl(-1, c, (uintptr_t) tail_arg);
-		printf("ioctl(-1, " XLAT_FMT ", {scancode=%#x, keycode=%#x",
+		printf("ioctl(-1, " XLAT_FMT ", {scancode=%#x, keycode=%#x})"
+		       RETVAL,
 		       XLAT_SEL(c, s), args[i].scancode, args[i].keycode);
-		if ((c == KDGETKEYCODE) && RETVAL_INJECTED)
-			printf(" => %#x", args[i].keycode);
-		printf("})" RETVAL);
 	}
 }
 
@@ -638,14 +636,14 @@ check_unimap(unsigned int c, const char *s)
 	umd->entry_ct = 0xdead;
 	umd->entries = NULL;
 	sys_ioctl(-1, c, (uintptr_t) umd);
-	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=57005%s, entries=NULL})"
-	       RETVAL, XLAT_SEL(c, s), c == GIO_UNIMAP ? " => 57005" : "");
+	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=57005, entries=NULL})"
+	       RETVAL, XLAT_SEL(c, s));
 
 	umd->entry_ct = 0;
 	umd->entries = ups + 33;
 	sys_ioctl(-1, c, (uintptr_t) umd);
-	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=0%s, entries=",
-	       XLAT_SEL(c, s), c == GIO_UNIMAP ? " => 0" : "");
+	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=0, entries=",
+	       XLAT_SEL(c, s));
 	if (c == GIO_UNIMAP && !RETVAL_INJECTED)
 		printf("%p", ups + 33);
 	else
@@ -654,8 +652,8 @@ check_unimap(unsigned int c, const char *s)
 
 	umd->entry_ct = 1;
 	sys_ioctl(-1, c, (uintptr_t) umd);
-	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=1%s, entries=%p})" RETVAL,
-	       XLAT_SEL(c, s), c == GIO_UNIMAP ? " => 1" : "", ups + 33);
+	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=1, entries=%p})" RETVAL,
+	       XLAT_SEL(c, s), ups + 33);
 
 	for (unsigned int i = 0; i < 6; i++) {
 		umd->entry_ct = 31 + (i + 1) / 2;
@@ -665,7 +663,6 @@ check_unimap(unsigned int c, const char *s)
 		       XLAT_SEL(c, s), 31 + (i + 1) / 2);
 
 		if (c == GIO_UNIMAP) {
-			printf(" => %u", 31 + (i + 1) / 2);
 #if !RETVAL_INJECTED
 			printf(", entries=%p})" RETVAL, ups + 2 - i / 2);
 			continue;

@@ -550,8 +550,10 @@ kd_keycode(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 		tprint_struct_next();
 		PRINT_FIELD_X(val, keycode);
 
-		if (get)
+		if (get) {
+			set_tcb_priv_ulong(tcp, val.keycode);
 			return 0;
+		}
 
 		goto end;
 	}
@@ -564,8 +566,10 @@ kd_keycode(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	tprint_value_changed();
-	PRINT_VAL_X(val.keycode);
+	if (val.keycode != (unsigned int) get_tcb_priv_ulong(tcp)) {
+		tprint_value_changed();
+		PRINT_VAL_X(val.keycode);
+	}
 
 end:
 	tprint_struct_end();
