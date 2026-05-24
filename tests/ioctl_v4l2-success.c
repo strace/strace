@@ -608,7 +608,7 @@ main(int argc, char **argv)
 
 		ioctl(-1, VIDIOC_REQBUFS, reqb);
 		printf("ioctl(-1, %s, {type=%s, memory=%s"
-		       ", count=4277009102 => 4277009102}) = %ld (INJECTED)\n",
+		       ", count=4277009102}) = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_REQBUFS),
 		       buf_types[i % ARRAY_SIZE(buf_types)].str,
 		       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
@@ -1132,10 +1132,8 @@ main(int argc, char **argv)
 		ioctl(-1, ctrl_cmds[i].val, ctrl);
 		printf("ioctl(-1, %s, {id=0x80a0c0e0"
 		       NRAW(" /* V4L2_CID_??? */")
-		       ", value=-2136948511%s}) = %ld (INJECTED)\n",
+		       ", value=-2136948511}) = %ld (INJECTED)\n",
 		       sprintxlat(ctrl_cmds[i].str, ctrl_cmds[i].val, NULL),
-		       ctrl_cmds[i].val == VIDIOC_S_CTRL
-			? " => -2136948511" : "",
 		       inject_retval);
 	}
 

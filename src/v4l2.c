@@ -474,11 +474,14 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "V4L2_MEMORY_???");
 		tprint_struct_next();
 		PRINT_FIELD_U(reqbufs, count);
+		set_tcb_priv_ulong(tcp, reqbufs.count);
 
 		return 0;
 	}
 
-	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs)) {
+	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs) &&
+	    (reqbufs.count !=
+	    (unsigned int) get_tcb_priv_ulong(tcp))) {
 		tprint_value_changed();
 		PRINT_VAL_U(reqbufs.count);
 	}
@@ -1000,6 +1003,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (!is_get) {
 			tprint_struct_next();
 			PRINT_FIELD_D(c, value);
+			set_tcb_priv_ulong(tcp, (unsigned long) c.value);
 		}
 		return 0;
 	}
@@ -1008,7 +1012,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (is_get) {
 			tprint_struct_next();
 			PRINT_FIELD_D(c, value);
-		} else {
+		} else if (c.value != (int32_t) get_tcb_priv_ulong(tcp)) {
 			tprint_value_changed();
 			PRINT_VAL_D(c.value);
 		}
