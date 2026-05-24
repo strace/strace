@@ -127,6 +127,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV) {
 			tprint_struct_next();
+			tprints_field_name("dxferp");
 			print_buffer = true;
 		} else if (din_len) {
 			tprint_value_changed();
@@ -134,8 +135,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		}
 
 		if (print_buffer) {
-			PRINT_FIELD_SG_IO_BUFFER(sg_io, dxferp, din_len,
-						 sg_io.iovec_count, tcp);
+			print_sg_io_buffer(tcp, (mpers_ptr_t)(sg_io.dxferp),
+					   din_len, sg_io.iovec_count);
 		}
 	}
 	tprint_struct_next();

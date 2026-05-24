@@ -310,7 +310,7 @@ main(void)
 	       ", dxfer_len=%u"
 	       ", timeout=%u"
 	       ", flags=SG_FLAG_UNUSED_LUN_INHIBIT"
-	       ", dxferp=\"\\x%x\\x%x\\x%x\" => dxferp=\"\\x%x\\x%x\""
+	       ", dxferp=\"\\x%x\\x%x\\x%x\" => \"\\x%x\\x%x\""
 	       ", status=%#x"
 	       ", masked_status=%#x"
 	       ", msg_status=%#x"
