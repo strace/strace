@@ -19,6 +19,8 @@ SYS_FUNC(time)
 	if (exiting(tcp)) {
 		kernel_time_t t;
 
+		/* tloc */
+		tprints_arg_name("tloc");
 		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t)) {
 			tprint_indirect_begin();
 			PRINT_VAL_D(t);
