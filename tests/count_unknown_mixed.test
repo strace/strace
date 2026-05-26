@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Check that -c summary includes both known and unknown syscalls.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+if [ "$MIPS_ABI" = "o32" ]; then
+	skip_ "mips $MIPS_ABI is not supported by this test yet"
+fi
+
+run_prog > "$OUT"
+
+cat > "$EXP" << '__EOF__'
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+100.00 +[^ ]+ +[^ ]+ +2 +1 +total
+__EOF__
+
+check_prog sed
+sed -e '1s/^/[ ]*[^ ]+ +[^ ]+ +[^ ]+ +1 +1 +/' \
+    -e '2s/^/[ ]*[^ ]+ +[^ ]+ +[^ ]+ +1 +/' < "$OUT" >> "$EXP"
+
+run_strace -e trace=getpid -c $args > /dev/null
+
+match_grep "$LOG" "$EXP"

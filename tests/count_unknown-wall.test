@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Check that -c wall columns work for out-of-range syscalls.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+NAME=count_unknown
+
+if [ "$MIPS_ABI" = "o32" ]; then
+	skip_ "mips $MIPS_ABI is not supported by this test yet"
+fi
+
+run_prog > /dev/null
+
+run_strace -e trace=none -c \
+	-U 'time,wall-total,wall-min,wall-max,wall-avg,calls,errors,syscall' \
+	$args > "$OUT"
+
+check_prog awk
+awk '
+BEGIN {
+	f["time"] = 1
+	f["wall-total"] = 2
+	f["wall-min"] = 3
+	f["wall-max"] = 4
+	d["wall-avg"] = 5
+	d["calls"] = 6
+	d["errors"] = 7
+}
+$NF ~ /^syscall_0x/ {
+	found=1
+	for (i in f) {
+		v=$f[i]
+		if (v !~ /^[0-9]+\.[0-9]+$/) {
+			printf("invalid %s for %s: %s\n", i, $NF, v) > "/dev/stderr"
+			exit 1
+		}
+	}
+	for (i in d) {
+		v=$d[i]
+		if (v !~ /^[0-9]+$/) {
+			printf("invalid %s for %s: %s\n", i, $NF, v) > "/dev/stderr"
+			exit 1
+		}
+	}
+}
+END {
+	if (found != 1) {
+		print "summary lines for out-of-range syscalls not found" > "/dev/stderr"
+		exit 1
+	}
+}
+' "$LOG" ||
+	dump_log_and_fail_with "$STRACE $args: output does not meet expectations"

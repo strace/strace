@@ -8,21 +8,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#include "tests.h"
-#include "sysent.h"
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "scno.h"
-
-#include "sysent_shorthand_defs.h"
-
-static const struct_sysent syscallent[] = {
-#include "syscallent.h"
-};
-
-#include "sysent_shorthand_undefs.h"
+#include "nsyscalls.h"
 
 #ifndef DEBUG_PRINT
 # define DEBUG_PRINT 0
@@ -36,17 +22,7 @@ static FILE *debug_out;
 static void
 test_syscall(const unsigned long nr)
 {
-	static const kernel_ulong_t a[] = {
-		(kernel_ulong_t) 0xface0fedbadc0dedULL,
-		(kernel_ulong_t) 0xface1fedbadc1dedULL,
-		(kernel_ulong_t) 0xface2fedbadc2dedULL,
-		(kernel_ulong_t) 0xface3fedbadc3dedULL,
-		(kernel_ulong_t) 0xface4fedbadc4dedULL,
-		(kernel_ulong_t) 0xface5fedbadc5dedULL
-	};
-
-	long rc = syscall(nr | SYSCALL_BIT,
-			  a[0], a[1], a[2], a[3], a[4], a[5]);
+	long rc = invoke_syscall(nr);
 
 #if DEBUG_PRINT
 	fprintf(debug_out, "%s: pid %d invalid syscall %#lx\n",
@@ -56,16 +32,22 @@ test_syscall(const unsigned long nr)
 #ifdef LINUX_MIPSO32
 	printf("syscall(%#lx, %#lx, %#lx, %#lx, %#lx, %#lx, %#lx)"
 	       " = %s\n", nr | SYSCALL_BIT,
-	       a[0], a[1], a[2], a[3], a[4], a[5], sprintrc(rc));
+	       out_of_range_syscall_args[0],
+	       out_of_range_syscall_args[1],
+	       out_of_range_syscall_args[2],
+	       out_of_range_syscall_args[3],
+	       out_of_range_syscall_args[4],
+	       out_of_range_syscall_args[5],
+	       sprintrc(rc));
 #else
 	printf("syscall_%#lx(%#llx, %#llx, %#llx, %#llx, %#llx, %#llx)"
 	       " = %s\n", nr | SYSCALL_BIT,
-	       (unsigned long long) a[0],
-	       (unsigned long long) a[1],
-	       (unsigned long long) a[2],
-	       (unsigned long long) a[3],
-	       (unsigned long long) a[4],
-	       (unsigned long long) a[5],
+	       (unsigned long long) out_of_range_syscall_args[0],
+	       (unsigned long long) out_of_range_syscall_args[1],
+	       (unsigned long long) out_of_range_syscall_args[2],
+	       (unsigned long long) out_of_range_syscall_args[3],
+	       (unsigned long long) out_of_range_syscall_args[4],
+	       (unsigned long long) out_of_range_syscall_args[5],
 	       sprintrc(rc));
 #endif
 }

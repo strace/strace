@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# Check that -S sorting works for out-of-range syscalls in -c summary.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+NAME=count_unknown
+
+if [ "$MIPS_ABI" = "o32" ]; then
+	skip_ "mips $MIPS_ABI is not supported by this test yet"
+fi
+
+test_unknown_sort()
+{
+	local sortby sortopts sedexpr
+	sortby="$1"; shift
+	sortopts="$1"; shift
+	sedexpr="$1"; shift
+
+	run_prog > /dev/null
+	run_strace -e trace=none -c $sortby "$@" $args > /dev/null
+	[ -s "$LOG" ] ||
+		dump_log_and_fail_with "$STRACE $args produced no output"
+
+	check_prog sed
+	sed -E -n -e "$sedexpr" < "$LOG" > "$OUT"
+	[ -s "$OUT" ] ||
+		dump_log_and_fail_with "sed -E -n -e \"$sedexpr\" produced no output"
+
+	LC_ALL=C sort -c $sortopts "$OUT" ||
+		dump_log_and_fail_with "$STRACE $args output not sorted properly"
+}
+
+s='[[:space:]]+'
+c="$s([^[:space:]]+)"
+d='[0-9]'
+
+test_unknown_sort '-S total_time' '-g -r' \
+	"/^$s$d/ s/^$c$s.*/\1/p"
+
+test_unknown_sort '-S wall-total' '-g -r' \
+	"/^$s$d/ s/^$c$c$s.*/\2/p" \
+	-U time,wall-total,calls,errors,syscall
+
+test_unknown_sort '-S avg_time' '-n -r' \
+	"/^$s$d/ s/^$c$c$c$s.*/\3/p"
+
+test_unknown_sort '-S calls' '-n -r' \
+	"/^$s$d/ s/^$c$c$c$c$s.*/\4/p"
+
+test_unknown_sort '-S error' '-n -r' \
+	"/^$s$d/ s/^$c$c$c$c$c$s.*/\5/p"
+
+test_unknown_sort '-S syscall_name' '' \
+	"/^$s$d/ s/^$c$c$c$c$c$c\$/\6/p"

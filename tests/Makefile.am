@@ -142,6 +142,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone_ptrace-qq \
 	close_range \
 	count-f \
+	count_unknown \
+	count_unknown_many \
+	count_unknown_mixed \
 	delay \
 	detach-vfork \
 	env-i \
@@ -644,6 +647,11 @@ MISC_TESTS = \
 	bexecve.test \
 	clone_ptrace.test \
 	count-f.test \
+	count_unknown.test \
+	count_unknown-S.test \
+	count_unknown-wall.test \
+	count_unknown_many.test \
+	count_unknown_mixed.test \
 	delay.test \
 	detach-running.test \
 	detach-sleeping.test \
@@ -891,6 +899,7 @@ EXTRA_DIST = \
 	lstatx.c \
 	nlattr_ifla.h \
 	nlattr_ifla_af_inet6.h \
+	nsyscalls.h \
 	print_user_desc.c \
 	printsignal.c \
 	printxval.c \

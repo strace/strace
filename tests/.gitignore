@@ -89,6 +89,9 @@ clone_ptrace-qq
 close_range
 copy_file_range
 count-f
+count_unknown
+count_unknown_many
+count_unknown_mixed
 creat
 delay
 delete_module
