@@ -68,12 +68,12 @@ main(void)
 
 	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, alen)
 	       == (long) alen);
-	printf("sendfile(%d, %d, [0] => [%u], %u) = %u\n",
+	printf("sendfile(%d, %d, [0 => %u], %u) = %u\n",
 	       sv[1], reg_in, alen, alen, alen);
 
 	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, file_size + 1)
 	       == (long) blen);
-	printf("sendfile(%d, %d, [%u] => [%u], %u) = %u\n",
+	printf("sendfile(%d, %d, [%u => %u], %u) = %u\n",
 	       sv[1], reg_in, alen, file_size, file_size + 1, blen);
 
 	*p_off = (typeof(*p_off)) 0xcafef00dfacefeedULL;
