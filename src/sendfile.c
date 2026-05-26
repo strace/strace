@@ -31,9 +31,6 @@ SYS_FUNC(sendfile64)
 	} else {
 		if (!syserror(tcp) && tcp->u_rval) {
 			tprint_value_changed();
-
-			/* offset */
-			tprints_arg_name("offset");
 			printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
 		}
 
@@ -69,9 +66,6 @@ SYS_FUNC(sendfile)
 	} else {
 		if (!syserror(tcp) && tcp->u_rval) {
 			tprint_value_changed();
-
-			/* offset */
-			tprints_arg_name("offset");
 			printnum_ulong(tcp, tcp->u_arg[2]);
 		}
 
