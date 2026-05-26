@@ -498,9 +498,9 @@ main(int argc, const char *argv[])
 	info->mask = PIDFD_INFO_PID;
 
 	do_ioctl_fd(-1, PIDFD_GET_INFO_cmd.val, (uintptr_t) info);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = %s\n",
+	printf("ioctl(-1, " XLAT_FMT ", {mask=%s}) = %s\n",
 	       XLAT_SEL(PIDFD_GET_INFO_cmd.val, PIDFD_GET_INFO_cmd.str),
-	       info, errstr);
+	       XLAT_KNOWN(0x1, "PIDFD_INFO_PID"), errstr);
 
 	do_ioctl_fd(pidfd, PIDFD_GET_INFO_cmd.val, (uintptr_t) efault);
 	printf("ioctl(%d, " XLAT_FMT ", %p) = %s\n",
@@ -528,7 +528,8 @@ main(int argc, const char *argv[])
 	       XLAT_SEL(PIDFD_GET_INFO_oversize_cmd.val,
 		        PIDFD_GET_INFO_oversize_cmd.str));
 	if (rc < 0)
-		printf("%p", info);
+		printf("{mask=%s}",
+		       XLAT_KNOWN(0x1, "PIDFD_INFO_PID"));
 	else
 		print_pidfd_info(info);
 	printf(") = %s\n", errstr);
@@ -542,7 +543,8 @@ main(int argc, const char *argv[])
 	       pidfd,
 	       XLAT_SEL(PIDFD_GET_INFO_cmd.val, PIDFD_GET_INFO_cmd.str));
 	if (rc < 0)
-		printf("%p", info);
+		printf("{mask=%s}",
+		       XLAT_KNOWN(0x1, "PIDFD_INFO_PID"));
 	else
 		print_pidfd_info(info);
 	printf(") = %s\n", errstr);

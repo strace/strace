@@ -130,32 +130,6 @@ pidfd_ioctl_print_pidfd_info_fields(struct tcb *tcp,
 	}
 }
 
-static void
-pidfd_ioctl_print_pidfd_get_info(struct tcb *tcp,
-				 const kernel_ulong_t arg,
-				 const unsigned int usize,
-				 const uint64_t req_mask)
-{
-	struct pidfd_info info = { 0 };
-	const unsigned int len = MIN(sizeof(info), usize);
-
-	if (umoven_or_printaddr(tcp, arg, len, &info))
-		return;
-
-	tprint_struct_begin();
-	tprints_field_name("mask");
-	printflags64(pidfd_info_mask, req_mask, "PIDFD_INFO_???");
-
-	if (info.mask != req_mask) {
-		tprint_value_changed();
-		printflags64(pidfd_info_mask, info.mask, "PIDFD_INFO_???");
-	}
-
-	pidfd_ioctl_print_pidfd_info_fields(tcp, &info, usize);
-
-	tprint_struct_end();
-}
-
 int
 pidfd_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 {
@@ -178,7 +152,7 @@ pidfd_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	struct pidfd_info info;
+	struct pidfd_info info = { 0 };
 
 	if (entering(tcp)) {
 		if (umove_or_printaddr(tcp, arg, &info.mask))
@@ -192,21 +166,37 @@ pidfd_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 			set_tcb_priv_ulong(tcp, (unsigned long) info.mask);
 		}
 
+		tprint_struct_begin();
+		tprints_field_name("mask");
+		printflags64(pidfd_info_mask, info.mask, "PIDFD_INFO_???");
+
 		return 0;
 	}
+
+	uint64_t req_mask;
 
 	if (sizeof(info.mask) > sizeof(long)) {
 		typeof(info.mask) *req_mask_p = get_tcb_priv_data(tcp);
 		if (!req_mask_p) {
-			printaddr(arg);
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
-		info.mask = *req_mask_p;
+		req_mask = *req_mask_p;
 	} else {
-		info.mask = get_tcb_priv_ulong(tcp);
+		req_mask = get_tcb_priv_ulong(tcp);
 	}
 
-	pidfd_ioctl_print_pidfd_get_info(tcp, arg, usize, info.mask);
+	const unsigned int len = MIN(sizeof(info), usize);
+	if (tfetch_mem(tcp, arg, len, &info)) {
+		if (info.mask != req_mask) {
+			tprint_value_changed();
+			printflags64(pidfd_info_mask, info.mask,
+				     "PIDFD_INFO_???");
+		}
+		pidfd_ioctl_print_pidfd_info_fields(tcp, &info, usize);
+	}
+
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
