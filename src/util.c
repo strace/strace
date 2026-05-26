@@ -1768,9 +1768,9 @@ umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
 	return -1;
 }
 
-int
-umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
-				unsigned int len, uint64_t *const our_addr)
+bool
+tfetch_to_uint64_64(struct tcb *const tcp, const uint64_t addr,
+		    unsigned int len, uint64_t *const our_addr)
 {
 	union {
 		uint64_t val;
@@ -1781,8 +1781,17 @@ umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
 	if (len <= sizeof(data) &&
 	    tfetch_mem64_ignore_syserror(tcp, addr, len, data.bytes + offs)) {
 		*our_addr = data.val;
-		return 0;
+		return true;
 	}
+	return false;
+}
+
+int
+umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
+				unsigned int len, uint64_t *const our_addr)
+{
+	if (tfetch_to_uint64_64(tcp, addr, len, our_addr))
+		return 0;
 	printaddr64(addr);
 	return -1;
 }
