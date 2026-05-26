@@ -21,7 +21,8 @@ SYS_FUNC(sendfile64)
 
 		/* offset */
 		tprints_arg_next_name("offset");
-		if (!printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64)) {
+		if (!printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64)
+		    || !tcp->u_arg[3]) {
 
 			/* count */
 			tprints_arg_next_name("count");
