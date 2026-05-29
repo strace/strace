@@ -825,6 +825,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				strace_close_memstream(tcp, publish);
 			line_ended();
 		}
+#ifdef ENABLE_STACKTRACE
+		if (stack_trace_mode)
+			unwind_tcb_discard(tcp);
+#endif
 		return res;
 	}
 	tcp->s_prev_ent = prev_ent;
@@ -851,6 +855,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		if (!publish) {
 			if (cflag != CFLAG_ONLY_STATS)
 				line_ended();
+#ifdef ENABLE_STACKTRACE
+			if (stack_trace_mode)
+				unwind_tcb_discard(tcp);
+#endif
 			return 0;
 		}
 	}

@@ -1624,6 +1624,7 @@ extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
 extern void unwind_tcb_print(struct tcb *);
 extern void unwind_tcb_capture(struct tcb *);
+extern void unwind_tcb_discard(struct tcb *);
 # endif
 
 # ifdef HAVE_LINUX_KVM_H

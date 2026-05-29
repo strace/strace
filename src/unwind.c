@@ -32,7 +32,7 @@ struct unwind_queue_t {
 	struct call_t *head;
 };
 
-static void queue_print(struct unwind_queue_t *queue);
+static void queue_drain(struct unwind_queue_t *queue, bool print);
 
 static const char asprintf_error_str[] = "???";
 
@@ -62,7 +62,7 @@ unwind_tcb_fin(struct tcb *tcp)
 	if (!tcp->unwind_queue)
 		return;
 
-	queue_print(tcp->unwind_queue);
+	queue_drain(tcp->unwind_queue, true);
 	free(tcp->unwind_queue);
 	tcp->unwind_queue = NULL;
 
@@ -271,7 +271,7 @@ queue_put_error(void *queue,
 }
 
 static void
-queue_print(struct unwind_queue_t *queue)
+queue_drain(struct unwind_queue_t *queue, bool print)
 {
 	struct call_t *call, *tmp;
 
@@ -282,8 +282,10 @@ queue_print(struct unwind_queue_t *queue)
 		tmp = call;
 		call = call->next;
 
-		tprints_string(tmp->output_line);
-		line_ended();
+		if (print) {
+			tprints_string(tmp->output_line);
+			line_ended();
+		}
 
 		if (tmp->output_line != asprintf_error_str)
 			free(tmp->output_line);
@@ -309,9 +311,15 @@ unwind_tcb_print(struct tcb *tcp)
 	if (tcp->unwind_queue->head) {
 		debug_func_msg("head: tcp=%p, queue=%p",
 			       tcp, tcp->unwind_queue->head);
-		queue_print(tcp->unwind_queue);
+		queue_drain(tcp->unwind_queue, true);
 	} else
 		unwinder.tcb_walk(tcp, print_call_cb, print_error_cb, NULL);
+}
+
+void
+unwind_tcb_discard(struct tcb *tcp)
+{
+	queue_drain(tcp->unwind_queue, false);
 }
 
 /*
