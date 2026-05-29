@@ -8,7 +8,7 @@
  */
 
 [  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
-[  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
+[  1] = { 1,	TP,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},
 [  3] = { 3,	TD,		SEN(read),			"read"			},
 [  4] = { 3,	TD,		SEN(write),			"write"			},
@@ -18,7 +18,7 @@
 [  8] = { 2,	TD|TF,		SEN(creat),			"creat"			},
 [  9] = { 2,	TF,		SEN(link),			"link"			},
 [ 10] = { 1,	TF,		SEN(unlink),			"unlink"		},
-[ 11] = { 3,	CC|TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
+[ 11] = { 3,	CC|TF|TP|TSD|SI,	SEN(execve),			"execve"		},
 [ 12] = { 1,	TF,		SEN(chdir),			"chdir"			},
 [ 13] = { 1,	TCL,		SEN(time),			"time"			},
 [ 14] = { 3,	TF,		SEN(mknod),			"mknod"			},
@@ -258,7 +258,7 @@
 [249] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [250] = { 5,	0,		SEN(printargs),			"alloc_hugepages"	},
 [251] = { 1,	0,		SEN(printargs),			"free_hugepages"	},
-[252] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
+[252] = { 1,	TP,		SEN(exit),			"exit_group"		},
 [253] = { 4,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [254] = { 1,	0,		SEN(printargs),			"bfin_spinlock"		},
 [255] = { 1,	TD,		SEN(epoll_create),		"epoll_create"		},
@@ -398,4 +398,4 @@
 [389] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [390] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [391] = { 3,	TD,		SEN(bpf),			"bpf"			},
-[392] = { 5,	CC|TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
+[392] = { 5,	CC|TD|TF|TP|TSD|SI,	SEN(execveat),			"execveat"		},

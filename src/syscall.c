@@ -659,11 +659,8 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_mode &&
-	    !check_exec_syscall(tcp) &&
-	    tcp_sysent(tcp)->sys_flags & STACKTRACE_CAPTURE_ON_ENTER) {
+	if (stack_trace_mode && !check_exec_syscall(tcp))
 		unwind_tcb_capture(tcp);
-	}
 #endif
 
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES))

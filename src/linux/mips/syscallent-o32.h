@@ -10,7 +10,7 @@
 /* For an O32 strace, decode the o32 syscalls.  */
 # define SYS_syscall_subcall	4000
 [BASE_NR +   0] = { MA,	TSD,		SEN(syscall),			"syscall"		}, /* start of Linux o32 */
-[BASE_NR +   1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
+[BASE_NR +   1] = { 1,	TP,		SEN(exit),			"exit"			},
 [BASE_NR +   2] = { 0,	TP,		SEN(fork),			"fork"			},
 [BASE_NR +   3] = { 3,	TD,		SEN(read),			"read"			},
 [BASE_NR +   4] = { 3,	TD,		SEN(write),			"write"			},
@@ -20,7 +20,7 @@
 [BASE_NR +   8] = { 2,	TD|TF,		SEN(creat),			"creat"			},
 [BASE_NR +   9] = { 2,	TF,		SEN(link),			"link"			},
 [BASE_NR +  10] = { 1,	TF,		SEN(unlink),			"unlink"		},
-[BASE_NR +  11] = { 3,	CC|TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
+[BASE_NR +  11] = { 3,	CC|TF|TP|TSD|SI,	SEN(execve),			"execve"		},
 [BASE_NR +  12] = { 1,	TF,		SEN(chdir),			"chdir"			},
 [BASE_NR +  13] = { 1,	TCL,		SEN(time),			"time"			},
 [BASE_NR +  14] = { 3,	TF,		SEN(mknod),			"mknod"			},
@@ -255,7 +255,7 @@
 [BASE_NR + 243] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [BASE_NR + 244] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [BASE_NR + 245] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
-[BASE_NR + 246] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
+[BASE_NR + 246] = { 1,	TP,		SEN(exit),			"exit_group"		},
 [BASE_NR + 247] = { 4,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [BASE_NR + 248] = { 1,	TD,		SEN(epoll_create),		"epoll_create"		},
 [BASE_NR + 249] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},
@@ -365,7 +365,7 @@
 [BASE_NR + 353] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [BASE_NR + 354] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [BASE_NR + 355] = { 3,	TD,		SEN(bpf),			"bpf"			},
-[BASE_NR + 356] = { 5,	CC|TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
+[BASE_NR + 356] = { 5,	CC|TD|TF|TP|TSD|SI,	SEN(execveat),			"execveat"		},
 [BASE_NR + 357] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [BASE_NR + 358] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [BASE_NR + 359] = { 3,	TM,		SEN(mlock2),			"mlock2"		},

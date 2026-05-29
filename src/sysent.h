@@ -27,20 +27,19 @@ typedef struct sysent {
 # define TRACE_MEMORY			000000100	/* Trace memory mapping-related syscalls. */
 # define SYSCALL_NEVER_FAILS		000000200	/* Syscall is always successful. */
 # define MEMORY_MAPPING_CHANGE		000000400	/* Trigger proc/maps cache updating */
-# define STACKTRACE_CAPTURE_ON_ENTER	000001000	/* Capture stacktrace on "entering" stage */
-# define TRACE_INDIRECT_SUBCALL		000002000	/* Syscall is an indirect socket/ipc subcall. */
-# define COMPAT_SYSCALL_TYPES		000004000	/* A compat syscall that uses compat types. */
-# define TRACE_STAT			000010000	/* Trace {,*_}{,old}{,x}stat{,64} syscalls. */
-# define TRACE_LSTAT			000020000	/* Trace *lstat* syscalls. */
-# define TRACE_STATFS			000040000	/* Trace statfs, statfs64, and statvfs syscalls. */
-# define TRACE_FSTATFS			000100000	/* Trace fstatfs, fstatfs64 and fstatvfs syscalls. */
-# define TRACE_STATFS_LIKE		000200000	/* Trace statfs-like, fstatfs-like and ustat syscalls. */
-# define TRACE_FSTAT			000400000	/* Trace *fstat{,at}{,64} syscalls. */
-# define TRACE_STAT_LIKE		001000000	/* Trace *{,l,f}stat{,x,at}{,64} syscalls. */
-# define TRACE_PURE			002000000	/* Trace getter syscalls with no arguments. */
-# define TRACE_SECCOMP_DEFAULT		004000000	/* Syscall is traced by seccomp filter by default. */
-# define TRACE_CREDS			010000000	/* Trace process credentials-related syscalls. */
-# define TRACE_CLOCK			020000000	/* Trace syscalls reading or modifying system clocks. */
-# define COMM_CHANGE			040000000	/* Trigger /proc/$pid/comm cache update. */
+# define TRACE_INDIRECT_SUBCALL		000001000	/* Syscall is an indirect socket/ipc subcall. */
+# define COMPAT_SYSCALL_TYPES		000002000	/* A compat syscall that uses compat types. */
+# define TRACE_STAT			000004000	/* Trace {,*_}{,old}{,x}stat{,64} syscalls. */
+# define TRACE_LSTAT			000010000	/* Trace *lstat* syscalls. */
+# define TRACE_STATFS			000020000	/* Trace statfs, statfs64, and statvfs syscalls. */
+# define TRACE_FSTATFS			000040000	/* Trace fstatfs, fstatfs64 and fstatvfs syscalls. */
+# define TRACE_STATFS_LIKE		000100000	/* Trace statfs-like, fstatfs-like and ustat syscalls. */
+# define TRACE_FSTAT			000200000	/* Trace *fstat{,at}{,64} syscalls. */
+# define TRACE_STAT_LIKE		000400000	/* Trace *{,l,f}stat{,x,at}{,64} syscalls. */
+# define TRACE_PURE			001000000	/* Trace getter syscalls with no arguments. */
+# define TRACE_SECCOMP_DEFAULT		002000000	/* Syscall is traced by seccomp filter by default. */
+# define TRACE_CREDS			004000000	/* Trace process credentials-related syscalls. */
+# define TRACE_CLOCK			010000000	/* Trace syscalls reading or modifying system clocks. */
+# define COMM_CHANGE			020000000	/* Trigger /proc/$pid/comm cache update. */
 
 #endif /* !STRACE_SYSENT_H */

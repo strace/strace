@@ -8,7 +8,7 @@
  */
 
 [  0] = { 6,	0,		SEN(printargs),			"osf_syscall"		}, /* not implemented */
-[  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
+[  1] = { 1,	TP,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},
 [  3] = { 3,	TD,		SEN(read),			"read"			},
 [  4] = { 3,	TD,		SEN(write),			"write"			},
@@ -66,7 +66,7 @@
 [ 56] = { 5,	0,		SEN(printargs),			"osf_revoke"		}, /* not implemented */
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
-[ 59] = { 3,	CC|TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
+[ 59] = { 3,	CC|TF|TP|TSD|SI,	SEN(execve),			"execve"		},
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
@@ -348,7 +348,7 @@
 [401] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [402] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [403 ... 404] = { },
-[405] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
+[405] = { 1,	TP,		SEN(exit),			"exit_group"		},
 [406] = { 3,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [407] = { 1,	TD,		SEN(epoll_create),		"epoll_create"		},
 [408] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},
@@ -456,7 +456,7 @@
 [510] = { 5,	TD|TF,		SEN(renameat2),			"renameat2"		},
 [511] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [512] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
-[513] = { 5,	CC|TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
+[513] = { 5,	CC|TD|TF|TP|TSD|SI,	SEN(execveat),			"execveat"		},
 [514] = { 3,	0,		SEN(seccomp),			"seccomp"		},
 [515] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [516] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},

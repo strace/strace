@@ -23,7 +23,6 @@
 #undef NF
 #undef MA
 #undef SI
-#undef SE
 #undef CST
 #undef TSD
 #undef TC
