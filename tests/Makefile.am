@@ -456,6 +456,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	strace--syscall-limit-status-summary \
 	strace--syscall-limit-summary \
 	strace-Y-0123456789 \
+	strace-k-z \
 	strace-p-Y-p2 \
 	strace-p1-Y-p \
 	symlink-P \
@@ -561,7 +562,7 @@ include gen_tests.am
 if ENABLE_STACKTRACE
 STACKTRACE_TESTS = strace-k.test strace-k-p.test strace-k-with-depth-limit.test
 if USE_LIBDW
-STACKTRACE_TESTS += strace-kk.test strace-kk-p.test
+STACKTRACE_TESTS += strace-kk.test strace-kk-p.test strace-k-z.test
 endif
 if USE_DEMANGLE
 STACKTRACE_TESTS += strace-k-demangle.test
@@ -779,6 +780,7 @@ check_SCRIPTS = \
 	strace-k-demangle.test \
 	strace-k-p.test \
 	strace-k-with-depth-limit.test \
+	strace-k-z.test \
 	strace-k.test \
 	strace-kk-p.test \
 	strace-kk.test \

@@ -1216,6 +1216,7 @@ strace--syscall-limit-status-c
 strace--syscall-limit-status-summary
 strace--syscall-limit-summary
 strace-Y-0123456789
+strace-k-z
 strace-n
 strace-no-x
 strace-p-Y-p2

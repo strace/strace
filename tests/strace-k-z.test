@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Check that stack tracing combined with syscall status filtering does not
+# abort strace with "bug: unprinted entries in queue".
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+# strace -k is implemented using /proc/$pid/maps
+[ -f /proc/self/maps ] ||
+	framework_skip_ '/proc/self/maps is not available'
+
+run_prog > /dev/null
+run_strace -k -z $args
+
+check_prog grep
+grep -E '^ > ' < "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args produced no stack traces"
