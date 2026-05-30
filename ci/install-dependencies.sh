@@ -57,7 +57,7 @@ clone_repo()
 
 case "$TARGET" in
 	aarch64)
-		packages="$common_packages gcc-multilib-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross"
+		packages="$common_packages gcc-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross"
 		;;
 	x86_64|x32|x86|s390x)
 		packages="$common_packages gcc-multilib"
@@ -73,7 +73,7 @@ case "$CC" in
 			$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 		case "$TARGET" in
 			aarch64)
-				apt_get_install $packages "$CC"-multilib-arm-linux-gnueabihf "$CC"
+				apt_get_install $packages "$CC"-arm-linux-gnueabihf "$CC"
 				;;
 			x86_64|x32|x86|s390x)
 				apt_get_install $packages "$CC"-multilib "$CC"
