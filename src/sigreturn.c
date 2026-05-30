@@ -15,8 +15,8 @@
 # include <asm/sigcontext.h>
 #endif
 
-/* The following function might be unused, hence the inline qualifier.  */
-static inline void
+/* The following function might be unused.  */
+static void ATTRIBUTE_UNUSED
 print_sigmask_addr_size(const void *const addr, const unsigned int size)
 {
 	tprint_struct_begin();
