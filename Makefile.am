@@ -17,7 +17,7 @@ TESTS_MX32 = tests-mx32
 endif
 SUBDIRS = bundled src tests $(TESTS_M32) $(TESTS_MX32)
 
-man_MANS = doc/strace.1 doc/strace-log-merge.1
+man_MANS = doc/strace.1 doc/strace-log-merge.1 doc/asinfo.1
 
 ACLOCAL_AMFLAGS = -I m4 -I src/xlat
 
