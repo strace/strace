@@ -1070,6 +1070,7 @@ EXTRA_DIST =				\
 	mpers_test.sh			\
 	mpers_xlat.h			\
 	scno.head			\
+	scno_hook.mk			\
 	strace-graph			\
 	strace-log-merge		\
 	$(XLAT_INPUT_FILES)		\
@@ -1160,8 +1161,6 @@ DISTCLEANFILES = gnu/stubs-32.h \
 		 #
 
 include scno.am
-
-$(strace_OBJECTS): scno.h
 
 # defines mpers_source_files
 include mpers.am

@@ -21,5 +21,6 @@ scno.h: $(top_srcdir)/src/scno.head syscallent.i
 	LC_ALL=C sed -n '$(SCNO_SED)' $(filter-out $<,$^) >> $@-t
 	mv $@-t $@
 
-BUILT_SOURCES += scno.h
 CLEANFILES += syscallent.i scno.h
+
+_hide_from_automake := $(eval include $(top_srcdir)/src/scno_hook.mk)

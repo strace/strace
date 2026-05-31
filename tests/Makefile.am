@@ -951,9 +951,6 @@ ksysent.h: $(srcdir)/ksysent.sed
 
 $(ksysent_OBJECTS): ksysent.h
 
-objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
-$(objects): scno.h
-
 clean-local: clean-local-check
 .PHONY: clean-local-check
 clean-local-check:
