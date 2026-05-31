@@ -949,7 +949,7 @@ ksysent.h: $(srcdir)/ksysent.sed
 	mv -f $@.t2 $@
 	rm -f $@.t1
 
-ksysent.$(OBJEXT): ksysent.h
+$(ksysent_OBJECTS): ksysent.h
 
 objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
 $(objects): scno.h
@@ -965,7 +965,6 @@ check-prerequisites-local: $(check_LIBRARIES) $(check_PROGRAMS)
 .PHONY: check-valgrind-local
 check-valgrind-local: $(check_LIBRARIES) $(check_PROGRAMS)
 
-BUILT_SOURCES = ksysent.h
 CLEANFILES = ksysent.h
 
 include ../src/scno.am
