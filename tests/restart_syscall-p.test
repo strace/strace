@@ -16,5 +16,5 @@ tracee_pid=$!
 
 ../sleep 1
 
-run_strace -qq -a14  -p $tracee_pid
+run_strace -qq -a14 -e trace=restart_syscall,exit_group -p $tracee_pid
 match_diff
