@@ -352,7 +352,8 @@ check_ax25(void)
 	rc = connect(-1, sax_void, sizeof(struct sockaddr_ax25) - 1);
 	pidns_print_leader();
 	printf("connect(-1, {sa_family=AF_AX25, sa_data=\"\\202\\203\\204\\205"
-	       "\\206\\207\\210\\211\\212\\213\\214\\215\\216\"}, %zu) = %s\n",
+	       "\\206\\207\\210\\211\\212\\213\\214%s\"}, %zu) = %s\n",
+	       sizeof(struct sockaddr_ax25) > 14 ? "\\215\\216" : "",
 	       sizeof(struct sockaddr_ax25) - 1, sprintrc(rc));
 
 	memcpy(sax, &ax25, sizeof(ax25));
