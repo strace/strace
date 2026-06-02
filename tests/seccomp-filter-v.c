@@ -52,6 +52,9 @@ static const struct sock_filter filter_c[] = {
 	SOCK_FILTER_ALLOW_SYSCALL(close),
 	SOCK_FILTER_ALLOW_SYSCALL(exit),
 	SOCK_FILTER_ALLOW_SYSCALL(exit_group),
+#ifdef __NR_get_thread_area
+	SOCK_FILTER_ALLOW_SYSCALL(get_thread_area),
+#endif
 
 	/* deny syscalls */
 	SOCK_FILTER_DENY_SYSCALL(sync, EBUSY),
@@ -160,6 +163,9 @@ main(void)
 	PRINT_ALLOW_SYSCALL(close);
 	PRINT_ALLOW_SYSCALL(exit);
 	PRINT_ALLOW_SYSCALL(exit_group);
+#ifdef __NR_get_thread_area
+	PRINT_ALLOW_SYSCALL(get_thread_area);
+#endif
 
 	PRINT_DENY_SYSCALL(sync, EBUSY),
 	PRINT_DENY_SYSCALL(setsid, EPERM),
