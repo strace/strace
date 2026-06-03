@@ -17,4 +17,16 @@ tracee_pid=$!
 ../sleep 1
 
 run_strace -qq -a14 -e trace=restart_syscall,exit_group -p $tracee_pid
-match_diff
+
+# On mips the interrupted syscall number is not available on attach.
+case "$STRACE_ARCH" in
+mips)	syscall='system call' ;;
+*)	syscall=nanosleep ;;
+esac
+
+cat > "$EXP" <<__EOF__
+restart_syscall(<... resuming interrupted $syscall ...>) = 0
+exit_group(0) = ?
+__EOF__
+
+match_diff "$LOG" "$EXP"

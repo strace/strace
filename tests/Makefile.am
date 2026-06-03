@@ -810,7 +810,6 @@ check_DATA = \
 	qual_inject-signal.expected \
 	qualify_personality_empty.in \
 	regex.in \
-	restart_syscall-p.expected \
 	rt_sigaction.awk \
 	sched.in \
 	sigaltstack.expected \
