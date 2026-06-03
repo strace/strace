@@ -343,7 +343,7 @@ injected_pidfd_get_info_decode_checks(struct pidfd_info *info)
 	info->supported_mask = PIDFD_INFO_PID;
 	info->exit_code = 2 << 8; /* WIFEXITED with status 2 */
 	info->coredump_mask = PIDFD_COREDUMPED;
-	info->coredump_signal = SIGABRT;
+	info->coredump_signal = SIGILL;
 	do_ioctl_fd(-1, cmd, (uintptr_t) info);
 	printf("ioctl(-1, " XLAT_FMT ", {mask=%s"
 	       ", cgroupid=%llu, pid=%d, tgid=%d, ppid=%d"
@@ -360,7 +360,7 @@ injected_pidfd_get_info_decode_checks(struct pidfd_info *info)
 	       info->suid, info->sgid, info->fsuid, info->fsgid,
 	       "[{WIFEXITED(s) && WEXITSTATUS(s) == 2}]",
 	       XLAT_KNOWN(0x1, "PIDFD_COREDUMPED"),
-	       XLAT_KNOWN(6, "SIGABRT"),
+	       XLAT_KNOWN(4, "SIGILL"),
 	       info->coredump_code,
 	       XLAT_KNOWN(0x1, "PIDFD_INFO_PID"),
 	       errstr);
@@ -381,7 +381,7 @@ injected_pidfd_get_info_decode_checks(struct pidfd_info *info)
 	       info->suid, info->sgid, info->fsuid, info->fsgid,
 	       "[{WIFEXITED(s) && WEXITSTATUS(s) == 2}]",
 	       XLAT_KNOWN(0x1, "PIDFD_COREDUMPED"),
-	       XLAT_KNOWN(6, "SIGABRT"),
+	       XLAT_KNOWN(4, "SIGILL"),
 	       info->coredump_code,
 	       errstr);
 
@@ -401,7 +401,7 @@ injected_pidfd_get_info_decode_checks(struct pidfd_info *info)
 	       info->suid, info->sgid, info->fsuid, info->fsgid,
 	       "[{WIFEXITED(s) && WEXITSTATUS(s) == 2}]",
 	       XLAT_KNOWN(0x1, "PIDFD_COREDUMPED"),
-	       XLAT_KNOWN(6, "SIGABRT"),
+	       XLAT_KNOWN(4, "SIGILL"),
 	       errstr);
 
 	do_ioctl_fd(-1, PIDFD_GET_INFO_ver0_cmd.val, (uintptr_t) info);
