@@ -13,6 +13,7 @@ Noteworthy changes in release ?.? (????-??-??)
     and IFLA_BR_STP_MODE netlink attributes.
   * Updated lists of CLONE_*, FSMOUNT_*, KT_*, KVM_*, LANDLOCK_*, NETDEV_*,
     NL80211_*, and PIDFD_* constants.
+  * Updated lists of ioctl commands from Linux 7.1.
 
 Noteworthy changes in release 7.0 (2026-04-26)
 ==============================================
