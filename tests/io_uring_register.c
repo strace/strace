@@ -1068,15 +1068,18 @@ test_IORING_REGISTER_PBUF_RING(int fd_null)
 		       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
 		       buf_reg + 1, errstr);
 
-		for (size_t j = 0; j < 256; j++) {
+		for (size_t j = 0; j < 2048; j++) {
 			memset(buf_reg, 0, sizeof(*buf_reg));
 			buf_reg->ring_addr = j & 2 ? (uintptr_t) buf_reg : 0;
-			buf_reg->ring_entries = j & 4 ? 3141592653 : 0;
+			buf_reg->ring_entries = j & 4 ? 3141592653U : 0;
 			buf_reg->bgid = j & 8 ? 42069 : 0;
-			buf_reg->flags = j & 16 ? 31337 : 0;
-			buf_reg->resv[0] = j &  32 ? 0xbadc0deddeadfaceULL : 0;
-			buf_reg->resv[1] = j &  64 ? 0xdecaffedbeefdeadULL : 0;
-			buf_reg->resv[2] = j & 128 ? 0xbadc0dedfacefeedULL : 0;
+			buf_reg->flags = j & 16 ? 0x7a69 : 0;
+			buf_reg->min_left = j & 32 ? 0xdeadf00d : 0;
+			buf_reg->resv[0] = j &   64 ? 0xbadc0ded : 0;
+			buf_reg->resv[1] = j &  128 ? 0xdeadface : 0;
+			buf_reg->resv[2] = j &  256 ? 0xdecaffed : 0;
+			buf_reg->resv[3] = j &  512 ? 0xbeefdead : 0;
+			buf_reg->resv[4] = j & 1024 ? 0xfacefeed : 0;
 
 			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
 					      buf_reg, 0x42);
@@ -1096,15 +1099,19 @@ test_IORING_REGISTER_PBUF_RING(int fd_null)
 				printf("%p", buf_reg);
 			else
 				printf("NULL");
-			printf(", ring_entries=%s, bgid=%s, flags=%s",
-			       j & 4 ? "3141592653" : "0",
-			       j & 8 ? "42069" : "0",
-			       j & 16 ? "0x7a69" : "0");
-			if (j & 0xe0) {
-				printf(", resv=[%s, %s, %s]",
-				       j &  32 ? "0xbadc0deddeadface" : "0",
-				       j &  64 ? "0xdecaffedbeefdead" : "0",
-				       j & 128 ? "0xbadc0dedfacefeed" : "0");
+			printf(", ring_entries=%u, bgid=%u, flags=%#x"
+			       ", min_left=%u",
+			       j & 4 ? 3141592653U : 0,
+			       j & 8 ? 42069 : 0,
+			       j & 16 ? 0x7a69 : 0,
+			       j & 32 ? 0xdeadf00d : 0);
+			if (j & 0x7c0) {
+				printf(", resv=[%#x, %#x, %#x, %#x, %#x]",
+				       j &   64 ? 0xbadc0ded : 0,
+				       j &  128 ? 0xdeadface : 0,
+				       j &  256 ? 0xdecaffed : 0,
+				       j &  512 ? 0xbeefdead : 0,
+				       j & 1024 ? 0xfacefeed : 0);
 			}
 			printf("}, 1) = %s\n", errstr);
 		}
