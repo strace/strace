@@ -45,11 +45,14 @@ arch_get_syscall_args(struct tcb *tcp)
 static void
 arch_get_syscall_args_extra(struct tcb *tcp, const unsigned int n)
 {
+	kernel_ulong_t sp;
+
 	/* This assumes n >= 4. */
 	if (n_args(tcp) > n
-	    && umoven(tcp, mips_REG_SP + n * sizeof(tcp->u_arg[0]),
-		      (n_args(tcp) - n) * sizeof(tcp->u_arg[0]),
-		      &tcp->u_arg[n]) < 0) {
+	    && (!get_stack_pointer(tcp, &sp)
+		|| umoven(tcp, sp + n * sizeof(tcp->u_arg[0]),
+			  (n_args(tcp) - n) * sizeof(tcp->u_arg[0]),
+			  &tcp->u_arg[n]) < 0)) {
 		/*
 		 * Let's proceed with the first n arguments
 		 * instead of reporting the failure.
