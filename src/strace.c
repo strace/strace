@@ -1399,6 +1399,26 @@ process_opt_p_list(char *opt)
 	}
 }
 
+static inline bool
+has_yama(void)
+{
+	bool yama = false;
+
+	if (run_uid != 0)
+	{
+		FILE *fp = fopen (
+			"/proc/sys/kernel/yama/ptrace_scope", "r");
+
+		if (fp) {
+			int yamaval = 0;
+
+			if (fscanf(fp, "%d", &yamaval) == 1 && yamaval > 0)
+				yama = true;
+			fclose(fp);
+		}
+	}
+	return yama;
+}
 static void
 attach_tcb(struct tcb *const tcp)
 {
@@ -1407,6 +1427,10 @@ attach_tcb(struct tcb *const tcp)
 	if (ptrace_attach_or_seize(tcp->pid, &ptrace_attach_cmd) < 0) {
 		perror_msg("attach: ptrace(%s, %d)",
 			   ptrace_attach_cmd, tcp->pid);
+		if (errno == EPERM && has_yama())
+			fprintf(stderr,
+				"System has sysctl kernel.yama.ptrace_scope on "
+				"that can block it.\n");
 		droptcb(tcp);
 		return;
 	}
