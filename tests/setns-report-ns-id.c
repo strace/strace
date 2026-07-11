@@ -21,6 +21,19 @@
 int
 main(void)
 {
+	/*
+	 * Try a user namespace for CAP_SYS_ADMIN
+	 * before creating a network namespace.
+	 */
+	(void) syscall(__NR_unshare, CLONE_NEWUSER);
+
+	/*
+	 * Now enter a new network namespace
+	 * owned by the child user namespace.
+	 */
+	if (syscall(__NR_unshare, CLONE_NEWNET) < 0)
+		perror_msg_and_skip("unshare(CLONE_NEWNET)");
+
 	const char *netns_path = "/proc/self/ns/net";
 	skip_if_unavailable(netns_path);
 
