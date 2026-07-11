@@ -57,11 +57,16 @@ test_children_namespace(unsigned int flag, const char *flag_str,
 		error_msg_and_fail("readlink: %s: result is too large", ns_path);
 	ns[n] = '\0';
 
-	int rc = syscall(__NR_setns, ns_fd, flag);
+	int rc = syscall(__NR_setns, ns_fd, 0);
 	if (rc < 0) {
 		close(ns_fd);
 		goto out;
 	}
+	printf("setns(%d, 0) = %s (%s)\n", ns_fd, sprintrc(rc), ns);
+
+	rc = syscall(__NR_setns, ns_fd, flag);
+	if (rc < 0)
+		perror_msg_and_fail("setns (%s)", flag_str);
 	printf("setns(%d, %s) = %s (%s)\n",
 	       ns_fd, flag_str, sprintrc(rc), ns);
 	close(ns_fd);
@@ -107,6 +112,24 @@ main(void)
 		perror_msg_and_skip("setns (CLONE_NEWNET)");
 	printf("setns(%d, CLONE_NEWNET) = %s (%s)\n",
 	       netns_fd, sprintrc(rc), netns);
+
+	if (syscall(__NR_unshare, 0x40000000) < 0)
+		perror_msg_and_skip("unshare (CLONE_NEWNET)");
+
+	rc = syscall(__NR_setns, netns_fd, 0);
+	if (rc < 0)
+		perror_msg_and_skip("setns (0)");
+	printf("setns(%d, 0) = %s (%s)\n",
+	       netns_fd, sprintrc(rc), netns);
+
+	if (sizeof(kernel_ulong_t) > sizeof(unsigned int)) {
+		rc = syscall(__NR_setns, netns_fd,
+			     (kernel_ulong_t) 0x100000000ULL);
+		if (rc < 0)
+			perror_msg_and_skip("setns (0x100000000)");
+		printf("setns(%d, 0) = %s (%s)\n",
+		       netns_fd, sprintrc(rc), netns);
+	}
 
 	test_children_namespace(0x20000000, "CLONE_NEWPID",
 				"/proc/self/ns/pid_for_children");
