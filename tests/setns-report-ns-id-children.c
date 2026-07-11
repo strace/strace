@@ -51,13 +51,17 @@ test_children_namespace(unsigned int flag, const char *flag_str,
 	read_proc_self_fd_link(ns_fd, ns, sizeof(ns));
 
 	int saved_errno;
-	long rc = setns_and_print_expected(ns_fd, flag, flag_str, ns);
+	long rc = setns_and_print_expected(ns_fd, ARG_STR(0), ns);
 	if (rc < 0) {
 		saved_errno = errno;
 		close(ns_fd);
 		errno = saved_errno;
 		goto out;
 	}
+
+	if (setns_and_print_expected(ns_fd, flag, flag_str, ns) < 0)
+		perror_msg_and_fail("setns(%d, %s)", ns_fd, flag_str);
+
 	close(ns_fd);
 
 out:
@@ -70,7 +74,7 @@ out:
 	}
 	if (rc < 0) {
 		errno = saved_errno;
-		perror_msg_and_skip("setns(%d, %s)", ns_fd, flag_str);
+		perror_msg_and_skip("setns(%d, 0)", ns_fd);
 	}
 }
 
