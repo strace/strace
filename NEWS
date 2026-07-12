@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Enhanced -e namespace=new option to decode namespace transition even
+    if nstype is 0 in setns(2).
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================

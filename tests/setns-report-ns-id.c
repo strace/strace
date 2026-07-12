@@ -51,6 +51,15 @@ main(void)
 	printf("setns(%d, CLONE_NEWNET) = %s (%s)\n",
 	       netns_fd, sprintrc(rc), netns);
 
+	if (syscall(__NR_unshare, 0x40000000) < 0)
+		perror_msg_and_skip("unshare (CLONE_NEWNET)");
+
+	rc = syscall(__NR_setns, netns_fd, 0);
+	if (rc < 0)
+		perror_msg_and_skip("setns (0)");
+	printf("setns(%d, 0) = %s (%s)\n",
+	       netns_fd, sprintrc(rc), netns);
+
 	puts("+++ exited with 0 +++");
 
 	return 0;
