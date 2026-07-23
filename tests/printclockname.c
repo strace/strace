@@ -61,6 +61,11 @@ main(void)
 		       dyn_clock_ids[i].str, errstr);
 	}
 
+	const unsigned int beyond_aux_clock = clock_aux_last_for_tests() + 1;
+	k_clock_getres(beyond_aux_clock, NULL);
+	printf("clock_getres(" XLAT_UNKNOWN_FMT("%#x", "CLOCK_???")
+	       ", NULL) = %s\n", beyond_aux_clock, errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

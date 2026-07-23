@@ -9,6 +9,7 @@
  */
 
 #include "defs.h"
+#include "auxiliary_clock.h"
 #include "kernel_fcntl.h"
 #include <signal.h>
 #include <sys/timex.h>
@@ -296,6 +297,28 @@ printclockname(int clockid)
 		}
 		tprint_fn_end();
 		tprint_comment_end();
+
+	} else if (is_auxiliary_clock(clockid)) {
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+			PRINT_VAL_X(clockid);
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			return;
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_begin();
+		else
+			STRACE_PRINT_COLOR_SEQ(COLOR_CONST);
+
+		STRACE_PRINTS("CLOCK_AUX");
+
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE)
+			STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
+
+		STRACE_PRINTF(" + %u", auxiliary_clock_num(clockid));
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_end();
 
 	} else
 		printxval(clocknames, clockid, "CLOCK_???");

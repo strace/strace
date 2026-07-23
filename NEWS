@@ -19,6 +19,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of VIDIOC_{UN,}SUBSCRIBE_EVENT ioctl commands.
   * Enhanced -e namespace=new option to decode setns(2) namespace transitions
     when nstype is 0.
+  * Implemented decoding of auxiliary clock IDs.
   * Updated lists of ATA_*, KVM_*, NL80211_*, V4L2_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 7.3.
 

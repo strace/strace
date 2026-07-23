@@ -21,5 +21,6 @@ struct clock_test_id {
 };
 
 const struct clock_test_id *clock_ids_for_tests(unsigned int *count);
+unsigned int clock_aux_last_for_tests(void);
 
 #endif /* STRACE_CLOCK_IDS_FOR_TESTS_H */
