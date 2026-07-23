@@ -3,6 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implement dynamic clock id decoding.
+  * Implemented decoding of CLOCK_AUX auxiliary clock IDs.
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================

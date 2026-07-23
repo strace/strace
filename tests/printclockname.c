@@ -67,6 +67,31 @@ main(void)
 	printf("clock_getres(FD_TO_CLOCKID(0), NULL)    = -1 EINVAL (Invalid argument)\n");
 #endif
 
+	syscall(__NR_clock_getres, CLOCK_AUX + 0, NULL);
+#if XLAT_RAW
+	printf("clock_getres(0x10, NULL)                = 0\n");
+#elif XLAT_VERBOSE
+	printf("clock_getres(0x10 /* CLOCK_AUX + 0 */, NULL) = 0\n");
+#else
+	printf("clock_getres(CLOCK_AUX + 0, NULL)       = 0\n");
+#endif
+
+	syscall(__NR_clock_getres, CLOCK_AUX + 7, NULL);
+#if XLAT_RAW
+	printf("clock_getres(0x17, NULL)                = 0\n");
+#elif XLAT_VERBOSE
+	printf("clock_getres(0x17 /* CLOCK_AUX + 7 */, NULL) = 0\n");
+#else
+	printf("clock_getres(CLOCK_AUX + 7, NULL)       = 0\n");
+#endif
+
+	syscall(__NR_clock_getres, CLOCK_AUX_LAST + 1, NULL);
+#if XLAT_RAW
+	printf("clock_getres(%#x, NULL)                = -1 EINVAL (Invalid argument)\n", CLOCK_AUX_LAST + 1);
+#else
+	printf("clock_getres(%#x /* CLOCK_??? */, NULL) = -1 EINVAL (Invalid argument)\n", CLOCK_AUX_LAST + 1);
+#endif
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
