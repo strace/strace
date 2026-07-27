@@ -19,6 +19,7 @@
 static void
 test_flock64_lk64(void)
 {
+#if F_SETLK != F_SETLK64 && F_SETLKW != F_SETLKW64 && F_GETLK != F_GETLK64
 	TEST_FLOCK64_EINVAL(F_SETLK64);
 	TEST_FLOCK64_EINVAL(F_SETLKW64);
 
@@ -47,6 +48,7 @@ test_flock64_lk64(void)
 	printf("%s(0, F_SETLKW64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
+#endif
 }
 
 #else
