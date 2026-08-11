@@ -1,0 +1,40 @@
+.TH ASINFO 1 "" "" ""
+.SH NAME
+asinfo \- map syscall names and numbers, list syscalls
+.SH SYNOPSIS
+.B asinfo
+[
+.BI --arch= AUDIT_ARCH_*
+]
+.B --to-names
+NR ...
+.br
+.B asinfo
+[
+.BI --arch= AUDIT_ARCH_*
+]
+.B --to-numbers
+NAME ...
+.br
+.B asinfo
+[
+.BI --arch= AUDIT_ARCH_*
+]
+.B --list
+.SH DESCRIPTION
+.B asinfo
+is a small helper from the strace project that provides information about
+Linux system calls: it converts syscall numbers to names and vice versa and
+can list all syscalls for the selected architecture.
+.PP
+The
+.B --arch
+option accepts an
+.B AUDIT_ARCH_*
+name (e.g. AUDIT_ARCH_X86_64) or a numeric value (decimal or hexadecimal).
+If omitted, the current personality is used.
+.SH EXIT STATUS
+Returns 0 on success, non-zero otherwise.
+.SH SEE ALSO
+.BR strace (1)
+
