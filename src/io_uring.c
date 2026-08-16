@@ -35,7 +35,7 @@
 #include "xlat/uring_mem_region_reg_flags.h"
 #include "xlat/uring_query_ops.h"
 #include "xlat/uring_zcrx_ctrl_ops.h"
-#include "xlat/uring_zcrx_notif_types.h"
+#include "xlat/uring_zcrx_event_types.h"
 #include "xlat/uring_rw_attr_flags.h"
 #include "xlat/uring_nop_flags.h"
 #include "xlat/uring_fixed_fd_flags.h"
@@ -1272,7 +1272,7 @@ print_io_uring_zcrx_ifq_reg(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(arg, rx_buf_len);
 	tprint_struct_next();
-	PRINT_FIELD_ADDR64(arg, notif_desc);
+	PRINT_FIELD_ADDR64(arg, event_desc);
 
 	if (!IS_ARRAY_ZERO(arg.__resv)) {
 		tprint_struct_next();
@@ -1333,16 +1333,16 @@ print_zcrx_ctrl_export(struct tcb *tcp,
 }
 
 static void
-print_zcrx_ctrl_arm_notif(struct tcb *tcp,
-			  const struct zcrx_ctrl_arm_notif *const arm)
+print_zcrx_ctrl_arm_event(struct tcb *tcp,
+			  const struct zcrx_ctrl_arm_event *const arm)
 {
 	CHECK_TYPE_SIZE(*arm, 12 * sizeof(uint32_t));
 	CHECK_TYPE_SIZE(arm->__resv, 11 * sizeof(uint32_t));
 
 	tprint_struct_begin();
 
-	PRINT_FIELD_XVAL(*arm, notif_type, uring_zcrx_notif_types,
-			 "ZCRX_NOTIF_???");
+	PRINT_FIELD_XVAL(*arm, event_type, uring_zcrx_event_types,
+			 "ZCRX_EVENT_???");
 
 	if (!IS_ARRAY_ZERO(arm->__resv)) {
 		tprint_struct_next();
@@ -1411,10 +1411,10 @@ print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 		/* Return 0 to indicate we need to decode on exit */
 		return 0;
 
-	case ZCRX_CTRL_ARM_NOTIFICATION:
+	case ZCRX_CTRL_ARM_EVENT:
 		tprint_struct_next();
-		tprints_field_name("zc_arm_notif");
-		print_zcrx_ctrl_arm_notif(tcp, &arg.zc_arm_notif);
+		tprints_field_name("zc_arm_event");
+		print_zcrx_ctrl_arm_event(tcp, &arg.zc_arm_event);
 		tprint_struct_end();
 		return RVAL_DECODED;
 
@@ -1600,29 +1600,29 @@ print_io_uring_query_zcrx(struct tcb *tcp, const kernel_ulong_t addr)
 }
 
 static void
-print_io_uring_query_zcrx_notif(struct tcb *tcp, const kernel_ulong_t addr)
+print_io_uring_query_zcrx_event(struct tcb *tcp, const kernel_ulong_t addr)
 {
-	struct io_uring_query_zcrx_notif notif;
-	CHECK_TYPE_SIZE(notif, 48);
-	CHECK_TYPE_SIZE(notif.__resv2, 4 * sizeof(uint64_t));
+	struct io_uring_query_zcrx_event event;
+	CHECK_TYPE_SIZE(event, 48);
+	CHECK_TYPE_SIZE(event.__resv2, 4 * sizeof(uint64_t));
 
-	if (umove_or_printaddr(tcp, addr, &notif))
+	if (umove_or_printaddr(tcp, addr, &event))
 		return;
 
 	tprint_struct_begin();
-	PRINT_FIELD_X(notif, notif_flags);
+	PRINT_FIELD_X(event, event_flags);
 	tprint_struct_next();
-	PRINT_FIELD_U(notif, notif_stats_size);
+	PRINT_FIELD_U(event, stats_size);
 	tprint_struct_next();
-	PRINT_FIELD_U(notif, notif_stats_off_alignment);
+	PRINT_FIELD_U(event, stats_off_alignment);
 
-	if (notif.__resv1) {
+	if (event.__resv1) {
 		tprint_struct_next();
-		PRINT_FIELD_X(notif, __resv1);
+		PRINT_FIELD_X(event, __resv1);
 	}
-	if (!IS_ARRAY_ZERO(notif.__resv2)) {
+	if (!IS_ARRAY_ZERO(event.__resv2)) {
 		tprint_struct_next();
-		PRINT_FIELD_ARRAY(notif, __resv2, tcp, print_xint_array_member);
+		PRINT_FIELD_ARRAY(event, __resv2, tcp, print_xint_array_member);
 	}
 
 	tprint_struct_end();
@@ -1697,8 +1697,8 @@ print_io_uring_query_list(struct tcb *tcp, kernel_ulong_t addr)
 			case IO_URING_QUERY_SCQ:
 				print_io_uring_query_scq(tcp, hdr.query_data);
 				break;
-			case IO_URING_QUERY_ZCRX_NOTIF:
-				print_io_uring_query_zcrx_notif(tcp,
+			case IO_URING_QUERY_ZCRX_EVENT:
+				print_io_uring_query_zcrx_event(tcp,
 								hdr.query_data);
 				break;
 			default:
