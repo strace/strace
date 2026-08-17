@@ -15,6 +15,7 @@ Noteworthy changes in release ?.? (????-??-??)
     operation.
   * Updated lists of BPF_*, ETH_P_*, FS_*, FUTEX_*, IFLA_*, IO_URING_*, KVM_*,
     LANDLOCK_*, NL80211_*, O_*, RTEXT_*, V4L2_*, and XFRM_MSG_* constants.
+  * Updated lists of ioctl commands from Linux 7.2.
 
 Noteworthy changes in release 7.1 (2026-06-15)
 ==============================================
