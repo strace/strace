@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.? (????-??-??)
-===============================================
+Noteworthy changes in release 7.2 (2026-08-18)
+==============================================
 
 * Improvements
   * Implemented decoding of OPENAT2_REGULAR openat2 flag.
@@ -11,7 +11,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of landlock_add_rule syscall flags.
   * Implemented decoding of ZCRX_CTRL_ARM_NOTIFICATION io_uring zcrx ctrl
     operation.
-  * Implemented decoding of IO_URING_QUERY_ZCRX_NOTIF io_uring query
+  * Implemented decoding of IO_URING_QUERY_ZCRX_EVENT io_uring query
     operation.
   * Updated lists of BPF_*, ETH_P_*, FS_*, FUTEX_*, IFLA_*, IO_URING_*, KVM_*,
     LANDLOCK_*, NL80211_*, O_*, RTEXT_*, V4L2_*, and XFRM_MSG_* constants.
