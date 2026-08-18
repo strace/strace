@@ -831,22 +831,22 @@ main(int argc, char *argv[])
 	 */
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_WAKE_LIST64, 10, NULL, NULL,
-		0, (rc == 0));
+		0, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_WAKE_LIST64, %u) = %s\n",
 	       uaddr, 10, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_WAKE_LIST64_PRIVATE, 10,
-		NULL, NULL, 0, (rc == 0));
+		NULL, NULL, 0, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_WAKE_LIST64_PRIVATE, %u) = %s\n",
 	       uaddr, 10, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_WAKE_LIST32, 10, NULL, NULL,
-		0, (rc == 0));
+		0, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_WAKE_LIST32, %u) = %s\n",
 	       uaddr, 10, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_WAKE_LIST32_PRIVATE, 10,
-		NULL, NULL, 0, (rc == 0));
+		NULL, NULL, 0, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_WAKE_LIST32_PRIVATE, %u) = %s\n",
 	       uaddr, 10, sprintrc(rc));
 
@@ -856,22 +856,22 @@ main(int argc, char *argv[])
 	 */
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_BITSET_LIST64, 10, NULL,
-		NULL, VAL3, (rc == 0));
+		NULL, VAL3, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_BITSET_LIST64, %u, %#x) = %s\n",
 	       uaddr, 10, VAL3_PR, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_BITSET_LIST64_PRIVATE, 10,
-		NULL, NULL, VAL3, (rc == 0));
+		NULL, NULL, VAL3, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_BITSET_LIST64_PRIVATE, %u, %#x)"
 	       " = %s\n", uaddr, 10, VAL3_PR, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_BITSET_LIST32, 10, NULL,
-		NULL, VAL3, (rc == 0));
+		NULL, VAL3, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_BITSET_LIST32, %u, %#x) = %s\n",
 	       uaddr, 10, VAL3_PR, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_UNLOCK_BITSET_LIST32_PRIVATE, 10,
-		NULL, NULL, VAL3, (rc == 0));
+		NULL, NULL, VAL3, (rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_UNLOCK_BITSET_LIST32_PRIVATE, %u, %#x)"
 	       " = %s\n", uaddr, 10, VAL3_PR, sprintrc(rc));
 
