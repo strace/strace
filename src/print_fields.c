@@ -100,10 +100,24 @@ tprint_array_index_equal(void)
 void
 tprints_syscall_name(const char *name)
 {
-	if (!name)
-		name = "system call";
+	if (!name) {
+		STRACE_PRINTF("%s", "system call");
+		return;
+	}
 
-	STRACE_PRINTF("%s", name);
+	if (!hyperlink_is_enabled) {
+		STRACE_PRINTF("%s", name);
+		return;
+	}
+
+	char *url = make_hyperlink_url_for_syscall(name);
+	if (!url) {
+		STRACE_PRINTF("%s", name);
+		return;
+	}
+
+	STRACE_PRINTF(HYPERLINK_FMT, url, name);
+	free(url);
 }
 
 void

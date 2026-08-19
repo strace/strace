@@ -1,0 +1,33 @@
+#!/bin/sh -efu
+#
+# Check --hyperlink option
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+unset STRACE_COLORS
+unset NO_COLOR
+
+TERM=linux
+export TERM
+
+run_prog ../getpid > /dev/null
+
+csi_color="$(printf '\033\\[')"
+csi_link_begin="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/getpid\.2\.html')"
+csi_link_end="$(printf '\033]8;;\033\\\\')"
+printf '%s\n' ".*${csi_color}33m${csi_link_begin}getpid${csi_link_end}.*${csi_color}0m.*" > "$EXP"
+run_strace --trace=getpid --hyperlink --color=always ../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+run_prog ../restart_syscall > /dev/null
+
+csi_link_restart="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/restart_syscall\.2\.html')"
+csi_link_sleep_begin="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/(clock_)?nanosleep(_time64)?\.2\.html')"
+printf '%s\n' "^${csi_link_restart}restart_syscall${csi_link_end}\\(<\\.\\.\\. resuming interrupted ${csi_link_sleep_begin}(clock_)?nanosleep(_time64)?${csi_link_end} \\.\\.\\.>\\) = .*" > "$EXP"
+run_strace --hyperlink ../restart_syscall > /dev/null
+match_grep "$LOG" "$EXP"
