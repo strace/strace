@@ -213,6 +213,9 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Tue Aug 18 2026 Dmitry V. Levin <ldv@strace.io> - 7.2-1
+- v7.1 -> v7.2.
+
 * Mon Jun 15 2026 Dmitry V. Levin <ldv@strace.io> - 7.1-1
 - v7.0 -> v7.1 (resolves: #2461721).
 
