@@ -67,6 +67,7 @@ extern void tprint_array_next(void);
 extern void tprint_array_end(void);
 extern void tprint_array_index_begin(void);
 extern void tprint_array_index_equal(void);
+extern void tprints_syscall_name(const char *name);
 extern void tprints_arg_begin(const char *name);
 extern void tprint_arg_next(void);
 extern void tprint_arg_end(void);
