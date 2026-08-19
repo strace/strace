@@ -1159,6 +1159,45 @@ Recognized color keys are:
 .BR retval ,
 .BR error .
 .TP
+.BR \-\-hyperlink [=\fIwhen\fR]
+Add hyperlinks from system call names in trace lines and syscall summaries
+to manual pages at
+.UR https://man7.org/linux/man-pages/man2
+man7.org
+.UE .
+The
+.I when
+parameter can be
+.BR auto ,
+.BR always ,
+or
+.BR never .
+Without an argument,
+.B \-\-hyperlink
+is equivalent to
+.BR \-\-hyperlink = auto .
+The default is
+.BR \-\-hyperlink = never .
+In
+.B auto
+mode, hyperlinks are enabled only when the trace output stream is a terminal
+and
+.B TERM
+is set to something other than
+.B dumb
+or
+.BR unknown ;
+terminal detection does not guarantee hyperlink support.
+The
+.B always
+mode also enables hyperlinks in files and pipes.
+Hyperlinks are independent of color settings and the
+.B NO_COLOR
+environment variable.
+Note that the hyperlinks are constructed mechanically based on system call names;
+a corresponding manual page may not necessarily exist for every system call
+(e.g. newly added or architecture-specific system calls).
+.TP
 .B \-q
 .TQ
 .B \-\-quiet

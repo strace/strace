@@ -15,6 +15,7 @@
  */
 
 #include "defs.h"
+#include "hyperlink.h"
 #include "xstring.h"
 
 #include <stdarg.h>
@@ -600,6 +601,28 @@ calc_summary_stats(struct summary_stats *stats, struct call_counts *cc, const ch
 }
 
 static void
+print_summary_syscall_name(FILE *outf, const char *name,
+			   size_t width, bool last_column)
+{
+	char *url = hyperlink_mode == HYPERLINK_ALWAYS
+		    ? make_hyperlink_url_for_syscall(name) : NULL;
+
+	if (url)
+		fprint_hyperlink_begin(outf, url);
+	fputs(name, outf);
+	if (url) {
+		fprint_hyperlink_end(outf);
+		free(url);
+	}
+
+	/* Count only visible characters; keep padding outside the link. */
+	if (!last_column) {
+		for (size_t len = strlen(name); len < width; ++len)
+			fputc(' ', outf);
+	}
+}
+
+static void
 call_summary_pers(FILE *outf)
 {
 	/*
@@ -801,7 +824,10 @@ call_summary_pers(FILE *outf)
 			    (uint64_t) (ts_float(&cc->time_avg) * 1e6));
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
-			PC_(CSC_SC_NAME,    sys_name);
+			case CSC_SC_NAME:
+				print_summary_syscall_name(outf, sys_name,
+						   cwidths[c], i == last_column);
+				break;
 			PC_(CSC_TIME_WALL_TOTAL, ts_float(&cc->wall_time));
 			PC_(CSC_TIME_WALL_MIN,   ts_float(&cc->wall_time_min));
 			PC_(CSC_TIME_WALL_MAX,   ts_float(&cc->wall_time_max));

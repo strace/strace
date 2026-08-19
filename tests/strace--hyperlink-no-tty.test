@@ -1,0 +1,122 @@
+#!/bin/sh -efu
+#
+# Check --hyperlink without a tty.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+unset STRACE_COLORS
+unset NO_COLOR
+
+TERM=linux
+export TERM
+
+run_prog ../getpid > /dev/null
+
+csi_color="$(printf '\033\\[')"
+osc8_prefix="$(printf '\033]8;;')"
+osc8_getpid_begin="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/getpid\.2\.html')"
+osc8_end="$(printf '\033]8;;\033\\\\')"
+
+# run_strace redirects trace output to a file, so auto must not add links.
+printf '%s\n' "!.*${osc8_prefix}.*" > "$EXP"
+run_strace --trace=getpid --color=always ../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+run_strace --trace=getpid --hyperlink ../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+run_strace --trace=getpid --hyperlink=auto ../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+# The last --hyperlink option determines the mode.
+run_strace --trace=getpid --hyperlink=always --hyperlink=never \
+	../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+run_strace --trace=getpid --hyperlink=always --hyperlink \
+	../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+# Auto must also omit links when strace pipes its trace output.
+$STRACE --trace=getpid --hyperlink=auto -o "|cat > $LOG" \
+	../getpid > /dev/null || dump_log_and_fail_with 'piped output failed'
+match_grep "$LOG" "$EXP"
+
+run_strace -ff --trace=getpid --hyperlink=auto ../getpid > /dev/null
+# The test shell starts with -f; temporarily allow globbing to check
+# each per-PID output file created by -ff.
+set +f
+set -- "$LOG".[0-9]*
+set -f
+[ -f "$1" ] || fail_ 'no per-pid output found'
+for file do
+	match_grep "$file" "$EXP"
+done
+rm -f -- "$@"
+
+# Explicit links can coexist with colors in redirected output.
+printf '%s\n' ".*${csi_color}33m${osc8_getpid_begin}getpid${osc8_end}.*${csi_color}0m.*" > "$EXP"
+run_strace --trace=getpid --hyperlink=always --color=always \
+	../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+# 60 - strlen("getpid()") = 52 spaces padding before '=' with -a 60
+printf '%s\n' "^${osc8_getpid_begin}getpid${osc8_end}\\(\\) {52}= [0-9]+" > "$EXP"
+run_strace --trace=getpid --hyperlink=always -a 60 ../getpid > /dev/null
+match_grep "$LOG" "$EXP"
+
+# Neither NO_COLOR nor --color=never disables explicitly requested links.
+NO_COLOR=1
+export NO_COLOR
+run_strace --trace=getpid --hyperlink=always --color=never \
+	../getpid > /dev/null
+printf '%s\n' "^${osc8_getpid_begin}getpid${osc8_end}\\(\\).*" > "$EXP"
+match_grep "$LOG" "$EXP"
+unset NO_COLOR
+
+# In -U name,calls, the name has width 16: 10 spaces after "getpid",
+# followed by one column separator.  Only the visible name is linked.
+run_strace -c -U name,calls --trace=getpid --hyperlink=always \
+	../getpid > /dev/null
+printf '%s\n' "^${osc8_getpid_begin}getpid${osc8_end} {11}[[:space:]]*1$" \
+	"!.*${osc8_prefix}.*total.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+run_strace -C --trace=getpid --hyperlink=always ../getpid > /dev/null
+printf '%s\n' "^${osc8_getpid_begin}getpid${osc8_end}\\(\\).*" \
+	".*${osc8_getpid_begin}getpid${osc8_end}$" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+run_strace -c --trace=getpid --hyperlink=never ../getpid > /dev/null
+printf '%s\n' "!.*${osc8_prefix}.*" > "$EXP"
+match_grep "$LOG" "$EXP"
+
+run_prog ../nsyscalls > /dev/null
+# MIPS o32 prints out-of-range calls as syscall(...), without a name.
+if [ "${MIPS_ABI-}" != o32 ]; then
+	run_strace --trace=none --hyperlink=always ../nsyscalls > /dev/null
+	printf '%s\n' '^syscall_0x[[:xdigit:]]+\(.*' \
+		"!.*${osc8_prefix}https://man7.*/syscall_0x.*" \
+		> "$EXP"
+	match_grep "$LOG" "$EXP"
+	run_strace -c --trace=none --hyperlink=always ../nsyscalls > /dev/null
+	printf '%s\n' '.*syscall_0x[[:xdigit:]]+$' \
+		"!.*${osc8_prefix}https://man7.*/syscall_0x.*" \
+		> "$EXP"
+	match_grep "$LOG" "$EXP"
+fi
+
+run_prog ../restart_syscall > /dev/null
+
+# A restart line links both restart_syscall and the interrupted syscall.
+osc8_restart_begin="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/restart_syscall\.2\.html')"
+osc8_sleep_begin="$(printf '\033]8;;%s\033\\\\' 'https://man7\.org/linux/man-pages/man2/(clock_)?nanosleep(_time64)?\.2\.html')"
+printf '%s\n' "^${osc8_restart_begin}restart_syscall${osc8_end}\\(<\\.\\.\\. resuming interrupted ${osc8_sleep_begin}(clock_)?nanosleep(_time64)?${osc8_end} \\.\\.\\.>\\) = .*" > "$EXP"
+run_strace --trace=restart_syscall,/nanosleep --hyperlink=always \
+	../restart_syscall > /dev/null
+match_grep "$LOG" "$EXP"

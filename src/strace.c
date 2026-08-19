@@ -30,6 +30,7 @@
 
 #include "kill_save_errno.h"
 #include "color.h"
+#include "hyperlink.h"
 #include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
@@ -83,6 +84,11 @@ static const struct xlat_data color_mode_str[] = {
 	{ COLOR_AUTO,	"auto" },
 	{ COLOR_NEVER,	"never" },
 	{ COLOR_ALWAYS,	"always" },
+};
+static const struct xlat_data hyperlink_mode_str[] = {
+	{ HYPERLINK_AUTO,	"auto" },
+	{ HYPERLINK_NEVER,	"never" },
+	{ HYPERLINK_ALWAYS,	"always" },
 };
 unsigned int xflag;
 bool debug_flag;
@@ -371,6 +377,9 @@ Output format:\n\
                  alignment COLUMN for printing syscall results (default %d)\n\
   --color[=WHEN]\n\
                  colorize output; WHEN is auto, always, or never (default auto)\n\
+  --hyperlink[=WHEN]\n\
+                 link system call names to man7.org; WHEN is auto, always,\n\
+                 or never (default never; without WHEN, auto)\n\
   -e abbrev=SET, --abbrev=SET\n\
                  abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
@@ -2459,6 +2468,7 @@ init(int argc, char *argv[])
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
 		GETOPT_ALWAYS_SHOW_PID,
 		GETOPT_COLOR,
+		GETOPT_HYPERLINK,
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
@@ -2527,6 +2537,7 @@ init(int argc, char *argv[])
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
 		{ "color",		required_argument, 0, GETOPT_COLOR },
+		{ "hyperlink",		optional_argument, 0, GETOPT_HYPERLINK },
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2836,6 +2847,17 @@ init(int argc, char *argv[])
 			color_mode = (enum color_mode_t) color_mode_raw;
 			break;
 		}
+		case GETOPT_HYPERLINK:
+			if (!optarg) {
+				hyperlink_mode = HYPERLINK_AUTO;
+			} else {
+				int mode = (int) find_arg_val(optarg,
+						  hyperlink_mode_str, -1, -1);
+				if (mode < 0)
+					error_opt_arg(c, lopt, optarg);
+				hyperlink_mode = (enum hyperlink_mode_t) mode;
+			}
+			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
@@ -3215,6 +3237,7 @@ init(int argc, char *argv[])
 	}
 
 	color_init(fileno(shared_log), output_separately);
+	hyperlink_init(fileno(shared_log), output_separately);
 
 	/*
 	 * argv[0]	-pPID	-oFILE	Default interactive setting
