@@ -98,10 +98,19 @@ tprint_array_index_equal(void)
 }
 
 void
+tprints_syscall_name(const char *name)
+{
+	if (!name)
+		name = "system call";
+
+	STRACE_PRINTF("%s", name);
+}
+
+void
 tprints_arg_begin(const char *name)
 {
 	STRACE_PRINT_COLOR_SEQ(COLOR_SYSCALL);
-	STRACE_PRINTF("%s", name);
+	tprints_syscall_name(name);
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS("(");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
