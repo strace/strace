@@ -1,3 +1,10 @@
+Noteworthy changes in release ?.? (????-??-??)
+==============================================
+
+* Improvements
+  * Implemented --hyperlink option to add hyperlinks from system call names
+    to manual pages on man7.org.
+
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================
 

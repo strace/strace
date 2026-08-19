@@ -15,6 +15,7 @@
 # ifdef IN_STRACE
 
 #  include "color.h"
+#  include "hyperlink.h"
 
 #  define STRACE_PRINTS(s_) tprints_string(s_)
 #  define STRACE_PRINT_COLOR_SEQ(kind_) tprint_color_seq(kind_)
