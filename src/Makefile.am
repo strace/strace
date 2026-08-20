@@ -164,6 +164,8 @@ libstrace_a_SOURCES =	\
 	getrandom.c	\
 	gpio_ioctl.c	\
 	hdio.c		\
+	hyperlink.c	\
+	hyperlink.h	\
 	hostname.c	\
 	inotify.c	\
 	inotify_ioctl.c	\

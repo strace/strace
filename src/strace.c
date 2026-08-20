@@ -30,6 +30,7 @@
 
 #include "kill_save_errno.h"
 #include "color.h"
+#include "hyperlink.h"
 #include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
@@ -371,6 +372,8 @@ Output format:\n\
                  alignment COLUMN for printing syscall results (default %d)\n\
   --color[=WHEN]\n\
                  colorize output; WHEN is auto, always, or never (default auto)\n\
+  --hyperlink\n\
+                 add hyperlinks from system call names to manual pages at man7.org.\n\
   -e abbrev=SET, --abbrev=SET\n\
                  abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
@@ -2450,6 +2453,7 @@ init(int argc, char *argv[])
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
 		GETOPT_ALWAYS_SHOW_PID,
 		GETOPT_COLOR,
+		GETOPT_HYPERLINK,
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
@@ -2518,6 +2522,7 @@ init(int argc, char *argv[])
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
 		{ "color",		required_argument, 0, GETOPT_COLOR },
+		{ "hyperlink",		no_argument,	   0, GETOPT_HYPERLINK },
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2827,6 +2832,9 @@ init(int argc, char *argv[])
 			color_mode = (enum color_mode_t) color_mode_raw;
 			break;
 		}
+		case GETOPT_HYPERLINK:
+			hyperlink_is_enabled = true;
+			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
