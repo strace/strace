@@ -19,6 +19,14 @@
 int
 main(void)
 {
+	/* First enter a new user namespace so we have CAP_SYS_ADMIN inside it */
+	if (syscall(__NR_unshare, 0x10000000) < 0)
+		perror_msg_and_skip("unshare (CLONE_NEWUSER)");
+
+	/* Now enter a new network namespace owned by the child user namespace */
+	if (syscall(__NR_unshare, 0x40000000) < 0)
+		perror_msg_and_skip("unshare (CLONE_NEWNET)");
+
 	const char *netns_path = "/proc/self/ns/net";
 	skip_if_unavailable(netns_path);
 
@@ -41,6 +49,15 @@ main(void)
 	if (rc < 0)
 		perror_msg_and_skip("setns (CLONE_NEWNET)");
 	printf("setns(%d, CLONE_NEWNET) = %s (%s)\n",
+	       netns_fd, sprintrc(rc), netns);
+
+	if (syscall(__NR_unshare, 0x40000000) < 0)
+		perror_msg_and_skip("unshare (CLONE_NEWNET)");
+
+	rc = syscall(__NR_setns, netns_fd, 0);
+	if (rc < 0)
+		perror_msg_and_skip("setns (0)");
+	printf("setns(%d, 0) = %s (%s)\n",
 	       netns_fd, sprintrc(rc), netns);
 
 	puts("+++ exited with 0 +++");
