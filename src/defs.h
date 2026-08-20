@@ -269,6 +269,9 @@ struct tcb {
 # if SUPPORTED_PERSONALITIES > 1
 	unsigned int currpers;	/* Personality at the time of scno update */
 # endif
+	unsigned long resume_id;/* Resumption ID used to keep track of interrupted
+				 * and resumed syscalls.
+				 */
 	unsigned long u_error;	/* Error code */
 	kernel_ulong_t scno;	/* System call number */
 	kernel_ulong_t true_scno;	/* Same, but without subcall decoding and shuffling */
