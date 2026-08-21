@@ -47,6 +47,8 @@ libselinux_LDADD =
 endif
 
 libtests_a_SOURCES = \
+	clock_ids_for_tests.c \
+	clock_ids_for_tests.h \
 	clock_t_str.c \
 	create_nl_socket.c \
 	create_tmpfile.c \
@@ -913,6 +915,7 @@ EXTRA_DIST = \
 	nlattr_ifla_af_inet6.h \
 	nsyscalls.h \
 	print_user_desc.c \
+	printclockname.c \
 	printsignal.c \
 	printxval.c \
 	process_vm_readv_writev.c \
