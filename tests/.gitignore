@@ -941,6 +941,9 @@ preadv-pwritev
 preadv2-pwritev2
 print_maxfd
 print_ppid_tracerpid
+printclockname-Xabbrev
+printclockname-Xraw
+printclockname-Xverbose
 printpath-umovestr
 printpath-umovestr-peekdata
 printpath-umovestr-undumpable
