@@ -256,10 +256,10 @@ printclockname(int clockid)
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
 
-		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
+		if ((clockid & CLOCKFD_MASK) == CLOCKFD) {
 			tprints_fn_begin("FD_TO_CLOCKID");
 			PRINT_VAL_D(CLOCKID_TO_FD(clockid));
-		else {
+		} else {
 			tprints_fn_begin(CPUCLOCK_PERTHREAD(clockid) ?
 					  "MAKE_THREAD_CPUCLOCK" :
 					  "MAKE_PROCESS_CPUCLOCK");
