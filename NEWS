@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implement dynamic clock id decoding.
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================

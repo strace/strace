@@ -16,6 +16,9 @@
 
 #include "tests.h"
 
+#define CLOCKFD 3
+#define FD_TO_CLOCKID(fd)   ((~(unsigned int)(clockid_t) (fd) << 3) | CLOCKFD)
+
 int
 main(void)
 {
@@ -53,6 +56,15 @@ main(void)
 	printf("clock_getres(0x3 /* CLOCK_THREAD_CPUTIME_ID */, NULL) = 0\n");
 #else
 	printf("clock_getres(CLOCK_THREAD_CPUTIME_ID, NULL) = 0\n");
+#endif
+
+	syscall(__NR_clock_getres, FD_TO_CLOCKID(0), NULL);
+#if XLAT_RAW
+	printf("clock_getres(-5, NULL)                  = -1 EINVAL (Invalid argument)\n");
+#elif XLAT_VERBOSE
+	printf("clock_getres(-5 /* FD_TO_CLOCKID(0) */, NULL) = -1 EINVAL (Invalid argument)\n");
+#else
+	printf("clock_getres(FD_TO_CLOCKID(0), NULL)    = -1 EINVAL (Invalid argument)\n");
 #endif
 
 	puts("+++ exited with 0 +++");

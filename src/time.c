@@ -239,13 +239,24 @@ SYS_FUNC(adjtimex64)
 
 #include "xlat/clockflags.h"
 #include "xlat/clocknames.h"
+#include "xlat/cpuclocknames.h"
+
+#ifndef CLOCKID_TO_FD
+# define CPUCLOCK_PID(clock)		((pid_t) ~((clock) >> 3))
+# define CPUCLOCK_PERTHREAD(clock) \
+	(((clock) & (clockid_t) CPUCLOCK_PERTHREAD_MASK) != 0)
+
+# define CLOCKID_TO_FD(clk)	((unsigned int) ~((clk) >> 3))
+# define CPUCLOCK_CLOCK_MASK	3
+# define CPUCLOCK_PERTHREAD_MASK	4
+# define CLOCKFD_MASK		(CPUCLOCK_PERTHREAD_MASK|CPUCLOCK_CLOCK_MASK)
+# define CPUCLOCK_MAX		3
+# define CLOCKFD			CPUCLOCK_MAX
+#endif
 
 static void
 printclockname(int clockid)
 {
-#ifdef CLOCKID_TO_FD
-# include "xlat/cpuclocknames.h"
-
 	if (clockid < 0) {
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 			PRINT_VAL_D(clockid);
@@ -272,8 +283,8 @@ printclockname(int clockid)
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();
+
 	} else
-#endif
 		printxval(clocknames, clockid, "CLOCK_???");
 }
 
