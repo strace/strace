@@ -239,22 +239,48 @@ SYS_FUNC(adjtimex64)
 
 #include "xlat/clockflags.h"
 #include "xlat/clocknames.h"
+#include "xlat/cpuclocknames.h"
+
+#ifndef CPUCLOCK_CLOCK_MASK
+# define CPUCLOCK_CLOCK_MASK	3
+#endif
+
+#ifndef CLOCKID_TO_FD
+# define CPUCLOCK_PID(clock)		((pid_t) ~((clock) >> 3))
+# define CPUCLOCK_PERTHREAD(clock) \
+	(((clock) & (clockid_t) CPUCLOCK_PERTHREAD_MASK) != 0)
+
+# define CLOCKID_TO_FD(clk)	((unsigned int) ~((clk) >> 3))
+# define CPUCLOCK_PERTHREAD_MASK	4
+# define CLOCKFD_MASK		(CPUCLOCK_PERTHREAD_MASK|CPUCLOCK_CLOCK_MASK)
+# define CPUCLOCK_MAX		3
+# define CLOCKFD			CPUCLOCK_MAX
+#endif
+
+static void
+printcpuclockname(int clockid)
+{
+	clockid = clockid & CPUCLOCK_CLOCK_MASK;
+	const char *const str = xlookup(cpuclocknames, clockid);
+
+	if (str) {
+		STRACE_PRINT_COLOR_SEQ(COLOR_CONST);
+		STRACE_PRINTS(str);
+		STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
+	} else
+		PRINT_VAL_X(clockid);
+}
 
 static void
 printclockname(int clockid)
 {
-#ifdef CLOCKID_TO_FD
-# include "xlat/cpuclocknames.h"
-
 	if (clockid < 0) {
-		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			PRINT_VAL_D(clockid);
+		PRINT_VAL_D(clockid);
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 			return;
 
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprint_comment_begin();
+		tprint_comment_begin();
 
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD) {
 			tprints_fn_begin("FD_TO_CLOCKID");
@@ -264,16 +290,14 @@ printclockname(int clockid)
 					  "MAKE_THREAD_CPUCLOCK" :
 					  "MAKE_PROCESS_CPUCLOCK");
 			PRINT_VAL_D(CPUCLOCK_PID(clockid));
+
 			tprint_fn_next();
-			printxval(cpuclocknames, clockid & CLOCKFD_MASK,
-				  "CPUCLOCK_???");
+			printcpuclockname(clockid);
 		}
 		tprint_fn_end();
+		tprint_comment_end();
 
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprint_comment_end();
 	} else
-#endif
 		printxval(clocknames, clockid, "CLOCK_???");
 }
 

@@ -45,6 +45,22 @@ main(void)
 		       errstr);
 	}
 
+	static const struct strval32 dyn_clock_ids[] = {
+		{ ARG_XLAT_UNKNOWN(-5, "FD_TO_CLOCKID(0)") },
+		{ ARG_XLAT_UNKNOWN(-21, "FD_TO_CLOCKID(2)") },
+		{ ARG_XLAT_UNKNOWN(-15,
+				   "MAKE_PROCESS_CPUCLOCK(1, CPUCLOCK_VIRT)") },
+		{ ARG_XLAT_UNKNOWN(-10,
+				   "MAKE_THREAD_CPUCLOCK(1, CPUCLOCK_SCHED)") },
+		{ ARG_XLAT_UNKNOWN(-9,
+				   "MAKE_THREAD_CPUCLOCK(1, 0x3)") },
+	};
+	for (unsigned int i = 0; i < ARRAY_SIZE(dyn_clock_ids); ++i) {
+		k_clock_getres(dyn_clock_ids[i].val, NULL);
+		printf("clock_getres(%s, NULL) = %s\n",
+		       dyn_clock_ids[i].str, errstr);
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
