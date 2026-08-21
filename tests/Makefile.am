@@ -373,6 +373,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-tagged-addr-success-Xverbose \
 	print_maxfd \
 	print_ppid_tracerpid \
+	printclockname-Xabbrev \
+	printclockname-Xraw \
+	printclockname-Xverbose \
 	prlimit64--pidns-translation \
 	prlimit64-success \
 	prlimit64-success--pidns-translation \
@@ -906,6 +909,7 @@ EXTRA_DIST = \
 	nlattr_ifla_af_inet6.h \
 	nsyscalls.h \
 	print_user_desc.c \
+	printclockname.c \
 	printsignal.c \
 	printxval.c \
 	process_vm_readv_writev.c \
