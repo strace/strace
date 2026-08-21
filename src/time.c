@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#include "auxiliary_clock.h"
 #include "defs.h"
 #include "kernel_fcntl.h"
 #include <signal.h>
@@ -239,13 +240,24 @@ SYS_FUNC(adjtimex64)
 
 #include "xlat/clockflags.h"
 #include "xlat/clocknames.h"
+#include "xlat/cpuclocknames.h"
+
+#ifndef CLOCKID_TO_FD
+# define CPUCLOCK_PID(clock)		((pid_t) ~((clock) >> 3))
+# define CPUCLOCK_PERTHREAD(clock) \
+	(((clock) & (clockid_t) CPUCLOCK_PERTHREAD_MASK) != 0)
+
+# define CLOCKID_TO_FD(clk)	((unsigned int) ~((clk) >> 3))
+# define CPUCLOCK_CLOCK_MASK	3
+# define CPUCLOCK_PERTHREAD_MASK	4
+# define CLOCKFD_MASK		(CPUCLOCK_PERTHREAD_MASK|CPUCLOCK_CLOCK_MASK)
+# define CPUCLOCK_MAX		3
+# define CLOCKFD			CPUCLOCK_MAX
+#endif
 
 static void
 printclockname(int clockid)
 {
-#ifdef CLOCKID_TO_FD
-# include "xlat/cpuclocknames.h"
-
 	if (clockid < 0) {
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 			PRINT_VAL_D(clockid);
@@ -256,10 +268,10 @@ printclockname(int clockid)
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
 
-		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
+		if ((clockid & CLOCKFD_MASK) == CLOCKFD) {
 			tprints_fn_begin("FD_TO_CLOCKID");
 			PRINT_VAL_D(CLOCKID_TO_FD(clockid));
-		else {
+		} else {
 			tprints_fn_begin(CPUCLOCK_PERTHREAD(clockid) ?
 					  "MAKE_THREAD_CPUCLOCK" :
 					  "MAKE_PROCESS_CPUCLOCK");
@@ -272,8 +284,30 @@ printclockname(int clockid)
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();
+
+	} else if (is_auxiliary_clock(clockid)) {
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+			PRINT_VAL_X(clockid);
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			return;
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_begin();
+		else
+			STRACE_PRINT_COLOR_SEQ(COLOR_CONST);
+
+		STRACE_PRINTS("CLOCK_AUX");
+
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE)
+			STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
+
+		STRACE_PRINTF(" + %u", auxiliary_clock_num(clockid));
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_end();
+
 	} else
-#endif
 		printxval(clocknames, clockid, "CLOCK_???");
 }
 

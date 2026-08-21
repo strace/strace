@@ -906,6 +906,7 @@ EXTRA_DIST = \
 	nlattr_ifla_af_inet6.h \
 	nsyscalls.h \
 	print_user_desc.c \
+	printclockname.c \
 	printsignal.c \
 	printxval.c \
 	process_vm_readv_writev.c \

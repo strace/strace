@@ -663,6 +663,9 @@ pread64-pwrite64
 preadv
 preadv-pwritev
 preadv2-pwritev2
+printclockname-Xabbrev
+printclockname-Xraw
+printclockname-Xverbose
 printpath-umovestr
 printpath-umovestr-peekdata
 printpath-umovestr-undumpable

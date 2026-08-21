@@ -136,6 +136,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/tcp_metrics.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/thermal.h \
+	linux/include/uapi/linux/time.h \
 	linux/include/uapi/linux/time_types.h \
 	linux/include/uapi/linux/tipc.h \
 	linux/include/uapi/linux/tls.h \
