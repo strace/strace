@@ -70,19 +70,15 @@ main(void)
 	syscall(__NR_clock_getres, FD_TO_CLOCKID(0), NULL);
 #if XLAT_RAW
 	printf("clock_getres(-5, NULL)                  = -1 EINVAL (Invalid argument)\n");
-#elif XLAT_VERBOSE
-	printf("clock_getres(-5 /* FD_TO_CLOCKID(0) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #else
-	printf("clock_getres(FD_TO_CLOCKID(0), NULL)    = -1 EINVAL (Invalid argument)\n");
+	printf("clock_getres(-5 /* FD_TO_CLOCKID(0) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #endif
 
 	syscall(__NR_clock_getres, FD_TO_CLOCKID(2), NULL);
 #if XLAT_RAW
 	printf("clock_getres(-21, NULL)                 = -1 EINVAL (Invalid argument)\n");
-#elif XLAT_VERBOSE
-	printf("clock_getres(-21 /* FD_TO_CLOCKID(2) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #else
-	printf("clock_getres(FD_TO_CLOCKID(2), NULL)    = -1 EINVAL (Invalid argument)\n");
+	printf("clock_getres(-21 /* FD_TO_CLOCKID(2) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #endif
 
 	syscall(__NR_clock_getres, MAKE_PROCESS_CPUCLOCK(1, CPUCLOCK_VIRT), NULL);
@@ -91,7 +87,7 @@ main(void)
 #elif XLAT_VERBOSE
 	printf("clock_getres(-15 /* MAKE_PROCESS_CPUCLOCK(1, 0x1 /* CPUCLOCK_VIRT */) */, NULL) = 0\n");
 #else
-	printf("clock_getres(MAKE_PROCESS_CPUCLOCK(1, CPUCLOCK_VIRT), NULL) = 0\n");
+	printf("clock_getres(-15 /* MAKE_PROCESS_CPUCLOCK(1, CPUCLOCK_VIRT) */, NULL) = 0\n");
 #endif
 
 	syscall(__NR_clock_getres, MAKE_THREAD_CPUCLOCK(1, CPUCLOCK_SCHED), NULL);
@@ -100,7 +96,7 @@ main(void)
 #elif XLAT_VERBOSE
 	printf("clock_getres(-10 /* MAKE_THREAD_CPUCLOCK(1, 0x2 /* CPUCLOCK_SCHED */) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #else
-	printf("clock_getres(MAKE_THREAD_CPUCLOCK(1, CPUCLOCK_SCHED), NULL) = -1 EINVAL (Invalid argument)\n");
+	printf("clock_getres(-10 /* MAKE_THREAD_CPUCLOCK(1, CPUCLOCK_SCHED) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #endif
 
 	puts("+++ exited with 0 +++");
