@@ -258,14 +258,12 @@ static void
 printclockname(int clockid)
 {
 	if (clockid < 0) {
-		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			PRINT_VAL_D(clockid);
+		PRINT_VAL_D(clockid);
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 			return;
 
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprint_comment_begin();
+		tprint_comment_begin();
 
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD) {
 			tprints_fn_begin("FD_TO_CLOCKID");
@@ -280,9 +278,7 @@ printclockname(int clockid)
 				  "CPUCLOCK_???");
 		}
 		tprint_fn_end();
-
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprint_comment_end();
+		tprint_comment_end();
 
 	} else
 		printxval(clocknames, clockid, "CLOCK_???");
