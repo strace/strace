@@ -98,9 +98,9 @@ main(void)
 #if XLAT_RAW
 	printf("clock_getres(-10, NULL)                 = -1 EINVAL (Invalid argument)\n");
 #elif XLAT_VERBOSE
-	printf("clock_getres(-10 /* MAKE_THREAD_CPUCLOCK(1, 0x6 /* CPUCLOCK_??? */) */, NULL) = -1 EINVAL (Invalid argument)\n");
+	printf("clock_getres(-10 /* MAKE_THREAD_CPUCLOCK(1, 0x2 /* CPUCLOCK_SCHED */) */, NULL) = -1 EINVAL (Invalid argument)\n");
 #else
-	printf("clock_getres(MAKE_THREAD_CPUCLOCK(1, 0x6 /* CPUCLOCK_??? */), NULL) = -1 EINVAL (Invalid argument)\n");
+	printf("clock_getres(MAKE_THREAD_CPUCLOCK(1, CPUCLOCK_SCHED), NULL) = -1 EINVAL (Invalid argument)\n");
 #endif
 
 	puts("+++ exited with 0 +++");
