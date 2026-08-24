@@ -276,7 +276,7 @@ printclockname(int clockid)
 					  "MAKE_PROCESS_CPUCLOCK");
 			PRINT_VAL_D(CPUCLOCK_PID(clockid));
 			tprint_fn_next();
-			printxval(cpuclocknames, clockid & CLOCKFD_MASK,
+			printxval(cpuclocknames, clockid & CPUCLOCK_CLOCK_MASK,
 				  "CPUCLOCK_???");
 		}
 		tprint_fn_end();
