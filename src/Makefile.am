@@ -599,6 +599,19 @@ EXTRA_DIST =				\
 	linux/csky/set_error.c		\
 	linux/csky/set_scno.c		\
 	linux/csky/syscallent.h		\
+	linux/e2k/arch_defs_.h		\
+	linux/e2k/arch_regs.c		\
+	linux/e2k/get_error.c		\
+	linux/e2k/get_scno.c		\
+	linux/e2k/get_syscall_args.c	\
+	linux/e2k/getregs_old.c		\
+	linux/e2k/getregs_old.h		\
+	linux/e2k/ioctls_arch0.h	\
+	linux/e2k/ioctls_inc0.h		\
+	linux/e2k/raw_syscall.h		\
+	linux/e2k/set_error.c		\
+	linux/e2k/set_scno.c		\
+	linux/e2k/syscallent.h		\
 	linux/generic/arch_fpregset.c		\
 	linux/generic/arch_fpregset.h		\
 	linux/generic/arch_kvm.c		\

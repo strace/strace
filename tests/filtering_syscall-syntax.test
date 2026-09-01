@@ -76,6 +76,9 @@ case "$STRACE_ARCH" in
 	alpha)	invalid_scno1=299
 		invalid_scno2=404
 		;;
+	e2k)	invalid_scno1=499
+		invalid_scno2=501
+		;;
 	*)	invalid_scno1=415
 		invalid_scno2=501
 		;;

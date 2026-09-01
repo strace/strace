@@ -72,6 +72,11 @@ while read -r name arg0 args; do {
 			cat <<-EOF
 			$hdr
 			. "\${srcdir=.}/scno_tampering.sh"
+			ret=0
+			../$name || ret=\$?
+			if [ "\$ret" -eq 77 ]; then
+				exit 77
+			fi
 			run_strace $arg0 $args "../$name" > "\$EXP"
 			match_diff "\$LOG" "\$EXP"
 			EOF
