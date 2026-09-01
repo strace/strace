@@ -81,7 +81,8 @@ read_namespace_id(int pid, const char *const ns_type)
 
 static const char *
 get_namespace_auxstr(int pid, uint64_t flags,
-		     struct tcb *const tcp_for_pid_translation)
+		     struct tcb *const tcp_for_pid_translation,
+		     const char *expected_ns_str)
 {
 	static char str[sizeof("cgroup:[4026531835], "
 			          "ipc:[4026531839], "
@@ -115,6 +116,16 @@ get_namespace_auxstr(int pid, uint64_t flags,
 	}
 
 	*p = '\0';
+
+	if (flags == 0 && expected_ns_str) {
+		const char *ns_name = read_namespace_id(pid, expected_ns_str);
+		if (ns_name) {
+			(void)xappendstr(str, p, "%s", ns_name);
+			return str;
+		}
+		return NULL;
+	}
+
 	for (size_t i = 0; i < ARRAY_SIZE(ns); ++i) {
 		if (flags & ns[i].flags) {
 			const char *ns_name = read_namespace_id(pid, ns[i].str);
@@ -212,7 +223,8 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 		if ((flags & nsflags) && !syserror(tcp)) {
-			tcp->auxstr = get_namespace_auxstr(tcp->u_rval, flags, tcp);
+			tcp->auxstr = get_namespace_auxstr(tcp->u_rval, flags, tcp,
+							   NULL);
 			if (tcp->auxstr)
 				r_extra = RVAL_STR;
 		}
@@ -381,7 +393,8 @@ SYS_FUNC(clone3)
 		tprint_struct_end();
 
 	if ((arg.flags & nsflags) && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, arg.flags, tcp);
+		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, arg.flags, tcp,
+						   NULL);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
@@ -393,6 +406,26 @@ out:
 	return RVAL_DECODED | RVAL_TID | r_extra;
 }
 
+static const char *
+read_namespace_type_for_fd(int pid, int fd)
+{
+	static const char fd_path[] = "/proc/%d/fd/%d";
+	char linkpath[sizeof(fd_path) + sizeof(int) * 3 + sizeof(int) * 3];
+	xsprintf(linkpath, fd_path, pid, fd);
+
+	static char buf[PATH_MAX + 1];
+	ssize_t n = readlink(linkpath, buf, sizeof(buf));
+	if ((size_t) n >= sizeof(buf))
+		return NULL;
+	buf[n] = '\0';
+
+	/* buf contains a string like "ns:[4026531838]". */
+	char *p = strchr(buf, ':');
+	if (p == NULL)
+		return NULL;
+	*p = '\0';
+	return buf;
+}
 
 SYS_FUNC(setns)
 {
@@ -406,7 +439,15 @@ SYS_FUNC(setns)
 
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[1], NULL);
+		uint64_t flags = tcp->u_arg[1];
+		const char *ns_str = NULL;
+
+		if (flags == 0)
+			ns_str = read_namespace_type_for_fd(tcp->pid,
+							    tcp->u_arg[0]);
+
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, flags, NULL,
+						   ns_str);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
@@ -424,7 +465,8 @@ SYS_FUNC(unshare)
 
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0], NULL);
+		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0], NULL,
+						   NULL);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
