@@ -716,6 +716,7 @@ MISC_TESTS = \
 	status-unfinished-threads.test \
 	strace--color-no-tty.test \
 	strace--color-tty.test \
+	strace--hyperlink.test \
 	strace--argv0.test \
 	strace--syscall-limit.test \
 	strace--syscall-limit--seccomp-bpf.test \

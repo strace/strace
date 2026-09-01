@@ -15,6 +15,7 @@
 # ifdef IN_STRACE
 
 #  include "color.h"
+#  include "hyperlink.h"
 
 #  define STRACE_PRINTS(s_) tprints_string(s_)
 #  define STRACE_PRINT_COLOR_SEQ(kind_) tprint_color_seq(kind_)
@@ -67,6 +68,7 @@ extern void tprint_array_next(void);
 extern void tprint_array_end(void);
 extern void tprint_array_index_begin(void);
 extern void tprint_array_index_equal(void);
+extern void tprints_syscall_name(const char *name);
 extern void tprints_arg_begin(const char *name);
 extern void tprint_arg_next(void);
 extern void tprint_arg_end(void);

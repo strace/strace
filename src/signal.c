@@ -831,8 +831,9 @@ SYS_FUNC(rt_sigtimedwait_time64)
 
 SYS_FUNC(restart_syscall)
 {
-	tprintf_string("<... resuming interrupted %s ...>",
-		tcp->s_prev_ent ? tcp->s_prev_ent->sys_name : "system call");
+	tprints_string("<... resuming interrupted ");
+	tprints_syscall_name(tcp->s_prev_ent ? tcp->s_prev_ent->sys_name : NULL);
+	tprints_string(" ...>");
 
 	return RVAL_DECODED;
 }

@@ -1159,6 +1159,14 @@ Recognized color keys are:
 .BR retval ,
 .BR error .
 .TP
+.B \-\-hyperlink
+Add hyperlinks from system call names to manual pages at
+.UR https://man7.org/linux/man-pages/man2
+man7.org.
+Note that the hyperlinks are constructed mechanically based on system call names;
+a corresponding manual page may not necessarily exist for every system call
+(e.g. newly added or architecture-specific system calls).
+.TP
 .B \-q
 .TQ
 .B \-\-quiet

@@ -98,10 +98,33 @@ tprint_array_index_equal(void)
 }
 
 void
+tprints_syscall_name(const char *name)
+{
+	if (!name) {
+		STRACE_PRINTF("%s", "system call");
+		return;
+	}
+
+	if (!hyperlink_is_enabled) {
+		STRACE_PRINTF("%s", name);
+		return;
+	}
+
+	char *url = make_hyperlink_url_for_syscall(name);
+	if (!url) {
+		STRACE_PRINTF("%s", name);
+		return;
+	}
+
+	STRACE_PRINTF(HYPERLINK_FMT, url, name);
+	free(url);
+}
+
+void
 tprints_arg_begin(const char *name)
 {
 	STRACE_PRINT_COLOR_SEQ(COLOR_SYSCALL);
-	STRACE_PRINTF("%s", name);
+	tprints_syscall_name(name);
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS("(");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
