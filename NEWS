@@ -3,7 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of SO_RIGHTS_NOTRUNC socket option.
-  * Updated the list of ATA_* constants.
+  * Updated lists of ATA_* and KVM_* constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================
