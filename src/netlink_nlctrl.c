@@ -8,6 +8,8 @@
 #include "defs.h"
 #include "netlink_generic.h"
 #include "nlattr.h"
+#include "kernel_time_types.h"
+#define UAPI_LINUX_TASKSTATS_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/cgroupstats.h>
 #include <linux/devlink.h>
 #include <linux/ethtool_netlink.h>
