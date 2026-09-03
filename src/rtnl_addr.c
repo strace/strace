@@ -116,6 +116,7 @@ static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
 	[IFA_RT_PRIORITY]	= decode_nla_u32,
 	[IFA_TARGET_NETNSID]	= decode_nla_s32,
 	[IFA_PROTO]		= decode_ifa_proto,
+	[IFA_MC_USERS]		= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)

@@ -208,7 +208,7 @@ main(void)
 		/* Unknown message type */
 		TEST_NLATTR_(fd, nlh0, hdrlen,
 			     init_ifaddrmsg, print_ifaddrmsg,
-			     12, "0xc" NRAW(" /* IFA_??? */"),
+			     13, "0xd" NRAW(" /* IFA_??? */"),
 			     4, pattern, 4,
 			     print_quoted_hex(pattern, 4));
 
@@ -351,6 +351,10 @@ main(void)
 		check_u32_nlattr(fd, nlh0, hdrlen,
 				 init_ifaddrmsg, print_ifaddrmsg,
 				 ARG_XLAT_KNOWN(0x9, "IFA_RT_PRIORITY"),
+				 pattern, 0);
+		check_u32_nlattr(fd, nlh0, hdrlen,
+				 init_ifaddrmsg, print_ifaddrmsg,
+				 ARG_XLAT_KNOWN(0xc, "IFA_MC_USERS"),
 				 pattern, 0);
 
 		/* s32 */
