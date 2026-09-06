@@ -569,6 +569,17 @@ main(void)
 	}
 
 
+	/* be16: NHA_DST_PORT */
+	static const uint16_t ports[] = { 0, 0x1234, 0x8000, 0xabcd, 0xffff };
+	for (size_t i = 0; i < ARRAY_SIZE(ports); i++) {
+		TEST_NLATTR_OBJECT_(fd, nlh0, hdrlen, init_nhmsg, print_nhmsg,
+				   NHA_DST_PORT,
+				   XLAT_KNOWN(0x12, "NHA_DST_PORT"),
+				   pattern, ports[i],
+				   printf("htons(%u)", ntohs(ports[i])));
+	}
+
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

@@ -202,6 +202,7 @@ static const nla_decoder_t nhmsg_nla_decoders[] = {
 	[NHA_GROUP_STATS]	= decode_nha_group_stats,
 	[NHA_HW_STATS_ENABLE]	= decode_nla_u32,
 	[NHA_HW_STATS_USED]	= decode_nla_u32,
+	[NHA_DST_PORT]		= decode_nla_be16,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_nhmsg)
