@@ -26,6 +26,8 @@
 # include "xlat/rtnl_nha_res_group_attrs.h"
 # include "xlat/rtnl_nha_res_bucket_attrs.h"
 # include "xlat/nha_op_flags.h"
+# include "xlat/rtnl_nha_group_stats_attrs.h"
+# include "xlat/rtnl_nha_group_stats_entry_attrs.h"
 #undef XLAT_MACROS_ONLY
 
 #define DEF_NLATTR_NHMSG_FUNCS(sfx_, af_)				\
@@ -94,6 +96,33 @@ DEF_NLATTR_NHMSG_FUNCS(nhmsg_inet6, AF_INET6)
 
 DEF_NLATTR_NHMSG_NESTED_FUNCS(res_grp, NHA_RES_GROUP)
 DEF_NLATTR_NHMSG_NESTED_FUNCS(res_bkt, NHA_RES_BUCKET)
+DEF_NLATTR_NHMSG_NESTED_FUNCS(grp_stats, NHA_GROUP_STATS)
+
+static void
+init_nhmsg_grp_stats_entry(struct nlmsghdr *const nlh,
+			    const unsigned int msg_len)
+{
+	init_nhmsg_grp_stats(nlh, msg_len);
+	struct nlattr *nla = NLMSG_ATTR(nlh, sizeof(struct nhmsg));
+	nla = (struct nlattr *) ((char *) nla + NLA_HDRLEN);
+	SET_STRUCT(struct nlattr, nla,
+		.nla_len = msg_len
+			   - NLMSG_SPACE(sizeof(struct nhmsg))
+			   - NLA_HDRLEN,
+		.nla_type = NHA_GROUP_STATS_ENTRY,
+	);
+}
+
+static void
+print_nhmsg_grp_stats_entry(const unsigned int msg_len)
+{
+	print_nhmsg_grp_stats(msg_len);
+	printf(", [{nla_len=%u, nla_type=" XLAT_FMT "}",
+	       (unsigned int) (msg_len - NLMSG_HDRLEN
+			       - NLMSG_ALIGN(sizeof(struct nhmsg))
+			       - NLA_HDRLEN),
+	       XLAT_SEL(NHA_GROUP_STATS_ENTRY, "NHA_GROUP_STATS_ENTRY"));
+}
 
 static void
 print_nh_grp(const struct nexthop_grp *const elem, size_t idx)
@@ -429,6 +458,102 @@ main(void)
 				   XLAT_KNOWN(0xe, "NHA_OP_FLAGS"),
 				   pattern, op_flags[i].val,
 				   printf("%s", op_flags[i].str));
+	}
+
+
+	/* NHA_GROUP_STATS */
+	static const unsigned int grp_stats_hdrlen =
+		sizeof(struct nhmsg) + sizeof(struct nlattr);
+	void *nlh2 = midtail_alloc(NLMSG_SPACE(grp_stats_hdrlen),
+				   NLA_HDRLEN + 16);
+
+	TEST_NLATTR_(fd, nlh0, hdrlen, init_nhmsg, print_nhmsg,
+		     NHA_GROUP_STATS, XLAT_KNOWN(0xf, "NHA_GROUP_STATS"),
+		     3, pattern, 3,
+		     print_quoted_hex(pattern, 3));
+
+	/* unknown NHA_GROUP_STATS_* attr */
+	static const uint16_t unk_grp_stats_types[] = {
+		2, 0xffff & NLA_TYPE_MASK,
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(unk_grp_stats_types); i++) {
+		sprintf(nla_type_str, "%#x" NRAW(" /* NHA_GROUP_STATS_??? */"),
+			unk_grp_stats_types[i]);
+		TEST_NLATTR_(fd, nlh2, grp_stats_hdrlen,
+			     init_nhmsg_grp_stats, print_nhmsg_grp_stats,
+			     unk_grp_stats_types[i], nla_type_str,
+			     16, pattern, 16,
+			     print_quoted_hex(pattern, 16);
+			     printf("]"));
+	}
+
+	/* not decoded: NHA_GROUP_STATS_UNSPEC */
+	TEST_NLATTR_(fd, nlh2, grp_stats_hdrlen,
+		     init_nhmsg_grp_stats, print_nhmsg_grp_stats,
+		     NHA_GROUP_STATS_UNSPEC,
+		     XLAT_KNOWN(0, "NHA_GROUP_STATS_UNSPEC"),
+		     8, pattern, 8,
+		     print_quoted_hex(pattern, 8);
+		     printf("]"));
+
+	/* NHA_GROUP_STATS_ENTRY: short data */
+	TEST_NLATTR_(fd, nlh2, grp_stats_hdrlen,
+		     init_nhmsg_grp_stats, print_nhmsg_grp_stats,
+		     NHA_GROUP_STATS_ENTRY,
+		     XLAT_KNOWN(0x1, "NHA_GROUP_STATS_ENTRY"),
+		     3, pattern, 3,
+		     print_quoted_hex(pattern, 3);
+		     printf("]"));
+
+	/* NHA_GROUP_STATS_ENTRY nested attrs */
+	static const unsigned int grp_stats_entry_hdrlen =
+		sizeof(struct nhmsg) + 2 * sizeof(struct nlattr);
+	void *nlh3 = midtail_alloc(NLMSG_SPACE(grp_stats_entry_hdrlen),
+				   NLA_HDRLEN + 16);
+
+	/* unknown NHA_GROUP_STATS_ENTRY_* attr */
+	static const uint16_t unk_entry_types[] = {
+		4, 0xffff & NLA_TYPE_MASK,
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(unk_entry_types); i++) {
+		sprintf(nla_type_str, "%#x" NRAW(" /* NHA_GROUP_STATS_ENTRY_??? */"),
+			unk_entry_types[i]);
+		TEST_NLATTR_(fd, nlh3, grp_stats_entry_hdrlen,
+			     init_nhmsg_grp_stats_entry,
+			     print_nhmsg_grp_stats_entry,
+			     unk_entry_types[i], nla_type_str,
+			     16, pattern, 16,
+			     print_quoted_hex(pattern, 16);
+			     printf("]]"));
+	}
+
+	/* not decoded: NHA_GROUP_STATS_ENTRY_UNSPEC */
+	TEST_NLATTR_(fd, nlh3, grp_stats_entry_hdrlen,
+		     init_nhmsg_grp_stats_entry, print_nhmsg_grp_stats_entry,
+		     NHA_GROUP_STATS_ENTRY_UNSPEC,
+		     XLAT_KNOWN(0, "NHA_GROUP_STATS_ENTRY_UNSPEC"),
+		     8, pattern, 8,
+		     print_quoted_hex(pattern, 8);
+		     printf("]]"));
+
+	/* u32: NHA_GROUP_STATS_ENTRY_ID */
+	check_u32_nlattr(fd, nlh0, hdrlen,
+			 init_nhmsg_grp_stats_entry,
+			 print_nhmsg_grp_stats_entry,
+			 ARG_XLAT_KNOWN(0x1, "NHA_GROUP_STATS_ENTRY_ID"),
+			 pattern, 2);
+
+	/* u64: NHA_GROUP_STATS_ENTRY_PACKETS, NHA_GROUP_STATS_ENTRY_PACKETS_HW */
+	static const struct strval32 entry_u64_attrs[] = {
+		{ ARG_XLAT_KNOWN(0x2, "NHA_GROUP_STATS_ENTRY_PACKETS") },
+		{ ARG_XLAT_KNOWN(0x3, "NHA_GROUP_STATS_ENTRY_PACKETS_HW") },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(entry_u64_attrs); i++) {
+		check_u64_nlattr(fd, nlh0, hdrlen,
+				 init_nhmsg_grp_stats_entry,
+				 print_nhmsg_grp_stats_entry,
+				 entry_u64_attrs[i].val,
+				 entry_u64_attrs[i].str, pattern, 2);
 	}
 
 

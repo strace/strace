@@ -19,6 +19,8 @@
 #include "xlat/rtnl_nha_res_bucket_attrs.h"
 #include "xlat/rtnl_nha_res_group_attrs.h"
 #include "xlat/nha_op_flags.h"
+#include "xlat/rtnl_nha_group_stats_attrs.h"
+#include "xlat/rtnl_nha_group_stats_entry_attrs.h"
 
 static bool
 print_nh_grp(struct tcb *const tcp, void *const elem_buf,
@@ -128,6 +130,45 @@ decode_nha_res_bucket(struct tcb *const tcp,
 	return true;
 }
 
+static const nla_decoder_t nha_group_stats_entry_nla_decoders[] = {
+	[NHA_GROUP_STATS_ENTRY_UNSPEC]		= NULL,
+	[NHA_GROUP_STATS_ENTRY_ID]		= decode_nla_u32,
+	[NHA_GROUP_STATS_ENTRY_PACKETS]		= decode_nla_u64,
+	[NHA_GROUP_STATS_ENTRY_PACKETS_HW]	= decode_nla_u64,
+};
+
+static bool
+decode_nha_group_stats_entry(struct tcb *const tcp,
+			      const kernel_ulong_t addr,
+			      const unsigned int len,
+			      const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_nha_group_stats_entry_attrs,
+		      "NHA_GROUP_STATS_ENTRY_???",
+		      ARRSZ_PAIR(nha_group_stats_entry_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t nha_group_stats_nla_decoders[] = {
+	[NHA_GROUP_STATS_UNSPEC]	= NULL,
+	[NHA_GROUP_STATS_ENTRY]		= decode_nha_group_stats_entry,
+};
+
+static bool
+decode_nha_group_stats(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_nha_group_stats_attrs,
+		      "NHA_GROUP_STATS_???",
+		      ARRSZ_PAIR(nha_group_stats_nla_decoders), opaque_data);
+
+	return true;
+}
+
 static bool
 decode_nha_op_flags(struct tcb *const tcp,
 		    const kernel_ulong_t addr,
@@ -158,6 +199,7 @@ static const nla_decoder_t nhmsg_nla_decoders[] = {
 	[NHA_RES_GROUP]		= decode_nha_res_group,
 	[NHA_RES_BUCKET]	= decode_nha_res_bucket,
 	[NHA_OP_FLAGS]		= decode_nha_op_flags,
+	[NHA_GROUP_STATS]	= decode_nha_group_stats,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_nhmsg)
