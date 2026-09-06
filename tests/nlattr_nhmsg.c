@@ -557,6 +557,18 @@ main(void)
 	}
 
 
+	/* u32: NHA_HW_STATS_ENABLE, NHA_HW_STATS_USED */
+	static const struct strval32 hw_stats_attrs[] = {
+		{ ARG_XLAT_KNOWN(0x10, "NHA_HW_STATS_ENABLE") },
+		{ ARG_XLAT_KNOWN(0x11, "NHA_HW_STATS_USED") },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(hw_stats_attrs); i++) {
+		check_u32_nlattr(fd, nlh0, hdrlen, init_nhmsg, print_nhmsg,
+				 hw_stats_attrs[i].val, hw_stats_attrs[i].str,
+				 pattern, 0);
+	}
+
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

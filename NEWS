@@ -4,8 +4,8 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented decoding of SO_RIGHTS_NOTRUNC socket option.
   * Implemented decoding of IFA_MC_USERS and IFA_PROTO netlink attributes.
-  * Implemented decoding of NHA_GROUP_STATS and NHA_OP_FLAGS netlink
-    nexthop attributes.
+  * Implemented decoding of NHA_GROUP_STATS, NHA_HW_STATS_ENABLE,
+    NHA_HW_STATS_USED, and NHA_OP_FLAGS netlink nexthop attributes.
   * Updated lists of ATA_*, KVM_*, and *_MAGIC constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)
