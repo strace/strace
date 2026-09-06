@@ -1,0 +1,14 @@
+#unconditional
+#From include/uapi/linux/nexthop.h
+#Prefix NHA_OP_FLAG_
+#ifndef BIT
+/*
+ * Workaround a bug in kernel headers that define NHA_OP_FLAG_* constants
+ * using BIT() macro without providing its definition.
+ */
+# define BIT(nr_)	(1UL << (nr_))
+#endif
+
+NHA_OP_FLAG_DUMP_STATS
+NHA_OP_FLAG_DUMP_HW_STATS
+NHA_OP_FLAG_RESP_GRP_RESVD_0

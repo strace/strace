@@ -18,6 +18,7 @@
 #include "xlat/rtnl_nexthop_grp_types.h"
 #include "xlat/rtnl_nha_res_bucket_attrs.h"
 #include "xlat/rtnl_nha_res_group_attrs.h"
+#include "xlat/nha_op_flags.h"
 
 static bool
 print_nh_grp(struct tcb *const tcp, void *const elem_buf,
@@ -127,6 +128,20 @@ decode_nha_res_bucket(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_nha_op_flags(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		nha_op_flags, "NHA_OP_FLAG_???",
+		.size = 4,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t nhmsg_nla_decoders[] = {
 	[NHA_UNSPEC]		= NULL,
 	[NHA_ID]		= decode_nla_u32,
@@ -142,6 +157,7 @@ static const nla_decoder_t nhmsg_nla_decoders[] = {
 	[NHA_FDB]		= decode_nla_u32,
 	[NHA_RES_GROUP]		= decode_nha_res_group,
 	[NHA_RES_BUCKET]	= decode_nha_res_bucket,
+	[NHA_OP_FLAGS]		= decode_nha_op_flags,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_nhmsg)

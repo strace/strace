@@ -25,6 +25,7 @@
 # include "xlat/rtnl_nexthop_attrs.h"
 # include "xlat/rtnl_nha_res_group_attrs.h"
 # include "xlat/rtnl_nha_res_bucket_attrs.h"
+# include "xlat/nha_op_flags.h"
 #undef XLAT_MACROS_ONLY
 
 #define DEF_NLATTR_NHMSG_FUNCS(sfx_, af_)				\
@@ -122,7 +123,7 @@ main(void)
 
 
 	/* Unknown attrs */
-	static const uint16_t unk_types[] = { 14, 0xffff & NLA_TYPE_MASK };
+	static const uint16_t unk_types[] = { 19, 0xffff & NLA_TYPE_MASK };
 	for (size_t i = 0; i < ARRAY_SIZE(unk_types); i++) {
 		sprintf(nla_type_str, "%#x" NRAW(" /* NHA_??? */"), unk_types[i]);
 		TEST_NLATTR_(fd, nlh0, hdrlen,
@@ -405,6 +406,30 @@ main(void)
 			 init_nhmsg_res_bkt, print_nhmsg_res_bkt,
 			 ARG_XLAT_KNOWN(0x3, "NHA_RES_BUCKET_NH_ID"),
 			 pattern, 1);
+
+
+	/* NHA_OP_FLAGS */
+	static const struct strval32 op_flags[] = {
+		{ 0, "0" },
+		{ ARG_XLAT_KNOWN(0x1, "NHA_OP_FLAG_DUMP_STATS") },
+		{ ARG_XLAT_KNOWN(0x2, "NHA_OP_FLAG_DUMP_HW_STATS") },
+		{ ARG_XLAT_KNOWN(0x3,
+		  "NHA_OP_FLAG_DUMP_STATS|NHA_OP_FLAG_DUMP_HW_STATS") },
+		{ ARG_XLAT_KNOWN(0x80000000, "NHA_OP_FLAG_RESP_GRP_RESVD_0") },
+		{ ARG_XLAT_KNOWN(0x80000003,
+		  "NHA_OP_FLAG_DUMP_STATS|NHA_OP_FLAG_DUMP_HW_STATS"
+		  "|NHA_OP_FLAG_RESP_GRP_RESVD_0") },
+		{ ARG_XLAT_KNOWN(0xdeadbeef,
+		  "NHA_OP_FLAG_DUMP_STATS|NHA_OP_FLAG_DUMP_HW_STATS"
+		  "|NHA_OP_FLAG_RESP_GRP_RESVD_0|0x5eadbeec") },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(op_flags); i++) {
+		TEST_NLATTR_OBJECT_(fd, nlh0, hdrlen, init_nhmsg, print_nhmsg,
+				   NHA_OP_FLAGS,
+				   XLAT_KNOWN(0xe, "NHA_OP_FLAGS"),
+				   pattern, op_flags[i].val,
+				   printf("%s", op_flags[i].str));
+	}
 
 
 	puts("+++ exited with 0 +++");
