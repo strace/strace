@@ -120,6 +120,7 @@ libstrace_a_SOURCES =	\
 	fallocate.c	\
 	fanotify.c	\
 	fchownat.c	\
+	fchroot.c	\
 	fcntl.c		\
 	fetch_bpf_fprog.c \
 	fetch_indirect_syscall_args.c \

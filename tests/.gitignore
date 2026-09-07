@@ -164,6 +164,8 @@ fchmodat2
 fchown
 fchown32
 fchownat
+fchroot
+fchroot-y
 fcntl
 fcntl--pidns-translation
 fcntl64

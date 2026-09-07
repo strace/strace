@@ -56,3 +56,4 @@
 [BASE_NR + 469] = { 5,	TD|TF,		SEN(file_setattr),		"file_setattr"	},
 [BASE_NR + 470] = { 4,	0,		SEN(listns),			"listns"	},
 [BASE_NR + 471] = { 0,	0,		SEN(rseq_slice_yield),		"rseq_slice_yield"	},
+[BASE_NR + 472] = { 2,	TD,		SEN(fchroot),			"fchroot"	},

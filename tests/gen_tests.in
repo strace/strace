@@ -179,6 +179,8 @@ fchownat--secontext	--secontext -e trace=fchownat
 fchownat--secontext_full	--secontext=full -e trace=fchownat
 fchownat--secontext_full_mismatch	-e secontext=full,mismatch -e trace=fchownat
 fchownat--secontext_mismatch	-e secontext=mismatch -e trace=fchownat
+fchroot	-a14
+fchroot-y	-e trace=fchroot -y -a14 </dev/full
 fcntl	-a8
 fcntl--pidns-translation	test_pidns -a8 -e trace=fcntl
 fcntl64	-a8
