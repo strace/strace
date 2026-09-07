@@ -24,6 +24,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdio.h>
+# include <stdarg.h>
 /* Open-coding isprint(ch) et al proved more efficient than calling
  * generalized libc interface. We don't *want* to do non-ASCII anyway.
  */
