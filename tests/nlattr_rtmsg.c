@@ -354,6 +354,27 @@ main(void)
 			   RTA_ENCAP_TYPE, pattern, encap_type,
 			   printf("LWTUNNEL_ENCAP_NONE"));
 
+	/* RTA_DEL_REASON */
+	static const struct strval32 del_reasons[] = {
+		{ ARG_XLAT_KNOWN(0, "RT_DEL_REASON_UNSPEC") },
+		{ ARG_XLAT_KNOWN(0x1, "RT_DEL_REASON_EXPIRED") },
+		{ ARG_XLAT_KNOWN(0x2, "RT_DEL_REASON_RA_WITHDRAWN") },
+		{ ARG_XLAT_UNKNOWN(0x3, "RT_DEL_REASON_???") },
+		{ ARG_XLAT_UNKNOWN(0xdeadbeef, "RT_DEL_REASON_???") },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(del_reasons); i++) {
+		TEST_NLATTR_OBJECT_(fd, nlh0, hdrlen, init_rtmsg, print_rtmsg,
+				   RTA_DEL_REASON,
+				   XLAT_KNOWN(0x20, "RTA_DEL_REASON"),
+				   pattern, del_reasons[i].val,
+				   printf("%s", del_reasons[i].str));
+		TEST_NLATTR_(fd, nlh0, hdrlen, init_rtmsg, print_rtmsg,
+			     RTA_DEL_REASON, XLAT_KNOWN(0x20, "RTA_DEL_REASON"),
+			     sizeof(del_reasons[i].val) + 4,
+			     &del_reasons[i].val, sizeof(del_reasons[i].val),
+			     printf("%s", del_reasons[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

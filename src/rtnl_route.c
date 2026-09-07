@@ -21,6 +21,7 @@
 #include "xlat/routing_protocols.h"
 #include "xlat/routing_table_ids.h"
 #include "xlat/routing_types.h"
+#include "xlat/rt_del_reason.h"
 #include "xlat/rtnl_route_attrs.h"
 #include "xlat/rtnl_rta_metrics_attrs.h"
 
@@ -192,6 +193,21 @@ DECL_NLA(lwt_encap_type)
 	return true;
 }
 
+static bool
+decode_rta_del_reason(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = rt_del_reason,
+		.dflt = "RT_DEL_REASON_???",
+		.size = 4,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_DST]		= decode_route_addr,
 	[RTA_SRC]		= decode_route_addr,
@@ -224,6 +240,7 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_DPORT]		= decode_nla_u16,
 	[RTA_NH_ID]		= decode_nla_u32,
 	[RTA_FLOWLABEL]		= decode_nla_be32,
+	[RTA_DEL_REASON]	= decode_rta_del_reason,
 };
 
 /*

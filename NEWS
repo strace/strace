@@ -7,6 +7,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of NHA_DST_PORT, NHA_GROUP_STATS,
     NHA_HW_STATS_ENABLE, NHA_HW_STATS_USED, and NHA_OP_FLAGS netlink
     nexthop attributes.
+  * Implemented decoding of RTA_DEL_REASON route attribute.
   * Updated lists of ATA_*, KVM_*, and *_MAGIC constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)
