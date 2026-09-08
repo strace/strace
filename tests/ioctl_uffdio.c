@@ -116,6 +116,10 @@ main(void)
 		api_struct->ioctls &= ~(1ull<<_UFFDIO_REGISTER|
 					1ull<<_UFFDIO_UNREGISTER|
 					1ull<<_UFFDIO_API);
+		if (api_struct->ioctls & (1ull<<_UFFDIO_SET_MODE)) {
+			printf("|1<<_UFFDIO_SET_MODE");
+			api_struct->ioctls &= ~(1ull<<_UFFDIO_SET_MODE);
+		}
 		if (api_struct->ioctls)
 			printf("|%#" PRIx64, (uint64_t)api_struct->ioctls);
 	}
@@ -165,6 +169,10 @@ main(void)
 		if (register_struct->ioctls & (1ull<<_UFFDIO_POISON)) {
 			printf("|1<<_UFFDIO_POISON");
 			register_struct->ioctls &= ~(1ull<<_UFFDIO_POISON);
+		}
+		if (register_struct->ioctls & (1ull<<_UFFDIO_RWPROTECT)) {
+			printf("|1<<_UFFDIO_RWPROTECT");
+			register_struct->ioctls &= ~(1ull<<_UFFDIO_RWPROTECT);
 		}
 		if (register_struct->ioctls)
 			printf("|%#" PRIx64, (uint64_t)register_struct->ioctls);
