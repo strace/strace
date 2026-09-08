@@ -256,6 +256,23 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		break;
 	}
 
+	case UFFDIO_SET_MODE: {
+		struct uffdio_set_mode usm;
+
+		tprints_arg_next_name("argp");
+		if (!umove_or_printaddr(tcp, arg, &usm)) {
+			tprint_struct_begin();
+			PRINT_FIELD_FLAGS(usm, enable, uffd_api_features,
+					  "UFFD_FEATURE_???");
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(usm, disable, uffd_api_features,
+					  "UFFD_FEATURE_???");
+			tprint_struct_end();
+		}
+
+		break;
+	}
+
 	case UFFDIO_CONTINUE: {
 		struct uffdio_continue uc;
 

@@ -61,6 +61,8 @@ main(void)
 	memset(poison_struct, 0, sizeof(*poison_struct));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_rwprotect, rwprotect_struct);
 	memset(rwprotect_struct, 0, sizeof(*rwprotect_struct));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_set_mode, set_mode_struct);
+	memset(set_mode_struct, 0, sizeof(*set_mode_struct));
 
 	struct {
 		unsigned int val;
@@ -90,6 +92,8 @@ main(void)
 		  "{range={start=0, len=0}, mode=0}" },
 		{ ARG_STR(UFFDIO_RWPROTECT), rwprotect_struct,
 		  "{range={start=0, len=0}, mode=0}" },
+		{ ARG_STR(UFFDIO_SET_MODE), set_mode_struct,
+		  "{enable=0, disable=0}" },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(requests); ++i) {
@@ -307,6 +311,14 @@ main(void)
 	       ", mode=UFFDIO_RWPROTECT_MODE_RWP"
 	       "|UFFDIO_RWPROTECT_MODE_DONTWAKE}) = %s\n",
 	       fd, area2, pagesize, errstr);
+
+	/* ---- SET_MODE ---- */
+	set_mode_struct->enable = UFFD_FEATURE_RWP_ASYNC;
+	set_mode_struct->disable = 0;
+	sys_ioctl(fd, UFFDIO_SET_MODE, set_mode_struct);
+	printf("ioctl(%d, UFFDIO_SET_MODE"
+	       ", {enable=UFFD_FEATURE_RWP_ASYNC, disable=0}) = %s\n",
+	       fd, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -9,8 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
     NHA_HW_STATS_ENABLE, NHA_HW_STATS_USED, and NHA_OP_FLAGS netlink
     nexthop attributes.
   * Implemented decoding of RTA_DEL_REASON route attribute.
-  * Implemented decoding of UFFDIO_MOVE and UFFDIO_RWPROTECT userfaultfd
-    ioctls.
+  * Implemented decoding of UFFDIO_MOVE, UFFDIO_RWPROTECT, and
+    UFFDIO_SET_MODE userfaultfd ioctls.
   * Updated lists of ATA_*, KVM_*, V4L2_*, and *_MAGIC constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)

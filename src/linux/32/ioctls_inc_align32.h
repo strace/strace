@@ -2571,6 +2571,7 @@
 { "linux/userfaultfd.h", "UFFDIO_POISON", _IOC_READ|_IOC_WRITE, 0xaa08, 0x20 },
 { "linux/userfaultfd.h", "UFFDIO_REGISTER", _IOC_READ|_IOC_WRITE, 0xaa00, 0x20 },
 { "linux/userfaultfd.h", "UFFDIO_RWPROTECT", _IOC_READ|_IOC_WRITE, 0xaa09, 0x18 },
+{ "linux/userfaultfd.h", "UFFDIO_SET_MODE", _IOC_WRITE, 0xaa0a, 0x10 },
 { "linux/userfaultfd.h", "UFFDIO_UNREGISTER", _IOC_READ, 0xaa01, 0x10 },
 { "linux/userfaultfd.h", "UFFDIO_WAKE", _IOC_READ, 0xaa02, 0x10 },
 { "linux/userfaultfd.h", "UFFDIO_WRITEPROTECT", _IOC_READ|_IOC_WRITE, 0xaa06, 0x18 },
