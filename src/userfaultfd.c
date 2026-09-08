@@ -26,6 +26,7 @@ SYS_FUNC(userfaultfd)
 #include "xlat/uffd_api_flags.h"
 #include "xlat/uffd_continue_mode_flags.h"
 #include "xlat/uffd_copy_flags.h"
+#include "xlat/uffd_move_mode_flags.h"
 #include "xlat/uffd_poison_mode_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
@@ -181,6 +182,36 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (!syserror(tcp) && !umove(tcp, arg, &uz)) {
 			tprint_struct_next();
 			PRINT_FIELD_X(uz, zeropage);
+		}
+
+		tprint_struct_end();
+
+		break;
+	}
+
+	case UFFDIO_MOVE: {
+		struct uffdio_move um;
+
+		if (entering(tcp)) {
+			tprints_arg_next_name("argp");
+			if (umove_or_printaddr(tcp, arg, &um))
+				return RVAL_IOCTL_DECODED;
+			tprint_struct_begin();
+			PRINT_FIELD_X(um, dst);
+			tprint_struct_next();
+			PRINT_FIELD_X(um, src);
+			tprint_struct_next();
+			PRINT_FIELD_X(um, len);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(um, mode, uffd_move_mode_flags,
+					  "UFFDIO_MOVE_MODE_???");
+
+			return 0;
+		}
+
+		if (!syserror(tcp) && !umove(tcp, arg, &um)) {
+			tprint_struct_next();
+			PRINT_FIELD_X(um, move);
 		}
 
 		tprint_struct_end();

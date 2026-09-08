@@ -55,6 +55,8 @@ main(void)
 	memset(writeprotect_struct, 0, sizeof(*writeprotect_struct));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_continue, continue_struct);
 	memset(continue_struct, 0, sizeof(*continue_struct));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_move, move_struct);
+	memset(move_struct, 0, sizeof(*move_struct));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_poison, poison_struct);
 	memset(poison_struct, 0, sizeof(*poison_struct));
 
@@ -73,6 +75,8 @@ main(void)
 		{ ARG_STR(UFFDIO_WAKE), range_struct,
 		  "{start=0, len=0}" },
 		{ ARG_STR(UFFDIO_COPY), copy_struct,
+		  "{dst=0, src=0, len=0, mode=0}" },
+		{ ARG_STR(UFFDIO_MOVE), move_struct,
 		  "{dst=0, src=0, len=0, mode=0}" },
 		{ ARG_STR(UFFDIO_ZEROPAGE), zero_struct,
 		  "{range={start=0, len=0}, mode=0}" },
@@ -190,6 +194,20 @@ main(void)
 	       " mode=UFFDIO_COPY_MODE_DONTWAKE|UFFDIO_COPY_MODE_WP|0xdeadbeec"
 	       "}) = %s\n",
 	       fd, area2, area1, pagesize, errstr);
+
+	/* ---- MOVE ---- */
+	move_struct->dst = (uint64_t)(uintptr_t)area2;
+	move_struct->src = (uint64_t)(uintptr_t)area1;
+	move_struct->len = pagesize;
+	move_struct->mode = UFFDIO_MOVE_MODE_DONTWAKE;
+	rc = sys_ioctl(fd, UFFDIO_MOVE, move_struct);
+	printf("ioctl(%d, UFFDIO_MOVE, {dst=%p, src=%p, len=%#zx"
+	       ", mode=UFFDIO_MOVE_MODE_DONTWAKE",
+	       fd, area2, area1, pagesize);
+	if (rc >= 0)
+		printf(", move=%#llx",
+		       (unsigned long long)(uint64_t) move_struct->move);
+	printf("}) = %s\n", errstr);
 
 	/* ---- ZEROPAGE ---- */
 	madvise(area2, pagesize, MADV_DONTNEED);
