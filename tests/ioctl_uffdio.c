@@ -59,6 +59,8 @@ main(void)
 	memset(move_struct, 0, sizeof(*move_struct));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_poison, poison_struct);
 	memset(poison_struct, 0, sizeof(*poison_struct));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_rwprotect, rwprotect_struct);
+	memset(rwprotect_struct, 0, sizeof(*rwprotect_struct));
 
 	struct {
 		unsigned int val;
@@ -85,6 +87,8 @@ main(void)
 		{ ARG_STR(UFFDIO_CONTINUE), continue_struct,
 		  "{range={start=0, len=0}, mode=0}" },
 		{ ARG_STR(UFFDIO_POISON), poison_struct,
+		  "{range={start=0, len=0}, mode=0}" },
+		{ ARG_STR(UFFDIO_RWPROTECT), rwprotect_struct,
 		  "{range={start=0, len=0}, mode=0}" },
 	};
 
@@ -292,6 +296,17 @@ main(void)
 		printf(", updated=%llu",
 		       (unsigned long long)(uint64_t) poison_struct->updated);
 	printf("}) = %s\n", errstr);
+
+	/* ---- RWPROTECT ---- */
+	rwprotect_struct->range.start = (uint64_t)(uintptr_t)area2;
+	rwprotect_struct->range.len = pagesize;
+	rwprotect_struct->mode =
+		UFFDIO_RWPROTECT_MODE_RWP|UFFDIO_RWPROTECT_MODE_DONTWAKE;
+	sys_ioctl(fd, UFFDIO_RWPROTECT, rwprotect_struct);
+	printf("ioctl(%d, UFFDIO_RWPROTECT, {range={start=%p, len=%#zx}"
+	       ", mode=UFFDIO_RWPROTECT_MODE_RWP"
+	       "|UFFDIO_RWPROTECT_MODE_DONTWAKE}) = %s\n",
+	       fd, area2, pagesize, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

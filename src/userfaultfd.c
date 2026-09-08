@@ -30,6 +30,7 @@ SYS_FUNC(userfaultfd)
 #include "xlat/uffd_poison_mode_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
+#include "xlat/uffd_rwprotect_mode_flags.h"
 #include "xlat/uffd_writeprotect_mode_flags.h"
 #include "xlat/uffd_zeropage_flags.h"
 
@@ -231,6 +232,24 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_FLAGS(uwp, mode,
 					  uffd_writeprotect_mode_flags,
 					  "UFFDIO_WRITEPROTECT_MODE_???");
+			tprint_struct_end();
+		}
+
+		break;
+	}
+
+	case UFFDIO_RWPROTECT: {
+		struct uffdio_rwprotect urwp;
+
+		tprints_arg_next_name("argp");
+		if (!umove_or_printaddr(tcp, arg, &urwp)) {
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(urwp, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(urwp, mode,
+					  uffd_rwprotect_mode_flags,
+					  "UFFDIO_RWPROTECT_MODE_???");
 			tprint_struct_end();
 		}
 
