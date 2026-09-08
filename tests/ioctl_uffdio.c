@@ -243,6 +243,17 @@ main(void)
 		       (unsigned long long)(uint64_t) continue_struct->mapped);
 	printf("}) = %s\n", errstr);
 
+	continue_struct->mode =
+		UFFDIO_CONTINUE_MODE_DONTWAKE|UFFDIO_CONTINUE_MODE_WP;
+	rc = sys_ioctl(fd, UFFDIO_CONTINUE, continue_struct);
+	printf("ioctl(%d, UFFDIO_CONTINUE, {range={start=%p, len=%#zx}"
+	       ", mode=UFFDIO_CONTINUE_MODE_DONTWAKE|UFFDIO_CONTINUE_MODE_WP",
+	       fd, area2, pagesize);
+	if (rc >= 0)
+		printf(", mapped=%llu",
+		       (unsigned long long)(uint64_t) continue_struct->mapped);
+	printf("}) = %s\n", errstr);
+
 	/* ---- POISON ---- */
 	poison_struct->range.start = (uint64_t)(uintptr_t)area2;
 	poison_struct->range.len = pagesize;
