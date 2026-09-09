@@ -504,7 +504,7 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			 * The kernel UAPI is broken by Linux commit
 			 * v6.7-rc1~160^2~22^2~6^2~6.
 			 */
-			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision;
+			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision; /* skip check */
 		} netkit; /* skip check */
 
 		struct {
@@ -516,7 +516,7 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 			 * The kernel UAPI is broken by Linux commit
 			 * v6.17-rc1~125^2~101^2~3.
 			 */
-			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision;
+			uint64_t ATTRIBUTE_ALIGNED(8) expected_revision; /* skip check */
 		} cgroup; /* skip check */
 
 		struct {
