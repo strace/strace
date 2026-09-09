@@ -119,6 +119,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	block_reset_raise_run \
 	block_reset_run \
 	bpf-obj_get_info_by_fd \
+	bpf-obj_get_info_by_fd-link \
 	bpf-obj_get_info_by_fd-prog \
 	bpf-obj_get_info_by_fd-prog-v \
 	bpf-obj_get_info_by_fd-v \

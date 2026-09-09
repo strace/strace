@@ -404,6 +404,149 @@ struct bpf_prog_info_struct {
 	offsetofend(struct bpf_prog_info_struct, attach_btf_id)
 # define expected_bpf_prog_info_struct_size 228
 
+struct bpf_link_info_struct {
+	uint32_t type;
+	uint32_t id;
+	uint32_t prog_id;
+	union {
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) tp_name;
+			uint32_t tp_name_len;
+			uint32_t pad_; /* skip check */
+			uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+		} raw_tracepoint;
+		struct {
+			uint32_t attach_type;
+			uint32_t target_obj_id;
+			uint32_t target_btf_id;
+			uint32_t pad_; /* skip check */
+			uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+		} tracing;
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) cgroup_id;
+			uint32_t attach_type;
+			/*
+			 * The kernel UAPI is broken by Linux commit
+			 * v5.8-rc1~165^2~343^2~16^2~6 .
+			 */
+		} cgroup; /* skip check */
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) target_name;
+			uint32_t target_name_len;
+			union {
+				struct {
+					uint32_t map_id;
+				} map;
+			};
+			union {
+				struct {
+					uint64_t ATTRIBUTE_ALIGNED(8) cgroup_id;
+					uint32_t order;
+					/*
+					 * The kernel UAPI is broken by Linux commit
+					 * v6.1-rc1~170^2~251^2~32^2~4 .
+					 */
+				} cgroup; /* skip check */
+				struct {
+					uint32_t tid;
+					uint32_t pid;
+				} task;
+			};
+		} iter;
+		struct {
+			uint32_t netns_ino;
+			uint32_t attach_type;
+		} netns;
+		struct {
+			uint32_t ifindex;
+		} xdp;
+		struct {
+			uint32_t map_id;
+		} struct_ops;
+		struct {
+			uint32_t pf;
+			uint32_t hooknum;
+			int32_t priority;
+			uint32_t flags;
+		} netfilter;
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) addrs;
+			uint32_t count;
+			uint32_t flags;
+			uint64_t ATTRIBUTE_ALIGNED(8) missed;
+			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
+		} kprobe_multi;
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) path;
+			uint64_t ATTRIBUTE_ALIGNED(8) offsets;
+			uint64_t ATTRIBUTE_ALIGNED(8) ref_ctr_offsets;
+			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
+			uint32_t path_size;
+			uint32_t count;
+			uint32_t flags;
+			uint32_t pid;
+		} uprobe_multi;
+		struct {
+			uint32_t attach_type;
+			uint32_t count;
+			uint32_t btf_obj_id;
+			uint32_t pad_; /* skip check */
+			uint64_t ATTRIBUTE_ALIGNED(8) ids;
+			uint64_t ATTRIBUTE_ALIGNED(8) addrs;
+			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
+		} tracing_multi;
+		struct {
+			uint32_t type;
+			uint32_t pad_; /* skip check */
+			union {
+				struct {
+					uint64_t ATTRIBUTE_ALIGNED(8) file_name;
+					uint32_t name_len;
+					uint32_t offset;
+					uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+					uint64_t ATTRIBUTE_ALIGNED(8) ref_ctr_offset;
+				} uprobe;
+				struct {
+					uint64_t ATTRIBUTE_ALIGNED(8) func_name;
+					uint32_t name_len;
+					uint32_t offset;
+					uint64_t ATTRIBUTE_ALIGNED(8) addr;
+					uint64_t ATTRIBUTE_ALIGNED(8) missed;
+					uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+				} kprobe;
+				struct {
+					uint64_t ATTRIBUTE_ALIGNED(8) tp_name;
+					uint32_t name_len;
+					uint32_t pad_; /* skip check */
+					uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+				} tracepoint;
+				struct {
+					uint64_t ATTRIBUTE_ALIGNED(8) config;
+					uint32_t type;
+					uint32_t pad_; /* skip check */
+					uint64_t ATTRIBUTE_ALIGNED(8) cookie;
+				} event;
+			};
+		} perf_event;
+		struct {
+			uint32_t ifindex;
+			uint32_t attach_type;
+		} tcx;
+		struct {
+			uint32_t ifindex;
+			uint32_t attach_type;
+		} netkit;
+		struct {
+			uint32_t map_id;
+			uint32_t attach_type;
+		} sockmap;
+	};
+};
+
+# define bpf_link_info_struct_size \
+	sizeof(struct bpf_link_info_struct)
+# define expected_bpf_link_info_struct_size 64
+
 struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) in_batch;
 	uint64_t ATTRIBUTE_ALIGNED(8) out_batch;

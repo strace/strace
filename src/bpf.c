@@ -32,6 +32,8 @@
 #include "xlat/bpf_link_create_kprobe_multi_flags.h"
 #include "xlat/bpf_link_create_netfilter_flags.h"
 #include "xlat/bpf_link_create_uprobe_multi_flags.h"
+#include "xlat/bpf_link_type.h"
+#include "xlat/bpf_perf_event_type.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -1211,6 +1213,416 @@ print_bpf_prog_info_end:
 	tprint_struct_end();
 }
 
+static void
+print_bpf_link_info_raw_tracepoint(
+		const typeof_field(struct bpf_link_info_struct,
+				   raw_tracepoint) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, tp_name);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, tp_name_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_tracing(
+		const typeof_field(struct bpf_link_info_struct,
+				   tracing) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, target_obj_id);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, target_btf_id);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_cgroup(
+		const typeof_field(struct bpf_link_info_struct,
+				   cgroup) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, cgroup_id);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_iter(
+		const typeof_field(struct bpf_link_info_struct,
+				   iter) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, target_name);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, target_name_len);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_netns(
+		const typeof_field(struct bpf_link_info_struct,
+				   netns) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, netns_ino);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_xdp(
+		const typeof_field(struct bpf_link_info_struct,
+				   xdp) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(*p, ifindex);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_struct_ops(
+		const typeof_field(struct bpf_link_info_struct,
+				   struct_ops) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, map_id);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_netfilter(
+		const typeof_field(struct bpf_link_info_struct,
+				   netfilter) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, pf);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, hooknum);
+	tprint_struct_next();
+	PRINT_FIELD_D(*p, priority);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, flags, bpf_link_create_netfilter_flags,
+			  "BPF_F_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_kprobe_multi(
+		const typeof_field(struct bpf_link_info_struct,
+				   kprobe_multi) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, addrs);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, count);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, flags, bpf_link_create_kprobe_multi_flags,
+			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, missed);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, cookies);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_uprobe_multi(
+		const typeof_field(struct bpf_link_info_struct,
+				   uprobe_multi) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, path);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, offsets);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, ref_ctr_offsets);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, cookies);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, path_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, count);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, flags, bpf_link_create_uprobe_multi_flags,
+			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, pid);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_tracing_multi(
+		const typeof_field(struct bpf_link_info_struct,
+				   tracing_multi) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, count);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, btf_obj_id);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, ids);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, addrs);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, cookies);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_perf_event_uprobe(
+		const typeof_field(struct bpf_link_info_struct,
+				   perf_event.uprobe) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, file_name);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, name_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, offset);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, ref_ctr_offset);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_perf_event_kprobe(
+		const typeof_field(struct bpf_link_info_struct,
+				   perf_event.kprobe) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, func_name);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, name_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, offset);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*p, addr);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, missed);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_perf_event_tracepoint(
+		const typeof_field(struct bpf_link_info_struct,
+				   perf_event.tracepoint) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(*p, tp_name);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, name_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_perf_event_event(
+		const typeof_field(struct bpf_link_info_struct,
+				   perf_event.event) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_X(*p, config);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, type);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, cookie);
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_perf_event(
+		const typeof_field(struct bpf_link_info_struct,
+				   perf_event) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, type, bpf_perf_event_type, "BPF_PERF_EVENT_???");
+	switch (p->type) {
+	case BPF_PERF_EVENT_UPROBE:
+	case BPF_PERF_EVENT_URETPROBE:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(*p, uprobe,
+				    print_bpf_link_info_perf_event_uprobe);
+		break;
+	case BPF_PERF_EVENT_KPROBE:
+	case BPF_PERF_EVENT_KRETPROBE:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(*p, kprobe,
+				    print_bpf_link_info_perf_event_kprobe);
+		break;
+	case BPF_PERF_EVENT_TRACEPOINT:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(*p, tracepoint,
+				    print_bpf_link_info_perf_event_tracepoint);
+		break;
+	case BPF_PERF_EVENT_EVENT:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(*p, event,
+				    print_bpf_link_info_perf_event_event);
+		break;
+	}
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_tcx(
+		const typeof_field(struct bpf_link_info_struct,
+				   tcx) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(*p, ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_netkit(
+		const typeof_field(struct bpf_link_info_struct,
+				   netkit) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(*p, ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info_sockmap(
+		const typeof_field(struct bpf_link_info_struct,
+				   sockmap) *const p)
+{
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, map_id);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_end();
+}
+
+static void
+print_bpf_link_info(struct tcb * const tcp, uint32_t bpf_fd,
+		    const char *info_buf, uint32_t size,
+		    struct obj_get_info_saved *saved)
+{
+	if (entering(tcp))
+		return;
+
+	struct bpf_link_info_struct info = { 0 };
+	const unsigned int len = MIN(size, bpf_link_info_struct_size);
+
+	memcpy(&info, info_buf, len);
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(info, type, bpf_link_type, "BPF_LINK_TYPE_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(info, id);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, prog_id);
+
+	if (len <= offsetof(struct bpf_link_info_struct, raw_tracepoint))
+		goto print_bpf_link_info_end;
+
+	switch (info.type) {
+	case BPF_LINK_TYPE_RAW_TRACEPOINT:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, raw_tracepoint,
+				    print_bpf_link_info_raw_tracepoint);
+		break;
+	case BPF_LINK_TYPE_TRACING:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, tracing,
+				    print_bpf_link_info_tracing);
+		break;
+	case BPF_LINK_TYPE_CGROUP:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, cgroup,
+				    print_bpf_link_info_cgroup);
+		break;
+	case BPF_LINK_TYPE_ITER:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, iter,
+				    print_bpf_link_info_iter);
+		break;
+	case BPF_LINK_TYPE_NETNS:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, netns,
+				    print_bpf_link_info_netns);
+		break;
+	case BPF_LINK_TYPE_XDP:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, xdp,
+				    print_bpf_link_info_xdp);
+		break;
+	case BPF_LINK_TYPE_STRUCT_OPS:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, struct_ops,
+				    print_bpf_link_info_struct_ops);
+		break;
+	case BPF_LINK_TYPE_NETFILTER:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, netfilter,
+				    print_bpf_link_info_netfilter);
+		break;
+	case BPF_LINK_TYPE_KPROBE_MULTI:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, kprobe_multi,
+				    print_bpf_link_info_kprobe_multi);
+		break;
+	case BPF_LINK_TYPE_UPROBE_MULTI:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, uprobe_multi,
+				    print_bpf_link_info_uprobe_multi);
+		break;
+	case BPF_LINK_TYPE_TRACING_MULTI:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, tracing_multi,
+				    print_bpf_link_info_tracing_multi);
+		break;
+	case BPF_LINK_TYPE_PERF_EVENT:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, perf_event,
+				    print_bpf_link_info_perf_event);
+		break;
+	case BPF_LINK_TYPE_TCX:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, tcx,
+				    print_bpf_link_info_tcx);
+		break;
+	case BPF_LINK_TYPE_NETKIT:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, netkit,
+				    print_bpf_link_info_netkit);
+		break;
+	case BPF_LINK_TYPE_SOCKMAP:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(info, sockmap,
+				    print_bpf_link_info_sockmap);
+		break;
+	}
+
+	decode_attr_extra_data(tcp, info_buf, size, bpf_link_info_struct_size);
+
+print_bpf_link_info_end:
+	tprint_struct_end();
+}
+
 static const char *
 fetch_bpf_obj_info(struct tcb * const tcp, uint64_t info, uint32_t size)
 {
@@ -1249,7 +1661,8 @@ print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
 		print_bpf_obj_info_fn print_fn;
 	} obj_printers[] = {
 		{ "anon_inode:bpf-map", print_bpf_map_info },
-		{ "anon_inode:bpf-prog", print_bpf_prog_info }
+		{ "anon_inode:bpf-prog", print_bpf_prog_info },
+		{ "anon_inode:bpf-link", print_bpf_link_info }
 	};
 
 	if (entering(tcp)) {

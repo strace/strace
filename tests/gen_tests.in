@@ -31,6 +31,7 @@ arch_prctl-success-Xverbose	+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3
 at_fdcwd-pathmax	-a36 --trace=openat -y -P sample
 bpf	-a20
 bpf-obj_get_info_by_fd	-a20 -y -e trace=bpf
+bpf-obj_get_info_by_fd-link	-a20 -y -v -e trace=bpf
 bpf-obj_get_info_by_fd-prog	-a20 -y -e trace=bpf
 bpf-obj_get_info_by_fd-prog-v	-a20 -y -v -e trace=bpf
 bpf-obj_get_info_by_fd-v	-a20 -y -v -e trace=bpf
