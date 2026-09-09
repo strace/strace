@@ -24,6 +24,8 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/blkpg.h \
 	linux/include/uapi/linux/blktrace_api.h \
 	linux/include/uapi/linux/blkzoned.h \
+	linux/include/uapi/linux/bpf.h \
+	linux/include/uapi/linux/bpf_common.h \
 	linux/include/uapi/linux/bsg.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
