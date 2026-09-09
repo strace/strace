@@ -488,8 +488,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ]),,, [#include <netinet/in.h>
 #include <net/if.h>])
 
-st_BPF_ATTR
-
 AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 	AC_CHECK_MEMBERS([struct sockaddr_hci.hci_channel],,,
 			 [#include <bluetooth/bluetooth.h>

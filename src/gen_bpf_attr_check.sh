@@ -24,24 +24,17 @@ for struct in $(sed -n 's/^struct \([^[:space:]]\+_struct\) .*/\1/p' < "$input")
 		BPF_*) type_name='union bpf_attr' ;;
 		*) type_name="struct ${struct%_struct}" ;;
 	esac
-	TYPE_NAME="$(printf %s "$type_name" |tr '[:lower:] ' '[:upper:]_')"
-
 	enum="$(sed -n 's/^struct '"$struct"' \/\* \([^[:space:]]\+\) \*\/ {.*/\1/p' < "$input")"
-	ENUM="$(printf %s "$enum" |tr '[:lower:]' '[:upper:]')"
 	enum="$enum${enum:+.}"
-	ENUM="$ENUM${ENUM:+_}"
-	sed -n '/^struct '"$struct"' [^{]*{/,/^};$/p' < "$input" |
-	sed -n 's/^[[:space:]]\+[^][;:]*[[:space:]]\([^]}[[:space:];:]\+\)\(\[[^;:]*\]\)\?;$/\1/p' |
+	gawk -v struct="$struct" \
+		-f "${0%/*}/../m4/gen_bpf_attr_fields.awk" < "$input" |
 	while read field; do
-		FIELD="$(printf %s "$field" |tr '[:lower:]' '[:upper:]')"
 		cat <<EOF
 
-# ifdef HAVE_${TYPE_NAME}_$ENUM$FIELD
-	static_assert(sizeof_field(struct $struct, $field) == sizeof_field($type_name, $enum$field),
-		      "$struct.$field size mismatch");
-	static_assert(offsetof(struct $struct, $field) == offsetof($type_name, $enum$field),
-		      "$struct.$field offset mismatch");
-# endif /* HAVE_${TYPE_NAME}_$ENUM$FIELD */
+static_assert(sizeof_field(struct $struct, $field) == sizeof_field($type_name, $enum$field),
+	      "$struct.$field size mismatch");
+static_assert(offsetof(struct $struct, $field) == offsetof($type_name, $enum$field),
+	      "$struct.$field offset mismatch");
 EOF
 	done
 		cat <<EOF

@@ -262,7 +262,7 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t attach_flags;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_ids;
 	uint32_t prog_cnt;
-	uint32_t dummy;
+	uint32_t pad_; /* skip check */
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_attach_flags;
 	uint64_t ATTRIBUTE_ALIGNED(8) link_ids;
 	uint64_t ATTRIBUTE_ALIGNED(8) link_attach_flags;
@@ -276,7 +276,7 @@ struct BPF_PROG_QUERY_struct /* query */ {
 struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) name;
 	uint32_t prog_fd;
-	uint32_t dummy;
+	uint32_t pad_; /* skip check */
 	uint64_t ATTRIBUTE_ALIGNED(8) cookie;
 };
 
