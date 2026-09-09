@@ -9,9 +9,7 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_BPF_H
-# include <linux/bpf.h>
-#endif
+#include <linux/bpf.h>
 #include <linux/filter.h>
 
 #include "bpf_attr.h"

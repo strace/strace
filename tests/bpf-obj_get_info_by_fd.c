@@ -26,10 +26,7 @@
 #include "print_fields.h"
 #include "scno.h"
 
-#ifdef HAVE_LINUX_BPF_H
-# include <linux/bpf.h>
-#endif
-
+#include <linux/bpf.h>
 #include "bpf_attr.h"
 
 #include "xlat.h"
@@ -49,16 +46,6 @@
 #include "xlat/ebpf_op_alu.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/ebpf_size.h"
-
-#ifndef HAVE_STRUCT_BPF_INSN
-struct bpf_insn {
-	uint8_t	code;
-	uint8_t	dst_reg:4;
-	uint8_t	src_reg:4;
-	int16_t	off;
-	int32_t	imm;
-};
-#endif
 
 static const char *errstr;
 

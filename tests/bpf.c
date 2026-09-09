@@ -18,10 +18,7 @@
 
 #include "scno.h"
 
-#ifdef HAVE_LINUX_BPF_H
-# include <linux/bpf.h>
-#endif
-
+#include <linux/bpf.h>
 #include "bpf_attr.h"
 #include "print_fields.h"
 #include "xmalloc.h"
@@ -48,16 +45,6 @@
 
 #ifndef FD0_PATH
 # define FD0_PATH ""
-#endif
-
-#ifndef HAVE_STRUCT_BPF_INSN
-struct bpf_insn {
-	uint8_t	code;
-	uint8_t	dst_reg:4;
-	uint8_t	src_reg:4;
-	int16_t	off;
-	int32_t	imm;
-};
 #endif
 
 #define BPF_ATTR_DATA_FIELD(cmd_) struct cmd_ ## _struct cmd_ ## _data
