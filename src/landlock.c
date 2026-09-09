@@ -15,6 +15,7 @@
 #include "xlat/landlock_rule_types.h"
 #include "xlat/landlock_ruleset_access_fs.h"
 #include "xlat/landlock_ruleset_access_net.h"
+#include "xlat/landlock_restrict_self_flags.h"
 #include "xlat/landlock_scope_flags.h"
 
 static void
@@ -182,7 +183,8 @@ SYS_FUNC(landlock_restrict_self)
 
 	/* flags */
 	tprints_arg_next_name("flags");
-	PRINT_VAL_X((unsigned int) tcp->u_arg[1]);
+	printflags(landlock_restrict_self_flags, tcp->u_arg[1],
+		   "LANDLOCK_RESTRICT_SELF_???");
 
 	return RVAL_DECODED;
 }
