@@ -2931,7 +2931,46 @@ test_IORING_REGISTER_ZCRX_CTRL(int fd_null, int fd_full)
 	       ctrl->zc_arm_event.__resv[10],
 	       errstr);
 
-	/* Test 12: Unknown opcode */
+	/* Test 12: Basic ADD_AREA operation */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 5;
+	ctrl->op = ZCRX_CTRL_ADD_AREA;
+	ctrl->zc_area.area_ptr = 0xfacefeedcafef00dULL;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+	       ", zc_area={area_ptr=%#llx}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_ADD_AREA),
+	       (unsigned long long) ctrl->zc_area.area_ptr,
+	       errstr);
+
+	/* Test 13: ADD_AREA with non-zero reserved fields */
+	memset(ctrl, 0, sizeof(*ctrl));
+	ctrl->zcrx_id = 6;
+	ctrl->op = ZCRX_CTRL_ADD_AREA;
+	ctrl->zc_area.area_ptr = 0x1234567890abcdefULL;
+	ctrl->zc_area.__resv[0] = 0xdeadbeefdeadbeefULL;
+	ctrl->zc_area.__resv[4] = 0xcafebabecafebabeULL;
+
+	sys_io_uring_register(fd_null, zcrx_ctrl_ops.val, ctrl, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", {zcrx_id=%u, op=" XLAT_FMT
+	       ", zc_area={area_ptr=%#llx"
+	       ", __resv=[%#llx, 0, 0, 0, %#llx]}}, 1) = %s\n",
+	       fd_null, path_null,
+	       XLAT_SEL(zcrx_ctrl_ops.val, zcrx_ctrl_ops.str),
+	       ctrl->zcrx_id,
+	       XLAT_ARGS(ZCRX_CTRL_ADD_AREA),
+	       (unsigned long long) ctrl->zc_area.area_ptr,
+	       (unsigned long long) ctrl->zc_area.__resv[0],
+	       (unsigned long long) ctrl->zc_area.__resv[4],
+	       errstr);
+
+	/* Test 14: Unknown opcode */
 	memset(ctrl, 0, sizeof(*ctrl));
 	ctrl->zcrx_id = 1;
 	ctrl->op = 0xdeadbeef;

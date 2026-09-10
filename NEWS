@@ -13,6 +13,7 @@ Noteworthy changes in release ?.? (????-??-??)
     UFFDIO_SET_MODE userfaultfd ioctls.
   * Implemented decoding of bpf_link_info for BPF_OBJ_GET_INFO_BY_FD.
   * Implemented decoding of landlock_restrict_self flags.
+  * Implemented decoding of ZCRX_CTRL_ADD_AREA io_uring zcrx ctrl operation.
   * Updated lists of ATA_*, KVM_*, NL80211_*, V4L2_*, and *_MAGIC constants.
 
 Noteworthy changes in release 7.2 (2026-08-18)

@@ -1352,6 +1352,25 @@ print_zcrx_ctrl_arm_event(struct tcb *tcp,
 	tprint_struct_end();
 }
 
+static void
+print_zcrx_ctrl_add_area(struct tcb *tcp,
+			  const struct zcrx_ctrl_add_area *const area)
+{
+	CHECK_TYPE_SIZE(*area, 6 * sizeof(uint64_t));
+	CHECK_TYPE_SIZE(area->__resv, 5 * sizeof(uint64_t));
+
+	tprint_struct_begin();
+
+	PRINT_FIELD_ADDR64(*area, area_ptr);
+
+	if (!IS_ARRAY_ZERO(area->__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*area, __resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
 static int
 print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 {
@@ -1415,6 +1434,13 @@ print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_TCB_PTR(arg, zc_arm_event,
 					tcp, print_zcrx_ctrl_arm_event);
+		tprint_struct_end();
+		return RVAL_DECODED;
+
+	case ZCRX_CTRL_ADD_AREA:
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_TCB_PTR(arg, zc_area,
+					tcp, print_zcrx_ctrl_add_area);
 		tprint_struct_end();
 		return RVAL_DECODED;
 
