@@ -1265,8 +1265,8 @@ print_io_uring_zcrx_ifq_reg(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(arg, region_ptr);
 	tprint_struct_next();
-	tprints_field_name("offsets");
-	print_io_uring_zcrx_offsets(tcp, &arg.offsets);
+	PRINT_FIELD_OBJ_TCB_PTR(arg, offsets,
+				tcp, print_io_uring_zcrx_offsets);
 	tprint_struct_next();
 	PRINT_FIELD_U(arg, zcrx_id);
 	tprint_struct_next();
@@ -1366,8 +1366,8 @@ print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 		 */
 		if (tfetch_obj(tcp, addr, &arg)) {
 			tprint_struct_next();
-			tprints_field_name("zc_export");
-			print_zcrx_ctrl_export(tcp, &arg.zc_export);
+			PRINT_FIELD_OBJ_TCB_PTR(arg, zc_export,
+					tcp, print_zcrx_ctrl_export);
 		}
 		tprint_struct_end();
 		return RVAL_DECODED;
@@ -1399,8 +1399,8 @@ print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 	switch (arg.op) {
 	case ZCRX_CTRL_FLUSH_RQ:
 		tprint_struct_next();
-		tprints_field_name("zc_flush");
-		print_zcrx_ctrl_flush_rq(tcp, &arg.zc_flush);
+		PRINT_FIELD_OBJ_TCB_PTR(arg, zc_flush,
+					tcp, print_zcrx_ctrl_flush_rq);
 		/* No output fields, nothing to decode on exit */
 		tprint_struct_end();
 		return RVAL_DECODED;
@@ -1413,8 +1413,8 @@ print_io_uring_zcrx_ctrl(struct tcb *tcp, const kernel_ulong_t addr)
 
 	case ZCRX_CTRL_ARM_EVENT:
 		tprint_struct_next();
-		tprints_field_name("zc_arm_event");
-		print_zcrx_ctrl_arm_event(tcp, &arg.zc_arm_event);
+		PRINT_FIELD_OBJ_TCB_PTR(arg, zc_arm_event,
+					tcp, print_zcrx_ctrl_arm_event);
 		tprint_struct_end();
 		return RVAL_DECODED;
 
