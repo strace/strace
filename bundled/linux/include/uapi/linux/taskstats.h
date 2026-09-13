@@ -18,7 +18,9 @@
 #define _LINUX_TASKSTATS_H
 
 #include <linux/types.h>
+#ifndef UAPI_LINUX_TASKSTATS_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/time_types.h>
+#endif
 
 /* Format for per-task data returned to userland when
  *	- a task exits
