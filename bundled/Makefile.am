@@ -20,6 +20,7 @@ EXTRA_DIST = \
 	linux/arch/sparc/include/uapi/asm/fcntl.h \
 	linux/include/uapi/asm-generic/fcntl.h \
 	linux/include/uapi/asm-generic/hugetlb_encode.h \
+	linux/include/uapi/asm-generic/posix_types.h \
 	linux/include/uapi/linux/audit.h \
 	linux/include/uapi/linux/blkpg.h \
 	linux/include/uapi/linux/blktrace_api.h \
@@ -117,6 +118,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/perf_event.h \
 	linux/include/uapi/linux/pidfd.h \
 	linux/include/uapi/linux/pkt_sched.h \
+	linux/include/uapi/linux/posix_types.h \
 	linux/include/uapi/linux/prctl.h \
 	linux/include/uapi/linux/ptp_clock.h \
 	linux/include/uapi/linux/qrtr.h \
