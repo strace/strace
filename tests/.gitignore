@@ -464,6 +464,12 @@ ioctl_tee
 ioctl_termios
 ioctl_termios-v
 ioctl_tiocm
+ioctl_tun
+ioctl_tun-success
+ioctl_tun-v
+ioctl_tun-v-success
+ioctl_tun-y
+ioctl_tun-y-success
 ioctl_ubi
 ioctl_ubi-success
 ioctl_udmabuf

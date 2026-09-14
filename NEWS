@@ -9,6 +9,7 @@ Noteworthy changes in release ?.? (????-??-??)
     NHA_HW_STATS_ENABLE, NHA_HW_STATS_USED, and NHA_OP_FLAGS netlink
     nexthop attributes.
   * Implemented decoding of RTA_DEL_REASON route attribute.
+  * Implemented decoding of TUN/TAP ioctls.
   * Implemented decoding of UFFDIO_MOVE, UFFDIO_RWPROTECT, and
     UFFDIO_SET_MODE userfaultfd ioctls.
   * Implemented decoding of bpf_link_info for BPF_OBJ_GET_INFO_BY_FD.

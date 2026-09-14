@@ -481,6 +481,12 @@ ioctl_tee	+ioctl.test
 ioctl_termios	+ioctl.test
 ioctl_termios-v	+ioctl.test -v
 ioctl_tiocm	+ioctl.test
+ioctl_tun	+ioctl.test -a25
+ioctl_tun-success	+ioctl-success.sh -a25
+ioctl_tun-v	+ioctl.test -a25 -v
+ioctl_tun-v-success	+ioctl-success.sh -a25 -v
+ioctl_tun-y	+ioctl.test -a25 -y
+ioctl_tun-y-success	+ioctl-success.sh -a25 -y
 ioctl_ubi	+ioctl.test
 ioctl_ubi-success	+ioctl-success.sh -a24
 ioctl_udmabuf	+ioctl.test -y

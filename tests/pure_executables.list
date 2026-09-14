@@ -307,6 +307,9 @@ ioctl_tee
 ioctl_termios
 ioctl_termios-v
 ioctl_tiocm
+ioctl_tun
+ioctl_tun-v
+ioctl_tun-y
 ioctl_ubi
 ioctl_udmabuf
 ioctl_uffdio

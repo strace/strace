@@ -256,6 +256,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_seccomp-y-success-Xabbrev \
 	ioctl_seccomp-y-success-Xraw \
 	ioctl_seccomp-y-success-Xverbose \
+	ioctl_tun-success \
+	ioctl_tun-v-success \
+	ioctl_tun-y-success \
 	ioctl_ubi-success \
 	ioctl_v4l2-success \
 	ioctl_v4l2-success-Xabbrev \

@@ -1504,6 +1504,7 @@ DECL_IOCTL(seccomp);
 DECL_IOCTL(scsi);
 DECL_IOCTL(tee);
 DECL_IOCTL(term);
+DECL_IOCTL(tun);
 DECL_IOCTL(ubi);
 DECL_IOCTL(udmabuf);
 DECL_IOCTL(uffdio);

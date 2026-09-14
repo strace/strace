@@ -1,0 +1,12 @@
+#unconditional
+#From include/uapi/linux/if_tun.h
+#Prefix TUN_F_
+TUN_F_CSUM
+TUN_F_TSO4
+TUN_F_TSO6
+TUN_F_TSO_ECN
+TUN_F_UFO
+TUN_F_USO4
+TUN_F_USO6
+TUN_F_UDP_TUNNEL_GSO
+TUN_F_UDP_TUNNEL_GSO_CSUM

@@ -321,6 +321,15 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
 	return rc;
 }
 
+static int
+T_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
+{
+	int rc = term_ioctl(tcp, code, arg);
+	if (rc == RVAL_DECODED)
+		rc = tun_ioctl(tcp, code, arg);
+	return rc;
+}
+
 /**
  * Decode arg parameter for unknown ioctl types. */
 static int
@@ -441,7 +450,7 @@ ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 	case 'R':
 		return random_ioctl(tcp, code, arg);
 	case 'T':
-		return term_ioctl(tcp, code, arg);
+		return T_ioctl(tcp, code, arg);
 	case 'V':
 		return v4l2_ioctl(tcp, code, arg);
 	case 'W':

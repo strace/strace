@@ -415,3 +415,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 
 	return RVAL_IOCTL_DECODED;
 }
+
+MPERS_PRINTER_DECL(unsigned int, get_ifreq_size, void)
+{
+	return sizeof(struct_ifreq);
+}

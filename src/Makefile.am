@@ -409,6 +409,7 @@ libstrace_a_SOURCES =	\
 	trie.c		\
 	trie.h		\
 	truncate.c	\
+	tun_ioctl.c	\
 	ubi.c		\
 	ucopy.c		\
 	udmabuf.c	\
