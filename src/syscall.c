@@ -755,7 +755,9 @@ print_syscall_resume(struct tcb *tcp)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		tprintf_string("<... %s resumed #%lu>", tcp_sysent(tcp)->sys_name, tcp->resume_id);
+		/* Reset resumption ID for this TCB */
+		tcp->resume_id = 0;
 	}
 	printing_tcp = tcp;
 }

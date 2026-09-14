@@ -29,7 +29,7 @@ thread(void *arg)
 	int tid = syscall(__NR_gettid);
 
 	printf("%-5d execveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
-	       ", NULL, 0 <pid changed to %d ...>\n"
+	       ", NULL, 0 <pid changed to %d ... (#1)>\n"
 #if !QUIET_MSG
 	       "%-5d +++ superseded by execve in pid %d +++\n"
 #endif
@@ -76,7 +76,7 @@ main(int ac, char **av)
 			++trigger;
 	}
 
-	printf("%-5d <... execveat resumed>) = 0\n"
+	printf("%-5d <... execveat resumed #1>) = 0\n"
 	       "%-5d +++ exited with 0 +++\n",
 	       leader, leader);
 	return 0;

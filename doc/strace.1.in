@@ -141,7 +141,7 @@ Signals are printed as a signal symbol and a decoded
 structure.
 An excerpt from tracing and interrupting the command "sleep 666" is:
 .CW
-sigsuspend([] <unfinished ...>
+sigsuspend([] <unfinished #1 ...>
 --- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=...} ---
 +++ killed by SIGINT +++
 .CE
@@ -153,9 +153,9 @@ will attempt to preserve the order of these events and mark the ongoing call as
 When the call returns, it will be marked as
 .IR resumed .
 .CW
-[pid 28772] select(4, [3], NULL, NULL, NULL <unfinished ...>
+[pid 28772] select(4, [3], NULL, NULL, NULL <unfinished #2 ...>
 [pid 28779] clock_gettime(CLOCK_REALTIME, {tv_sec=1130322148, tv_nsec=3977000}) = 0
-[pid 28772] <... select resumed> )      = 1 (in [3])
+[pid 28772] <... select resumed #2> )      = 1 (in [3])
 .CE
 The interruption of a (restartable) system call by a signal delivery
 is handled differently, as the kernel terminates the system call and
