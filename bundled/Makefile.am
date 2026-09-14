@@ -62,6 +62,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_ether.h \
 	linux/include/uapi/linux/if_link.h \
+	linux/include/uapi/linux/if_tun.h \
 	linux/include/uapi/linux/if_xdp.h \
 	linux/include/uapi/linux/in.h \
 	linux/include/uapi/linux/in6.h \
