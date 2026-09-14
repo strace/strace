@@ -10,7 +10,8 @@
 #include "scno.h"
 
 #if defined __powerpc64__ \
- || (defined __sparc__ && defined __arch64__)
+ || (defined __sparc__ && defined __arch64__) \
+ || defined __e2k__
 /* Old sigreturn is defined but not implemented in the kernel. */
 # undef __NR_sigreturn
 #endif

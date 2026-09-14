@@ -26,5 +26,6 @@ case "$STRACE_ARCH" in
 	x32|x86_64)
 		echo 79 ;;
 	xtensa)	echo 43 ;;
+	e2k)	echo 183 ;;
 	*)	echo 17 ;;
 esac

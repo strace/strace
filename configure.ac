@@ -101,6 +101,10 @@ csky*)
 	arch=csky
 	AC_DEFINE([CSKY], 1, [Define for the C-SKY architecture])
 	;;
+e2k*)
+	arch=e2k
+	AC_DEFINE([E2K], 1, [Define for the Elbrus2000 architecture])
+	;;
 hppa*|parisc*)
 	arch=hppa
 	karch=parisc
