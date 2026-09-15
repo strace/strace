@@ -173,6 +173,34 @@ MPERS_PRINTER_DECL(void, print_timespec, struct tcb *tcp,
 This file will be compiled three times on x86_64 (native, m32, mx32), with
 each version having different sizeof(struct_timespec) and field offsets.
 
+## MPERS for Struct Size Only
+
+When a struct's size differs between personalities but the fields you
+need are at personality-agnostic offsets, you can MPERS just the
+**size** rather than the whole fetch operation.
+
+For example, `struct ifreq` is 40 bytes on 64-bit and 32 bytes on
+32-bit (due to a pointer in the union), but `ifr_name` (offset 0) and
+`ifr_flags` (offset 16) are identical in both layouts.
+
+If an existing MPERS translation unit already has the type (e.g.,
+`sock.c` has `DEF_MPERS_TYPE(struct_ifreq)`), add a size function
+there rather than creating a new translation unit:
+
+```c
+MPERS_PRINTER_DECL(unsigned int, get_ifreq_size, void)
+{
+    return sizeof(struct_ifreq);
+}
+```
+
+Then in the decoder, use `umoven_or_printaddr(tcp, arg, get_ifreq_size(), &buf)`
+to read the personality-correct number of bytes, and access the
+fixed-offset fields normally.
+
+See also `get_sock_fprog_size()` in `src/fetch_bpf_fprog.c` for another
+example of this pattern.
+
 ## Macro Reference
 
 ### DEF_MPERS_TYPE(type_name)

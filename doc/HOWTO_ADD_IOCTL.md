@@ -566,6 +566,52 @@ MPERS is required when:
 Common examples: structures with `struct timespec`, `struct timeval`,
 pointers.
 
+### Architecture-Dependent Ioctl Numbers
+
+A distinct but related problem arises when ioctl commands encode a struct
+size via `_IOW` / `_IOR` / `_IOWR` and that struct contains a pointer or
+other type whose size differs between 32-bit and 64-bit. In this case,
+the ioctl command **number itself** differs between architectures.
+
+For example:
+
+```c
+/* sizeof(struct sock_fprog) is 16 on 64-bit, 8 on 32-bit */
+#define TUNATTACHFILTER _IOW('T', 213, struct sock_fprog)
+```
+
+On 64-bit: `TUNATTACHFILTER` = `0x400854d5` (size field = 16).
+On 32-bit: `TUNATTACHFILTER` = `0x400854d5` becomes `0x400454d5`
+(size field = 8).
+
+A plain `case TUNATTACHFILTER:` in a decoder compiled as 64-bit will
+never match the 32-bit ioctl number, silently falling through to the
+`default` case for compat tracees.
+
+**Fix**: mask out the size bits when matching these commands:
+
+```c
+#define SUBSYS_IOC(cmd_) ((cmd_) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
+
+/* In the decoder, use a nested switch for affected commands only: */
+default:
+    switch (SUBSYS_IOC(code)) {
+    case SUBSYS_IOC(TUNATTACHFILTER):
+    case SUBSYS_IOC(TUNDETACHFILTER):
+        /* decode ... */
+        return RVAL_IOCTL_DECODED;
+    default:
+        return RVAL_DECODED;
+    }
+```
+
+Only apply this to ioctls whose size field actually varies across
+architectures. Ioctls using `int`, `unsigned int`, or `_IO` (no size)
+are safe with plain `case` matching.
+
+This is not the same as parametric commands (where `_IOC_NR` encodes
+variable data) — here the NR is fixed but the SIZE field changes.
+
 ### MPERS Mechanics
 
 There is nothing ioctl-specific about MPERS support. The same
