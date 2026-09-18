@@ -829,7 +829,7 @@ SYS_FUNC(prctl)
 	return 0;
 }
 
-#if defined X86_64 || defined X32 || defined I386
+#if defined X86_64 || defined X32 || defined I386 || defined __e2k__
 # include "xlat/archvals.h"
 # include "xlat/x86_xfeature_bits.h"
 # include "xlat/x86_xfeatures.h"

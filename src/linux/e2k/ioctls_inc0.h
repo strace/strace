@@ -1,0 +1,11 @@
+{ "asm-generic/ioctls.h", "TIODUMPREGS", 0, 0x54F6, 0 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_BC_SEND_MESSAGE", _IOC_READ|_IOC_WRITE, 0x6d03, 0x04 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_BC_SET_CHANNEL", _IOC_WRITE, 0x6d04, 0x04 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_BM_GET_PTRS", _IOC_READ, 0x6d08, 0x08 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_BM_SET_RPTR", _IOC_WRITE, 0x6d09, 0x04 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_BM_STARTSTOP", _IOC_WRITE, 0x6d07, 0x08 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_GET_DMA_LATENCY", _IOC_READ, 0x6d02, 0x08 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_GET_STATS", _IOC_READ, 0x6d01, 0x98 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_RT_GET_LAST_CMD", _IOC_READ, 0x6d06, 0x08 },
+{ "linux/mcst/mmrse_io.h", "MMRSE_IOCTL_RT_INIT", _IOC_WRITE, 0x6d05, 0x10 },
+#include "../64/ioctls_inc.h"
