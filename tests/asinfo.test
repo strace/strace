@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Basic asinfo roundtrip test: name -> number -> name
+. "${srcdir=.}/init.sh"
+
+ASINFO='../../src/asinfo'
+
+run_prog_skip_if_failed "$ASINFO" --list > /dev/null
+
+num="$($ASINFO --to-numbers read)" ||
+	fail_ "asinfo --to-numbers read failed"
+
+[ -n "$num" ] || fail_ "empty number for read"
+
+name="$($ASINFO --to-names "$num")" ||
+	fail_ "asinfo --to-names $num failed"
+
+[ "x$name" = "xread" ] ||
+	fail_ "roundtrip mismatch: read -> $num -> $name"
+
+exit 0
+
+
