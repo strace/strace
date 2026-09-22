@@ -16,6 +16,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of landlock_restrict_self flags.
   * Implemented decoding of ZCRX_CTRL_ADD_AREA io_uring zcrx ctrl operation.
   * Updated lists of ATA_*, KVM_*, NL80211_*, V4L2_*, and *_MAGIC constants.
+  * Enhanced -e namespace=new option to decode namespace transition even
+    if nstype is 0 in setns(2).
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================
