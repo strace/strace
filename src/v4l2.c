@@ -1574,6 +1574,50 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED | RVAL_STR;
 }
 
+#include "xlat/v4l2_event_subscription_flags.h"
+#include "xlat/v4l2_event_types.h"
+
+static void
+print_v4l2_event_type(uint32_t type)
+{
+	if (type >= V4L2_EVENT_PRIVATE_START) {
+		static const char prefix[] = "V4L2_EVENT_PRIVATE_START+";
+		char s[sizeof(prefix) + sizeof(type) * 3];
+
+		xsprintf(s, "%s%u", prefix, type - V4L2_EVENT_PRIVATE_START);
+		print_xlat_ex(type, s, XLAT_STYLE_DEFAULT);
+	} else {
+		printxval(v4l2_event_types, type, "V4L2_EVENT_???");
+	}
+}
+
+static int
+print_v4l2_subscribe_event(struct tcb *const tcp, unsigned int code,
+			   const kernel_ulong_t arg)
+{
+	struct v4l2_event_subscription es;
+
+	tprints_arg_next_name("argp");
+	if (umove_or_printaddr(tcp, arg, &es))
+		return RVAL_IOCTL_DECODED;
+
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_VAL(es, type, print_v4l2_event_type);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(es, id);
+
+	if (code == VIDIOC_SUBSCRIBE_EVENT) {
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(es, flags, v4l2_event_subscription_flags,
+				  "V4L2_EVENT_SUB_FL_???");
+	}
+
+	tprint_struct_end();
+
+	return RVAL_IOCTL_DECODED;
+}
+
 MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
@@ -1689,6 +1733,10 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_QUERYMENU: /* RW */
 		return print_v4l2_querymenu(tcp, arg);
+
+	case VIDIOC_SUBSCRIBE_EVENT: /* W */
+	case VIDIOC_UNSUBSCRIBE_EVENT: /* W */
+		return print_v4l2_subscribe_event(tcp, code, arg);
 
 	default:
 		return RVAL_DECODED;

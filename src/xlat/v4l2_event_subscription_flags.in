@@ -1,0 +1,5 @@
+#unconditional
+#From include/uapi/linux/videodev2.h
+#Prefix V4L2_EVENT_SUB_FL_
+V4L2_EVENT_SUB_FL_SEND_INITIAL
+V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK
