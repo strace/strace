@@ -531,8 +531,6 @@ main(void)
 		{ ARG_STR(VIDIOC_S_DV_TIMINGS) },
 		{ ARG_STR(VIDIOC_G_DV_TIMINGS) },
 		{ ARG_STR(VIDIOC_DQEVENT) },
-		{ ARG_STR(VIDIOC_SUBSCRIBE_EVENT) },
-		{ ARG_STR(VIDIOC_UNSUBSCRIBE_EVENT) },
 		{ ARG_STR(VIDIOC_PREPARE_BUF) },
 		{ ARG_STR(VIDIOC_G_SELECTION) },
 		{ ARG_STR(VIDIOC_S_SELECTION) },
@@ -1375,6 +1373,73 @@ main(void)
 	       XLAT_STR(VIDIOC_QUERYMENU),
 	       NABBR(p_v4l2_querymenu->id,)
 	       p_v4l2_querymenu->index
+	);
+
+	/* VIDIOC_{UN,}SUBSCRIBE_EVENT */
+	ioctl(-1, VIDIOC_SUBSCRIBE_EVENT, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_SUBSCRIBE_EVENT));
+
+	ioctl(-1, VIDIOC_UNSUBSCRIBE_EVENT, 0);
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_UNSUBSCRIBE_EVENT));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_event_subscription, p_v4l2_event_sub);
+
+	p_v4l2_event_sub->type = V4L2_EVENT_FRAME_SYNC;
+	p_v4l2_event_sub->id = 42;
+	p_v4l2_event_sub->flags = V4L2_EVENT_SUB_FL_SEND_INITIAL | 0xACBD0000;
+
+	ioctl(-1, VIDIOC_SUBSCRIBE_EVENT, p_v4l2_event_sub);
+	printf("ioctl(-1, %s, {"
+	       "type=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_FRAME_SYNC") VERB(" */") ", "
+	       "id=%u, "
+	       "flags=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_SUB_FL_SEND_INITIAL|%#x") VERB(" */")
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_SUBSCRIBE_EVENT),
+	       NABBR(p_v4l2_event_sub->type,)
+	       p_v4l2_event_sub->id
+	       NABBR(, p_v4l2_event_sub->flags)
+	       NRAW(, p_v4l2_event_sub->flags ^ V4L2_EVENT_SUB_FL_SEND_INITIAL)
+	);
+
+	ioctl(-1, VIDIOC_UNSUBSCRIBE_EVENT, p_v4l2_event_sub);
+	printf("ioctl(-1, %s, {"
+	       "type=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_FRAME_SYNC") VERB(" */") ", "
+	       "id=%u"
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_UNSUBSCRIBE_EVENT),
+	       NABBR(p_v4l2_event_sub->type,)
+	       p_v4l2_event_sub->id
+	);
+
+	p_v4l2_event_sub->type = -1;
+	p_v4l2_event_sub->id = -1;
+	p_v4l2_event_sub->flags = V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK | 0xACBD0000;
+
+	ioctl(-1, VIDIOC_SUBSCRIBE_EVENT, p_v4l2_event_sub);
+	printf("ioctl(-1, %s, {"
+	       "type=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_PRIVATE_START+%u") VERB(" */") ", "
+	       "id=%u, "
+	       "flags=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK|%#x") VERB(" */")
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_SUBSCRIBE_EVENT),
+	       NABBR(p_v4l2_event_sub->type,)
+	       NRAW(p_v4l2_event_sub->type - V4L2_EVENT_PRIVATE_START,)
+	       p_v4l2_event_sub->id
+	       NABBR(, p_v4l2_event_sub->flags)
+	       NRAW(, p_v4l2_event_sub->flags ^ V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK)
+	);
+
+	ioctl(-1, VIDIOC_UNSUBSCRIBE_EVENT, p_v4l2_event_sub);
+	printf("ioctl(-1, %s, {"
+	       "type=" NABBR("%#x") VERB(" /* ") NRAW("V4L2_EVENT_PRIVATE_START+%u") VERB(" */") ", "
+	       "id=%u"
+	       "})" RVAL_EBADF,
+	       XLAT_STR(VIDIOC_UNSUBSCRIBE_EVENT),
+	       NABBR(p_v4l2_event_sub->type,)
+	       NRAW(p_v4l2_event_sub->type - V4L2_EVENT_PRIVATE_START,)
+	       p_v4l2_event_sub->id
 	);
 
 	puts("+++ exited with 0 +++");
