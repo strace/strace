@@ -129,22 +129,22 @@ thread(void *arg)
 	switch (action % NUMBER_OF_ACTIONS) {
 		case ACTION_exit:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", %p /* %u vars */ <pid changed to %u ...>\n",
+			       ", %p /* %u vars */ <pid changed to %u ... (#1)>\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
 			       environ, arglen(environ), leader);
 			break;
 		case ACTION_rt_sigsuspend:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", %p /* %u vars */ <unfinished ...>\n"
-			       "%-5d <... rt_sigsuspend resumed>) = ?\n",
+			       ", %p /* %u vars */ <unfinished #3 ...>\n"
+			       "%-5d <... rt_sigsuspend resumed #2>) = ?\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
 			       environ, arglen(environ),
 			       leader);
 			break;
 		case ACTION_nanosleep:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", %p /* %u vars */ <unfinished ...>\n"
-			       "%-5d <... nanosleep resumed> <unfinished ...>)"
+			       ", %p /* %u vars */ <unfinished #5 ...>\n"
+			       "%-5d <... nanosleep resumed #4> <unfinished ...>)"
 			       " = ?\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
 			       environ, arglen(environ),
@@ -155,7 +155,7 @@ thread(void *arg)
 # if PRINT_SUPERSEDED
 	printf("%-5d +++ superseded by execve in pid %u +++\n", leader, tid);
 # endif
-	printf("%-5d <... execve resumed>) = 0\n", leader);
+	printf("%-5d <... execve resumed #%u>) = 0\n", leader, 2 * action + 1);
 
 	(void) syscall(__NR_nanosleep, (unsigned long) &ots, 0UL);
 	execve(argv[0], argv, environ);
@@ -220,14 +220,14 @@ main(int ac, char **av)
 			(void) syscall(__NR_exit, 42);
 			break;
 		case ACTION_rt_sigsuspend:
-			printf("%s rt_sigsuspend([], %u <unfinished ...>\n",
+			printf("%s rt_sigsuspend([], %u <unfinished #2 ...>\n",
 			       leader_str, sigsetsize);
 			close(fds[1]);
 			(void) k_sigsuspend(&mask);
 			break;
 		case ACTION_nanosleep:
 			printf("%s nanosleep({tv_sec=%u, tv_nsec=0}"
-			       " <unfinished ...>\n",
+			       " <unfinished #4 ...>\n",
 			       leader_str, (unsigned int) ots.tv_sec);
 			close(fds[1]);
 			(void) syscall(__NR_nanosleep,
