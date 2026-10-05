@@ -486,20 +486,29 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 # define CHECK_SIZE(hdr_, size_, name_, ...) \
 	CHECK_SIZE_EX((hdr_), sizeof(*(hdr_)), (size_), name_, ##__VA_ARGS__)
 
-# define PRINT_UNKNOWN_TAIL_EX(hdr_, hdr_size_, size_) \
-	do { \
-		if ((size_) > (hdr_size_) && \
-		    !is_filled(((char *) hdr_) + (hdr_size_), '\0', \
-		               (size_) - (hdr_size_))) { \
-			tprint_struct_next(); \
-			print_quoted_string(((char *) hdr_) + (hdr_size_), \
-					    (size_) - (hdr_size_), \
-					    QUOTE_FORCE_HEX); \
-		} \
-	} while (0)
+static void
+print_unknown_tail(const void *const hdr, const size_t hdr_size,
+		   const size_t size, const size_t available_size)
+{
+	const size_t safe_size = MIN(size, available_size);
 
-# define PRINT_UNKNOWN_TAIL(hdr_, size_) \
-	PRINT_UNKNOWN_TAIL_EX((hdr_), sizeof(*(hdr_)), (size_))
+	if (safe_size > hdr_size
+	    && !is_filled((const char *) hdr + hdr_size, '\0',
+			  safe_size - hdr_size)) {
+		tprint_struct_next();
+		print_quoted_string((const char *) hdr + hdr_size,
+				    safe_size - hdr_size, QUOTE_FORCE_HEX);
+	}
+
+	if (size > available_size) {
+		tprint_struct_next();
+		tprint_more_data_follows();
+	}
+}
+
+# define PRINT_UNKNOWN_TAIL(hdr_, size_, available_size_) \
+	print_unknown_tail((hdr_), sizeof(*(hdr_)), (size_), \
+			   (available_size_))
 
 static void
 print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
@@ -598,7 +607,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 			}
 		}
 
-		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
+		print_unknown_tail(hdr, last_decoded, size, size);
 	} else {
 		tprint_struct_next();
 		tprint_more_data_follows();
@@ -745,7 +754,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 			}
 		}
 
-		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
+		print_unknown_tail(hdr, last_decoded, size, size);
 	} else {
 		tprint_struct_next();
 		tprint_more_data_follows();
@@ -907,7 +916,7 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			print_funcs(hdr->infyautf);
 		}
 
-		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
+		print_unknown_tail(hdr, last_decoded, size, size);
 	} else {
 		tprint_struct_next();
 		tprint_more_data_follows();
@@ -1088,7 +1097,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		tprint_struct_next();
 		PRINT_FIELD_WEIGHT(*hdr, infgpicc);
 
-		PRINT_UNKNOWN_TAIL(hdr, size);
+		PRINT_UNKNOWN_TAIL(hdr, size, size);
 	} else {
 		tprint_struct_next();
 		tprint_more_data_follows();
@@ -1226,7 +1235,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	tprint_struct_next();
 	PRINT_FIELD_U(*hdr, infglen3);
 
-	PRINT_UNKNOWN_TAIL(hdr, hdr->infhdln);
+	PRINT_UNKNOWN_TAIL(hdr, hdr->infhdln, sizeof(data));
 
 sthyi_sections:
 	tprint_struct_end();
