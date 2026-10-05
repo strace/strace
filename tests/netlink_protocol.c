@@ -192,6 +192,74 @@ send_query(const int fd)
 }
 
 static void
+print_nlmsgerr_nesting_header(const struct nlmsghdr *const nlh)
+{
+	printf("{nlmsg_len=%u, nlmsg_type=%s, nlmsg_flags=0"
+	       ", nlmsg_seq=0, nlmsg_pid=0}",
+	       nlh->nlmsg_len,
+	       nlh->nlmsg_type == NLMSG_ERROR ? "NLMSG_ERROR" : "NLMSG_NOOP");
+}
+
+static void
+test_nlmsgerr_nesting(const int fd)
+{
+	enum {
+		MAX_NESTING = 8,
+		DEEP_NESTING = 0x4000,
+		NESTING_STRIDE = NLMSG_HDRLEN + sizeof(int)
+	};
+	static const unsigned int depths[] = {
+		1, MAX_NESTING - 1, MAX_NESTING,
+		MAX_NESTING + 1, MAX_NESTING + 2, DEEP_NESTING
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(depths); ++i) {
+		const unsigned int depth = depths[i];
+		const unsigned int len = depth * NESTING_STRIDE + NLMSG_HDRLEN;
+		struct nlmsghdr *const nlh = xcalloc(1, len);
+
+		for (unsigned int j = 0; j < depth; ++j) {
+			struct nlmsghdr *const err_nlh =
+				(void *) nlh + j * NESTING_STRIDE;
+			err_nlh->nlmsg_len = len - j * NESTING_STRIDE;
+			err_nlh->nlmsg_type = NLMSG_ERROR;
+			const int error = -13;
+			memcpy(NLMSG_DATA(err_nlh), &error, sizeof(error));
+		}
+
+		struct nlmsghdr *const terminal =
+			(void *) nlh + depth * NESTING_STRIDE;
+		terminal->nlmsg_len = NLMSG_HDRLEN;
+		terminal->nlmsg_type = NLMSG_NOOP;
+
+		const long rc = sendto(fd, nlh, len, MSG_DONTWAIT, NULL, 0);
+		const char *const rcstr = sprintrc(rc);
+
+		printf("sendto(%d, ", fd);
+		const unsigned int decoded = MIN(depth, MAX_NESTING);
+		for (unsigned int j = 0; j < decoded; ++j) {
+			printf("[");
+			print_nlmsgerr_nesting_header((void *) nlh
+						      + j * NESTING_STRIDE);
+			printf(", {error=-EACCES, msg=");
+		}
+
+		if (depth > MAX_NESTING)
+			printf("[");
+		print_nlmsgerr_nesting_header((void *) nlh
+					      + decoded * NESTING_STRIDE);
+		if (depth > MAX_NESTING)
+			printf(", ...]");
+
+		for (unsigned int j = 0; j < decoded; ++j)
+			printf("}]");
+
+		printf(", %u, MSG_DONTWAIT, NULL, 0) = %s\n", len, rcstr);
+		free(nlh);
+	}
+}
+
+static void
 test_nlmsgerr(const int fd)
 {
 	struct nlmsgerr *err;
@@ -465,6 +533,7 @@ int main(void)
 
 	send_query(fd);
 	test_nlmsgerr(fd);
+	test_nlmsgerr_nesting(fd);
 	test_nlmsg_done(fd);
 	test_ack_flags(fd);
 

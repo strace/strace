@@ -20,6 +20,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Bug fixes
   * Fixed the argument names printed by -N/--arg-names for getresgid,
     setfsgid, setgid, setregid, and setresgid syscalls.
+  * Limited nested NLMSG_ERROR netlink decoding to prevent stack exhaustion.
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================

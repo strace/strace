@@ -538,13 +538,19 @@ static const nla_decoder_t nlmsgerr_nla_decoders[] = {
 	[NLMSGERR_ATTR_COOKIE]	= decode_nlmsgerr_attr_cookie
 };
 
+enum {
+	/* NLMSG_ERROR normally embeds a request, not another error. */
+	NLMSG_ERROR_MAX_NESTING = 8
+};
+
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
 			     const int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
-			     const kernel_ulong_t len);
+			     const kernel_ulong_t len,
+			     const unsigned int error_nesting);
 
 static void
 decode_nlmsgerr(struct tcb *const tcp,
@@ -552,7 +558,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 		const int family,
 		kernel_ulong_t addr,
 		unsigned int len,
-		const bool capped)
+		const bool capped,
+		const unsigned int error_nesting)
 {
 	struct nlmsgerr err;
 
@@ -591,7 +598,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 
 	tprints_field_name("msg");
 	decode_nlmsghdr_with_payload(tcp, fd, family,
-				     &err.msg, addr, payload);
+				     &err.msg, addr, payload,
+				     error_nesting + 1);
 
 	tprint_struct_end();
 
@@ -622,11 +630,18 @@ decode_payload(struct tcb *const tcp,
 	       const int family,
 	       const struct nlmsghdr *const nlmsghdr,
 	       const kernel_ulong_t addr,
-	       const unsigned int len)
+	       const unsigned int len,
+	       const unsigned int error_nesting)
 {
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
+		if (error_nesting >= NLMSG_ERROR_MAX_NESTING) {
+			tprint_more_data_follows();
+			return;
+		}
+
 		decode_nlmsgerr(tcp, fd, family, addr, len,
-				nlmsghdr->nlmsg_flags & NLM_F_CAPPED);
+				nlmsghdr->nlmsg_flags & NLM_F_CAPPED,
+				error_nesting);
 		return;
 	}
 
@@ -664,7 +679,8 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
-			     const kernel_ulong_t len)
+			     const kernel_ulong_t len,
+			     const unsigned int error_nesting)
 {
 	const unsigned int nlmsg_len = MIN(nlmsghdr->nlmsg_len, len);
 
@@ -676,7 +692,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprint_array_next();
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
-						     nlmsg_len - NLMSG_HDRLEN);
+			       nlmsg_len - NLMSG_HDRLEN, error_nesting);
 		tprint_array_end();
 	}
 }
@@ -723,7 +739,7 @@ decode_netlink(struct tcb *const tcp,
 		}
 
 		decode_nlmsghdr_with_payload(tcp, fd, family,
-					     &nlmsghdr, addr, len);
+					     &nlmsghdr, addr, len, 0);
 
 		if (!next_addr)
 			break;
