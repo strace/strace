@@ -17,6 +17,14 @@
 #ifndef STRACE_PTRACE_H
 # define STRACE_PTRACE_H
 
+# include "arch_defs.h"
+
+# if ARCH_NEEDS_FRAME_OFFSETS
+#  ifndef __FRAME_OFFSETS
+#   define __FRAME_OFFSETS
+#  endif
+# endif
+
 # include <stdint.h>
 # include <sys/ptrace.h>
 
