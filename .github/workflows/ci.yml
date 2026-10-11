@@ -56,37 +56,37 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { cc: gcc-15, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-15, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: gcc-15, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: gcc-15, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-15, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: gcc-14, target: aarch64, variant: kheaders, runner: ubuntu-24.04-arm }
-          - { cc: gcc-14, target: aarch64, variant: libdw, runner: ubuntu-24.04-arm }
-          - { cc: gcc-14, target: aarch64, variant: libunwind, runner: ubuntu-24.04-arm }
-          - { cc: gcc-13, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-13, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: gcc-13, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: gcc-13, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-13, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: gcc-13, target: aarch64, variant: kheaders, runner: ubuntu-24.04-arm }
-          - { cc: gcc-13, target: aarch64, variant: libdw, runner: ubuntu-24.04-arm }
-          - { cc: gcc-13, target: aarch64, variant: libunwind, runner: ubuntu-24.04-arm }
-          - { cc: gcc-12, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-12, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: gcc-12, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: gcc-12, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-12, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: gcc-11, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-11, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: gcc-11, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: gcc-11, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: gcc-11, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
+          - { cc: gcc-15, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-15, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: gcc-15, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: gcc-15, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-15, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: gcc-14, target: aarch64, variant: kheaders, runner: ubuntu-26.04-arm }
+          - { cc: gcc-14, target: aarch64, variant: libdw, runner: ubuntu-26.04-arm }
+          - { cc: gcc-14, target: aarch64, variant: libunwind, runner: ubuntu-26.04-arm }
+          - { cc: gcc-13, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-13, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: gcc-13, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: gcc-13, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-13, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: gcc-13, target: aarch64, variant: kheaders, runner: ubuntu-26.04-arm }
+          - { cc: gcc-13, target: aarch64, variant: libdw, runner: ubuntu-26.04-arm }
+          - { cc: gcc-13, target: aarch64, variant: libunwind, runner: ubuntu-26.04-arm }
+          - { cc: gcc-12, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-12, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: gcc-12, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: gcc-12, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-12, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: gcc-11, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-11, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: gcc-11, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: gcc-11, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: gcc-11, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
           - { cc: gcc-10, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
           - { cc: gcc-10, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
           - { cc: gcc-10, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
@@ -97,27 +97,27 @@ jobs:
           - { cc: gcc-9, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
           - { cc: gcc-9, target: x86, variant: kheaders, runner: ubuntu-24.04 }
           - { cc: gcc-9, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: clang-19, target: aarch64, variant: kheaders, runner: ubuntu-24.04-arm }
-          - { cc: clang-19, target: aarch64, variant: libdw, runner: ubuntu-24.04-arm }
-          - { cc: clang-19, target: aarch64, variant: libunwind, runner: ubuntu-24.04-arm }
-          - { cc: clang-18, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-18, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: clang-18, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: clang-18, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-18, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
-          - { cc: clang-18, target: aarch64, variant: kheaders, runner: ubuntu-24.04-arm }
-          - { cc: clang-18, target: aarch64, variant: libdw, runner: ubuntu-24.04-arm }
-          - { cc: clang-18, target: aarch64, variant: libunwind, runner: ubuntu-24.04-arm }
-          - { cc: clang-17, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-17, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
-          - { cc: clang-17, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
-          - { cc: clang-17, target: x86, variant: kheaders, runner: ubuntu-24.04 }
-          - { cc: clang-17, target: x86, variant: nostacktrace, runner: ubuntu-24.04 }
+          - { cc: clang-19, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-19, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: clang-19, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: clang-19, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-19, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: clang-19, target: aarch64, variant: kheaders, runner: ubuntu-26.04-arm }
+          - { cc: clang-19, target: aarch64, variant: libdw, runner: ubuntu-26.04-arm }
+          - { cc: clang-19, target: aarch64, variant: libunwind, runner: ubuntu-26.04-arm }
+          - { cc: clang-18, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-18, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: clang-18, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: clang-18, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-18, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
+          - { cc: clang-18, target: aarch64, variant: kheaders, runner: ubuntu-26.04-arm }
+          - { cc: clang-18, target: aarch64, variant: libdw, runner: ubuntu-26.04-arm }
+          - { cc: clang-18, target: aarch64, variant: libunwind, runner: ubuntu-26.04-arm }
+          - { cc: clang-17, target: x86_64, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-17, target: x86_64, variant: libdw, runner: ubuntu-26.04 }
+          - { cc: clang-17, target: x86_64, variant: libunwind, runner: ubuntu-26.04 }
+          - { cc: clang-17, target: x86, variant: kheaders, runner: ubuntu-26.04 }
+          - { cc: clang-17, target: x86, variant: nostacktrace, runner: ubuntu-26.04 }
           - { cc: clang-16, target: x86_64, variant: kheaders, runner: ubuntu-24.04 }
           - { cc: clang-16, target: x86_64, variant: libdw, runner: ubuntu-24.04 }
           - { cc: clang-16, target: x86_64, variant: libunwind, runner: ubuntu-24.04 }
