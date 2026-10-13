@@ -43,10 +43,7 @@ main(void)
 		(kernel_ulong_t) 0x123456789abcdef0ULL,
 		(kernel_ulong_t) 0xbadc0dedda7a1057ULL,
 	};
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} prots[] = {
+	static const struct strval_klong prots[] = {
 		{ ARG_STR(PROT_READ) },
 		/* For now, only 0x0300001f are used */
 		{ (kernel_ulong_t) 0xdeadfeed00ca7500ULL,

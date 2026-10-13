@@ -94,10 +94,7 @@ main(int argc, char *argv[])
 				   ", -5) returning %ld", inject_retval);
 #endif /* INJECT_RETVAL */
 
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} args[] = {
+	static const struct strval_klong args[] = {
 		{ 0, "PR_RISCV_V_VSTATE_CTRL_DEFAULT"
 		     "|PR_RISCV_V_VSTATE_CTRL_DEFAULT<<2"
 		     "|!PR_RISCV_V_VSTATE_CTRL_INHERIT" },

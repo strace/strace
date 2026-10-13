@@ -39,10 +39,7 @@ main(void)
 		(kernel_ulong_t) 0xfffffffffffffffdULL;
 	static const kernel_ulong_t bogus_op_bits =
 		(kernel_ulong_t) 0xbadc0ded00000000ULL;
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} options[] = {
+	static const struct strval_klong options[] = {
 		{ 37, "PR_GET_CHILD_SUBREAPER" },
 		{ 19, "PR_GET_ENDIAN" },
 		{  9, "PR_GET_FPEMU" },

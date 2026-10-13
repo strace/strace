@@ -55,10 +55,7 @@ main(int argc, char *argv[])
 				   ", -5) returning %ld", inject_retval);
 #endif /* INJECT_RETVAL */
 
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} args[] = {
+	static const struct strval_klong args[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(PR_PAC_APIAKEY) },
 		{ ARG_STR(PR_PAC_APIBKEY|PR_PAC_APDAKEY|PR_PAC_APDBKEY|0x10) },

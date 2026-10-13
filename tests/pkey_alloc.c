@@ -23,10 +23,7 @@ main(void)
 		(kernel_ulong_t) 0xffff0000eeee1111ULL,
 		(kernel_ulong_t) 0x123456789abcdef0ULL,
 	};
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} rights[] = {
+	static const struct strval_klong rights[] = {
 		{ (kernel_ulong_t) 0xbadc0ded00000002ULL,
 			sizeof(kernel_ulong_t) > sizeof(int) ?
 			"PKEY_DISABLE_WRITE|0xbadc0ded00000000" :

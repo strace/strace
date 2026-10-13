@@ -83,10 +83,7 @@ main(int argc, char *argv[])
 				   ", -5) returning %ld", inject_retval);
 #endif /* INJECT_RETVAL */
 
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} args[] = {
+	static const struct strval_klong args[] = {
 		{ 0, "!PR_TAGGED_ADDR_ENABLE|PR_MTE_TCF_NONE" },
 		{ /* 1 */ ARG_STR(PR_TAGGED_ADDR_ENABLE|PR_MTE_TCF_NONE) },
 		{ 2, "!PR_TAGGED_ADDR_ENABLE|PR_MTE_TCF_SYNC" },

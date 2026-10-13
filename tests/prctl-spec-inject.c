@@ -62,10 +62,7 @@ main(int argc, char **argv)
 		{ 32, "" },
 		{ 42, " (PR_SPEC_ENABLE|PR_SPEC_FORCE_DISABLE|0x20)" },
 	};
-	static const struct {
-		kernel_ulong_t arg;
-		const char *str;
-	} set_strs[] = {
+	static const struct strval_klong set_strs[] = {
 		{ 0, "0 /* PR_SPEC_??? */" },
 		{ 1, "0x1 /* PR_SPEC_??? */" },
 		{ 2, "PR_SPEC_ENABLE" },
@@ -153,7 +150,7 @@ main(int argc, char **argv)
 
 	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
 		for (unsigned i = 0; i < ARRAY_SIZE(set_strs); i++) {
-			rc = do_prctl(53, spec_strs[c].arg, set_strs[i].arg);
+			rc = do_prctl(53, spec_strs[c].arg, set_strs[i].val);
 			printf("prctl(PR_SET_SPECULATION_CTRL, %s"
 			       ", %s) = %s (INJECTED)\n",
 			       spec_strs[c].str, set_strs[i].str, sprintrc(rc));

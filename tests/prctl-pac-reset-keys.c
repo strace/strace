@@ -29,10 +29,7 @@ main(void)
 	printf("prctl(PR_PAC_RESET_KEYS, 0x20 /* PR_PAC_??? */, 0, 0, 0)"
 	       " = %s\n", sprintrc(rc));
 
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} arg2[] = {
+	static const struct strval_klong arg2[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(PR_PAC_APIAKEY) },
 		{ ARG_STR(PR_PAC_APIBKEY|PR_PAC_APDAKEY|PR_PAC_APDBKEY|PR_PAC_APGAKEY|0xcae0) },

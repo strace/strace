@@ -1331,10 +1331,7 @@ main(int argc, char *argv[])
 
 
 	/* KDSIGACCEPT */
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} sigaccept_vecs[] = {
+	static const struct strval_klong sigaccept_vecs[] = {
 		{ (kernel_ulong_t) -1ULL,
 		  SIZEOF_LONG == 8 ? "18446744073709551615" : "4294967295" },
 		{ 0, "0" },
@@ -1365,10 +1362,7 @@ main(int argc, char *argv[])
 
 
 	/* KDGKBMETA */
-	static const struct {
-		kernel_ulong_t arg;
-		const char *str;
-	} meta_vecs[] = {
+	static const struct strval_klong meta_vecs[] = {
 		{ ARG_XLAT_UNKNOWN(0, "K_???") },
 		{ ARG_XLAT_UNKNOWN(0x1, "K_???") },
 		{ ARG_XLAT_UNKNOWN(0x2, "K_???") },
@@ -1383,7 +1377,7 @@ main(int argc, char *argv[])
 	check_null_invalid(ARG_STR(KDGKBMETA));
 
 	for (size_t i = 0; i < ARRAY_SIZE(meta_vecs); i++) {
-		*meta = meta_vecs[i].arg;
+		*meta = meta_vecs[i].val;
 		sys_ioctl(-1, KDGKBMETA, (uintptr_t) meta);
 		printf("ioctl(-1, " XLAT_FMT ", ", XLAT_ARGS(KDGKBMETA));
 #if RETVAL_INJECTED
@@ -1397,7 +1391,7 @@ main(int argc, char *argv[])
 
 	/* KDSKBMETA */
 	for (size_t i = 0; i < ARRAY_SIZE(meta_vecs); i++) {
-		sys_ioctl(-1, KDSKBMETA, meta_vecs[i].arg);
+		sys_ioctl(-1, KDSKBMETA, meta_vecs[i].val);
 		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSKBMETA), meta_vecs[i].str);
 	}

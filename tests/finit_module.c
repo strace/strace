@@ -25,10 +25,7 @@ main(void)
 	static const kernel_ulong_t bogus_fd =
 		(kernel_ulong_t) 0xdeb0d1edbeeff00dULL;
 
-	static const struct {
-		kernel_ulong_t val;
-		const char *str;
-	} flags[] = {
+	static const struct strval_klong flags[] = {
 		{ ARG_STR(0) },
 		{ (kernel_ulong_t) 0xffffffff00000002ULL,
 			"MODULE_INIT_IGNORE_VERMAGIC" },

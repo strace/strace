@@ -24,10 +24,7 @@ static void
 test_kern_features(unsigned int num)
 {
 	/* The expected return codes, as enforced by fault injection */
-	static struct {
-		kernel_ulong_t ret;
-		const char *str;
-	} checks[] = {
+	static struct strval_klong checks[] = {
 		{ 0, NULL },
 		{ 1, "KERN_FEATURE_MIXED_MODE_STACK" },
 		{ 2, "0x2" },
@@ -54,11 +51,11 @@ test_kern_features(unsigned int num)
 	printf("kern_features() = %#llx", (unsigned long long) rc);
 
 	if (num < ARRAY_SIZE(checks)) {
-		if (rc != checks[num].ret)
+		if (rc != checks[num].val)
 			error_msg_and_fail("Expected return value (%llx) "
 					   "doesn't match expected one (%#llx)",
 					   (unsigned long long) rc,
-					   (unsigned long long) checks[num].ret);
+					   (unsigned long long) checks[num].val);
 
 		if (checks[num].str)
 			printf(" (%s)", checks[num].str);

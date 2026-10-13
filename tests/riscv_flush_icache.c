@@ -20,19 +20,13 @@
 
 int main(void)
 {
-	static struct {
-		kernel_ulong_t addr;
-		const char *str;
-	} addrs[] = {
+	static struct strval_klong addrs[] = {
 		{ (kernel_ulong_t) (uintptr_t) ARG_STR(NULL) },
 		{ (kernel_ulong_t) 0xbadc0deddeadf157ULL,
 			sizeof(kernel_ulong_t) == 8 ? "0xbadc0deddeadf157" :
 			"0xdeadf157" },
 	};
-	static struct {
-		kernel_ulong_t val;
-		const char *str;
-	} flags[] = {
+	static struct strval_klong flags[] = {
 		{ ARG_STR(0) },
 		{ 1, "SYS_RISCV_FLUSH_ICACHE_LOCAL" },
 		{ (kernel_ulong_t) 0xfacefeedfffffffeULL,
@@ -49,8 +43,8 @@ int main(void)
 		for (size_t j = 0; j < ARRAY_SIZE(addrs); j++) {
 			for (size_t k = 0; k < ARRAY_SIZE(flags); k++) {
 				long rc = syscall(__NR_riscv_flush_icache,
-						  addrs[i].addr,
-						  addrs[j].addr,
+						  addrs[i].val,
+						  addrs[j].val,
 						  flags[k].val);
 
 				printf("riscv_flush_icache(%s, %s, %s) = %s\n",
