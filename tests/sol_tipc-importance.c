@@ -61,10 +61,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, imp);
 	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
 
-	static const struct {
-		int optval;
-		const char *str;
-	} imp_optvals[] = {
+	static const struct strival32 imp_optvals[] = {
 		{ ARG_STR(TIPC_LOW_IMPORTANCE) },
 		{ ARG_STR(TIPC_MEDIUM_IMPORTANCE) },
 		{ ARG_STR(TIPC_HIGH_IMPORTANCE) },
@@ -79,13 +76,13 @@ main(void)
 	unsigned int i = 0;
 
 	for (i = 0; i < ARRAY_SIZE(imp_optvals); i++) {
-		*imp = imp_optvals[i].optval;
+		*imp = imp_optvals[i].val;
 		set_importance(imp, sizeof(*imp));
 		printf("s%s, [", pfx_str);
 #if XLAT_RAW
-		printf("%#x", imp_optvals[i].optval);
+		printf("%#x", imp_optvals[i].val);
 #elif XLAT_VERBOSE
-		printf("%#x /* %s */", imp_optvals[i].optval, imp_optvals[i].str);
+		printf("%#x /* %s */", imp_optvals[i].val, imp_optvals[i].str);
 #else
 		printf("%s", imp_optvals[i].str);
 #endif
@@ -101,7 +98,7 @@ main(void)
 	/* classic getsockopt */
 	*len = sizeof(*imp);
 	for (i = 0; i < ARRAY_SIZE(imp_optvals); i++) {
-		*imp = imp_optvals[i].optval;
+		*imp = imp_optvals[i].val;
 
 		int rc = get_importance(imp, len);
 		printf("g%s, ", pfx_str);
@@ -109,9 +106,9 @@ main(void)
 			printf("%p", imp);
 		else {
 #if XLAT_RAW
-			printf("[%#x]", imp_optvals[i].optval);
+			printf("[%#x]", imp_optvals[i].val);
 #elif XLAT_VERBOSE
-			printf("[%#x /* %s */]", imp_optvals[i].optval, imp_optvals[i].str);
+			printf("[%#x /* %s */]", imp_optvals[i].val, imp_optvals[i].str);
 #else
 			printf("[%s]", imp_optvals[i].str);
 #endif
