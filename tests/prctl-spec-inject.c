@@ -40,19 +40,13 @@ main(int argc, char **argv)
 	static const kernel_ulong_t bogus_arg3 =
 		(kernel_ulong_t) 0xdecafeedbeefda7eULL;
 
-	static const struct {
-		long arg;
-		const char *str;
-	} spec_strs[] = {
+	static const struct strival_long spec_strs[] = {
 		{ 0, "PR_SPEC_STORE_BYPASS" },
 		{ 1, "PR_SPEC_INDIRECT_BRANCH" },
 		{ 2, "PR_SPEC_L1D_FLUSH" },
 	};
 
-	static const struct {
-		long arg;
-		const char *str;
-	} get_strs[] = {
+	static const struct strival_long get_strs[] = {
 		{ -1, "" },
 		{ 0, " (PR_SPEC_NOT_AFFECTED)" },
 		{ 1, " (PR_SPEC_PRCTL)" },
@@ -112,10 +106,10 @@ main(int argc, char **argv)
 	       (unsigned long long) bogus_arg2, sprintrc(rc));
 
 	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
-		rc = do_prctl(52, spec_strs[c].arg, bogus_arg3);
+		rc = do_prctl(52, spec_strs[c].val, bogus_arg3);
 
 		for (unsigned i = 0; i < ARRAY_SIZE(get_strs); i++) {
-			if (get_strs[i].arg == rc) {
+			if (get_strs[i].val == rc) {
 				str = get_strs[i].str;
 				break;
 			}
@@ -150,7 +144,7 @@ main(int argc, char **argv)
 
 	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
 		for (unsigned i = 0; i < ARRAY_SIZE(set_strs); i++) {
-			rc = do_prctl(53, spec_strs[c].arg, set_strs[i].val);
+			rc = do_prctl(53, spec_strs[c].val, set_strs[i].val);
 			printf("prctl(PR_SET_SPECULATION_CTRL, %s"
 			       ", %s) = %s (INJECTED)\n",
 			       spec_strs[c].str, set_strs[i].str, sprintrc(rc));

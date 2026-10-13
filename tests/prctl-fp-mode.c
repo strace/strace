@@ -38,10 +38,7 @@ main(int argc, char **argv)
 	static const kernel_ulong_t bogus_arg3 =
 			(kernel_ulong_t) 0xdecafeedbeefda7eULL;
 
-	static const struct {
-		long arg;
-		const char *str;
-	} get_strs[] = {
+	static const struct strival_long get_strs[] = {
 			{-1,       ""},
 			{0,        ""},
 			{1,        " (PR_FP_MODE_FR)"},
@@ -87,7 +84,7 @@ main(int argc, char **argv)
 	rc = do_prctl(PR_GET_FP_MODE, bogus_arg2, bogus_arg3);
 
 	for (size_t i = 0; i < ARRAY_SIZE(get_strs); i++) {
-		if (get_strs[i].arg == rc) {
+		if (get_strs[i].val == rc) {
 			str = get_strs[i].str;
 			break;
 		}

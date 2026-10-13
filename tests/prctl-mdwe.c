@@ -44,10 +44,7 @@ main(int argc, char **argv)
 	static const kernel_ulong_t bogus_arg5 =
 			(kernel_ulong_t) 0xfa57beeffacefeedULL;
 
-	static const struct {
-		long arg;
-		const char *str;
-	} get_strs[] = {
+	static const struct strival_long get_strs[] = {
 			{-1,         ""},
 			{0,          ""},
 			{1,          " (PR_MDWE_REFUSE_EXEC_GAIN)"},
@@ -103,7 +100,7 @@ main(int argc, char **argv)
 		const char *errstr = sprintrc(rc);
 
 		for (size_t i = 0; i < ARRAY_SIZE(get_strs); i++) {
-			if (get_strs[i].arg == rc) {
+			if (get_strs[i].val == rc) {
 				str = get_strs[i].str;
 				break;
 			}
