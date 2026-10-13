@@ -158,6 +158,11 @@ struct strival32 {
 	const char *str;
 };
 
+struct strival_long {
+	long val;
+	const char *str;
+};
+
 struct strval_klong {
 	kernel_ulong_t val;
 	const char *str;
