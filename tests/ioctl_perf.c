@@ -34,10 +34,7 @@ main(void)
 	static const uint64_t magic64 = 0xfacefeeddeadc0deULL;
 	static const char str[] = STR16 STR16 STR16 STR16;
 
-	static struct {
-		unsigned int cmd;
-		const char *str;
-	} flag_iocs[] = {
+	static struct strval32 flag_iocs[] = {
 		{ ARG_STR(PERF_EVENT_IOC_ENABLE) },
 		{ ARG_STR(PERF_EVENT_IOC_DISABLE) },
 		{ ARG_STR(PERF_EVENT_IOC_RESET) },
@@ -72,18 +69,18 @@ main(void)
 
 	/* PERF_EVENT_IOC_{ENABLE,DISABLE,RESET} */
 	for (unsigned i = 0; i < ARRAY_SIZE(flag_iocs); i++) {
-		ioctl(-1, flag_iocs[i].cmd, 0);
+		ioctl(-1, flag_iocs[i].val, 0);
 		printf("ioctl(-1, %s, 0)" RVAL_EBADF, flag_iocs[i].str);
 
-		ioctl(-1, flag_iocs[i].cmd, 1);
+		ioctl(-1, flag_iocs[i].val, 1);
 		printf("ioctl(-1, %s, PERF_IOC_FLAG_GROUP)" RVAL_EBADF,
 		       flag_iocs[i].str);
 
-		ioctl(-1, flag_iocs[i].cmd, 2);
+		ioctl(-1, flag_iocs[i].val, 2);
 		printf("ioctl(-1, %s, 0x2 /* PERF_IOC_FLAG_??? */)" RVAL_EBADF,
 		       flag_iocs[i].str);
 
-		sys_ioctl(-1, flag_iocs[i].cmd, magic);
+		sys_ioctl(-1, flag_iocs[i].val, magic);
 		printf("ioctl(-1, %s, PERF_IOC_FLAG_GROUP|%#x)" RVAL_EBADF,
 		       flag_iocs[i].str, (unsigned int) magic & ~1U);
 	}

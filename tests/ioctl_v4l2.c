@@ -415,10 +415,7 @@ main(void)
 	unsigned char cc[sizeof(int)] = { 'A', '\'', '\\', '\xfa' };
 
 	/* Unknown */
-	static const struct {
-		uint32_t flags;
-		const char *str;
-	} cmd_flags[] = {
+	static const struct strval32 cmd_flags[] = {
 		{ ARG_STR(_IOC_NONE) },
 		{ ARG_STR(_IOC_READ) },
 		{ ARG_STR(_IOC_WRITE) },
@@ -437,7 +434,7 @@ main(void)
 		/* Trying to hit common argument sizes */
 		for (size_t j = 0; j < 256; j += 4) {
 			for (size_t k = 0; k < ARRAY_SIZE(cmd_flags); k++) {
-				uint32_t ioc = _IOC(cmd_flags[k].flags, 'V',
+				uint32_t ioc = _IOC(cmd_flags[k].val, 'V',
 						    unknown_cmds[i], j);
 				/*
 				 * Conflicts with VT* and VBG* ioctls
@@ -495,10 +492,7 @@ main(void)
 	}
 
 	/* Decoding is not supported */
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} unsupp_cmds[] = {
+	static const struct strval32 unsupp_cmds[] = {
 		{ ARG_STR(VIDIOC_OVERLAY) },
 		{ ARG_STR(VIDIOC_G_AUDIO) },
 		{ ARG_STR(VIDIOC_S_AUDIO) },
@@ -560,14 +554,14 @@ main(void)
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(unsupp_cmds); i++) {
-		ioctl(-1, unsupp_cmds[i].cmd, 0);
+		ioctl(-1, unsupp_cmds[i].val, 0);
 		printf("ioctl(-1, " XLAT_FMT ", 0)" RVAL_EBADF,
-		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str));
+		       XLAT_SEL(unsupp_cmds[i].val, unsupp_cmds[i].str));
 
-		ioctl(-1, unsupp_cmds[i].cmd,
+		ioctl(-1, unsupp_cmds[i].val,
 		      (unsigned long) 0xbadc0deddeadc0deULL);
 		printf("ioctl(-1, " XLAT_FMT ", %#lx)" RVAL_EBADF,
-		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str),
+		       XLAT_SEL(unsupp_cmds[i].val, unsupp_cmds[i].str),
 		       (unsigned long) 0xbadc0deddeadc0deULL);
 	}
 

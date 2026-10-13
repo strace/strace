@@ -108,10 +108,7 @@ main(int argc, const char *argv[])
 		printf("}) = %s\n", errstr);
 	}
 
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} simple_get_cmds[] = {
+	static const struct strval32 simple_get_cmds[] = {
 		{ ARG_STR(WDIOC_GETSTATUS) },
 		{ ARG_STR(WDIOC_GETBOOTSTATUS) },
 		{ ARG_STR(WDIOC_GETTEMP) },
@@ -124,9 +121,9 @@ main(int argc, const char *argv[])
 	*val = 123;
 
 	for (size_t i = 0; i < ARRAY_SIZE(simple_get_cmds); ++i) {
-		int rc = do_ioctl_ptr(simple_get_cmds[i].cmd, val);
+		int rc = do_ioctl_ptr(simple_get_cmds[i].val, val);
 		printf("ioctl(-1, " XLAT_FMT ", ",
-		       XLAT_SEL(simple_get_cmds[i].cmd, simple_get_cmds[i].str));
+		       XLAT_SEL(simple_get_cmds[i].val, simple_get_cmds[i].str));
 		if (rc < 0) {
 			printf("%p) = %s\n", val, errstr);
 		} else {

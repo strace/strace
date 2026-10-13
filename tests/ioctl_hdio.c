@@ -83,10 +83,7 @@ main(int argc, char *argv[])
 	long rc;
 
 	/* Decoding is not supported */
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} unsupp_cmds[] = {
+	static const struct strval32 unsupp_cmds[] = {
 		{ ARG_STR(HDIO_GET_QDMA) },
 		{ ARG_STR(HDIO_SET_XFER) },
 		{ ARG_STR(HDIO_TRISTATE_HWIF) },
@@ -126,15 +123,15 @@ main(int argc, char *argv[])
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(unsupp_cmds); i++) {
-		do_ioctl(unsupp_cmds[i].cmd, 0);
+		do_ioctl(unsupp_cmds[i].val, 0);
 		printf("ioctl(-1, " XLAT_FMT ", 0) = %s\n",
-		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str),
+		       XLAT_SEL(unsupp_cmds[i].val, unsupp_cmds[i].str),
 		       errstr);
 
-		do_ioctl(unsupp_cmds[i].cmd,
+		do_ioctl(unsupp_cmds[i].val,
 			 (unsigned long) 0xbadc0deddeadc0deULL);
 		printf("ioctl(-1, " XLAT_FMT ", %#lx) = %s\n",
-		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str),
+		       XLAT_SEL(unsupp_cmds[i].val, unsupp_cmds[i].str),
 		       (unsigned long) 0xbadc0deddeadc0deULL, errstr);
 	}
 
@@ -267,10 +264,7 @@ main(int argc, char *argv[])
 	do_ioctl_ptr(HDIO_SCAN_HWIF, &scan_hwif_args);
 
 	/* Getters of the form ioctl(..., ..., &val) */
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} getter_cmds[] = {
+	static const struct strval32 getter_cmds[] = {
 		{ ARG_STR(HDIO_GET_32BIT) },
 		{ ARG_STR(HDIO_GET_ACOUSTIC) },
 		{ ARG_STR(HDIO_GET_ADDRESS) },
@@ -285,9 +279,9 @@ main(int argc, char *argv[])
 	for (size_t i = 0; i < ARRAY_SIZE(getter_cmds); i++) {
 		kernel_ulong_t val = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
 
-		rc = do_ioctl_ptr(getter_cmds[i].cmd, &val);
+		rc = do_ioctl_ptr(getter_cmds[i].val, &val);
 		printf("ioctl(-1, " XLAT_FMT ", ",
-		       XLAT_SEL(getter_cmds[i].cmd, getter_cmds[i].str));
+		       XLAT_SEL(getter_cmds[i].val, getter_cmds[i].str));
 		if (rc >= 0) {
 			printf("[%llu]", (unsigned long long) val);
 		} else {
@@ -297,10 +291,7 @@ main(int argc, char *argv[])
 	}
 
 	/* Setters of the form ioctl(..., ..., val) */
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} setter_cmds[] = {
+	static const struct strval32 setter_cmds[] = {
 			{ ARG_STR(HDIO_SET_32BIT) },
 			{ ARG_STR(HDIO_SET_ACOUSTIC) },
 			{ ARG_STR(HDIO_SET_ADDRESS) },
@@ -317,9 +308,9 @@ main(int argc, char *argv[])
 	for (size_t i = 0; i < ARRAY_SIZE(setter_cmds); i++) {
 		unsigned long val = (unsigned long) 0xfacefeeddeadbeefULL;
 
-		rc = do_ioctl(setter_cmds[i].cmd, val);
+		rc = do_ioctl(setter_cmds[i].val, val);
 		printf("ioctl(-1, " XLAT_FMT ", %llu) = %s\n",
-		       XLAT_SEL(setter_cmds[i].cmd, setter_cmds[i].str),
+		       XLAT_SEL(setter_cmds[i].val, setter_cmds[i].str),
 		       (unsigned long long) val, errstr);
 	}
 

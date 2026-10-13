@@ -91,10 +91,7 @@ main(void)
 		{ "overly long payload", STRINGIFY("overly long ") "...", 15 },
 	};
 
-	struct {
-		uint32_t keyring;
-		const char *str;
-	} keyrings[] = {
+	struct strval32 keyrings[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(1234567890) },
 		{ ARG_STR(-1234567890) },
@@ -114,7 +111,7 @@ main(void)
 						payloads[k].pload,
 						payloads[k].str,
 						payloads[k].plen,
-						keyrings[l].keyring,
+						keyrings[l].val,
 						keyrings[l].str);
 
 	puts("+++ exited with 0 +++");

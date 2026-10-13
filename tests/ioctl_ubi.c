@@ -77,10 +77,7 @@ main(int argc, const char *argv[])
 	skip_ioctls(argc, argv);
 #endif
 
-	static const struct {
-		unsigned int cmd;
-		const char *str;
-	}
+	static const struct strval32
 	noarg_cmds[] = {
 		{ ARG_STR(UBI_IOCVOLCRBLK) },
 		{ ARG_STR(UBI_IOCVOLRMBLK) },
@@ -120,7 +117,7 @@ main(int argc, const char *argv[])
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(noarg_cmds); ++i) {
-		do_ioctl(noarg_cmds[i].cmd, lmagic);
+		do_ioctl(noarg_cmds[i].val, lmagic);
 		printf("ioctl(-1, %s) = %s\n",
 		       noarg_cmds[i].str, errstr);
 	}
@@ -129,7 +126,7 @@ main(int argc, const char *argv[])
 	*pint = imagic;
 
 	for (size_t i = 0; i < ARRAY_SIZE(pint_cmds); ++i) {
-		do_ioctl_ptr(pint_cmds[i].cmd, pint);
+		do_ioctl_ptr(pint_cmds[i].val, pint);
 		printf("ioctl(-1, %s, [%d]) = %s\n",
 		       pint_cmds[i].str, *pint, errstr);
 	}
@@ -138,7 +135,7 @@ main(int argc, const char *argv[])
 	*pint64 = (int64_t) llmagic;
 
 	for (size_t i = 0; i < ARRAY_SIZE(pint64_cmds); ++i) {
-		do_ioctl_ptr(pint64_cmds[i].cmd, pint64);
+		do_ioctl_ptr(pint64_cmds[i].val, pint64);
 		printf("ioctl(-1, %s, [%jd]) = %s\n",
 		       pint64_cmds[i].str, (intmax_t) *pint64, errstr);
 	}
@@ -146,10 +143,10 @@ main(int argc, const char *argv[])
 	void *const efault = tail_alloc(1);
 
 	for (size_t i = 0; i < ARRAY_SIZE(ptr_cmds); ++i) {
-		do_ioctl(ptr_cmds[i].cmd, 0);
+		do_ioctl(ptr_cmds[i].val, 0);
 		printf("ioctl(-1, %s, NULL) = %s\n",
 		       ptr_cmds[i].str, errstr);
-		do_ioctl_ptr(ptr_cmds[i].cmd, efault);
+		do_ioctl_ptr(ptr_cmds[i].val, efault);
 		printf("ioctl(-1, %s, %p) = %s\n",
 		       ptr_cmds[i].str, efault, errstr);
 	}
@@ -158,7 +155,7 @@ main(int argc, const char *argv[])
 	fill_memory(attach, sizeof(*attach));
 
 	for (size_t i = 0; i < ARRAY_SIZE(attach_cmds); ++i) {
-		int rc = do_ioctl_ptr(attach_cmds[i].cmd, attach);
+		int rc = do_ioctl_ptr(attach_cmds[i].val, attach);
 		printf("ioctl(-1, %s, {ubi_num=%d, mtd_num=%d"
 		       ", vid_hdr_offset=%d, max_beb_per1024=%hd"
 		       ", disable_fm=%hhd, need_resv_pool=%hhd}",
@@ -176,7 +173,7 @@ main(int argc, const char *argv[])
 	leb->dtype = 3;
 
 	for (size_t i = 0; i < ARRAY_SIZE(leb_cmds); ++i) {
-		do_ioctl_ptr(leb_cmds[i].cmd, leb);
+		do_ioctl_ptr(leb_cmds[i].val, leb);
 		printf("ioctl(-1, %s, {lnum=%d, bytes=%d, dtype=%s}) = %s\n",
 		       leb_cmds[i].str, leb->lnum, leb->bytes, "UBI_UNKNOWN",
 		       errstr);
@@ -187,7 +184,7 @@ main(int argc, const char *argv[])
 	map->dtype = 3;
 
 	for (size_t i = 0; i < ARRAY_SIZE(map_cmds); ++i) {
-		do_ioctl_ptr(map_cmds[i].cmd, map);
+		do_ioctl_ptr(map_cmds[i].val, map);
 		printf("ioctl(-1, %s, {lnum=%d, dtype=%s}) = %s\n",
 		       map_cmds[i].str, map->lnum, "UBI_UNKNOWN", errstr);
 	}
@@ -207,7 +204,7 @@ main(int argc, const char *argv[])
 			mkvol->name_len = lens[j];
 			int len = CLAMP(mkvol->name_len, 0,
 					UBI_MAX_VOLUME_NAME);
-			int rc = do_ioctl_ptr(mkvol_cmds[i].cmd, mkvol);
+			int rc = do_ioctl_ptr(mkvol_cmds[i].val, mkvol);
 			printf("ioctl(-1, %s, {vol_id=%d, alignment=%d"
 			       ", bytes=%jd, vol_type=%s, flags=%s"
 			       ", name_len=%hd, name=\"%.*s\"...}",
@@ -226,12 +223,12 @@ main(int argc, const char *argv[])
 
 	for (size_t i = 0; i < ARRAY_SIZE(rnvol_cmds); ++i) {
 		fill_memory(rnvol, sizeof(*rnvol));
-		do_ioctl_ptr(rnvol_cmds[i].cmd, rnvol);
+		do_ioctl_ptr(rnvol_cmds[i].val, rnvol);
 		printf("ioctl(-1, %s, {count=%d, ents=[]}) = %s\n",
 		       rnvol_cmds[i].str, rnvol->count, errstr);
 
 		rnvol->count = 1;
-		do_ioctl_ptr(rnvol_cmds[i].cmd, rnvol);
+		do_ioctl_ptr(rnvol_cmds[i].val, rnvol);
 		printf("ioctl(-1, %s, {count=%d, ents=[{vol_id=%d"
 		       ", name_len=%hd, name=\"\"...}]}) = %s\n",
 		       rnvol_cmds[i].str, rnvol->count,
@@ -256,7 +253,7 @@ main(int argc, const char *argv[])
 		rnvol->ents[7].name_len = UBI_MAX_VOLUME_NAME + 1;
 		rnvol->ents[8].name_len = UBI_MAX_VOLUME_NAME + 1;
 		rnvol->ents[8].name[UBI_MAX_VOLUME_NAME] = '\0';
-		do_ioctl_ptr(rnvol_cmds[i].cmd, rnvol);
+		do_ioctl_ptr(rnvol_cmds[i].val, rnvol);
 		printf("ioctl(-1, %s, {count=%d, ents=[",
 		       rnvol_cmds[i].str, rnvol->count);
 		for (size_t j = 0; j < UBI_MAX_RNVOL; ++j) {
@@ -278,7 +275,7 @@ main(int argc, const char *argv[])
 	fill_memory(rsvol, sizeof(*rsvol));
 
 	for (size_t i = 0; i < ARRAY_SIZE(rsvol_cmds); ++i) {
-		do_ioctl_ptr(rsvol_cmds[i].cmd, rsvol);
+		do_ioctl_ptr(rsvol_cmds[i].val, rsvol);
 		printf("ioctl(-1, %s, {bytes=%jd, vol_id=%d}) = %s\n",
 		       rsvol_cmds[i].str, (intmax_t) rsvol->bytes,
 		       rsvol->vol_id, errstr);
@@ -289,7 +286,7 @@ main(int argc, const char *argv[])
 	prop->property = UBI_VOL_PROP_DIRECT_WRITE;
 
 	for (size_t i = 0; i < ARRAY_SIZE(prop_cmds); ++i) {
-		do_ioctl_ptr(prop_cmds[i].cmd, prop);
+		do_ioctl_ptr(prop_cmds[i].val, prop);
 		printf("ioctl(-1, %s, {property=%s, value=%#jx}) = %s\n",
 		       prop_cmds[i].str, "UBI_VOL_PROP_DIRECT_WRITE",
 		       (uintmax_t) prop->value, errstr);

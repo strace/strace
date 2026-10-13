@@ -160,21 +160,18 @@ test_IORING_REGISTER_FILES(int fd_null, int fd_full, const int *arg_fds,
 			   const int *fds, size_t fds_len)
 {
 	/* Operations with an fd array argument */
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} fd_arr_ops[] = {
+	static const struct strval32 fd_arr_ops[] = {
 		{ 2, "IORING_REGISTER_FILES" },
 		{ 4, "IORING_REGISTER_EVENTFD" },
 		{ 7, "IORING_REGISTER_EVENTFD_ASYNC" },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(fd_arr_ops); i++) {
-		sys_io_uring_register(fd_null, fd_arr_ops[i].op, arg_fds, fds_len);
+		sys_io_uring_register(fd_null, fd_arr_ops[i].val, arg_fds, fds_len);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT
 		       ", [%u<%s>, %u<%s>, -1, -2, -3], %zu) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(fd_arr_ops[i].op, fd_arr_ops[i].str),
+		       XLAT_SEL(fd_arr_ops[i].val, fd_arr_ops[i].str),
 		       fd_full, path_full, fd_null, path_null,
 		       fds_len, errstr);
 	}
@@ -593,10 +590,7 @@ test_IORING_REGISTER_FILES2_BUFFERS2(int fd_null,
 				     const int *arg_fds, const int *fds,
 				     size_t fds_len)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} rsrc_reg_ops[] = {
+	static const struct strval32 rsrc_reg_ops[] = {
 		{ 13, "IORING_REGISTER_FILES2" },
 		{ 15, "IORING_REGISTER_BUFFERS2" },
 	};
@@ -619,12 +613,12 @@ test_IORING_REGISTER_FILES2_BUFFERS2(int fd_null,
 	fill_memory(big_rsrc_reg, sizeof(*big_rsrc_reg) + 8);
 
 	for (size_t i = 0; i < ARRAY_SIZE(rsrc_reg_ops); i++) {
-		sys_io_uring_register(fd_null, rsrc_reg_ops[i].op, 0,
+		sys_io_uring_register(fd_null, rsrc_reg_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(rsrc_reg_ops[i].op, rsrc_reg_ops[i].str),
+		       XLAT_SEL(rsrc_reg_ops[i].val, rsrc_reg_ops[i].str),
 		       0xdeadbeef, errstr);
 
 		struct {
@@ -635,12 +629,12 @@ test_IORING_REGISTER_FILES2_BUFFERS2(int fd_null,
 			{ bogus_rsrc_reg, 32 },
 		};
 		for (size_t j = 0; j < ARRAY_SIZE(ptr_args); j++) {
-			sys_io_uring_register(fd_null, rsrc_reg_ops[i].op,
+			sys_io_uring_register(fd_null, rsrc_reg_ops[i].val,
 					      ptr_args[j].ptr, ptr_args[j].sz);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(rsrc_reg_ops[i].op,
+			       XLAT_SEL(rsrc_reg_ops[i].val,
 					rsrc_reg_ops[i].str),
 			       ptr_args[j].ptr, ptr_args[j].sz, errstr);
 		}
@@ -671,7 +665,7 @@ test_IORING_REGISTER_FILES2_BUFFERS2(int fd_null,
 
 			for (size_t k = 1; k < 5; k++) {
 				sys_io_uring_register(fd_null,
-						      rsrc_reg_ops[i].op,
+						      rsrc_reg_ops[i].val,
 						      k > 2 ? big_rsrc_reg
 						             : rsrc_reg,
 						      sizeof(*rsrc_reg)
@@ -679,7 +673,7 @@ test_IORING_REGISTER_FILES2_BUFFERS2(int fd_null,
 				printf("io_uring_register(%u<%s>, " XLAT_FMT
 				       ", {nr=%zu, flags=%s%s",
 				       fd_null, path_null,
-				       XLAT_SEL(rsrc_reg_ops[i].op,
+				       XLAT_SEL(rsrc_reg_ops[i].val,
 						rsrc_reg_ops[i].str),
 				       j & 32 ? (i ? iov_len : fds_len)
 						+ !!(j & 16) : 0,
@@ -712,10 +706,7 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 						  const int *arg_fds,
 						  const int *fds, size_t fds_len)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} rsrc_upd_ops[] = {
+	static const struct strval32 rsrc_upd_ops[] = {
 		{ 14, "IORING_REGISTER_FILES_UPDATE2" },
 		{ 16, "IORING_REGISTER_BUFFERS_UPDATE" },
 	};
@@ -731,12 +722,12 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 	fill_memory(big_rsrc_upd, sizeof(*big_rsrc_upd) + 8);
 
 	for (size_t i = 0; i < ARRAY_SIZE(rsrc_upd_ops); i++) {
-		sys_io_uring_register(fd_null, rsrc_upd_ops[i].op, 0,
+		sys_io_uring_register(fd_null, rsrc_upd_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(rsrc_upd_ops[i].op, rsrc_upd_ops[i].str),
+		       XLAT_SEL(rsrc_upd_ops[i].val, rsrc_upd_ops[i].str),
 		       0xdeadbeef, errstr);
 
 		struct {
@@ -747,12 +738,12 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 			{ bogus_rsrc_upd, 32 },
 		};
 		for (size_t j = 0; j < ARRAY_SIZE(ptr_args); j++) {
-			sys_io_uring_register(fd_null, rsrc_upd_ops[i].op,
+			sys_io_uring_register(fd_null, rsrc_upd_ops[i].val,
 					      ptr_args[j].ptr, ptr_args[j].sz);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(rsrc_upd_ops[i].op,
+			       XLAT_SEL(rsrc_upd_ops[i].val,
 					rsrc_upd_ops[i].str),
 			       ptr_args[j].ptr, ptr_args[j].sz, errstr);
 		}
@@ -785,7 +776,7 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 
 			for (size_t k = 1; k < 5; k++) {
 				sys_io_uring_register(fd_null,
-						      rsrc_upd_ops[i].op,
+						      rsrc_upd_ops[i].val,
 						      k > 2 ? big_rsrc_upd
 						             : rsrc_upd,
 						      sizeof(*rsrc_upd)
@@ -793,7 +784,7 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 				printf("io_uring_register(%u<%s>, " XLAT_FMT
 				       ", {offset=%s%s",
 				       fd_null, path_null,
-				       XLAT_SEL(rsrc_upd_ops[i].op,
+				       XLAT_SEL(rsrc_upd_ops[i].val,
 						rsrc_upd_ops[i].str),
 				       j % 3 ? "0" : "3735943886",
 				       j & 64 ? ", resv=0xbadc0ded" : "");
@@ -945,10 +936,7 @@ static void
 test_IORING_REGISTER_RING_FDS(int fd_null, const int *fds,
 			      const char *const paths[], size_t fds_len)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} ringfd_ops[] = {
+	static const struct strval32 ringfd_ops[] = {
 		{ 20, "IORING_REGISTER_RING_FDS" },
 		{ 21, "IORING_UNREGISTER_RING_FDS" },
 	};
@@ -968,27 +956,27 @@ test_IORING_REGISTER_RING_FDS(int fd_null, const int *fds,
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(ringfd_ops); i++) {
-		sys_io_uring_register(fd_null, ringfd_ops[i].op, 0,
+		sys_io_uring_register(fd_null, ringfd_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       XLAT_SEL(ringfd_ops[i].val, ringfd_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, ringfd_ops[i].op,
+		sys_io_uring_register(fd_null, ringfd_ops[i].val,
 				      ringfds + ringfd_count, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", [], 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       XLAT_SEL(ringfd_ops[i].val, ringfd_ops[i].str),
 		       errstr);
 
-		sys_io_uring_register(fd_null, ringfd_ops[i].op,
+		sys_io_uring_register(fd_null, ringfd_ops[i].val,
 				      ringfds + ringfd_count, 1);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       XLAT_SEL(ringfd_ops[i].val, ringfd_ops[i].str),
 		       ringfds + ringfd_count, errstr);
 
 		/* offs:sz: 33-31:32, 33-32:32, 33-32:33, 33-33:33 */
@@ -996,23 +984,23 @@ test_IORING_REGISTER_RING_FDS(int fd_null, const int *fds,
 			const size_t offs = (4 - j) / 2;
 			const size_t sz = 32 + j / 2;
 
-			sys_io_uring_register(fd_null, ringfd_ops[i].op,
+			sys_io_uring_register(fd_null, ringfd_ops[i].val,
 					      ringfds + offs, sz);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", [",
 			       fd_null, path_null,
-			       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str));
+			       XLAT_SEL(ringfd_ops[i].val, ringfd_ops[i].str));
 			for (uint32_t k = offs; k < MIN(ringfd_count,
 							DEFAULT_STRLEN + offs);
 			     k++) {
 				printf("%s{offset=", k != offs ? ", " : "");
-				printf(ringfd_ops[i].op == 21 ||
+				printf(ringfd_ops[i].val == 21 ||
 				       k % ARRAY_SIZE(ringfd_off) ? "%u" : "%d",
 				       ARR_ITEM(ringfd_off, k));
 				if (k % 2)
 					printf(", resv=%#x", k * 0x1010101);
 
 				const size_t fdid = k % fds_len;
-				if (ringfd_ops[i].op == 20) {
+				if (ringfd_ops[i].val == 20) {
 					printf(", data=%d%s%s%s",
 					       fds[fdid],
 					       paths[fdid] ? "<": "",
@@ -1041,29 +1029,26 @@ test_IORING_REGISTER_RING_FDS(int fd_null, const int *fds,
 static void
 test_IORING_REGISTER_PBUF_RING(int fd_null)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} buf_reg_ops[] = {
+	static const struct strval32 buf_reg_ops[] = {
 		{ 22, "IORING_REGISTER_PBUF_RING" },
 		{ 23, "IORING_UNREGISTER_PBUF_RING" },
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_buf_reg, buf_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_reg_ops); i++) {
-		sys_io_uring_register(fd_null, buf_reg_ops[i].op, 0,
+		sys_io_uring_register(fd_null, buf_reg_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+		       XLAT_SEL(buf_reg_ops[i].val, buf_reg_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+		sys_io_uring_register(fd_null, buf_reg_ops[i].val,
 				      buf_reg + 1, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+		       XLAT_SEL(buf_reg_ops[i].val, buf_reg_ops[i].str),
 		       buf_reg + 1, errstr);
 
 		for (size_t j = 0; j < 2048; j++) {
@@ -1079,20 +1064,20 @@ test_IORING_REGISTER_PBUF_RING(int fd_null)
 			buf_reg->resv[3] = j &  512 ? 0xbeefdead : 0;
 			buf_reg->resv[4] = j & 1024 ? 0xfacefeed : 0;
 
-			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+			sys_io_uring_register(fd_null, buf_reg_ops[i].val,
 					      buf_reg, 0x42);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+			       XLAT_SEL(buf_reg_ops[i].val, buf_reg_ops[i].str),
 			       buf_reg, errstr);
 
-			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+			sys_io_uring_register(fd_null, buf_reg_ops[i].val,
 					      buf_reg, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT
 			       ", {ring_addr=",
 			       fd_null, path_null,
-			       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str));
+			       XLAT_SEL(buf_reg_ops[i].val, buf_reg_ops[i].str));
 			if (j & 2)
 				printf("%p", buf_reg);
 			else
@@ -1119,30 +1104,28 @@ test_IORING_REGISTER_PBUF_RING(int fd_null)
 static void
 test_IORING_REGISTER_SYNC_CANCEL(int fd_null)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} sync_cancel_reg_ops[] = {
+	static const struct strval32 sync_cancel_reg_ops[] = {
 		{ 24, "IORING_REGISTER_SYNC_CANCEL" },
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_sync_cancel_reg,
 				    sync_cancel_reg);
 
 	for (size_t i = 0; i < ARRAY_SIZE(sync_cancel_reg_ops); i++) {
-		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op, 0,
+		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(sync_cancel_reg_ops[i].op,
+		       XLAT_SEL(sync_cancel_reg_ops[i].val,
 			        sync_cancel_reg_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+		sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].val,
 				      sync_cancel_reg + 1, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(sync_cancel_reg_ops[i].op, sync_cancel_reg_ops[i].str),
+		       XLAT_SEL(sync_cancel_reg_ops[i].val,
+				sync_cancel_reg_ops[i].str),
 		       sync_cancel_reg + 1, errstr);
 
 		for (size_t j = 0; j < 0x100; j++) {
@@ -1163,21 +1146,21 @@ test_IORING_REGISTER_SYNC_CANCEL(int fd_null)
 			if (j & 0x80)
 				sync_cancel_reg->pad2[2] = 0xbadc0de1dadface2ULL;
 
-			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].val,
 					      sync_cancel_reg, 0x42);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(sync_cancel_reg_ops[i].op,
+			       XLAT_SEL(sync_cancel_reg_ops[i].val,
 				        sync_cancel_reg_ops[i].str),
 			       sync_cancel_reg, errstr);
 
-			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].op,
+			sys_io_uring_register(fd_null, sync_cancel_reg_ops[i].val,
 					      sync_cancel_reg, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT
 			       ", {",
 			       fd_null, path_null,
-			       XLAT_SEL(sync_cancel_reg_ops[i].op,
+			       XLAT_SEL(sync_cancel_reg_ops[i].val,
 				        sync_cancel_reg_ops[i].str));
 			if (j & 0x1)
 				printf("addr=%p", sync_cancel_reg);
@@ -1215,30 +1198,28 @@ test_IORING_REGISTER_SYNC_CANCEL(int fd_null)
 static void
 test_IORING_REGISTER_FILE_ALLOC_RANGE(int fd_null)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} file_index_range_ops[] = {
+	static const struct strval32 file_index_range_ops[] = {
 		{ 25, "IORING_REGISTER_FILE_ALLOC_RANGE" },
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_file_index_range,
 				    file_index_range);
 
 	for (size_t i = 0; i < ARRAY_SIZE(file_index_range_ops); i++) {
-		sys_io_uring_register(fd_null, file_index_range_ops[i].op, 0,
+		sys_io_uring_register(fd_null, file_index_range_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(file_index_range_ops[i].op,
+		       XLAT_SEL(file_index_range_ops[i].val,
 			        file_index_range_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+		sys_io_uring_register(fd_null, file_index_range_ops[i].val,
 				      file_index_range + 1, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(file_index_range_ops[i].op, file_index_range_ops[i].str),
+		       XLAT_SEL(file_index_range_ops[i].val,
+				file_index_range_ops[i].str),
 		       file_index_range + 1, errstr);
 
 		for (size_t j = 0; j < (1U << 3); j++) {
@@ -1247,21 +1228,21 @@ test_IORING_REGISTER_FILE_ALLOC_RANGE(int fd_null)
 			file_index_range->len = j & 2 ? 0xcafef00dU : 0;
 			file_index_range->resv = j & 4 ? 0xbadc0de1dadface2ULL : 0;
 
-			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+			sys_io_uring_register(fd_null, file_index_range_ops[i].val,
 					      file_index_range, 0x42);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(file_index_range_ops[i].op,
+			       XLAT_SEL(file_index_range_ops[i].val,
 				        file_index_range_ops[i].str),
 			       file_index_range, errstr);
 
-			sys_io_uring_register(fd_null, file_index_range_ops[i].op,
+			sys_io_uring_register(fd_null, file_index_range_ops[i].val,
 					      file_index_range, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT
 			       ", {off=%u, len=%u",
 			       fd_null, path_null,
-			       XLAT_SEL(file_index_range_ops[i].op,
+			       XLAT_SEL(file_index_range_ops[i].val,
 				        file_index_range_ops[i].str),
 			       file_index_range->off, file_index_range->len);
 			if (j & 4)
@@ -1274,29 +1255,26 @@ test_IORING_REGISTER_FILE_ALLOC_RANGE(int fd_null)
 static void
 test_IORING_REGISTER_PBUF_STATUS(int fd_null)
 {
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} buf_status_ops[] = {
+	static const struct strval32 buf_status_ops[] = {
 		{ 26, "IORING_REGISTER_PBUF_STATUS" },
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_buf_status, buf_status);
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_status_ops); i++) {
-		sys_io_uring_register(fd_null, buf_status_ops[i].op, 0,
+		sys_io_uring_register(fd_null, buf_status_ops[i].val, 0,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
 		       " = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(buf_status_ops[i].op,
+		       XLAT_SEL(buf_status_ops[i].val,
 			        buf_status_ops[i].str),
 		       0xdeadbeef, errstr);
 
-		sys_io_uring_register(fd_null, buf_status_ops[i].op,
+		sys_io_uring_register(fd_null, buf_status_ops[i].val,
 				      buf_status + 1, 0);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(buf_status_ops[i].op, buf_status_ops[i].str),
+		       XLAT_SEL(buf_status_ops[i].val, buf_status_ops[i].str),
 		       buf_status + 1, errstr);
 
 		for (size_t j = 0; j < (1U << 3); j++) {
@@ -1305,16 +1283,16 @@ test_IORING_REGISTER_PBUF_STATUS(int fd_null)
 			buf_status->head = j & 2 ? 0xcafef00dU : 0;
 			buf_status->resv[7] = j & 4 ? 0xbadc0dedU : 0;
 
-			sys_io_uring_register(fd_null, buf_status_ops[i].op,
+			sys_io_uring_register(fd_null, buf_status_ops[i].val,
 					      buf_status, 0x42);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 66)"
 			       " = %s\n",
 			       fd_null, path_null,
-			       XLAT_SEL(buf_status_ops[i].op,
+			       XLAT_SEL(buf_status_ops[i].val,
 				        buf_status_ops[i].str),
 			       buf_status, errstr);
 
-			sys_io_uring_register(fd_null, buf_status_ops[i].op,
+			sys_io_uring_register(fd_null, buf_status_ops[i].val,
 					      buf_status, 1);
 			printf("io_uring_register(%u<%s>, " XLAT_FMT ", "
 #if RETVAL_INJECTED
@@ -1323,7 +1301,7 @@ test_IORING_REGISTER_PBUF_STATUS(int fd_null)
 			       "%p",
 #endif
 			       fd_null, path_null,
-			       XLAT_SEL(buf_status_ops[i].op,
+			       XLAT_SEL(buf_status_ops[i].val,
 				        buf_status_ops[i].str),
 #if RETVAL_INJECTED
 			       buf_status->buf_group, buf_status->head
@@ -3042,10 +3020,7 @@ main(void)
 	}
 
 	/* Opcodes without an argument */
-	static const struct {
-		unsigned int op;
-		const char *str;
-	} no_arg_ops[] = {
+	static const struct strval32 no_arg_ops[] = {
 		{ 1, "IORING_UNREGISTER_BUFFERS" },
 		{ 3, "IORING_UNREGISTER_FILES" },
 		{ 5, "IORING_UNREGISTER_EVENTFD" },
@@ -3056,21 +3031,21 @@ main(void)
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(no_arg_ops); i++) {
-		sys_io_uring_register(fd_null, no_arg_ops[i].op, path_null,
+		sys_io_uring_register(fd_null, no_arg_ops[i].val, path_null,
 				      0xdeadbeef);
 		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u) = %s\n",
 		       fd_null, path_null,
-		       XLAT_SEL(no_arg_ops[i].op, no_arg_ops[i].str),
+		       XLAT_SEL(no_arg_ops[i].val, no_arg_ops[i].str),
 		       path_null, 0xdeadbeef, errstr);
 
 		for (size_t j = 0; j < ARRAY_SIZE(op_flags); ++j) {
-			sys_io_uring_register(fd_null, no_arg_ops[i].op |
+			sys_io_uring_register(fd_null, no_arg_ops[i].val |
 						       op_flags[j].val,
 					      path_null, 0xdeadbeef);
 			printf("io_uring_register(%u, " XLAT_FMT "|" XLAT_FMT
 			       ", %p, %u) = %s\n",
 			       fd_null,
-			       XLAT_SEL(no_arg_ops[i].op, no_arg_ops[i].str),
+			       XLAT_SEL(no_arg_ops[i].val, no_arg_ops[i].str),
 			       XLAT_SEL(op_flags[j].val, op_flags[j].str),
 			       path_null, 0xdeadbeef, errstr);
 		}

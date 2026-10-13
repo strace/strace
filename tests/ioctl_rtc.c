@@ -115,10 +115,7 @@ main(int argc, const char *argv[])
 	skip_ioctls(argc, argv);
 #endif
 
-	static const struct {
-		unsigned int cmd;
-		const char *str;
-	} noarg_cmds[] = {
+	static const struct strval32 noarg_cmds[] = {
 		{ ARG_STR(RTC_AIE_OFF) },
 #ifdef HPPA
 		{ RTC_AIE_ON, "PA_PERF_ON or RTC_AIE_ON" },
@@ -167,13 +164,13 @@ main(int argc, const char *argv[])
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(noarg_cmds); ++i) {
-		do_ioctl(noarg_cmds[i].cmd, lmagic);
+		do_ioctl(noarg_cmds[i].val, lmagic);
 		printf("ioctl(-1, %s) = %s\n",
 		       noarg_cmds[i].str, errstr);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(long_cmds); ++i) {
-		do_ioctl(long_cmds[i].cmd, lmagic);
+		do_ioctl(long_cmds[i].val, lmagic);
 		printf("ioctl(-1, %s, %lu) = %s\n",
 		       long_cmds[i].str, lmagic, errstr);
 	}
@@ -182,7 +179,7 @@ main(int argc, const char *argv[])
 	*plong = lmagic;
 
 	for (size_t i = 0; i < ARRAY_SIZE(plong_cmds); ++i) {
-		if (do_ioctl_ptr(plong_cmds[i].cmd, plong) < 0) {
+		if (do_ioctl_ptr(plong_cmds[i].val, plong) < 0) {
 			printf("ioctl(-1, %s, %p) = %s\n",
 			       plong_cmds[i].str, plong, errstr);
 		} else {
@@ -194,10 +191,10 @@ main(int argc, const char *argv[])
 	void *const efault = tail_alloc(1);
 
 	for (size_t i = 0; i < ARRAY_SIZE(ptr_cmds); ++i) {
-		do_ioctl(ptr_cmds[i].cmd, 0);
+		do_ioctl(ptr_cmds[i].val, 0);
 		printf("ioctl(-1, %s, NULL) = %s\n",
 		       ptr_cmds[i].str, errstr);
-		do_ioctl_ptr(ptr_cmds[i].cmd, efault);
+		do_ioctl_ptr(ptr_cmds[i].val, efault);
 		printf("ioctl(-1, %s, %p) = %s\n",
 		       ptr_cmds[i].str, efault, errstr);
 	}
@@ -206,14 +203,14 @@ main(int argc, const char *argv[])
 	fill_memory(rt, sizeof(*rt));
 
 	for (size_t i = 0; i < ARRAY_SIZE(w_time_cmds); ++i) {
-		do_ioctl_ptr(w_time_cmds[i].cmd, rt);
+		do_ioctl_ptr(w_time_cmds[i].val, rt);
 		printf("ioctl(-1, %s, ", w_time_cmds[i].str);
 		print_rtc_time(rt);
 		printf(") = %s\n", errstr);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(r_time_cmds); ++i) {
-		if (do_ioctl_ptr(r_time_cmds[i].cmd, rt) < 0) {
+		if (do_ioctl_ptr(r_time_cmds[i].val, rt) < 0) {
 			printf("ioctl(-1, %s, %p) = %s\n",
 			       r_time_cmds[i].str, rt, errstr);
 		} else {
@@ -227,7 +224,7 @@ main(int argc, const char *argv[])
 	fill_memory(wk, sizeof(*wk));
 
 	for (size_t i = 0; i < ARRAY_SIZE(w_wkalrm_cmds); ++i) {
-		do_ioctl_ptr(w_wkalrm_cmds[i].cmd, wk);
+		do_ioctl_ptr(w_wkalrm_cmds[i].val, wk);
 		printf("ioctl(-1, %s, {enabled=%hhu, pending=%hhu, time=",
 		       w_wkalrm_cmds[i].str, wk->enabled, wk->pending);
 		print_rtc_time(&wk->time);
@@ -235,7 +232,7 @@ main(int argc, const char *argv[])
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(r_wkalrm_cmds); ++i) {
-		if (do_ioctl_ptr(r_wkalrm_cmds[i].cmd, wk) < 0) {
+		if (do_ioctl_ptr(r_wkalrm_cmds[i].val, wk) < 0) {
 			printf("ioctl(-1, %s, %p) = %s\n",
 			       r_wkalrm_cmds[i].str, wk, errstr);
 		} else {
@@ -250,7 +247,7 @@ main(int argc, const char *argv[])
 	fill_memory(pll, sizeof(*pll));
 
 	for (size_t i = 0; i < ARRAY_SIZE(w_pll_cmds); ++i) {
-		do_ioctl_ptr(w_pll_cmds[i].cmd, pll);
+		do_ioctl_ptr(w_pll_cmds[i].val, pll);
 		printf("ioctl(-1, %s, {pll_ctrl=%d, pll_value=%d"
 		       ", pll_max=%d, pll_min=%d, pll_posmult=%d"
 		       ", pll_negmult=%d, pll_clock=%ld}) = %s\n",
@@ -260,7 +257,7 @@ main(int argc, const char *argv[])
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(r_pll_cmds); ++i) {
-		if (do_ioctl_ptr(r_pll_cmds[i].cmd, pll) < 0) {
+		if (do_ioctl_ptr(r_pll_cmds[i].val, pll) < 0) {
 			printf("ioctl(-1, %s, %p) = %s\n",
 			       r_pll_cmds[i].str, pll, errstr);
 		} else {

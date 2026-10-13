@@ -40,10 +40,7 @@ test_ptr(void)
 {
 	const char *const efault = tail_alloc(1) + 1;
 
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} cmd[] = {
+	static const struct strval32 cmd[] = {
 		{ ARG_STR(FIOSETOWN) },
 		{ ARG_STR(SIOCSPGRP) },
 		{ ARG_STR(FIOGETOWN) },
@@ -147,21 +144,21 @@ test_ptr(void)
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(cmd); ++i) {
-		do_ioctl(-1, cmd[i].cmd, 0);
+		do_ioctl(-1, cmd[i].val, 0);
 		printf("ioctl(%d, %s, NULL) = %s\n",
 		       -1, cmd[i].str, errstr);
 
-		do_ioctl_ptr(-1, cmd[i].cmd, efault);
+		do_ioctl_ptr(-1, cmd[i].val, efault);
 		printf("ioctl(%d, %s, %p) = %s\n",
 		       -1, cmd[i].str, efault, errstr);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(unknown_cmd); ++i) {
-		do_ioctl(-1, unknown_cmd[i].cmd, 0);
+		do_ioctl(-1, unknown_cmd[i].val, 0);
 		printf("ioctl(%d, %s, 0) = %s\n",
 		       -1, unknown_cmd[i].str, errstr);
 
-		do_ioctl_ptr(-1, unknown_cmd[i].cmd, efault);
+		do_ioctl_ptr(-1, unknown_cmd[i].val, efault);
 		printf("ioctl(%d, %s, %p) = %s\n",
 		       -1, unknown_cmd[i].str, efault, errstr);
 	}
@@ -204,26 +201,23 @@ test_str(void)
 {
 	char *const buf = tail_alloc(IFNAMSIZ);
 
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} cmd[] = {
+	static const struct strval32 cmd[] = {
 		{ ARG_STR(SIOCBRADDBR) },
 		{ ARG_STR(SIOCBRDELBR) },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(cmd); ++i) {
 		fill_memory_ex(buf, IFNAMSIZ, '0', 10);
-		do_ioctl_ptr(-1, cmd[i].cmd, buf + 1);
+		do_ioctl_ptr(-1, cmd[i].val, buf + 1);
 		printf("ioctl(%d, %s, %p) = %s\n",
 		       -1, cmd[i].str, buf + 1, errstr);
 
-		do_ioctl_ptr(-1, cmd[i].cmd, buf);
+		do_ioctl_ptr(-1, cmd[i].val, buf);
 		printf("ioctl(%d, %s, \"%.*s\"...) = %s\n",
 		       -1, cmd[i].str, IFNAMSIZ, buf, errstr);
 
 		buf[IFNAMSIZ - 1] = '\0';
-		do_ioctl_ptr(-1, cmd[i].cmd, buf);
+		do_ioctl_ptr(-1, cmd[i].val, buf);
 		printf("ioctl(%d, %s, \"%s\") = %s\n",
 		       -1, cmd[i].str, buf, errstr);
 	}

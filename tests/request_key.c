@@ -88,10 +88,7 @@ main(void)
 		{ "overly long info", STRINGIFY("overly long ") "..." },
 	};
 
-	struct {
-		uint32_t keyring;
-		const char *str;
-	} keyrings[] = {
+	struct strval32 keyrings[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(1234567890) },
 		{ ARG_STR(-1234567890) },
@@ -110,7 +107,7 @@ main(void)
 						types[i].type, types[i].str,
 						descs[j].desc, descs[j].str,
 						infos[k].info, infos[k].str,
-						keyrings[l].keyring,
+						keyrings[l].val,
 						keyrings[l].str);
 
 	puts("+++ exited with 0 +++");

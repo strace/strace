@@ -362,10 +362,7 @@ main(int argc, char **argv)
 
 
 	/* SECCOMP_IOCTL_NOTIF_ID_VALID */
-	static const struct {
-		uint32_t id;
-		const char *str;
-	} id_valid_cmds[] = {
+	static const struct strval32 id_valid_cmds[] = {
 		{ ARG_STR(SECCOMP_IOCTL_NOTIF_ID_VALID) },
 		{ IOC_ANOTHER_DIR(SECCOMP_IOCTL_NOTIF_ID_VALID, _IOC_READ),
 		  "SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR" },
@@ -374,31 +371,31 @@ main(int argc, char **argv)
 
 	for (size_t i = 0; i < ARRAY_SIZE(id_valid_cmds); i++) {
 
-		sys_ioctl(-1, id_valid_cmds[i].id, 0);
+		sys_ioctl(-1, id_valid_cmds[i].val, 0);
 		pidns_print_leader();
 		printf("ioctl(-1, " XLAT_FMT ", NULL) = %s" INJ_STR "\n",
-		       XLAT_SEL(id_valid_cmds[i].id, id_valid_cmds[i].str),
+		       XLAT_SEL(id_valid_cmds[i].val, id_valid_cmds[i].str),
 		       errstr);
 
-		sys_ioctl(-1, id_valid_cmds[i].id, (uintptr_t) id + 1);
+		sys_ioctl(-1, id_valid_cmds[i].val, (uintptr_t) id + 1);
 		pidns_print_leader();
 		printf("ioctl(-1, " XLAT_FMT ", %p) = %s" INJ_STR "\n",
-		       XLAT_SEL(id_valid_cmds[i].id, id_valid_cmds[i].str),
+		       XLAT_SEL(id_valid_cmds[i].val, id_valid_cmds[i].str),
 		       (char *) id + 1, errstr);
 
 		memset(id, 0, sizeof(*id));
-		rc = sys_ioctl(-1, id_valid_cmds[i].id, (uintptr_t) id);
+		rc = sys_ioctl(-1, id_valid_cmds[i].val, (uintptr_t) id);
 		pidns_print_leader();
 		printf("ioctl(-1, " XLAT_FMT ", [0]) = %s" INJ_STR "\n",
-		       XLAT_SEL(id_valid_cmds[i].id, id_valid_cmds[i].str),
+		       XLAT_SEL(id_valid_cmds[i].val, id_valid_cmds[i].str),
 		       errstr);
 
 		*id = 0xdecaffedfacefeedULL;
-		rc = sys_ioctl(-1, id_valid_cmds[i].id, (uintptr_t) id);
+		rc = sys_ioctl(-1, id_valid_cmds[i].val, (uintptr_t) id);
 		pidns_print_leader();
 		printf("ioctl(-1, " XLAT_FMT ", [0xdecaffedfacefeed]) = %s"
 		       INJ_STR "\n",
-		       XLAT_SEL(id_valid_cmds[i].id, id_valid_cmds[i].str),
+		       XLAT_SEL(id_valid_cmds[i].val, id_valid_cmds[i].str),
 		       errstr);
 	}
 

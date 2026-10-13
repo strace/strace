@@ -80,10 +80,7 @@ main(int argc, const char *argv[])
 	skip_ioctls(argc, argv);
 #endif
 
-	static const struct {
-		uint32_t cmd;
-		const char *str;
-	} ptr_cmds[] = {
+	static const struct strval32 ptr_cmds[] = {
 		{ ARG_STR(ECCGETLAYOUT) },
 		{ ARG_STR(ECCGETSTATS) },
 		{ ARG_STR(MEMERASE) },
@@ -114,14 +111,14 @@ main(int argc, const char *argv[])
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(ptr_cmds); ++i) {
-		do_ioctl(ptr_cmds[i].cmd, 0);
-		if (_IOC_DIR(ptr_cmds[i].cmd) == _IOC_WRITE)
+		do_ioctl(ptr_cmds[i].val, 0);
+		if (_IOC_DIR(ptr_cmds[i].val) == _IOC_WRITE)
 			printf("ioctl(-1, MIXER_WRITE(%u) or %s, NULL) = %s\n",
-			       (unsigned int) _IOC_NR(ptr_cmds[i].cmd),
+			       (unsigned int) _IOC_NR(ptr_cmds[i].val),
 			       ptr_cmds[i].str, errstr);
-		else if (_IOC_DIR(ptr_cmds[i].cmd) == _IOC_READ)
+		else if (_IOC_DIR(ptr_cmds[i].val) == _IOC_READ)
 			printf("ioctl(-1, MIXER_READ(%u) or %s, NULL) = %s\n",
-			       (unsigned int) _IOC_NR(ptr_cmds[i].cmd),
+			       (unsigned int) _IOC_NR(ptr_cmds[i].val),
 			       ptr_cmds[i].str, errstr);
 		else
 			printf("ioctl(-1, %s, NULL) = %s\n",
@@ -190,12 +187,12 @@ main(int argc, const char *argv[])
 	fill_memory(eiu, sizeof(*eiu));
 
 	for (size_t i = 0; i < ARRAY_SIZE(eiu_cmds); ++i) {
-		do_ioctl_ptr(eiu_cmds[i].cmd, eiu);
+		do_ioctl_ptr(eiu_cmds[i].val, eiu);
 		printf("ioctl(-1, MIXER_%s(%u) or %s"
 		       ", {start=%#x, length=%#x}) = %s\n",
-		       (_IOC_DIR(eiu_cmds[i].cmd) == _IOC_READ)
+		       (_IOC_DIR(eiu_cmds[i].val) == _IOC_READ)
 		        ? "READ" : "WRITE",
-		       (unsigned int) _IOC_NR(eiu_cmds[i].cmd),
+		       (unsigned int) _IOC_NR(eiu_cmds[i].val),
 		       eiu_cmds[i].str, eiu->start, eiu->length, errstr);
 	}
 
