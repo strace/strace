@@ -111,10 +111,7 @@ main(void)
 
 	uint8_t proto;
 
-	static const struct {
-		uint8_t arg;
-		const char *str;
-	} proto_args[] = {
+	static const struct strval8 proto_args[] = {
 		{ ARG_STR(RTPROT_UNSPEC) },
 		{ 5, "0x5 /* RTPROT_??? */" },
 		{ 17, "RTPROT_MROUTED" },
@@ -124,24 +121,21 @@ main(void)
 	};
 
 	for (unsigned i = 0; i < ARRAY_SIZE(proto_args); i++) {
-		proto = proto_args[i].arg;
+		proto = proto_args[i].val;
 		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				   init_rtmsg, print_rtmsg,
 				   FRA_PROTOCOL, pattern, proto,
 				   printf("%s", proto_args[i].str));
 	}
 
-	static const struct {
-		uint8_t arg;
-		const char *str;
-	} ipproto_args[] = {
+	static const struct strval8 ipproto_args[] = {
 		{ ARG_STR(IPPROTO_TCP) },
 		{ 254, "0xfe /* IPPROTO_??? */" },
 		{ ARG_STR(IPPROTO_RAW) },
 	};
 
 	for (unsigned i = 0; i < ARRAY_SIZE(ipproto_args); i++) {
-		proto = ipproto_args[i].arg;
+		proto = ipproto_args[i].val;
 		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				   init_rtmsg, print_rtmsg,
 				   FRA_IP_PROTO, pattern, proto,
