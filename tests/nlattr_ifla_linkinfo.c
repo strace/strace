@@ -712,8 +712,6 @@ main(void)
 	/* macvlan attrs */
 	static const struct strval32 und_macvlan_attrs[] = {
 		{ ARG_STR(IFLA_MACVLAN_UNSPEC) },
-		{ ARG_STR(IFLA_MACVLAN_MACADDR) },
-		{ ARG_STR(IFLA_MACVLAN_MACADDR_DATA) },
 		{ 10, "0xa /* IFLA_MACVLAN_??? */" },
 	};
 
@@ -726,6 +724,67 @@ main(void)
 				     { 2, "\"\\xab\\xac\"" },
 				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" });
 	}
+
+	static const uint8_t macvlan_addr[] = {
+		0xab, 0xac, 0xdb, 0xcd, 0x61, 0x62
+	};
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     IFLA_MACVLAN_MACADDR, "IFLA_MACVLAN_MACADDR",
+			     macvlan_addr, pattern,
+			     { 2, "ab:ac" },
+			     { 6, "ab:ac:db:cd:61:62" },
+			     { 8, "ab:ac:db:cd:61:62:61:62" });
+
+	struct {
+		struct {
+			struct nlattr nla;
+			uint8_t addr[6];
+			uint8_t pad[2];
+		} first, second;
+	} macvlan_addrs = {
+		.first = {
+			.nla = { .nla_len = NLA_HDRLEN + 6,
+				 .nla_type = IFLA_MACVLAN_MACADDR },
+			.addr = { 0xde, 0xad, 0xfa, 0xce, 0xbe, 0xef },
+		},
+		.second = {
+			.nla = { .nla_len = NLA_HDRLEN + 6,
+				 .nla_type = IFLA_MACVLAN_MACADDR },
+			.addr = { 0x02, 0x11, 0x22, 0x33, 0x44, 0x55 },
+		},
+	};
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     IFLA_MACVLAN_MACADDR_DATA,
+			     "IFLA_MACVLAN_MACADDR_DATA",
+			     macvlan_addrs, pattern,
+			     { 3, BE_LE("\"\\x00\\x0a\\x00\"",
+					"\"\\x0a\\x00\\x04\"") },
+			     { sizeof(macvlan_addrs.first),
+			       "[{nla_len=10, nla_type=IFLA_MACVLAN_MACADDR}, "
+			       "de:ad:fa:ce:be:ef]" },
+			     { sizeof(macvlan_addrs),
+			       "[[{nla_len=10, nla_type=IFLA_MACVLAN_MACADDR}, "
+			       "de:ad:fa:ce:be:ef], "
+			       "[{nla_len=10, nla_type=IFLA_MACVLAN_MACADDR}, "
+			       "02:11:22:33:44:55]]" });
+
+	macvlan_addrs.second.nla.nla_type = IFLA_MACVLAN_MAX + 1;
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "macvlan",
+			     IFLA_MACVLAN_MACADDR_DATA,
+			     "IFLA_MACVLAN_MACADDR_DATA",
+			     macvlan_addrs, pattern,
+			     { sizeof(macvlan_addrs.first) + 2,
+			       "[[{nla_len=10, nla_type=IFLA_MACVLAN_MACADDR}, "
+			       "de:ad:fa:ce:be:ef], "
+			       BE_LE("\"\\x00\\x0a\"", "\"\\x0a\\x00\"") "]" },
+			     { sizeof(macvlan_addrs),
+			       "[[{nla_len=10, nla_type=IFLA_MACVLAN_MACADDR}, "
+			       "de:ad:fa:ce:be:ef], "
+			       "[{nla_len=10, nla_type=0xa /* IFLA_MACVLAN_??? */}, "
+			       "\"\\x02\\x11\\x22\\x33\\x44\\x55\"]]" });
 
 	static const struct strval32 u32_macvlan_attrs[] = {
 		{ ARG_STR(IFLA_MACVLAN_MACADDR_COUNT) },

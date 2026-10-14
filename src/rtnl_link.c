@@ -668,13 +668,32 @@ decode_ifla_macvlan_macaddr_mode(struct tcb *const tcp,
 	return decode_nla_xval(tcp, addr, len, &opts);
 }
 
+static bool
+decode_ifla_macvlan_macaddr_data(struct tcb *const tcp,
+				const kernel_ulong_t addr,
+				const unsigned int len,
+				const void *const opaque_data)
+{
+	static const nla_decoder_t decoders[] = {
+		[IFLA_MACVLAN_MACADDR] = decode_nla_hwaddr_nofamily,
+	};
+
+	if (len < sizeof(struct nlattr))
+		return false;
+
+	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_macvlan_attrs,
+		      "IFLA_MACVLAN_???", ARRSZ_PAIR(decoders), NULL);
+
+	return true;
+}
+
 static const nla_decoder_t ifla_info_data_macvlan_nla_decoders[] = {
 	[IFLA_MACVLAN_UNSPEC]			= NULL,
 	[IFLA_MACVLAN_MODE]			= decode_ifla_macvlan_mode,
 	[IFLA_MACVLAN_FLAGS]			= decode_ifla_macvlan_flags,
 	[IFLA_MACVLAN_MACADDR_MODE]		= decode_ifla_macvlan_macaddr_mode,
-	[IFLA_MACVLAN_MACADDR]			= NULL,
-	[IFLA_MACVLAN_MACADDR_DATA]		= NULL,
+	[IFLA_MACVLAN_MACADDR]			= decode_nla_hwaddr_nofamily,
+	[IFLA_MACVLAN_MACADDR_DATA]		= decode_ifla_macvlan_macaddr_data,
 	[IFLA_MACVLAN_MACADDR_COUNT]		= decode_nla_u32,
 	[IFLA_MACVLAN_BC_QUEUE_LEN]		= decode_nla_u32,
 	[IFLA_MACVLAN_BC_QUEUE_LEN_USED]	= decode_nla_u32,
