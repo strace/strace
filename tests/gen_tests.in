@@ -1104,6 +1104,7 @@ setgroups32	-s2 -a19
 sethostname	-a22
 setns	-a21
 setns-report-ns-id	-a11	-e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id--pidns	+procfs-pidns.sh
 setregid	-a15
 setregid32	-a17
 setresgid	-a19

@@ -781,6 +781,7 @@ check_SCRIPTS = \
 	prctl-success.sh \
 	prctl.sh \
 	print_scno_getcwd.sh \
+	procfs-pidns.sh \
 	qualify_personality.sh \
 	qualify_personality_all.sh \
 	run.sh \
