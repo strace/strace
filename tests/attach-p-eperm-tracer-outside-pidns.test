@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# Check attach diagnostics for a tracer outside strace's PID namespace.
+#
+# Copyright (c) 2026 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+check_prog mkfifo
+check_prog unshare
+
+unshare -Urpf -- true ||
+	framework_skip_ 'unshare -Urpf -- true failed'
+mkfifo "$OUT.fifo" || framework_skip_ 'mkfifo failed'
+
+case $- in
+	*x*) set -- -x ;;
+	*) set -- ;;
+esac
+
+$STRACE -qq -f --trace=none --signal=none -o "$OUT" \
+	unshare -Urpf -- sh "$@" -c '
+	tracer_pid=
+	while read -r key value rest; do
+		if [ "$key" = TracerPid: ]; then
+			tracer_pid=$value
+			break
+		fi
+	done < /proc/self/status
+	[ "${tracer_pid:-0}" -gt 0 ] || exit 1
+
+	# Open both ends so the reader can start without waiting for a writer.
+	exec 3<> "$3" || exit 1
+	(read -r released < "$3") &
+	tracee_pid=$!
+	trap '\''echo "done" >&3'\'' 0
+	attach_rc=0
+	# Bound the attach attempt, not the lifetime of the tracee.
+	timeout_cmd="timeout -k 5 30"
+	$timeout_cmd true > /dev/null 2>&1 || timeout_cmd=
+	$timeout_cmd "$1" -p "$tracee_pid" 2>"$2" ||
+		attach_rc=$?
+	echo "done" >&3 || exit 1
+	trap - 0
+	exec 3>&-
+	wait "$tracee_pid" || exit 1
+	[ "$attach_rc" = 1 ] || exit 1
+
+	for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
+		if grep -Fqx \
+			"$1: attach: ptrace($cmd, $tracee_pid): Operation not permitted" \
+			"$2"; then
+			msg="$1: Process $tracee_pid is already being traced"
+			msg="$msg by pid $tracer_pid in procfs PID NS"
+			grep -Fqx "$msg" "$2"
+			exit $?
+		fi
+	done
+	exit 1
+	' sh "$STRACE_EXE" "$LOG" "$OUT.fifo" 2>"$OUT.err" || {
+	cat "$OUT.err" >&2
+	dump_log_and_fail_with 'unexpected attach diagnostics'
+}
