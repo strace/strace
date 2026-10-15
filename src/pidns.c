@@ -537,8 +537,11 @@ printpid_translation(struct tcb *tcp, int pid, enum pid_type type)
 	if (print_ns_translation || print_comm) {
 		int strace_pid = translate_pid(tcp, pid, type, NULL);
 		if (strace_pid) {
-			if (print_comm)
-				print_pid_comm(strace_pid);
+			if (print_comm) {
+				int proc_pid = get_proc_pid(strace_pid);
+				if (proc_pid)
+					print_pid_comm(proc_pid);
+			}
 			if (print_ns_translation && strace_pid != pid)
 				tprintf_comment("%d in strace's PID NS",
 						strace_pid);

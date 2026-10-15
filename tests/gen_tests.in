@@ -1210,6 +1210,7 @@ strace--absolute-timestamps-format-unix-precision-s +strace-ttt.test 0 --absolut
 strace--absolute-timestamps-format-unix-precision-us +strace-ttt.test 6 --absolute-timestamps=precision:us --absolute-timestamps=format:unix
 strace--always-show-pid	--always-show-pid --trace=fchdir -a15
 strace--decode-pids-comm	--decode-pids=comm --trace=getppid,tgkill --signal='!SIGCHLD,SIGCONT' -q -f -a 18
+strace--decode-pids-comm--pidns	+procfs-pidns.sh
 strace--follow-forks-output-separately +strace-ff.test --follow-forks --output-separately
 strace--relative-timestamps +strace-r.test --relative-timestamps
 strace--relative-timestamps-ms +strace-r.test --relative-timestamps=ms
