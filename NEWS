@@ -28,9 +28,9 @@ Noteworthy changes in release ?.? (????-??-??)
     when the declared header length exceeds the available buffer size.
   * Fixed decoding of AF_BRIDGE RTM_GETNEIGH requests, including requests
     with multiple attributes.
-  * Fixed procfs lookup that used the wrong PID when strace's PID namespace
-    differs from the mounted /proc, affecting -e namespace=new annotations
-    for setns(2).
+  * Fixed several procfs lookups that used the wrong PID when strace's
+    PID namespace differs from the mounted /proc, affecting -e namespace=new
+    annotations for setns(2) and unshare(2).
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================

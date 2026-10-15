@@ -1325,6 +1325,7 @@ unlink	-a24
 unlinkat	-a35
 unshare	-a11
 unshare-report-ns-id	-a11	-e trace=unshare -e namespace=new
+unshare-report-ns-id--pidns	+procfs-pidns.sh
 userfaultfd	-a15
 ustat	-a33
 utime	-a16

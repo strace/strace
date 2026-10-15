@@ -425,7 +425,8 @@ SYS_FUNC(unshare)
 
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0], NULL);
+		tcp->auxstr = get_namespace_auxstr(get_proc_pid(tcp->pid),
+						   tcp->u_arg[0], NULL);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
