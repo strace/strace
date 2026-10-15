@@ -1399,12 +1399,16 @@ process_opt_p_list(char *opt)
 	}
 }
 
-/* Returns tracer pid if pid is already being traced, 0 if not, -1 on error. */
+/* Returns the tracer's procfs PID, 0 if not traced, -1 on error. */
 static int
 proc_pid_tracer(int pid)
 {
+	int proc_pid = get_proc_pid(pid);
+	if (!proc_pid)
+		return -1;
+
 	char path[sizeof("/proc/%d/status") + sizeof(int) * 3];
-	xsprintf(path, "/proc/%d/status", pid);
+	xsprintf(path, "/proc/%d/status", proc_pid);
 	FILE *fp = fopen_stream(path, "r");
 	if (!fp)
 		return -1;
@@ -1469,8 +1473,13 @@ diagnose_attach_eperm(int pid)
 {
 	int tracer_pid = proc_pid_tracer(pid);
 	if (tracer_pid > 0) {
-		error_msg("Process %d is already being traced by pid %d",
-			  pid, tracer_pid);
+		int strace_pid = get_strace_pid(tracer_pid);
+		if (strace_pid)
+			error_msg("Process %d is already being traced by pid %d",
+				  pid, strace_pid);
+		else
+			error_msg("Process %d is already being traced by pid %d"
+				  " in procfs PID NS", pid, tracer_pid);
 		return;
 	}
 

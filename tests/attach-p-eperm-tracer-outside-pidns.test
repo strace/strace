@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Check attach diagnostics for a tracer outside strace's PID namespace.
+#
+# Copyright (c) 2026 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog unshare
+check_prog grep
+unshare -Urpf true > /dev/null 2>&1 ||
+	framework_skip_ 'unshare -Urpf true failed'
+
+$STRACE -qq -f --trace=none --signal=none -o "$OUT" \
+	unshare -Urpf -- sh -c '
+	tracer_pid=
+	while read -r key value rest; do
+		if [ "$key" = TracerPid: ]; then
+			tracer_pid=$value
+			break
+		fi
+	done < /proc/self/status
+	[ "${tracer_pid:-0}" -gt 0 ] || exit 1
+
+	sleep 30 &
+	tracee_pid=$!
+	if "$1" -p "$tracee_pid" 2>"$2"; then
+		kill "$tracee_pid"
+		wait "$tracee_pid" 2>/dev/null
+		exit 1
+	fi
+	kill "$tracee_pid"
+	wait "$tracee_pid" 2>/dev/null
+
+	for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
+		if grep -Fqx \
+			"$1: attach: ptrace($cmd, $tracee_pid): Operation not permitted" \
+			"$2"; then
+			msg="$1: Process $tracee_pid is already being traced"
+			msg="$msg by pid $tracer_pid in procfs PID NS"
+			grep -Fqx "$msg" "$2"
+			exit $?
+		fi
+	done
+	exit 1
+	' sh "$STRACE_EXE" "$LOG" 2>"$OUT.err" || {
+	cat "$OUT.err" >&2
+	dump_log_and_fail_with 'unexpected attach diagnostics'
+}

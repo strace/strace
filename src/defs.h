@@ -1214,6 +1214,12 @@ extern void pidns_init(void);
  */
 extern int get_proc_pid(int pid);
 
+/*
+ * Returns the PID in strace's namespace for a PID as present in /proc,
+ * or 0 if it is not visible there.
+ */
+extern int get_strace_pid(int proc_pid);
+
 /**
  * Translates a pid from tracee's namespace to our namespace.
  *

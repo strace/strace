@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Test attach diagnostics with procfs in an ancestor PID namespace.
+#
+# Copyright (c) 2026 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+if [ "${STRACE_TEST_PIDNS-}" != 1 ]; then
+	command -v unshare > /dev/null 2>&1 || exit 77
+	unshare -Urpf true > /dev/null 2>&1 || exit 77
+	exec unshare -Urpf -- env STRACE_TEST_PIDNS=1 "$0"
+fi
+
+. "${srcdir=.}/attach-p-eperm-already-traced.test"

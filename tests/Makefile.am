@@ -651,7 +651,9 @@ MISC_TESTS = \
 	attach-f-p.test \
 	attach-p-cmd.test \
 	attach-p-eperm-already-traced.test \
+	attach-p-eperm-already-traced--pidns.test \
 	attach-p-eperm-signal.test \
+	attach-p-eperm-tracer-outside-pidns.test \
 	attach-p-eperm-yama.test \
 	bexecve.test \
 	clone_ptrace.test \
