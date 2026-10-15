@@ -7,14 +7,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#include "tests.h"
-#include "scno.h"
-
-#include <limits.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
+#include "setns-report-ns-id-common.h"
 
 #include <linux/sched.h>
 
@@ -27,36 +20,14 @@ main(void)
 	 */
 	(void) syscall(__NR_unshare, CLONE_NEWUSER);
 
-	/*
-	 * Now enter a new network namespace
-	 * owned by the child user namespace.
-	 */
-	if (syscall(__NR_unshare, CLONE_NEWNET) < 0)
-		perror_msg_and_skip("unshare(CLONE_NEWNET)");
-
-	const char *netns_path = "/proc/self/ns/net";
-	skip_if_unavailable(netns_path);
-
-	int netns_fd = open(netns_path, O_RDONLY);
-	if (netns_fd < 0)
-		perror_msg_and_skip("open(%s)", netns_path);
+	/* Save one network namespace, then enter another. */
 	char netns[PATH_MAX + 1];
-	ssize_t n  = readlink(netns_path, netns, sizeof(netns));
-	if (n < 0)
-		perror_msg_and_fail("readlink: %s", netns_path);
-	else if ((size_t) n >= sizeof(netns))
-		error_msg_and_fail("readlink: %s: result is too large",
-				   netns_path);
-	netns[n] = '\0';
+	int netns_fd = open_namespace_pair("/proc/self/ns/net",
+					   ARG_STR(CLONE_NEWNET),
+					   netns, sizeof(netns));
 
-	if (syscall(__NR_unshare, CLONE_NEWNET) < 0)
-		perror_msg_and_skip("unshare(CLONE_NEWNET)");
-
-	int rc = syscall(__NR_setns, netns_fd, CLONE_NEWNET);
-	if (rc < 0)
+	if (setns_and_print_expected(netns_fd, ARG_STR(CLONE_NEWNET), netns) < 0)
 		perror_msg_and_skip("setns(CLONE_NEWNET)");
-	printf("setns(%d, CLONE_NEWNET) = %s (%s)\n",
-	       netns_fd, sprintrc(rc), netns);
 
 	puts("+++ exited with 0 +++");
 

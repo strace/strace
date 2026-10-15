@@ -919,6 +919,7 @@ EXTRA_DIST = \
 	semtimedop-common.c \
 	semtimedop-syscall.c \
 	setfsugid.c \
+	setns-report-ns-id-common.h \
 	setresugid.c \
 	setreugid.c \
 	setugid.c \
