@@ -29,6 +29,9 @@ Noteworthy changes in release ?.? (????-??-??)
     PID namespace differs from the mounted /proc, affecting -e namespace=new
     annotations for setns(2) and unshare(2), -Y/--decode-pids=comm process
     names, and "already traced" attach diagnostics.
+  * Fixed -e namespace=new to report the correct namespace ID for setns(2)
+    transitions to PID and time namespaces, which affect future children
+    rather than the caller.
 
 Noteworthy changes in release 7.2 (2026-08-18)
 ==============================================
