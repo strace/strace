@@ -61,8 +61,7 @@ test_children_namespace(unsigned int flag, const char *flag_str,
 	close(ns_fd);
 
 out:
-	if (rc < 0)
-		saved_errno = errno;
+	saved_errno = errno;
 	if (child > 0) {
 		if (pipefd[1] >= 0)
 			close(pipefd[1]);
