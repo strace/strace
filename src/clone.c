@@ -81,7 +81,7 @@ read_namespace_id(int pid, const char *const ns_type, bool for_children)
 
 	static char buf[PATH_MAX + 1];
 	ssize_t n = readlink(linkpath, buf, sizeof(buf));
-	if ((size_t) n >= sizeof(buf))
+	if (n <= 0 || (size_t) n >= sizeof(buf))
 		return NULL;
 	buf[n] = '\0';
 	return buf;
@@ -438,7 +438,7 @@ SYS_FUNC(unshare)
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
 		tcp->auxstr = get_namespace_auxstr(get_proc_pid(tcp->pid),
-						   tcp->u_arg[0], NULL, false);
+						   tcp->u_arg[0], NULL, true);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
