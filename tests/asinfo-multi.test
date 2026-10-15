@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Check multiple arguments and basic mappings
+. "${srcdir=.}/init.sh"
+
+ASINFO='../../src/asinfo'
+
+run_prog_skip_if_failed "$ASINFO" --list > /dev/null
+
+nums="$($ASINFO --to-numbers read write)" ||
+	fail_ "asinfo --to-numbers read write failed"
+
+exp='0
+1'
+[ "x$nums" = "x$exp" ] ||
+	fail_ "unexpected numbers: got [$nums], want [$exp]"
+
+name0="$($ASINFO --to-names 0)" ||
+	fail_ "asinfo --to-names 0 failed"
+[ "x$name0" = "xread" ] ||
+	fail_ "name for 0 mismatch: got [$name0], want [read]"
+
+name1="$($ASINFO --to-names 1)" ||
+	fail_ "asinfo --to-names 1 failed"
+[ "x$name1" = "xwrite" ] ||
+	fail_ "name for 1 mismatch: got [$name1], want [write]"
+
+exit 0
+
+

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Check error cases produce non-zero exit and expected messages
+. "${srcdir=.}/init.sh"
+
+ASINFO='../../src/asinfo'
+
+run_prog_skip_if_failed "$ASINFO" --list > /dev/null
+
+# Unknown name
+"$ASINFO" --to-numbers nosuch 1> /dev/null 2> "$LOG" &&
+	fail_ "asinfo --to-numbers nosuch should fail"
+grep -E -x ".*unknown syscall name 'nosuch'" "$LOG" ||
+	fail_ "missing unknown name error message"
+
+# Invalid number (large)
+"$ASINFO" --to-names 999999 1> /dev/null 2> "$LOG" &&
+	fail_ "asinfo --to-names 999999 should fail"
+grep -E -x ".*unknown syscall nr [0-9]+" "$LOG" ||
+	fail_ "missing unknown number error message"
+
+exit 0
+
+

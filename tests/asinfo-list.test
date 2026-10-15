@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Check that --list outputs expected core syscalls
+. "${srcdir=.}/init.sh"
+
+ASINFO='../../src/asinfo'
+
+run_prog_skip_if_failed "$ASINFO" --list > "$OUT"
+
+grep -E -x '0 read' "$OUT" ||
+	fail_ "--list missing '0 read'"
+grep -E -x '1 write' "$OUT" ||
+	fail_ "--list missing '1 write'"
+
+exit 0
+
+
