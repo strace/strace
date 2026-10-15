@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -34,6 +35,20 @@ enum {
 	PARENT_CPUTIME_LIMIT_NSEC = 300000000,
 	CHILD_CPUTIME_LIMIT_NSEC = 500000000,
 };
+
+static char*
+time_comment(int precision, clock_t val, long clk_tck)
+{
+	const size_t comment_size = 20;
+	char *comment_buf = malloc(comment_size);
+	if (val == 0) {
+		comment_buf[0] = '\0';
+		return comment_buf;
+	}
+	snprintf(comment_buf, comment_size, " /* %.*f s */",
+	         precision, (double) val / clk_tck);
+	return comment_buf;
+}
 
 int
 main(void)
@@ -99,19 +114,27 @@ main(void)
 			: clk_tck > 1 ? 1 : 0;
 
 	if (!XLAT_RAW && clk_tck > 0) {
-		printf("times({tms_utime=%llu /* %.*f s */"
-		       ", tms_stime=%llu /* %.*f s */"
-		       ", tms_cutime=%llu /* %.*f s */"
-		       ", tms_cstime=%llu /* %.*f s */}) = %llu\n",
+		char *utime_comment = time_comment(precision, tbuf.tms_utime, clk_tck);
+		char *stime_comment = time_comment(precision, tbuf.tms_stime, clk_tck);
+		char *cutime_comment = time_comment(precision, tbuf.tms_cutime, clk_tck);
+		char *cstime_comment = time_comment(precision, tbuf.tms_cstime, clk_tck);
+		printf("times({tms_utime=%llu%s"
+		       ", tms_stime=%llu%s"
+		       ", tms_cutime=%llu%s"
+		       ", tms_cstime=%llu%s}) = %llu\n",
 		       (unsigned long long) tbuf.tms_utime,
-		       precision, (double) tbuf.tms_utime / clk_tck,
+		       utime_comment,
 		       (unsigned long long) tbuf.tms_stime,
-		       precision, (double) tbuf.tms_stime / clk_tck,
+		       stime_comment,
 		       (unsigned long long) tbuf.tms_cutime,
-		       precision, (double) tbuf.tms_cutime / clk_tck,
+		       cutime_comment,
 		       (unsigned long long) tbuf.tms_cstime,
-		       precision, (double) tbuf.tms_cstime / clk_tck,
+		       cstime_comment,
 		       llres);
+		free(utime_comment);
+		free(stime_comment);
+		free(cutime_comment);
+		free(cstime_comment);
 	} else {
 		printf("times({tms_utime=%llu, tms_stime=%llu"
 		       ", tms_cutime=%llu, tms_cstime=%llu}) = %llu\n",
