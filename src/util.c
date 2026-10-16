@@ -716,6 +716,70 @@ scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
 				 ARRAY_SIZE(fdinfo_lines)) > 0;
 }
 
+#ifndef TUN_MINOR
+# define TUN_MINOR 200
+#endif
+
+static int
+get_misc_minor(const char *dev_name)
+{
+	FILE *f = fopen_stream("/proc/misc", "r");
+	if (!f)
+		return -1;
+
+	char *line = NULL;
+	size_t sz = 0;
+	int res_minor = -1;
+
+	while (getline(&line, &sz, f) > 0) {
+		unsigned int minor;
+		char name[64];
+
+		if (sscanf(line, "%u %63s", &minor, name) == 2
+		    && strcmp(name, dev_name) == 0) {
+			res_minor = (int) minor;
+			break;
+		}
+	}
+
+	free(line);
+	fclose(f);
+	return res_minor;
+}
+
+static bool
+is_tun(const struct finfo *finfo)
+{
+	static int tun_minor = -1;
+	static bool tun_minor_initialized = false;
+
+	if (finfo->type != FINFO_DEV_CHR || finfo->dev.major != 10)
+		return false;
+
+	if (!tun_minor_initialized) {
+		tun_minor = get_misc_minor("tun");
+		if (tun_minor < 0)
+			tun_minor = TUN_MINOR;
+		tun_minor_initialized = true;
+	}
+
+	return (int) finfo->dev.minor == tun_minor;
+}
+
+static bool
+set_tun_backend(const char *value, void *data)
+{
+	struct finfo *finfo = data;
+	size_t len = strcspn(value, " \t\r\n");
+
+	if (len >= sizeof(finfo->dev.tun_backend))
+		len = sizeof(finfo->dev.tun_backend) - 1;
+
+	memcpy(finfo->dev.tun_backend, value, len);
+	finfo->dev.tun_backend[len] = '\0';
+	return true;
+}
+
 static bool
 is_ptmx(const struct finfo *finfo)
 {
@@ -770,6 +834,12 @@ get_finfo_for_dev(pid_t pid, int fd, const char *path, struct finfo *finfo)
 		finfo->dev.tty_index = -1;
 		scan_fdinfo(pid, fd, prefix, sizeof(prefix) - 1,
 			    set_tty_index, finfo);
+	} else if (is_tun(finfo)) {
+		static const char prefix[] = "iff:\t";
+
+		finfo->dev.tun_backend[0] = '\0';
+		scan_fdinfo(pid, fd, prefix, sizeof(prefix) - 1,
+			    set_tun_backend, finfo);
 	}
 
 	return finfo;
@@ -795,6 +865,13 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 			       finfo->dev.major, finfo->dev.minor);
 		if (is_ptmx(finfo) && finfo->dev.tty_index >= 0)
 			tprintf_string(" @/dev/pts/%d", finfo->dev.tty_index);
+		else if (is_tun(finfo) && finfo->dev.tun_backend[0]) {
+			tprints_string(" @");
+			print_quoted_string_ex(
+				finfo->dev.tun_backend,
+				strlen(finfo->dev.tun_backend),
+				QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+		}
 		tprint_associated_info_end();
 		tprint_associated_info_end();
 		return true;

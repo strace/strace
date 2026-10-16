@@ -698,8 +698,15 @@ struct finfo {
 	struct {
 		unsigned int major, minor;
 
-		/* Use only when major == 5, minor == 2 (/dev/ptmx) */
-		int tty_index;
+		union {
+			/* Use only when major == 5, minor == 2 (/dev/ptmx) */
+			int tty_index;
+			/*
+			 * Use only when major == 10, minor == tun_minor
+			 * (/dev/net/tun)
+			 */
+			char tun_backend[16]; /* IFNAMSIZ */
+		};
 	} dev;
 };
 
