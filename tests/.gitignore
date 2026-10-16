@@ -106,6 +106,7 @@ dev--decode-fds-path
 dev--decode-fds-socket
 dev-pty-kcmp-yy
 dev-pty-yy
+dev-tun-yy
 dev-yy
 dup
 dup-P
