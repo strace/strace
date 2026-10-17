@@ -525,6 +525,28 @@ get_proc_pid(int pid)
 	return proc_pid;
 }
 
+int
+get_strace_pid(int proc_pid)
+{
+	if (proc_pid <= 0)
+		return 0;
+	if (is_proc_ours())
+		return proc_pid;
+
+	size_t our_count = get_id_list(0, NULL, PT_TID);
+	if (!our_count || our_count > MAX_NS_DEPTH)
+		return 0;
+
+	int ids[MAX_NS_DEPTH];
+	size_t count = get_id_list(proc_pid, ids, PT_TID);
+	if (count < our_count || count > MAX_NS_DEPTH)
+		return 0;
+
+	/* A PID at this depth may belong to a sibling namespace. */
+	int strace_pid = ids[our_count - 1];
+	return get_proc_pid(strace_pid) == proc_pid ? strace_pid : 0;
+}
+
 static void
 printpid_translation(struct tcb *tcp, int pid, enum pid_type type)
 {
@@ -537,8 +559,11 @@ printpid_translation(struct tcb *tcp, int pid, enum pid_type type)
 	if (print_ns_translation || print_comm) {
 		int strace_pid = translate_pid(tcp, pid, type, NULL);
 		if (strace_pid) {
-			if (print_comm)
-				print_pid_comm(strace_pid);
+			if (print_comm) {
+				int proc_pid = get_proc_pid(strace_pid);
+				if (proc_pid)
+					print_pid_comm(proc_pid);
+			}
 			if (print_ns_translation && strace_pid != pid)
 				tprintf_comment("%d in strace's PID NS",
 						strace_pid);

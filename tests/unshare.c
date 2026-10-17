@@ -13,6 +13,7 @@
 
 #include <limits.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifdef PRINT_NAMESPACE
@@ -42,7 +43,10 @@ main(void)
 			"CLONE_NEWTIME|CLONE_NEWNS|CLONE_NEWCGROUP"
 			"|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWPID"
 			"|CLONE_NEWNET",
-			{ "cgroup", "ipc", "mnt", "net", "pid", "time", "uts", NULL } },
+			{ "cgroup", "ipc", "mnt", "net", "pid_for_children",
+			  "time_for_children", "uts", NULL } },
+		{ 0x20000000, "CLONE_NEWPID", { "pid_for_children", NULL } },
+		{ 0x00000080, "CLONE_NEWTIME", { "time_for_children", NULL } },
 		{ 0x00020000, "CLONE_NEWNS", { "mnt", NULL } },
 		{ 0x2000000, "CLONE_NEWCGROUP", { "cgroup", NULL } },
 		{ 0x10000000, "CLONE_NEWUSER", { "user", NULL } },
@@ -66,23 +70,27 @@ main(void)
 
 #ifdef PRINT_NAMESPACE
 		if (rc == 0) {
+			unsigned int printed = 0;
 			unsigned int j;
 			for (j = 0; unshare_flags[i].fnames[j]; j++) {
 				const char *lname = unshare_flags[i].fnames[j];
 				char buf[PATH_MAX + 1];
 				ssize_t n = readlink(lname, buf, sizeof(buf));
+				/* No child has entered this PID namespace yet. */
+				if (n <= 0 && !strcmp(lname, "pid_for_children"))
+					continue;
 				if (n < 0)
 					perror_msg_and_skip("readlink: %s", lname);
 				else if ((size_t) n >= sizeof(buf))
 					error_msg_and_skip("readlink: %s: result is too large",
 							   lname);
 				buf[n] = '\0';
-				if (j == 0)
+				if (!printed++)
 					printf(" (%s", buf);
 				else
 					printf(", %s", buf);
 			}
-			printf("%s", j == 0 ? "\n" : ")\n");
+			printf("%s", printed ? ")\n" : "\n");
 		}
 #endif
 	}

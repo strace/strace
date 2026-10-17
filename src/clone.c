@@ -64,16 +64,24 @@ extern void namespace_auxstr_init(void)
 
 /* derived from print_dirfd */
 static const char *
-read_namespace_id(int pid, const char *const ns_type)
+read_namespace_id(int pid, const char *const ns_type, bool for_children)
 {
 	static const char ns_path[] = "/proc/%d/ns/%s";
-	/* "cgroup" is the longest name in the dentries in /proc/$pid/ns. */
-	char linkpath[sizeof(ns_path) + sizeof(int) * 3 + sizeof("cgroup")];
-	xsprintf(linkpath, ns_path, pid, ns_type);
+	/* "time_for_children" is the longest name in /proc/$pid/ns. */
+	char linkpath[sizeof(ns_path) + sizeof(int) * 3
+		      + sizeof("time_for_children")];
+	const char *name = ns_type;
+	if (for_children) {
+		if (!strcmp(ns_type, "pid"))
+			name = "pid_for_children";
+		else if (!strcmp(ns_type, "time"))
+			name = "time_for_children";
+	}
+	xsprintf(linkpath, ns_path, pid, name);
 
 	static char buf[PATH_MAX + 1];
 	ssize_t n = readlink(linkpath, buf, sizeof(buf));
-	if ((size_t) n >= sizeof(buf))
+	if (n <= 0 || (size_t) n >= sizeof(buf))
 		return NULL;
 	buf[n] = '\0';
 	return buf;
@@ -81,7 +89,8 @@ read_namespace_id(int pid, const char *const ns_type)
 
 static const char *
 get_namespace_auxstr(int pid, uint64_t flags,
-		     struct tcb *const tcp_for_pid_translation)
+		     struct tcb *const tcp_for_pid_translation,
+		     const char *expected_ns_str, bool for_children)
 {
 	static char str[sizeof("cgroup:[4026531835], "
 			          "ipc:[4026531839], "
@@ -115,9 +124,21 @@ get_namespace_auxstr(int pid, uint64_t flags,
 	}
 
 	*p = '\0';
+
+	if (flags == 0 && expected_ns_str) {
+		const char *ns_name = read_namespace_id(pid, expected_ns_str,
+						    for_children);
+		if (ns_name) {
+			(void) xappendstr(str, p, "%s", ns_name);
+			return str;
+		}
+		return NULL;
+	}
+
 	for (size_t i = 0; i < ARRAY_SIZE(ns); ++i) {
 		if (flags & ns[i].flags) {
-			const char *ns_name = read_namespace_id(pid, ns[i].str);
+			const char *ns_name = read_namespace_id(pid, ns[i].str,
+							    for_children);
 			if (ns_name) {
 				if (str != p)
 					p = xappendstr(str, p, ", ");
@@ -212,7 +233,8 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 		if ((flags & nsflags) && !syserror(tcp)) {
-			tcp->auxstr = get_namespace_auxstr(tcp->u_rval, flags, tcp);
+			tcp->auxstr = get_namespace_auxstr(tcp->u_rval, flags, tcp,
+							   NULL, false);
 			if (tcp->auxstr)
 				r_extra = RVAL_STR;
 		}
@@ -381,7 +403,8 @@ SYS_FUNC(clone3)
 		tprint_struct_end();
 
 	if ((arg.flags & nsflags) && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, arg.flags, tcp);
+		tcp->auxstr = get_namespace_auxstr(tcp->u_rval, arg.flags, tcp,
+						   NULL, false);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
@@ -393,6 +416,28 @@ out:
 	return RVAL_DECODED | RVAL_TID | r_extra;
 }
 
+static const char *
+read_namespace_type_for_fd(int pid, int fd)
+{
+	static char buf[PATH_MAX + 1];
+	ssize_t n = getfdpath_pid(pid, fd, buf, sizeof(buf), NULL);
+	if (n < 0 || (size_t) n >= sizeof(buf) - 1)
+		return NULL;
+
+	/* buf contains a string like "net:[4026531840]". */
+	char *p = strchr(buf, ':');
+	if (p == NULL || (size_t) (p - buf) > sizeof("cgroup") - 1)
+		return NULL;
+	*p = '\0';
+	static const char *const types[] = {
+		"cgroup", "ipc", "mnt", "net", "pid", "time", "user", "uts"
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(types); ++i) {
+		if (!strcmp(buf, types[i]))
+			return buf;
+	}
+	return NULL;
+}
 
 SYS_FUNC(setns)
 {
@@ -406,7 +451,18 @@ SYS_FUNC(setns)
 
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[1], NULL);
+		const unsigned int flags = (unsigned int) tcp->u_arg[1];
+		const char *ns_str = NULL;
+
+		if (flags == 0) {
+			ns_str = read_namespace_type_for_fd(tcp->pid,
+							    tcp->u_arg[0]);
+			if (!ns_str)
+				return RVAL_DECODED;
+		}
+
+		tcp->auxstr = get_namespace_auxstr(get_proc_pid(tcp->pid), flags,
+						   NULL, ns_str, true);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
@@ -424,7 +480,9 @@ SYS_FUNC(unshare)
 
 	int r_extra = 0;
 	if (show_namespace && !syserror(tcp)) {
-		tcp->auxstr = get_namespace_auxstr(tcp->pid, tcp->u_arg[0], NULL);
+		tcp->auxstr = get_namespace_auxstr(get_proc_pid(tcp->pid),
+						   tcp->u_arg[0], NULL, NULL,
+						   true);
 		if (tcp->auxstr)
 			r_extra = RVAL_STR;
 	}
