@@ -656,9 +656,9 @@ MISC_TESTS = \
 	bexecve.test \
 	clone_ptrace.test \
 	count-f.test \
-	count_unknown.test \
 	count_unknown-S.test \
 	count_unknown-wall.test \
+	count_unknown.test \
 	count_unknown_many.test \
 	count_unknown_mixed.test \
 	delay.test \
@@ -718,11 +718,11 @@ MISC_TESTS = \
 	status-none-threads.test \
 	status-successful-threads.test \
 	status-unfinished-threads.test \
+	strace--argv0.test \
 	strace--color-no-tty.test \
 	strace--color-tty.test \
-	strace--argv0.test \
-	strace--syscall-limit.test \
 	strace--syscall-limit--seccomp-bpf.test \
+	strace--syscall-limit.test \
 	strace--tips-full.test \
 	strace--tips.test \
 	strace-C.test \

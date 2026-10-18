@@ -327,10 +327,10 @@ libstrace_a_SOURCES =	\
 	regset.c	\
 	renameat.c	\
 	resource.c	\
-	rseq.c		\
 	retval.c	\
 	retval.h	\
 	riscv.c		\
+	rseq.c		\
 	rt_sigframe.c	\
 	rt_sigreturn.c	\
 	rtc.c		\
@@ -376,7 +376,6 @@ libstrace_a_SOURCES =	\
 	stat.h		\
 	stat64.c	\
 	statfs.c	\
-	statfs.c \
 	statfs.h	\
 	statfs64.c \
 	static_assert.h	\
@@ -1100,9 +1099,14 @@ sys_func.h: $(patsubst %,$(srcdir)/%,$(sys_func_h_sources))
 		sed -n 's/^SYS_FUNC(.*/extern &;/p' $$f; \
 	done | sort -u > $@
 
-syscallent_names = subcallent.h syscallent.h syscallent1.h \
-		   syscallent-common.h syscallent-common-32.h \
-		   syscallent-n32.h syscallent-n64.h syscallent-o32.h
+syscallent_names = subcallent.h \
+		   syscallent-common-32.h \
+		   syscallent-common.h \
+		   syscallent-n32.h \
+		   syscallent-n64.h \
+		   syscallent-o32.h \
+		   syscallent.h \
+		   syscallent1.h
 syscallent_patterns = $(patsubst %,\%/%,$(syscallent_names))
 syscallent_files = $(filter $(syscallent_patterns),$(EXTRA_DIST))
 
@@ -1156,8 +1160,8 @@ BUILT_SOURCES = $(ioctl_redefs_h) $(ioctlent_h) \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
 		printers.h sen.h sys_func.h
 CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
-		ioctl_iocdef.h ioctl_iocdef.i \
-		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
+		bpf_attr_check.c ioctl_iocdef.h ioctl_iocdef.i \
+		native_printer_decls.h native_printer_defs.h \
 		printers.h sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h \
 		 gnu/stubs-x32.h \

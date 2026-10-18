@@ -289,9 +289,9 @@ ioctl_loop
 ioctl_mtd
 ioctl_nbd
 ioctl_nsfs-ns_mnt_get
+ioctl_perf
 ioctl_pidfd_get_info
 ioctl_pidfd_namespace
-ioctl_perf
 ioctl_ptp
 ioctl_ptp-Xabbrev
 ioctl_ptp-Xraw
@@ -740,10 +740,10 @@ rename
 renameat
 renameat2
 request_key
-rseq
-rseq_slice_yield
 riscv_flush_icache
 rmdir
+rseq
+rseq_slice_yield
 rt_sigaction
 rt_sigpending
 rt_sigprocmask
