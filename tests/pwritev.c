@@ -7,8 +7,9 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 
-#ifdef HAVE_PWRITEV
+#ifdef __NR_pwritev
 
 # include <fcntl.h>
 # include <stdio.h>
@@ -17,6 +18,14 @@
 
 # define LEN 8
 # define LIM (LEN - 1)
+
+static long
+k_pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+	return syscall(__NR_pwritev, fd, iov, iovcnt,
+		       (kernel_ulong_t) offset,
+		       (kernel_ulong_t) ((unsigned long long) offset >> 32));
+}
 
 static void
 print_iov(const struct iovec *iov)
@@ -57,9 +66,6 @@ print_iovec(const struct iovec *iov, unsigned int cnt, unsigned int size)
 	putchar(']');
 }
 
-/* for pwritev(0, NULL, 1, -3) */
-DIAG_PUSH_IGNORE_NONNULL
-
 int
 main(void)
 {
@@ -83,7 +89,7 @@ main(void)
 	int written = 0;
 	for (unsigned int i = 0; i < LEN; ++i) {
 		written += iov[i].iov_len;
-		if (pwritev(0, iov, i + 1, offset + i) != written)
+		if (k_pwritev(0, iov, i + 1, offset + i) != written)
 			perror_msg_and_fail("pwritev");
 		fputs("pwritev(0, ", stdout);
 		print_iovec(iov, i + 1, LEN);
@@ -95,26 +101,26 @@ main(void)
 		unsigned int n = LEN + 1 - i;
 		fputs("pwritev(0, ", stdout);
 		print_iovec(iov + i, n, LEN - i);
-		rc = pwritev(0, iov + i, n, offset + LEN + i);
+		rc = k_pwritev(0, iov + i, n, offset + LEN + i);
 		printf(", %u, %lld) = %s\n",
 		       n, (long long) offset + LEN + i, sprintrc(rc));
 	}
 
 	iov->iov_base = iov + LEN * 2;
-	rc = pwritev(0, iov, 1, -1);
+	rc = k_pwritev(0, iov, 1, -1);
 	printf("pwritev(0, [{iov_base=%p, iov_len=%d}], 1, -1) = %s\n",
 	       iov->iov_base, LEN, sprintrc(rc));
 
 	iov += LEN;
-	rc = pwritev(0, iov, 42, -2);
+	rc = k_pwritev(0, iov, 42, -2);
 	printf("pwritev(0, %p, 42, -2) = %s\n",
 	       iov, sprintrc(rc));
 
-	rc = pwritev(0, NULL, 1, -3);
+	rc = k_pwritev(0, NULL, 1, -3);
 	printf("pwritev(0, NULL, 1, -3) = %s\n",
 	       sprintrc(rc));
 
-	rc = pwritev(0, iov, 0, -4);
+	rc = k_pwritev(0, iov, 0, -4);
 	printf("pwritev(0, [], 0, -4) = %s\n",
 	       sprintrc(rc));
 
@@ -122,10 +128,8 @@ main(void)
 	return 0;
 }
 
-DIAG_POP_IGNORE_NONNULL
-
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PWRITEV")
+SKIP_MAIN_UNDEFINED("__NR_pwritev")
 
 #endif

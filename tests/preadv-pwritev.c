@@ -9,13 +9,22 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 
-#if defined HAVE_PREADV && defined HAVE_PWRITEV
+#if defined HAVE_PREADV && defined __NR_pwritev
 
 # include <fcntl.h>
 # include <stdio.h>
 # include <sys/uio.h>
 # include <unistd.h>
+
+static long
+k_pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
+{
+	return syscall(__NR_pwritev, fd, iov, iovcnt,
+		       (kernel_ulong_t) offset,
+		       (kernel_ulong_t) ((unsigned long long) offset >> 32));
+}
 
 int
 main(void)
@@ -46,7 +55,7 @@ main(void)
 
 	long rc;
 
-	rc = pwritev(1, efault, 42, 0);
+	rc = k_pwritev(1, efault, 42, 0);
 	tprintf("pwritev(1, %p, 42, 0) = %s\n",
 		efault, sprintrc(rc));
 
@@ -73,12 +82,12 @@ main(void)
 	};
 	const struct iovec *w_iov = tail_memdup(w_iov_, sizeof(w_iov_));
 
-	rc = pwritev(1, w_iov, 0, 0);
+	rc = k_pwritev(1, w_iov, 0, 0);
 	if (rc)
 		perror_msg_and_fail("pwritev: expected 0, returned %ld", rc);
 	tprintf("pwritev(1, [], 0, 0) = 0\n");
 
-	rc = pwritev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
+	rc = k_pwritev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
 	tprintf("pwritev(1, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2, 0)"
 		" = %s\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
@@ -87,7 +96,7 @@ main(void)
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);
 
-	rc = pwritev(1, w_iov, ARRAY_SIZE(w_iov_), 0);
+	rc = k_pwritev(1, w_iov, ARRAY_SIZE(w_iov_), 0);
 	if (rc != (int) w_len)
 		perror_msg_and_fail("pwritev: expected %u, returned %ld",
 				    w_len, rc);
@@ -159,6 +168,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PREADV && HAVE_PWRITEV")
+SKIP_MAIN_UNDEFINED("HAVE_PREADV && __NR_pwritev")
 
 #endif

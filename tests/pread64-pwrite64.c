@@ -9,11 +9,26 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+static long
+k_pwrite64(int fd, const void *buf, size_t count, off_t offset)
+{
+#if SIZEOF_KERNEL_LONG_T > 4
+	return syscall(__NR_pwrite64, fd, buf, count, (long long) offset);
+#elif defined __ARM_EABI__ || defined LINUX_MIPSO32 || defined POWERPC \
+   || defined XTENSA || defined SH
+	return syscall(__NR_pwrite64, fd, buf, count, 0L,
+		       LL_VAL_TO_PAIR(offset));
+#else
+	return syscall(__NR_pwrite64, fd, buf, count, LL_VAL_TO_PAIR(offset));
+#endif
+}
 
 static void
 dump_str(const char *str, const unsigned int len)
@@ -82,7 +97,7 @@ test_dump(const unsigned int len)
 	for (unsigned int i = 0; i < len; ++i)
 		buf[i] = i;
 
-	rc = pwrite(1, buf, len, offset);
+	rc = k_pwrite64(1, buf, len, offset);
 	if (rc != (int) len)
 		perror_msg_and_fail("pwrite64: expected %d, returned %ld",
 				    len, rc);
@@ -131,24 +146,24 @@ main(void)
 
 	long rc;
 
-	rc = pwrite(1, w, 0, 0);
+	rc = k_pwrite64(1, w, 0, 0);
 	if (rc)
 		perror_msg_and_fail("pwrite64: expected 0, returned %ld", rc);
 	tprintf("pwrite64(1, \"\", 0, 0) = 0\n");
 
-	rc = pwrite(1, efault, 1, 0);
+	rc = k_pwrite64(1, efault, 1, 0);
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1 EFAULT"
 				    ", returned %ld", rc);
 	tprintf("pwrite64(1, %p, 1, 0)" RVAL_EFAULT, efault);
 
-	rc = pwrite(1, nil, 1, -3);
+	rc = k_pwrite64(1, nil, 1, -3);
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1, returned %ld", rc);
 	tprintf("pwrite64(1, \"\\0\", 1, -3)" RVAL_EINVAL);
 	dump_str(nil, 1);
 
-	rc = pwrite(1, w, w_len, 0);
+	rc = k_pwrite64(1, w, w_len, 0);
 	if (rc != (int) w_len)
 		perror_msg_and_fail("pwrite64: expected %u, returned %ld",
 				    w_len, rc);
