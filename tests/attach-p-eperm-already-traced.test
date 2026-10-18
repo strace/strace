@@ -10,21 +10,39 @@
 
 . "${srcdir=.}/init.sh"
 
-$STRACE -q --trace=none --signal=none -- \
-	sh -c "echo \$\$; sleep $TIMEOUT_DURATION" > "$OUT" 2>/dev/null &
-tracer_pid=$!
+check_prog mkfifo
+mkfifo "$OUT.pid" "$OUT.done" ||
+	framework_skip_ 'mkfifo failed'
+exec 3<> "$OUT.pid" &&
+exec 4<> "$OUT.done" ||
+	framework_skip_ 'mkfifo redirection failed'
 
-while ! [ -s "$OUT" ]; do
-	kill -0 "$tracer_pid" 2>/dev/null ||
-		fail_ "background $STRACE failed to start"
-done
-tracee_pid=$(cat "$OUT")
+$STRACE -qq --trace=none --signal=none -- \
+	sh -c 'echo $$ >&3; exec 3>&-; read -r released <&4' &
+tracer_pid=$!
+trap 'echo "done" >&4' 0
+
+pid_timeout=$((TIMEOUT_DURATION / 100))
+[ "$pid_timeout" -ge 5 ] || pid_timeout=5
+timeout_cmd="timeout -k 5 $pid_timeout"
+$timeout_cmd true > /dev/null 2>&1 || timeout_cmd=
+
+tracee_pid=$($timeout_cmd sh -c '
+	read -r pid <&3 && printf "%s\n" "$pid"
+') || fail_ 'failed to read tracee pid'
+exec 3>&-
+[ "$tracee_pid" -gt 0 ] ||
+	fail_ "background $STRACE failed to start"
 
 $STRACE -p "$tracee_pid" 2>"$LOG" &&
 	dump_log_and_fail_with "$STRACE -p $tracee_pid should have failed"
 
-kill "$tracee_pid"
-wait "$tracer_pid" 2>/dev/null
+echo "done" >&4 || fail_ 'failed to release tracee'
+trap - 0
+exec 4>&-
+wait "$tracer_pid" || fail_ "background $STRACE failed"
+
+rm -f -- "$OUT.pid" "$OUT.done"
 
 for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
 	cat > "$EXP" <<__EOF__
