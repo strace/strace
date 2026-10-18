@@ -136,7 +136,7 @@ grep -r "define.*GPIO.*_IO" /usr/include/linux/gpio.h
 Look for the `_IOC_TYPE` value:
 
 ```c
-#define GPIO_GET_LINEINFO_IOCTL _IOWR(0xB4, 0x02, struct gpio_v2_line_info)
+#define GPIO_V2_GET_LINEINFO_IOCTL _IOWR(0xB4, 0x05, struct gpio_v2_line_info)
 /*                                    ^^^^
  *                                    This is the type byte
  */
@@ -333,7 +333,7 @@ the generic handler should print the argument. Constants are defined in
 - **`RVAL_IOCTL_DECODED | RVAL_FD`**
   - **Meaning**: Decoded, and return value is a file descriptor
   - **When to use**: Ioctl returns a new file descriptor
-  - **Effect**: Enables `-y` (print paths) and `--trace-fds` features
+  - **Effect**: Marks the return value as a file descriptor for fd decoding
   - **Rare**: Most ioctls don't return file descriptors
 
 **Semantics:**
@@ -355,7 +355,7 @@ machinery.
 
 **On exiting (syscall exit, after returning 0 on entry):**
 - Return `RVAL_IOCTL_DECODED` if you printed `argp`
-- Return `RVAL_DECODED` if you didn't print it (generic prints argp)
+- Return `0` if you didn't print it (generic prints argp)
 
 ## Decoder Implementation Patterns
 
@@ -447,14 +447,15 @@ default:
 ### Unknown Commands Within a Subsystem
 
 For unrecognized commands within your subsystem, return `RVAL_DECODED`
-to let the generic handler print the raw command:
+to let the generic handler print the raw argument:
 
 ```c
 default:
 	return RVAL_DECODED;
 ```
 
-The generic handler will print:
+Command-name lookup (or the `_IOC` fallback) is independent of argument
+decoding. The generic handler prints the argument as a raw hex value:
 
 ```
 ioctl(3, _IOC(_IOC_READ|_IOC_WRITE, 0xb4, 0x99, 0x20), 0x7ffd...) = -1 ENOTTY
@@ -462,9 +463,9 @@ ioctl(3, _IOC(_IOC_READ|_IOC_WRITE, 0xb4, 0x99, 0x20), 0x7ffd...) = -1 ENOTTY
 
 ### Using tprints_arg_next_name("argp")
 
-Always call `tprints_arg_next_name("argp")` before printing the argument
-value. This ensures proper output formatting with the ioctl third
-argument label:
+Call `tprints_arg_next_name("argp")` before printing the argument value
+when your decoder handles it. If you return `RVAL_DECODED` without printing
+the argument, `SYS_FUNC(ioctl)` prints it instead:
 
 ```c
 case SUBSYS_GET_VALUE:
@@ -580,9 +581,8 @@ For example:
 #define TUNATTACHFILTER _IOW('T', 213, struct sock_fprog)
 ```
 
-On 64-bit: `TUNATTACHFILTER` = `0x400854d5` (size field = 16).
-On 32-bit: `TUNATTACHFILTER` = `0x400854d5` becomes `0x400454d5`
-(size field = 8).
+On 64-bit: `TUNATTACHFILTER` = `0x401054d5` (size field = 16).
+On 32-bit: `TUNATTACHFILTER` = `0x400854d5` (size field = 8).
 
 A plain `case TUNATTACHFILTER:` in a decoder compiled as 64-bit will
 never match the 32-bit ioctl number, silently falling through to the

@@ -172,7 +172,6 @@ wait4() status into actionable events:
 - **TE_STOP_BEFORE_EXECVE** -- PTRACE_EVENT_EXEC (about to execve)
 - **TE_STOP_BEFORE_EXIT** -- PTRACE_EVENT_EXIT (about to exit)
 - **TE_SECCOMP** -- SECCOMP_RET_TRACE triggered
-- **TE_RESTART** -- Continue with previously delivered signal
 
 ## Event Loop
 

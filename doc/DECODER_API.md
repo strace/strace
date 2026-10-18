@@ -105,8 +105,8 @@ Print values without field names:
 ```c
 PRINT_VAL_D(value)        /* Signed decimal */
 PRINT_VAL_U(value)        /* Unsigned decimal */
-PRINT_VAL_X(value)        /* Hexadecimal (lowercase) */
-PRINT_VAL_0X(value)       /* Hexadecimal with 0x prefix */
+PRINT_VAL_X(value)        /* Hexadecimal with 0x prefix */
+PRINT_VAL_0X(value)       /* Hexadecimal, padded to the value's width */
 PRINT_VAL_03O(value)      /* Octal with leading zeros */
 PRINT_VAL_ID(value)       /* Unsigned, except -1 printed as signed */
 ```
@@ -284,7 +284,7 @@ PRINT_FIELD_HEX_ARRAY_UPTO(where, field, count)
     /* Hex dump up to count bytes */
 
 PRINT_FIELD_COOKIE(where, field)
-    /* Cookie (opaque 2-element byte array) */
+    /* Cookie (two-element array printed as unsigned decimals) */
 
 PRINT_FIELD_UUID(where, field)
     /* UUID (RFC 4122 format) */
@@ -547,8 +547,8 @@ void print_xlat_d(int64_t val)
 The output style depends on `-Xabbrev`, `-Xverbose`, `-Xraw`:
 
 - **Abbrev**: `SEEK_END`
-- **Verbose**: `SEEK_END /* 2 */`
-- **Raw**: `2`
+- **Verbose**: `0x2 /* SEEK_END */`
+- **Raw**: `0x2`
 
 ## Output Formatting
 
@@ -751,9 +751,8 @@ typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
 For arrays already in tracer memory:
 
 ```c
-void print_local_array(struct tcb *tcp, const void *arr,
-                       print_fn print_func)
-    /* Print local array (size determined from array type) */
+print_local_array(tcp, arr, print_func)
+    /* Macro: print local array (size determined from array type) */
 
 void print_local_array_upto(struct tcb *tcp, const void *arr,
                             size_t upto, print_fn print_func)

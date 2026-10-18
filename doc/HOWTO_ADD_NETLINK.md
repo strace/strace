@@ -865,7 +865,7 @@ Common issues:
 - Expected output doesn't match strace output
 - Message field order wrong
 - Missing `+++ exited with 0 +++` line
-- Socket creation failed (test skipped but reported as failure)
+- Socket creation failed (test skipped by `create_nl_socket()`)
 - `/proc/self/fd/` not available (use `skip_if_unavailable`)
 
 ### Protocol Family Not Detected

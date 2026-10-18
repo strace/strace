@@ -134,6 +134,8 @@ Each commit message MUST follow this structure:
    already provide this information)
 4. **Blank line**: Separates descriptive text from ChangeLog entries
 5. **ChangeLog-style entries**: Describe all affected files
+6. **AI assistance**: End AI-assisted commits with
+   `Assisted-by: AGENT_NAME:MODEL_VERSION` (see below)
 
 ### Line Length
 
@@ -200,9 +202,7 @@ text is not needed.
 
 - Changes MUST NOT introduce whitespace errors (trailing whitespace, spaces
   before tabs, spaces for indentation, blank lines at the end of file)
-- Check with:
-  `git -c core.whitespace=space-before-tab,trailing-space diff-index \
-		--check 4b825dc642cb6eb9a060e54bf8d69288fbee4904`
+- Check uncommitted changes with `git diff --check`.
 
 ## Title (Summary Line)
 
@@ -449,7 +449,7 @@ Most changes should mention NEWS:
 
 When AI tools contribute to strace development, proper attribution
 helps track the evolving role of AI in the development process.
-Contributions should include an Assisted-by tag in the following format::
+AI-assisted commits must end with an Assisted-by tag in the following format:
 
   Assisted-by: AGENT_NAME:MODEL_VERSION
 
@@ -603,9 +603,7 @@ Used when multiple authors contributed to a commit.
 Co-authored-by: Name <name@example.com>
 ```
 
-**Examples:**
-- AI-assisted commits: `Co-authored-by: auto@cursor.ai`
-- Human collaborations: `Co-authored-by: Dmitry V. Levin <ldv@strace.io>`
+**Example:** `Co-authored-by: Dmitry V. Levin <ldv@strace.io>`
 
 #### Signed-off-by
 
@@ -788,7 +786,8 @@ All trailers follow this format:
 - MUST be placed at the end of the commit message
 - Should be separated from ChangeLog entries by a blank line
 - Multiple trailers of the same type are allowed (list them separately)
-- Order is typically: attribution trailers first, then reference trailers
+- Order is typically: attribution trailers first, then reference trailers;
+  place `Assisted-by` last when applicable
 
 ### Example with Trailers
 
@@ -802,16 +801,16 @@ New constant introduced by Linux kernel commit v6.18-rc1~132^2~195^2~4.
 * tests/nlattr_ifla_linkinfo.c (main): Update expected output.
 * NEWS: Mention this change.
 
-Co-authored-by: auto@cursor.ai
 Reported-by: Dmitry V. Levin <ldv@strace.io>
 Reviewed-by: Eugene Syromyatnikov <evgsyr@gmail.com>
 Resolves: https://github.com/strace/strace/issues/359
+Assisted-by: OpenCode:gpt-6-sol
 ```
 
 ### Trailer Usage Guidelines
 
-1. **Co-authored-by**: MUST be used when other collaborators, including
-   AI tools, contributed to the commit.
+1. **Co-authored-by**: Use when another person co-authored the commit.
+   Use `Assisted-by` for AI assistance.
 2. **Signed-off-by**: Typically required for external contributions
 3. **Suggested-by/Reported-by**: Credit people who contributed ideas or
    bug reports
@@ -844,8 +843,8 @@ Resolves: https://github.com/strace/strace/issues/359
    for new constants
 4. **Include all affected files**: Don't omit files that were modified
 5. **Use proper function/constant names**: Match the exact names in the code
-6. **Add Co-authored-by**: AI assistants MUST include the corresponding
-   Co-authored-by: trailer when AI assistance was used in creating the commit
+6. **Add Assisted-by**: AI assistants MUST end AI-assisted commits with
+   `Assisted-by: AGENT_NAME:MODEL_VERSION`.
 
 ### Common Mistakes to Avoid
 
@@ -870,8 +869,8 @@ Before committing, verify:
 - [ ] Tests are updated when functionality changes
 - [ ] No whitespace errors introduced
 - [ ] Consistent formatting throughout
-- [ ] Co-authored-by trailer added if others contributed or AI
-  assistance was used
+- [ ] Co-authored-by trailer added if there are co-authors
+- [ ] AI-assisted commit ends with an Assisted-by trailer
 
 ## Related Documentation
 

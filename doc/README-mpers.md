@@ -144,34 +144,37 @@ To use MPERS functionality in your decoder:
    - Call directly as `function_name(args)`
    - The build system generates the dispatch logic automatically
 
-## Example: print_timespec.c
+## Example: fetch_struct_stat.c
 
 ```c
-/* print_timespec.c */
+/* Simplified from src/fetch_struct_stat.c */
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(struct_timespec)
+#include DEF_MPERS_TYPE(struct_stat)
 
-#include <time.h>
-typedef struct timespec struct_timespec;
+#include "asm_stat.h"
+typedef struct stat struct_stat;
 
 #include MPERS_DEFS
+#include "stat.h"
 
-MPERS_PRINTER_DECL(void, print_timespec, struct tcb *tcp,
-                   kernel_ulong_t addr)
+MPERS_PRINTER_DECL(bool, fetch_struct_stat, struct tcb *tcp,
+                   kernel_ulong_t addr, struct strace_stat *dst)
 {
-    struct_timespec ts;
+    struct_stat st;
 
-    if (umove_or_printaddr(tcp, addr, &ts))
-        return;
+    if (umove_or_printaddr(tcp, addr, &st))
+        return false;
 
-    tprintf("{tv_sec=%lld, tv_nsec=%lld}",
-            (long long) ts.tv_sec, (long long) ts.tv_nsec);
+    dst->size = zero_extend_signed_to_ull(st.st_size);
+    /* Copy the remaining fields into dst. */
+    return true;
 }
 ```
 
-This file will be compiled three times on x86_64 (native, m32, mx32), with
-each version having different sizeof(struct_timespec) and field offsets.
+The real implementation in `src/fetch_struct_stat.c` also handles ABIs
+without `struct stat` and differences in timestamp fields. On x86_64,
+the file is compiled for native, m32, and mx32 personalities.
 
 ## MPERS for Struct Size Only
 

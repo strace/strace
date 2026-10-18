@@ -68,9 +68,9 @@ Use the `SYS_FUNC` macro to define the decoding function:
 ```c
 SYS_FUNC(syscall_name)
 {
-    // Access arguments via tcp->u_arg[0], tcp->u_arg[1], etc.
-    // Print arguments using appropriate print functions
-    // Return RVAL_DECODED or 0
+	/* Access arguments via tcp->u_arg[0], tcp->u_arg[1], etc. */
+	/* Print arguments using appropriate print functions. */
+	/* Return RVAL_DECODED or 0. */
 }
 ```
 
@@ -116,13 +116,13 @@ SYS_FUNC(mseal)
 SYS_FUNC(open_tree_attr)
 {
     decode_dfd_file_flags_attr(tcp,
-                               tcp->u_arg[0],  // dfd
-                               tcp->u_arg[1],  // pathname
+                               tcp->u_arg[0],  /* dfd */
+                               tcp->u_arg[1],  /* pathname */
                                open_tree_flags,
-                               tcp->u_arg[2],  // flags
+                               tcp->u_arg[2],  /* flags */
                                "OPEN_TREE_???",
-                               tcp->u_arg[3],  // attr
-                               tcp->u_arg[4]); // size
+                               tcp->u_arg[3],  /* attr */
+                               tcp->u_arg[4]); /* size */
 
     return RVAL_DECODED | RVAL_FD;
 }
@@ -141,17 +141,15 @@ For syscalls that modify arguments (like `lsm_get_self_attr`), use
 SYS_FUNC(lsm_get_self_attr)
 {
     if (entering(tcp)) {
-        // Print input arguments
-        // Store state if needed
-        set_tcb_priv_ulong(tcp, size);  // Store for later comparison
+        /* Print input arguments; store state if needed. */
+        set_tcb_priv_ulong(tcp, size);
         return 0;
     }
 
-    // Print output arguments
-    // Compare with stored state
+    /* Print output arguments; compare with stored state. */
     uint32_t saved_size = get_tcb_priv_ulong(tcp);
     if (saved_size != size) {
-        tprint_value_changed();  // Indicate value changed
+        tprint_value_changed();
     }
     return 0;
 }
@@ -172,15 +170,15 @@ When the syscall returns a value that affects output decoding, use
 SYS_FUNC(getxattrat)
 {
     if (entering(tcp)) {
-        // Store input size
+        /* Store input size. */
         set_tcb_priv_ulong(tcp, args.size);
         return 0;
     }
 
-    // Use return value for actual size
+    /* Use return value for actual size. */
     kernel_ulong_t val_size = entering(tcp) ?
         (kernel_long_t) args.size : tcp->u_rval;
-    // ...
+    /* ... */
 }
 ```
 
@@ -190,7 +188,7 @@ if the syscall returned an error:
 
 ```c
 if (!tfetch_obj_ignore_syserror(tcp, p_size, &size)) {
-    // Handle error case
+    /* Handle error case. */
     printaddr(p_ctx);
     return print_args_size_flags(tcp, p_size, flags);
 }
@@ -210,16 +208,17 @@ CONSTANT_NAME2   0x02
 ```
 
 **Special directives:**
-- `#unconditional` - Always include these constants. When using this
-  directive, list only symbolic names without numeric values (the build
-  system handles values automatically).
+- `#unconditional` - Include constants without conditional compilation.
+  Explicit fallback values are permitted and checked against definitions
+  in the included headers unless `#nocheckval` is specified.
 - `#value_indexed` - Values are indexed (0, 1, 2, ...)
 - `#val_type uint64_t` - Specify value type. Required for 64-bit xlat
   values to be properly decoded symbolically (e.g., when using
   `printxval64()`).
-- `#Prefix PREFIX_` - Add prefix to constant names
-- `#Pattern PATTERN_` - Match constants using a pattern (e.g., `#Pattern
-  *_NS` matches constants ending in `_NS` like `TIME_NS`, `MNT_NS`)
+- `#Prefix PREFIX_` - Annotate the name prefix for maintenance tools;
+  it does not change the generated constant names
+- `#Pattern PATTERN_` - Match constants using a regular expression (e.g.,
+  `#Pattern .*_NS` matches names ending in `_NS`)
 
 **Example (`src/xlat/futex2_flags.in`):**
 ```
@@ -227,6 +226,7 @@ CONSTANT_NAME2   0x02
 #From include/uapi/linux/futex.h
 #Prefix FUTEX2_
 FUTEX2_NUMA    0x04
+FUTEX2_MPOL    0x08
 FUTEX2_PRIVATE 0x80
 ```
 
@@ -258,7 +258,7 @@ it to `src/pathtrace.c` in the `pathtrace_match_set` function:
 
 ```c
 case SEN_open_tree_attr:
-    // Add to appropriate switch case group
+    /* Add to appropriate switch case group. */
     break;
 ```
 
@@ -342,7 +342,7 @@ Create test files in `tests/`:
 int
 main(void)
 {
-    // Test cases
+    /* Test cases. */
     long rc = syscall(__NR_<syscall_name>, ...);
     printf("<syscall_name>(...) = %s\n", sprintrc(rc));
 
@@ -389,9 +389,10 @@ Add to `tests/gen_tests.in`:
 - When the test name exactly matches the syscall name, you don't need to
   specify `--trace=` (it's added automatically). For example, `listns -a23`
   instead of `listns -a23 -e trace=listns`.
-- For variant test names (like `-success`, `-P`), you must explicitly
-  include `--trace=<syscall_name>` since the test name doesn't match the
-  syscall name.
+- For variant test names (like `-success`, `-P`), explicitly include
+  `--trace=<syscall_name>` when using `run_strace_match_diff()`. Injection
+  tests without `-y` are generated with `run_strace()` instead and need an
+  explicit trace expression regardless of the test name.
 
 **Determining the `-a` alignment value:**
 - Start with `-a32` (or a reasonable default based on similar tests)
@@ -400,14 +401,18 @@ Add to `tests/gen_tests.in`:
   space before the `=` sign
 - Run the test and compare output to determine the correct value
 
-Add to `tests/.gitignore`:
+Register each compiled test program in `tests/pure_executables.list` if it
+is safe to run concurrently, or in `check_PROGRAMS` in `tests/Makefile.am`
+otherwise. Generated tests need no separate `.test` registration.
+
+Add executable names to `tests/.gitignore` if not already ignored:
 ```
 <syscall_name>
 <syscall_name>-P
 <syscall_name>-success
 ```
 
-Add to `tests/pure_executables.list`:
+For concurrently safe programs, add to `tests/pure_executables.list`:
 ```
 <syscall_name>
 <syscall_name>-P
@@ -433,7 +438,7 @@ When implementing syscall families (like the xattr family), create
 helper functions that can be shared:
 
 ```c
-// Helper for dirfd, pathname, flags
+/* Helper for dirfd, pathname, flags. */
 static void
 decode_dirfd_pathname_flags(struct tcb *tcp)
 {
@@ -444,7 +449,7 @@ decode_dirfd_pathname_flags(struct tcb *tcp)
     printflags(xattrat_flags, tcp->u_arg[2], "AT_???");
 }
 
-// Helper that extends the above
+/* Helper that extends the above. */
 static void
 decode_dirfd_pathname_flags_name(struct tcb *tcp)
 {
@@ -486,10 +491,10 @@ print_lsm_id_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 
 SYS_FUNC(lsm_list_modules)
 {
-    // ...
+    /* ... */
     print_array(tcp, p_ids, (kernel_ulong_t) tcp->u_rval, &elem,
                 sizeof(elem), tfetch_mem, print_lsm_id_array_member, 0);
-    // ...
+    /* ... */
 }
 ```
 
@@ -576,7 +581,7 @@ open_tree_attr.
 
 Run the test:
 ```bash
-make check TESTS=<syscall_name>
+make check TESTS=<syscall_name>.gen.test
 ```
 
 Or run strace on a program that uses the syscall:

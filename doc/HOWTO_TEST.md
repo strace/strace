@@ -580,7 +580,7 @@ printf("bpf(BPF_MAP_CREATE" XLAT_FMT ", ...) = ...\n",
        XLAT_ARGS(BPF_MAP_CREATE));
 ```
 
-In raw mode: `bpf(0x0 /* BPF_MAP_CREATE */, ...)`
+In raw mode: `bpf(0x0, ...)`
 In verbose mode: `bpf(0x0 /* BPF_MAP_CREATE */, ...)`
 In abbreviated mode: `bpf(BPF_MAP_CREATE, ...)`
 
@@ -739,7 +739,7 @@ Defaults:
 match_awk [output] [awk_program] [error_message]
 ```
 
-Validates `output` against an AWK program. The AWK program receives
+Validates `output` against a gawk program. The program receives
 `output` via stdin and should exit 0 on success, non-zero on failure.
 
 Defaults:
@@ -831,7 +831,7 @@ The generated `.gen.test` files are already covered by the glob pattern
 Add your `.test` file to one of the test lists in `tests/Makefile.am`.
 Both lists must be kept in **lexicographical order**.
 
-**For decoder tests**, add to `DECODER_TESTS` (lines 580-643):
+**For decoder tests**, add to `DECODER_TESTS`:
 ```makefile
 DECODER_TESTS = \
 	...
@@ -839,7 +839,7 @@ DECODER_TESTS = \
 	...
 ```
 
-**For non-decoder tests**, add to `MISC_TESTS` (lines 645+):
+**For non-decoder tests**, add to `MISC_TESTS`:
 ```makefile
 MISC_TESTS = \
 	...
@@ -866,7 +866,8 @@ when running `make check`.
 
 **The relationship:**
 ```makefile
-check_PROGRAMS = $(PURE_EXECUTABLES) + additional test programs
+check_PROGRAMS = $(PURE_EXECUTABLES) $(secontext_EXECUTABLES) \
+	additional test programs
 ```
 
 where `PURE_EXECUTABLES` is generated from `pure_executables.list`.

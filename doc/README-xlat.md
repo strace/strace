@@ -118,8 +118,9 @@ platform-specific issues.
 Makes constants always defined (no conditional compilation).  Opposite:
 `#conditional` (restores conditional behavior).
 
-**Should only be used in xlat files where all constants are defined in bundled
-headers** (headers included in strace's source tree, not system headers).
+Use when all constants are known to be defined by the headers included by
+the decoder. Entries with explicit fallback values also work: the generator
+checks their values by default instead of defining them in this mode.
 
 ### `#conditional`
 
@@ -230,7 +231,7 @@ preprocessor directives in generated code.
 - Include guards and standard headers
 - Conditional definitions with fallback values
 - Static const `struct xlat_data <name>_xdata[]` array
-- Static const `struct xlat <name>[1]` object
+- `struct xlat <name>[1]` object (static unless declared externally)
 
 ### M4 File (with `#enum`)
 
@@ -302,8 +303,8 @@ src/xlat/watchdog_ioctl_cmds.in
 
 ## Best Practices
 
-- Use `#unconditional` only in xlat files where all constants are defined
-  in bundled headers (not system headers)
+- Use `#unconditional` only when all constants are available in the
+  headers included by the decoder
 - Use `#sorted` for large tables (>20 entries) to enable binary search
 - Use `#value_indexed` only when values are truly sequential
 - Use `#enum` to generate autoconf checks for portability
