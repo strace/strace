@@ -121,23 +121,20 @@ headers beyond `fcntl.h`.
 
 ## How to Update Bundled Headers
 
-Updates are done from a `headers_install`-ed kernel tree, not raw kernel
-sources. The `headers_install` target sanitizes headers for userspace use.
+Use [`maint/update-bundled-headers.sh`](../maint/update-bundled-headers.sh)
+with a checked-out Linux kernel source tree. It runs `make headers_install`
+for the generic and bundled architecture-specific headers, applies the
+repository's whitespace normalization, and copies the sanitized headers
+listed in `bundled/Makefile.am` (`EXTRA_DIST`). Do not copy raw kernel
+source headers: `headers_install` prepares them for userspace use.
 
 ### Updating Existing Headers
 
-Typical workflow when syncing with a new kernel release:
+To sync the existing bundled headers with a kernel release:
 
 ```bash
-# Build a headers_install'd kernel tree
-cd /path/to/linux
-make headers_install INSTALL_HDR_PATH=$TMPDIR/kernel-headers
-
-# Copy updated headers to strace
-cd /path/to/strace
-cp $TMPDIR/kernel-headers/include/linux/version.h \
-   bundled/linux/include/uapi/linux/
-...
+# From the strace source tree, with the Linux tree checked out at vX.Y
+maint/update-bundled-headers.sh /path/to/linux
 
 # Verify the build
 ./bootstrap
@@ -146,49 +143,32 @@ make -j$(nproc)
 make check
 ```
 
-For architecture-specific headers:
+To preview which headers would change, use `-n`; the script still runs
+`headers_install` but does not copy files. Use `-j JOBS` to set the number
+of parallel make jobs. `--commit` also creates a commit with a generated
+message; without it, the script only updates the files. Review the diff
+and follow [COMMIT-MESSAGES.md](COMMIT-MESSAGES.md) when committing.
+
+The script installs architecture-specific headers separately with the
+corresponding `ARCH` value. For example, it copies the installed mips
+`asm/fcntl.h` into `bundled/linux/arch/mips/include/uapi/asm/`.
+
+For a single header, you can also install headers manually and copy the
+sanitized file:
 
 ```bash
-# Example: updating asm/fcntl.h for mips, after installing mips headers
-cp $TMPDIR/mips-kernel-headers/include/asm/fcntl.h \
-   bundled/linux/arch/mips/include/uapi/asm/
-```
-
-**Important**: Always use `headers_install`-ed headers, not raw kernel
-sources. The installation process sanitizes headers for userspace by removing
-kernel-internal definitions and ensuring proper include guards.
-
-### Bulk Update Example
-
-For a kernel version update affecting multiple files:
-
-```bash
-cd /path/to/linux
-git checkout vX.Y
-make headers_install INSTALL_HDR_PATH=$TMPDIR/headers-vX.Y
-
-cd /path/to/strace
-cd bundled/linux/include/uapi/linux
-for f in *.h; do
-    cp $TMPDIR/headers-vX.Y/include/linux/$f .
-done
-cd -
-
-# Test
-make -j$(nproc) && make -j$(nproc) check
+make -C /path/to/linux headers_install INSTALL_HDR_PATH=$TMPDIR/kernel-headers
+cp $TMPDIR/kernel-headers/include/linux/version.h \
+   bundled/linux/include/uapi/linux/
 ```
 
 ## Adding a New Header
 
-When adding a header that strace previously didn't bundle:
+The update script only processes headers already listed in
+`bundled/Makefile.am`. When adding a header that strace previously didn't
+bundle:
 
-1. **Copy from headers_install**:
-   ```bash
-   cp $TMPDIR/kernel-headers/include/linux/pidfd.h \
-      bundled/linux/include/uapi/linux/
-   ```
-
-2. **Register in `bundled/Makefile.am`**:
+1. **Register in `bundled/Makefile.am`**:
    ```makefile
    EXTRA_DIST = \
        linux/COPYING \
@@ -198,6 +178,18 @@ When adding a header that strace previously didn't bundle:
    ```
    Add the new file to the `EXTRA_DIST` list in alphabetical order within
    its section.
+
+2. **Run the update script** to install and copy the listed headers:
+   ```bash
+   maint/update-bundled-headers.sh /path/to/linux
+   ```
+   Alternatively, install and copy only the new header manually:
+   ```bash
+   make -C /path/to/linux headers_install \
+       INSTALL_HDR_PATH=$TMPDIR/kernel-headers
+   cp $TMPDIR/kernel-headers/include/linux/pidfd.h \
+      bundled/linux/include/uapi/linux/
+   ```
 
 3. **Test**:
    ```bash
