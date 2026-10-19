@@ -15,9 +15,9 @@
 
 #include "xlat/nl_route_types.h"
 
-static void
-decode_family(struct tcb *const tcp, const uint8_t family,
-	      const kernel_ulong_t addr, const unsigned int len)
+void
+decode_rtnl_family(struct tcb *const tcp, const uint8_t family,
+		   const kernel_ulong_t addr, const unsigned int len)
 {
 	tprint_struct_begin();
 	tprints_field_name("family");
@@ -138,7 +138,7 @@ decode_netlink_route(struct tcb *const tcp,
 		    && route_decoders[index]) {
 			route_decoders[index](tcp, nlmsghdr, family, addr, len);
 		} else {
-			decode_family(tcp, family, addr, len);
+			decode_rtnl_family(tcp, family, addr, len);
 		}
 	}
 

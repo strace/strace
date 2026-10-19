@@ -13,6 +13,7 @@
 
 #include "netlink.h"
 #include <linux/neighbour.h>
+#include <linux/rtnetlink.h>
 
 #include "xlat/fdb_notify_flags.h"
 #include "xlat/neighbor_cache_entry_ext_flags.h"
@@ -196,10 +197,68 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 	}
 }
 
+/* Check attribute framing, not whether the kernel accepts the attributes. */
+static bool
+has_fdb_dump_attrs(struct tcb *const tcp, const kernel_ulong_t addr,
+		   const unsigned int len, size_t offset)
+{
+	offset = NLMSG_ALIGN(offset);
+
+	if (len < offset)
+		return false;
+
+	while (offset < len) {
+		struct nlattr attr;
+
+		if (len - offset < NLA_HDRLEN
+		    || umove(tcp, addr + offset, &attr)
+		    || attr.nla_len < NLA_HDRLEN
+		    || attr.nla_len > len - offset)
+			return false;
+
+		/*
+		 * The last attribute need not have trailing alignment padding.
+		 */
+		if (attr.nla_len == len - offset)
+			return true;
+
+		offset += NLA_ALIGN(attr.nla_len);
+	}
+
+	return offset == len;
+}
+
 DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh)
 {
-	if (family == AF_BRIDGE)
-		decode_ifinfomsg(tcp, nlmsghdr, family, addr, len);
-	else
-		decode_ndmsg(tcp, nlmsghdr, family, addr, len);
+	if (family == AF_BRIDGE && (nlmsghdr->nlmsg_flags & NLM_F_DUMP)) {
+		const size_t ndmsg_len = sizeof(struct ndmsg);
+		const size_t ndmsg_u32_attr_len = ndmsg_len + NLA_HDRLEN
+						  + sizeof(__u32);
+		const size_t ifinfomsg_len = sizeof(struct ifinfomsg);
+
+		if (len != ndmsg_len && len != ndmsg_u32_attr_len) {
+			/*
+			 * The socket's NETLINK_GET_STRICT_CHK setting
+			 * determines which format the kernel uses.
+			 * Without it, a payload can fit both layouts;
+			 * prefer the legacy ifinfomsg.
+			 */
+			if (has_fdb_dump_attrs(tcp, addr, len, ifinfomsg_len)) {
+				decode_ifinfomsg(tcp, nlmsghdr, family,
+						 addr, len);
+				return;
+			}
+
+			if (!has_fdb_dump_attrs(tcp, addr, len, ndmsg_len)) {
+				/*
+				 * Neither layout is recognizable,
+				 * avoid guessing at the header.
+				 */
+				decode_rtnl_family(tcp, family, addr, len);
+				return;
+			}
+		}
+	}
+
+	decode_ndmsg(tcp, nlmsghdr, family, addr, len);
 }

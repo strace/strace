@@ -19,6 +19,9 @@ route_decode_name(struct tcb *tcp,			\
 		  unsigned int len)			\
 /* End of DECL_NETLINK_ROUTE_DECODER definition. */
 
+extern void decode_rtnl_family(struct tcb *tcp, uint8_t family,
+			       kernel_ulong_t addr, unsigned int len);
+
 extern DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_cachereport);
 extern DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg);

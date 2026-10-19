@@ -22,6 +22,7 @@
 #include <linux/if_link.h>
 #include <linux/ip.h>
 #include <linux/neighbour.h>
+#include <linux/netlink.h>
 #include <linux/netconf.h>
 #include <linux/rtnetlink.h>
 #include <linux/nexthop.h>
@@ -378,6 +379,297 @@ test_rtnl_neigh(const int fd)
 				      ", ndm_flags=NTF_PROXY"
 				      ", ndm_type=RTN_UNSPEC}"));
 	}
+
+	const struct ndmsg bridge_msg = {
+		.ndm_family = AF_BRIDGE,
+		.ndm_ifindex = ifindex_lo(),
+		.ndm_state = NUD_PERMANENT,
+		.ndm_flags = NTF_PROXY,
+		.ndm_type = RTN_UNSPEC
+	};
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(bridge_msg), &bridge_msg, sizeof(bridge_msg),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_PERMANENT"
+			     ", ndm_flags=NTF_PROXY, ndm_type=RTN_UNSPEC}"));
+
+	const struct {
+		struct ndmsg ndmsg;
+		struct nlattr attr;
+		__u32 probes;
+	} bridge_msg_with_attr = {
+		.ndmsg = {
+			.ndm_family = AF_BRIDGE,
+			.ndm_ifindex = ifindex_lo(),
+			.ndm_state = NUD_PERMANENT,
+			.ndm_flags = NTF_PROXY,
+			.ndm_type = RTN_UNSPEC
+		},
+		.attr = {
+			.nla_len = NLA_HDRLEN + sizeof(__u32),
+			.nla_type = NDA_PROBES
+		},
+		.probes = 42
+	};
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(bridge_msg_with_attr), &bridge_msg_with_attr,
+		      sizeof(bridge_msg_with_attr),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_PERMANENT"
+			     ", ndm_flags=NTF_PROXY, ndm_type=RTN_UNSPEC}, "
+			     "[{nla_len=8, nla_type=NDA_PROBES}, 42]"));
+
+	/* Both dump sizes are decoded as ndmsg without strict checking. */
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg), &bridge_msg, sizeof(bridge_msg),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_PERMANENT"
+			     ", ndm_flags=NTF_PROXY, ndm_type=RTN_UNSPEC}"));
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg_with_attr), &bridge_msg_with_attr,
+		      sizeof(bridge_msg_with_attr),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_PERMANENT"
+			     ", ndm_flags=NTF_PROXY, ndm_type=RTN_UNSPEC}, "
+			     "[{nla_len=8, nla_type=NDA_PROBES}, 42]"));
+
+	struct {
+		struct ndmsg ndmsg;
+		struct {
+			struct nlattr attr;
+			__u32 ifindex;
+		} ifindex;
+		struct {
+			struct nlattr attr;
+			__u32 master;
+		} master;
+	} bridge_msg_with_two_attrs = {
+		.ndmsg = { .ndm_family = AF_BRIDGE },
+		.ifindex = {
+			.attr = {
+				.nla_len = NLA_HDRLEN + sizeof(__u32),
+				.nla_type = NDA_IFINDEX
+			},
+			.ifindex = ifindex_lo()
+		},
+		.master = {
+			.attr = {
+				.nla_len = NLA_HDRLEN + sizeof(__u32),
+				.nla_type = NDA_MASTER
+			},
+			.master = ifindex_lo()
+		}
+	};
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg_with_two_attrs),
+		      &bridge_msg_with_two_attrs,
+		      sizeof(bridge_msg_with_two_attrs),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=0, "
+			     "ndm_state=NUD_NONE, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=8, nla_type=NDA_IFINDEX}, "
+			     IFINDEX_LO_STR "], [{nla_len=8, "
+			     "nla_type=NDA_MASTER}, " IFINDEX_LO_STR "]]"));
+
+	bridge_msg_with_two_attrs.ndmsg.ndm_state = NUD_PERMANENT;
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg_with_two_attrs),
+		      &bridge_msg_with_two_attrs,
+		      sizeof(bridge_msg_with_two_attrs),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=0, "
+			     "ndm_state=NUD_PERMANENT, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=8, nla_type=NDA_IFINDEX}, "
+			     IFINDEX_LO_STR "], [{nla_len=8, "
+			     "nla_type=NDA_MASTER}, " IFINDEX_LO_STR "]]"));
+
+	bridge_msg_with_two_attrs.ndmsg.ndm_state = 0;
+	bridge_msg_with_two_attrs.ifindex.attr.nla_type = NDA_PROBES;
+	bridge_msg_with_two_attrs.ifindex.ifindex = 42;
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg_with_two_attrs),
+		      &bridge_msg_with_two_attrs,
+		      sizeof(bridge_msg_with_two_attrs),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=0, "
+			     "ndm_state=NUD_NONE, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=8, nla_type=NDA_PROBES}, 42], "
+			     "[{nla_len=8, nla_type=NDA_MASTER}, "
+			     IFINDEX_LO_STR "]]"));
+
+	bridge_msg_with_two_attrs.ifindex.attr.nla_type = NDA_IFINDEX;
+	bridge_msg_with_two_attrs.ifindex.attr.nla_len =
+		NLA_HDRLEN + sizeof(__u16);
+	bridge_msg_with_two_attrs.ifindex.ifindex = 0x01010101;
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_msg_with_two_attrs),
+		      &bridge_msg_with_two_attrs,
+		      sizeof(bridge_msg_with_two_attrs),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=0, "
+			     "ndm_state=NUD_NONE, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=6, nla_type=NDA_IFINDEX}, "
+			     "\"\\x01\\x01\"], [{nla_len=8, "
+			     "nla_type=NDA_MASTER}, " IFINDEX_LO_STR "]]"));
+
+	/* Neither layout has a complete attribute header. */
+	const struct {
+		struct ndmsg ndmsg;
+		char partial_attr;
+	} bridge_short_dump = { .ndmsg = { .ndm_family = AF_BRIDGE } };
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_short_dump.ndmsg) + 1,
+		      &bridge_short_dump, sizeof(bridge_short_dump.ndmsg) + 1,
+		      printf("{family=AF_BRIDGE, data=");
+		      print_quoted_hex((const char *) &bridge_short_dump + 1,
+				       sizeof(bridge_short_dump.ndmsg));
+		      printf("}"));
+
+	/* Neither layout fits a malformed ndmsg attribute. */
+	const struct {
+		struct ndmsg ndmsg;
+		struct nlattr attr;
+		__u32 probes;
+		__u32 extra;
+	} bridge_bad_dump = {
+		.ndmsg = { .ndm_family = AF_BRIDGE },
+		.attr = { .nla_type = NDA_PROBES },
+		.probes = 42
+	};
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_bad_dump), &bridge_bad_dump,
+		      sizeof(bridge_bad_dump),
+		      printf("{family=AF_BRIDGE, data=");
+		      print_quoted_hex((const char *) &bridge_bad_dump + 1,
+				       sizeof(bridge_bad_dump) - 1);
+		      printf("}"));
+
+	struct {
+		struct ifinfomsg ifinfo;
+		struct nlattr attr;
+		__u32 mtu;
+	} bridge_ifinfo_dump = {
+		.ifinfo = {
+			.ifi_family = AF_BRIDGE,
+			.ifi_type = ARPHRD_LOOPBACK,
+			.ifi_index = ifindex_lo(),
+			.ifi_flags = IFF_UP
+		},
+		.attr = {
+			.nla_len = NLA_HDRLEN + sizeof(__u32),
+			.nla_type = IFLA_MTU
+		},
+		.mtu = 1500
+	};
+	/* ifi_change overlaps the first ndmsg attribute header. */
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_ifinfo_dump), &bridge_ifinfo_dump,
+		      sizeof(bridge_ifinfo_dump),
+		      printf("{ifi_family=AF_BRIDGE, ifi_type=ARPHRD_LOOPBACK"
+			     ", ifi_index=" IFINDEX_LO_STR
+			     ", ifi_flags=IFF_UP, ifi_change=0}, "
+			     "[{nla_len=8, nla_type=IFLA_MTU}, 1500]"));
+
+	/* Both layouts fit: ifi_change looks like an empty ndmsg attr. */
+	bridge_ifinfo_dump.ifinfo.ifi_change = NLA_HDRLEN;
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_ifinfo_dump), &bridge_ifinfo_dump,
+		      sizeof(bridge_ifinfo_dump),
+		      printf("{ifi_family=AF_BRIDGE, ifi_type=ARPHRD_LOOPBACK"
+			     ", ifi_index=" IFINDEX_LO_STR ", ifi_flags=IFF_UP, ");
+		      PRINT_FIELD_X(bridge_ifinfo_dump.ifinfo, ifi_change);
+		      printf("}, [{nla_len=8, nla_type=IFLA_MTU}, 1500]"));
+
+	const struct nlattr oversized_attr = {
+		.nla_len = sizeof(bridge_ifinfo_dump),
+		.nla_type = IFLA_UNSPEC
+	};
+	memcpy(&bridge_ifinfo_dump.ifinfo.ifi_change, &oversized_attr,
+	       sizeof(oversized_attr));
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_ifinfo_dump), &bridge_ifinfo_dump,
+		      sizeof(bridge_ifinfo_dump),
+		      printf("{ifi_family=AF_BRIDGE, ifi_type=ARPHRD_LOOPBACK"
+			     ", ifi_index=" IFINDEX_LO_STR ", ifi_flags=IFF_UP, ");
+		      PRINT_FIELD_X(bridge_ifinfo_dump.ifinfo, ifi_change);
+		      printf("}, [{nla_len=8, nla_type=IFLA_MTU}, 1500]"));
+
+	/* The declared length reaches the attribute, but its bytes do not. */
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      sizeof(bridge_ifinfo_dump), &bridge_ifinfo_dump,
+		      sizeof(bridge_ifinfo_dump.ifinfo) - 3,
+		      printf("{family=AF_BRIDGE, data=%p}",
+			     NLMSG_DATA(TEST_NETLINK_nlh) + 1));
+
+	const struct {
+		struct ndmsg ndmsg;
+		struct {
+			struct nlattr attr;
+			__u32 master;
+		} master;
+		struct {
+			struct nlattr attr;
+			__u16 vlan;
+		} vlan;
+	} bridge_get_msg_with_two_attrs = {
+		.ndmsg = {
+			.ndm_family = AF_BRIDGE,
+			.ndm_ifindex = ifindex_lo()
+		},
+		.master = {
+			.attr = {
+				.nla_len = NLA_HDRLEN + sizeof(__u32),
+				.nla_type = NDA_MASTER
+			},
+			.master = ifindex_lo()
+		},
+		.vlan = {
+			.attr = {
+				.nla_len = NLA_HDRLEN + sizeof(__u16),
+				.nla_type = NDA_VLAN
+			},
+			.vlan = 42
+		}
+	};
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(bridge_get_msg_with_two_attrs),
+		      &bridge_get_msg_with_two_attrs,
+		      sizeof(bridge_get_msg_with_two_attrs),
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_NONE, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=8, nla_type=NDA_MASTER}, "
+			     IFINDEX_LO_STR "], [{nla_len=6, "
+			     "nla_type=NDA_VLAN}, 42]]"));
+	/* A final attribute needs no alignment padding. */
+	const size_t bridge_get_msg_len =
+		offsetofend(typeof(bridge_get_msg_with_two_attrs), vlan);
+	TEST_NETLINK_(fd, nlh0, RTM_GETNEIGH, "RTM_GETNEIGH",
+		      NLM_F_REQUEST | NLM_F_DUMP, "NLM_F_REQUEST|NLM_F_DUMP",
+		      bridge_get_msg_len,
+		      &bridge_get_msg_with_two_attrs,
+		      bridge_get_msg_len,
+		      printf("{ndm_family=AF_BRIDGE, ndm_ifindex=" IFINDEX_LO_STR
+			     ", ndm_state=NUD_NONE, ndm_flags=0, "
+			     "ndm_type=RTN_UNSPEC}, "
+			     "[[{nla_len=8, nla_type=NDA_MASTER}, "
+			     IFINDEX_LO_STR "], [{nla_len=6, "
+			     "nla_type=NDA_VLAN}, 42]]"));
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNEIGH + 3);
 }
