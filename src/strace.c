@@ -37,6 +37,7 @@
 #include "number_set.h"
 #include "ptrace_syscall_info.h"
 #include "scno.h"
+#include "sen.h"
 #include "printsiginfo.h"
 #include "strauss.h"
 #include "trace_event.h"
@@ -4131,6 +4132,14 @@ dispatch_event(const struct tcb_wait_data *wd)
 			 * we can let this process to report its death to us
 			 * normally, via WIFEXITED or WIFSIGNALED wait status.
 			 */
+			return true;
+		}
+		/* After trace_syscall, exiting() marks a syscall-entry stop. */
+		if (detach_on_execve && exiting(current_tcp) &&
+		    !(current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) &&
+		    (tcp_sysent(current_tcp)->sen == SEN_execve ||
+		     tcp_sysent(current_tcp)->sen == SEN_execveat)) {
+			detach(current_tcp); /* do "-b execve" thingy */
 			return true;
 		}
 		if (has_seccomp_filter(current_tcp)) {

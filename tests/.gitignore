@@ -96,6 +96,7 @@ count_unknown_mixed
 creat
 delay
 delete_module
+detach-on-execve-setgid-helper
 detach-vfork
 dev--decode-fds-all
 dev--decode-fds-dev
