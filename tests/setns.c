@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <linux/sched.h>
+
 static const char *errstr;
 
 static long
@@ -35,15 +37,15 @@ main(void)
 	static const int bogus_fd = 0xdeadc0de;
 
 	static const struct strval32 nstypes[] = {
-		{ 0, "0" },
-		{ 0x00000080U, "CLONE_NEWTIME" },
-		{ 0x00020000U, "CLONE_NEWNS" },
-		{ 0x02000000U, "CLONE_NEWCGROUP" },
-		{ 0x04000000U, "CLONE_NEWUTS" },
-		{ 0x08000000U, "CLONE_NEWIPC" },
-		{ 0x10000000U, "CLONE_NEWUSER" },
-		{ 0x20000000U, "CLONE_NEWPID" },
-		{ 0x40000000U, "CLONE_NEWNET" },
+		{ ARG_STR(0) },
+		{ ARG_STR(CLONE_NEWTIME) },
+		{ ARG_STR(CLONE_NEWNS) },
+		{ ARG_STR(CLONE_NEWCGROUP) },
+		{ ARG_STR(CLONE_NEWUTS) },
+		{ ARG_STR(CLONE_NEWIPC) },
+		{ ARG_STR(CLONE_NEWUSER) },
+		{ ARG_STR(CLONE_NEWPID) },
+		{ ARG_STR(CLONE_NEWNET) },
 		{ 0x81fdff7fU, "0x81fdff7f /* CLONE_NEW??? */" },
 		{ -1U,
 		  "CLONE_NEWTIME|CLONE_NEWNS|CLONE_NEWCGROUP|CLONE_NEWUTS|"

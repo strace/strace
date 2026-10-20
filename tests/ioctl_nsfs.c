@@ -19,10 +19,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <linux/nsfs.h>
-
-#ifndef CLONE_NEWUSER
-# define CLONE_NEWUSER 0x10000000
-#endif
+#include <linux/sched.h>
 
 static void
 test_no_namespace(void)

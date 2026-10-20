@@ -16,6 +16,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#include <linux/sched.h>
+
 int
 main(void)
 {
@@ -34,12 +36,12 @@ main(void)
 				   netns_path);
 	netns[n] = '\0';
 
-	if (syscall(__NR_unshare, 0x40000000) < 0)
-		perror_msg_and_skip("unshare (CLONE_NEWNET)");
+	if (syscall(__NR_unshare, CLONE_NEWNET) < 0)
+		perror_msg_and_skip("unshare(CLONE_NEWNET)");
 
-	int rc = syscall(__NR_setns, netns_fd, 0x40000000);
+	int rc = syscall(__NR_setns, netns_fd, CLONE_NEWNET);
 	if (rc < 0)
-		perror_msg_and_skip("setns (CLONE_NEWNET)");
+		perror_msg_and_skip("setns(CLONE_NEWNET)");
 	printf("setns(%d, CLONE_NEWNET) = %s (%s)\n",
 	       netns_fd, sprintrc(rc), netns);
 

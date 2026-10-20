@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <linux/sched.h>
+
 #ifdef PRINT_NAMESPACE
 # define LINE_END ""
 #else
@@ -38,14 +40,11 @@ main(void)
 			"|CLONE_SYSVSEM|CLONE_NEWCGROUP|CLONE_NEWUTS"
 			"|CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWNET|0x80a8c075",
 			{ NULL } },
-		{ 0x00000080|0x00020000|0x02000000|0x04000000|0x08000000|0x20000000|0x40000000,
-			"CLONE_NEWTIME|CLONE_NEWNS|CLONE_NEWCGROUP"
-			"|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWPID"
-			"|CLONE_NEWNET",
+		{ ARG_STR(CLONE_NEWTIME|CLONE_NEWNS|CLONE_NEWCGROUP|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWNET),
 			{ "cgroup", "ipc", "mnt", "net", "pid", "time", "uts", NULL } },
-		{ 0x00020000, "CLONE_NEWNS", { "mnt", NULL } },
-		{ 0x2000000, "CLONE_NEWCGROUP", { "cgroup", NULL } },
-		{ 0x10000000, "CLONE_NEWUSER", { "user", NULL } },
+		{ ARG_STR(CLONE_NEWNS), { "mnt", NULL } },
+		{ ARG_STR(CLONE_NEWCGROUP), { "cgroup", NULL } },
+		{ ARG_STR(CLONE_NEWUSER), { "user", NULL } },
 		{ ARG_STR(0x81f8f07f) " /* CLONE_??? */", { NULL } },
 	};
 
