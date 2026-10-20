@@ -56,6 +56,47 @@
 # define ARG_CTID	4
 #endif
 
+/*
+ * Clear CLONE_UNTRACED while --seccomp-bpf is active.  Otherwise the child
+ * can escape ptrace while inheriting strace's seccomp filter.
+ *
+ * Return -1 if the flag could not be cleared and the caller must skip the
+ * syscall, 0 otherwise.
+ */
+int
+sanitize_clone_untraced(struct tcb *tcp)
+{
+	const char *name = tcp_sysent(tcp)->sys_name;
+	if (!name)
+		return 0;
+	if (!strcmp(name, "clone") || !strcmp(name, "clone2")) {
+		const kernel_ulong_t flags = tcp->u_arg[ARG_FLAGS];
+		if (!(flags & CLONE_UNTRACED))
+			return 0;
+
+		const kernel_ulong_t new_flags = flags & ~CLONE_UNTRACED;
+		if (!syscall_set_arg(tcp, ARG_FLAGS, new_flags))
+			return -1;
+
+		tcp->u_arg[ARG_FLAGS] = new_flags;
+		return 0;
+	}
+
+	if (!strcmp(name, "clone3")) {
+		uint64_t flags;
+		if (tcp->u_arg[1] < sizeof(flags) ||
+		    umove(tcp, tcp->u_arg[0], &flags) < 0 ||
+		    !(flags & CLONE_UNTRACED))
+			return 0;
+
+		flags &= ~((uint64_t) CLONE_UNTRACED);
+		if (upoken(tcp, tcp->u_arg[0], sizeof(flags), &flags) != sizeof(flags))
+			return -1;
+	}
+
+	return 0;
+}
+
 static bool show_namespace = false;
 extern void namespace_auxstr_init(void)
 {
