@@ -45,6 +45,7 @@ strace \- trace system calls and signals
 .\" no -k option is available:
 .if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyYzZ
 .OP \-a column
+.OP \-\-wrap\-lines
 .OP \-b execve
 .OM \-e expr
 .OP \-I n
@@ -1130,6 +1131,10 @@ parameter can be one of
 .BR always ,
 or
 .BR never .
+.TP
+.BR \-\-wrap\-lines
+Wraps trace output to the terminal width and indents continuation lines.
+This option has no effect when the trace output is not a terminal.
 Custom color schemes can be specified with the
 .B STRACE_COLORS
 environment variable, for example:

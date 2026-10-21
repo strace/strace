@@ -721,6 +721,7 @@ MISC_TESTS = \
 	strace--argv0.test \
 	strace--color-no-tty.test \
 	strace--color-tty.test \
+	strace--wrap-lines.test \
 	strace--syscall-limit--seccomp-bpf.test \
 	strace--syscall-limit.test \
 	strace--tips-full.test \
