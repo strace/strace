@@ -1115,6 +1115,8 @@ setns-report-ns-id-pid	-a12 -e trace=setns -e namespace=new -e signal=none
 setns-report-ns-id-pid--pidns	+procfs-pidns.sh
 setns-report-ns-id-time	-a12 -e trace=setns -e namespace=new -e signal=none
 setns-report-ns-id-time--pidns	+procfs-pidns.sh
+setns-report-ns-id-user	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-user--pidns	+procfs-pidns.sh
 setns-report-ns-id-user-explicit	-a12 -e trace=setns -e namespace=new -e signal=none
 setns-report-ns-id-user-explicit--pidns	+procfs-pidns.sh
 setns-report-ns-id-uts	-a12 -e trace=setns -e namespace=new -e signal=none
