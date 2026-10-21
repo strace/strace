@@ -1104,11 +1104,17 @@ setgroups32	-s2 -a19
 sethostname	-a22
 setns	-a21
 setns-report-ns-id-cgroup	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-cgroup--pidns	+procfs-pidns.sh
 setns-report-ns-id-ipc	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-ipc--pidns	+procfs-pidns.sh
 setns-report-ns-id-mnt	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-mnt--pidns	+procfs-pidns.sh
 setns-report-ns-id-net	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-net--pidns	+procfs-pidns.sh
 setns-report-ns-id-user-explicit	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-user-explicit--pidns	+procfs-pidns.sh
 setns-report-ns-id-uts	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-uts--pidns	+procfs-pidns.sh
 setregid	-a15
 setregid32	-a17
 setresgid	-a19
