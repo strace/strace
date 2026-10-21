@@ -1103,7 +1103,11 @@ setgroups	-s2 -a17
 setgroups32	-s2 -a19
 sethostname	-a22
 setns	-a21
+setns-report-ns-id-cgroup	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-ipc	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-mnt	-a12 -e trace=setns -e namespace=new -e signal=none
 setns-report-ns-id-net	-a12 -e trace=setns -e namespace=new -e signal=none
+setns-report-ns-id-uts	-a12 -e trace=setns -e namespace=new -e signal=none
 setregid	-a15
 setregid32	-a17
 setresgid	-a19

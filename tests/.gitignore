@@ -1123,7 +1123,11 @@ setgroups
 setgroups32
 sethostname
 setns
+setns-report-ns-id-cgroup
+setns-report-ns-id-ipc
+setns-report-ns-id-mnt
 setns-report-ns-id-net
+setns-report-ns-id-uts
 setpgrp-exec
 setregid
 setregid32
