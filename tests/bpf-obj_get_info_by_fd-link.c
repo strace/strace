@@ -110,7 +110,7 @@ main(void)
 	printf(", cgroup={cgroup_id=%" PRIu64, link_info->cgroup.cgroup_id);
 	printf(", attach_type=");
 	printxval(bpf_attach_type, link_info->cgroup.attach_type, "BPF_???");
-	printf("}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
+	printf("}}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
