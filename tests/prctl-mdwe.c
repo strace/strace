@@ -1,7 +1,7 @@
 /*
  * Check decoding of prctl PR_GET_MDWE/PR_SET_MDWE operations.
  *
- * Copyright (c) 2021-2023 The strace developers.
+ * Copyright (c) 2021-2026 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
