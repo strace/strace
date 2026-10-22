@@ -4,7 +4,7 @@
 # All rights reserved.
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-. "$srcdir/init.sh"
+. "${srcdir=.}/init.sh"
 
 check_prog python3
 
