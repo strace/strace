@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Added --wrap-lines option to wrap trace output to terminal width.
   * Implemented decoding of fchroot syscall.
   * Implemented decoding of SO_RIGHTS_NOTRUNC socket option.
   * Implemented decoding of IFA_MC_USERS and IFA_PROTO netlink attributes.

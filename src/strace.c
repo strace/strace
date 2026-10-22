@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #ifdef HAVE_PATHS_H
 # include <paths.h>
 #endif
@@ -164,6 +165,8 @@ static gid_t run_gid;
 unsigned int max_strlen = DEFAULT_STRLEN;
 static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
+static bool wrap_lines;
+static unsigned int wrap_width;
 
 /* Default output style for xlat entities */
 enum xlat_style xlat_verbosity = XLAT_STYLE_ABBREV;
@@ -369,6 +372,9 @@ Filtering:\n\
 Output format:\n\
   -a COLUMN, --columns=COLUMN\n\
                  alignment COLUMN for printing syscall results (default %d)\n\
+  --wrap-lines\n\
+                 wrap trace output to terminal width and indent\n\
+                 continuation lines\n\
   --color[=WHEN]\n\
                  colorize output; WHEN is auto, always, or never (default auto)\n\
   -e abbrev=SET, --abbrev=SET\n\
@@ -752,11 +758,73 @@ outf_perror(const struct tcb * const tcp)
 		perror_msg("%s", outfname);
 }
 
+static bool
+line_wrap_is_active(struct tcb *tcp)
+{
+	if (!wrap_lines)
+		return false;
+
+	if (tcp->curcol == 0) {
+		struct winsize ws;
+		int fd = fileno(tcp->outf);
+
+		wrap_width = 0;
+		if (isatty(fd) && ioctl(fd, TIOCGWINSZ, &ws) == 0 &&
+		    ws.ws_col > 2)
+			wrap_width = ws.ws_col;
+	}
+
+	return wrap_width > 2;
+}
+
+static bool
+print_wrapped(const char *str, size_t len)
+{
+	for (size_t i = 0; i < len;) {
+		if (str[i] == '\n') {
+			if (fputc(str[i++], current_tcp->outf) == EOF)
+				return false;
+			current_tcp->curcol = 0;
+			continue;
+		}
+		if (current_tcp->curcol >= (int) wrap_width) {
+			if (fputs("\n  ", current_tcp->outf) == EOF)
+				return false;
+			current_tcp->curcol = 2;
+		}
+
+		size_t n = MIN(len - i,
+			       wrap_width - (unsigned int) current_tcp->curcol);
+		const char *nl = memchr(str + i, '\n', n);
+		if (nl)
+			n = nl - (str + i);
+		if (fwrite(str + i, 1, n, current_tcp->outf) != n)
+			return false;
+		i += n;
+		current_tcp->curcol += n;
+	}
+	return true;
+}
+
 ATTRIBUTE_FORMAT((printf, 1, 0))
 static void
 tvprintf(const char *const fmt, va_list args)
 {
 	if (current_tcp) {
+		if (line_wrap_is_active(current_tcp)) {
+			char *str;
+			int n = vasprintf(&str, fmt, args);
+
+			if (n < 0) {
+				outf_perror(current_tcp);
+				return;
+			}
+			if (!print_wrapped(str, (size_t) n))
+				outf_perror(current_tcp);
+			free(str);
+			return;
+		}
+
 		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			/* very unlikely due to vfprintf buffering */
@@ -795,8 +863,15 @@ tprints_string_uncol(const char *str)
 void
 tprints_string(const char *str)
 {
-	if (tprints_string_uncol(str))
+	if (!current_tcp)
+		return;
+
+	if (line_wrap_is_active(current_tcp)) {
+		if (!print_wrapped(str, strlen(str)))
+			outf_perror(current_tcp);
+	} else if (tprints_string_uncol(str)) {
 		current_tcp->curcol += strlen(str);
+	}
 }
 
 void
@@ -2459,6 +2534,7 @@ init(int argc, char *argv[])
 		GETOPT_STACK_TRACE_FRAME_LIMIT,
 		GETOPT_ALWAYS_SHOW_PID,
 		GETOPT_COLOR,
+		GETOPT_WRAP_LINES,
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
@@ -2527,6 +2603,7 @@ init(int argc, char *argv[])
 		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 		{ "always-show-pid",	no_argument,	   0, GETOPT_ALWAYS_SHOW_PID },
 		{ "color",		required_argument, 0, GETOPT_COLOR },
+		{ "wrap-lines",	no_argument,	   0, GETOPT_WRAP_LINES },
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2707,6 +2784,9 @@ init(int argc, char *argv[])
 			break;
 		case 'o':
 			outfname = optarg;
+			break;
+		case GETOPT_WRAP_LINES:
+			wrap_lines = true;
 			break;
 		case 'O':
 			if (set_overhead(optarg) < 0)

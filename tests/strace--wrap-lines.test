@@ -1,0 +1,73 @@
+#!/bin/sh -efu
+# Check --wrap-lines on a terminal and no effect on redirected output.
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog python3
+
+python3 - "$STRACE" ../getpid <<'PY'
+import errno
+import fcntl
+import os
+import pty
+import select
+import shlex
+import struct
+import subprocess
+import sys
+import time
+import termios
+
+width = 24
+long_arg = "0123456789012345678901234567890123456789"
+strace = shlex.split(sys.argv[1])
+program = sys.argv[2]
+command = strace + ["--trace=execve", "-s", "100", program, long_arg]
+
+result = subprocess.run(command, stdout=subprocess.DEVNULL,
+                        stderr=subprocess.PIPE, check=True, timeout=10)
+if not any(len(line) > width for line in result.stderr.splitlines()):
+    raise SystemExit("expected an unwrapped line on redirected output")
+
+master, slave = pty.openpty()
+fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, width, 0, 0))
+env = os.environ.copy()
+env["TERM"] = "dumb"
+env["NO_COLOR"] = "1"
+command = strace + ["--wrap-lines", "--trace=execve", "-s", "100",
+                    program, long_arg]
+proc = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=slave,
+                        env=env, close_fds=True)
+os.close(slave)
+output = bytearray()
+deadline = time.monotonic() + 10
+while True:
+    ready, _, _ = select.select([master], [], [], 0.1)
+    if ready:
+        try:
+            output.extend(os.read(master, 4096))
+        except OSError as error:
+            if error.errno != errno.EIO:
+                raise
+            break
+    elif proc.poll() is not None:
+        break
+    elif time.monotonic() >= deadline:
+        proc.kill()
+        proc.wait()
+        os.close(master)
+        raise SystemExit("strace command timed out")
+os.close(master)
+if proc.wait(timeout=10):
+    raise SystemExit("strace command failed")
+
+lines = output.replace(b"\r", b"").decode("ascii", "replace").splitlines()
+if not any(line.startswith("  ") for line in lines):
+    raise SystemExit("no indented continuation line")
+if any(len(line) > width for line in lines):
+    raise SystemExit("wrapped output exceeds terminal width")
+PY
