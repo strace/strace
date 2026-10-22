@@ -1662,7 +1662,8 @@ print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
 	} obj_printers[] = {
 		{ "anon_inode:bpf-map", print_bpf_map_info },
 		{ "anon_inode:bpf-prog", print_bpf_prog_info },
-		{ "anon_inode:bpf-link", print_bpf_link_info }
+		{ "anon_inode:bpf-link", print_bpf_link_info },
+		{ "anon_inode:bpf_link", print_bpf_link_info }
 	};
 
 	if (entering(tcp)) {

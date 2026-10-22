@@ -14,6 +14,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -43,6 +44,8 @@ sys_bpf(kernel_ulong_t cmd, void *attr, kernel_ulong_t size)
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/fd/");
+
 	static const struct bpf_insn cgroup_prog[] = {
 		{ /* r0 = 1 (allow) */
 			.code    = BPF_ALU64 | BPF_K | BPF_MOV,
@@ -97,10 +100,11 @@ main(void)
 	if (ret < 0)
 		perror_msg_and_skip("BPF_OBJ_GET_INFO_BY_FD");
 
+	char *link_fd_path = get_fd_path(link_fd);
 	printf("bpf(BPF_OBJ_GET_INFO_BY_FD"
-	       ", {info={bpf_fd=%d<anon_inode:bpf-link>"
+	       ", {info={bpf_fd=%d<%s>"
 	       ", info_len=%zu",
-	       link_fd, LINK_INFO_SZ);
+	       link_fd, link_fd_path, LINK_INFO_SZ);
 	if (get_info_attr.info_len != LINK_INFO_SZ)
 		printf(" => %u", get_info_attr.info_len);
 	printf(", info={type=");
@@ -110,8 +114,9 @@ main(void)
 	printf(", cgroup={cgroup_id=%" PRIu64, link_info->cgroup.cgroup_id);
 	printf(", attach_type=");
 	printxval(bpf_attach_type, link_info->cgroup.attach_type, "BPF_???");
-	printf("}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
+	printf("}}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
 
+	free(link_fd_path);
 	puts("+++ exited with 0 +++");
 	return 0;
 }
