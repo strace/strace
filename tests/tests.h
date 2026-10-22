@@ -136,7 +136,7 @@
 # endif
 
 /* For accessing arrays items in a circular manner */
-#define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
+# define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
 
 struct strval8 {
 	uint8_t val;
