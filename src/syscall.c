@@ -13,6 +13,7 @@
  */
 
 #include "defs.h"
+#include "filter_seccomp.h"
 #include "get_personality.h"
 #include "mmap_notify.h"
 #include "native_defs.h"
@@ -642,6 +643,10 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 				break;
 		}
 	}
+
+	if (!hide_log(tcp) && seccomp_filtering &&
+	    sanitize_clone_untraced(tcp) < 0 && !syscall_skip(tcp))
+		error_func_msg_and_die("failed to block CLONE_UNTRACED");
 
 	if (hide_log(tcp) || !traced(tcp)
 	    || ((tracing_paths || tracing_fds) && !pathtrace_match(tcp))) {
@@ -1584,6 +1589,26 @@ set_scno(struct tcb *tcp, kernel_ulong_t scno)
 	return arch_set_scno(tcp, scno);
 }
 
+bool
+syscall_set_arg(struct tcb *tcp, unsigned int arg_no, kernel_ulong_t value)
+{
+	if (!ptrace_set_syscall_info_supported ||
+	    !ptrace_syscall_info_is_entry() ||
+	    arg_no >= ARRAY_SIZE(ptrace_sci.entry.args))
+		return false;
+
+	const typeof(ptrace_sci.entry.args[0]) old_value =
+		ptrace_sci.entry.args[arg_no];
+	ptrace_sci.entry.args[arg_no] = value;
+	const size_t size = sizeof(ptrace_sci);
+	if (ptrace(PTRACE_SET_SYSCALL_INFO, tcp->pid,
+		   (void *) size, &ptrace_sci) == 0)
+		return true;
+
+	ptrace_sci.entry.args[arg_no] = old_value;
+	return false;
+}
+
 static void
 set_error(struct tcb *tcp, unsigned long new_error)
 {
@@ -1626,6 +1651,23 @@ set_error(struct tcb *tcp, unsigned long new_error)
 			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
 					 SYSCALL_NEVER_FAILS));
 	}
+}
+
+bool
+syscall_skip(struct tcb *tcp)
+{
+	int rc = set_scno(tcp, -1);
+	if (rc < 0)
+		return false;
+
+	tcp->flags |= TCB_TAMPERED;
+#if ARCH_NEEDS_SET_ERROR_FOR_SCNO_TAMPERING
+	if (rc == 0) {
+		tcp->u_error = 0;
+		set_error(tcp, ENOSYS);
+	}
+#endif
+	return true;
 }
 
 static void

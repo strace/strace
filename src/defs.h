@@ -599,6 +599,9 @@ extern void print_syscall_resume(struct tcb *tcp);
 extern int syscall_entering_decode(struct tcb *);
 extern int syscall_entering_trace(struct tcb *, unsigned int *);
 extern void syscall_entering_finish(struct tcb *, int);
+extern bool syscall_set_arg(struct tcb *, unsigned int, kernel_ulong_t);
+extern bool syscall_skip(struct tcb *);
+extern int sanitize_clone_untraced(struct tcb *);
 
 extern int syscall_exiting_decode(struct tcb *, struct timespec *);
 extern int syscall_exiting_trace(struct tcb *, struct timespec *, int);

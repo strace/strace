@@ -260,6 +260,12 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 		(stack_trace_mode ? MEMORY_MAPPING_CHANGE : 0) |
 		(is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
 		 COMM_CHANGE : 0);
+	const char *sys_name = sysent_vec[p][scno].sys_name;
+	if (sys_name && followfork && (!strcmp(sys_name, "clone") ||
+			    !strcmp(sys_name, "clone2") ||
+			    !strcmp(sys_name, "clone3")))
+		return true;
+
 	return sysent_vec[p][scno].sys_flags & always_trace_flags ||
 		is_number_in_set_array(scno, trace_set, p);
 }

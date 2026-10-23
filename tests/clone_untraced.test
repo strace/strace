@@ -1,0 +1,26 @@
+#!/bin/sh -efu
+#
+# Check that CLONE_UNTRACED cannot make children escape --seccomp-bpf.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+
+run_prog > /dev/null
+run_strace --seccomp-bpf -f -e trace=write ../$NAME > /dev/null
+
+grep -E \
+  'write\(1, "clone-(child-traced|blocked)\\n"' "$LOG" > /dev/null ||
+	fail_ "neither the child nor the rejected clone syscall was traced"
+
+grep -E \
+  'write\(1, "clone3-(child-traced|blocked|unavailable)\\n"' "$LOG" > /dev/null ||
+	fail_ "clone3 child or rejected clone3 syscall was not traced"
+
+if grep 'SIGTRAP' "$LOG" > /dev/null; then
+	fail_ "untraced child inherited a seccomp filter and received SIGTRAP"
+fi
