@@ -537,7 +537,7 @@ setup_termios2(void *tios_ptr, int variant)
 #  if defined __alpha__
 		       "c_cc=[[VEOF]=0, [VEOL]=0, [VEOL2]=0, "
 		       "[VERASE]=0, [VWERASE]=0, [VKILL]=0, "
-		       "[VREPRINT]=0x89, [VSWTC]=0x2a, [VINTR]=0, "
+		       "[VREPRINT]=0, [VSWTC]=0x2a, [VINTR]=0, "
 		       "[VQUIT]=0, [VSUSP]=0, [11]=0, [VSTART]=0, "
 		       "[VSTOP]=0, [VLNEXT]=0xff, [VDISCARD]=0, "
 		       "[VMIN]=0x89, [VTIME]=0xa0, [18]=0]"
@@ -686,7 +686,7 @@ setup_termios(void *tios_ptr, int variant)
 # if defined __alpha__
 		       "c_cc=[[VEOF]=0, [VEOL]=0, [VEOL2]=0, "
 		       "[VERASE]=0, [VWERASE]=0, [VKILL]=0, "
-		       "[VREPRINT]=0x89, [VSWTC]=0x2a, [VINTR]=0, "
+		       "[VREPRINT]=0, [VSWTC]=0x2a, [VINTR]=0, "
 		       "[VQUIT]=0, [VSUSP]=0, [11]=0, [VSTART]=0, "
 		       "[VSTOP]=0, [VLNEXT]=0xff, [VDISCARD]=0, "
 		       "[VMIN]=0x89, [VTIME]=0xa0, [18]=0]"
@@ -813,9 +813,9 @@ setup_termio(void *tios_ptr, int variant)
 #if VERBOSE
 		       "c_line=0xea /* N_??? */, "
 # if defined __alpha__
-		       "c_cc=[[_VEOF]=0, [_VEOL]=0, [_VEOL2]=0, "
-		       "[_VERASE]=0, [_VWERASE]=0, [_VKILL]=0, "
-		       "[_VREPRINT]=0x89, [_VSWTC]=0x2a]"
+		       "c_cc=[[_VINTR]=0, [_VQUIT]=0, [_VERASE]=0, "
+		       "[_VKILL]=0, [_VEOF]=0x89, [_VEOL]=0xa0, "
+		       "[_VEOL2]=0, [_VSWTC]=0x2a]"
 # elif defined __mips__
 		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
 		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
