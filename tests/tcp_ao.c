@@ -51,7 +51,7 @@ main(void)
 	       fd, key, errstr);
 
 #define KEY1 "\x42\xe9\xd2\xd3\xd1\xec\x9f\x55\x56\x9c\xd7\x89\x1a\x90\x53\xba\x59\x6d\x5f\x0a"
-	*key = (struct tcp_ao_add) {
+	SET_STRUCT(struct tcp_ao_add, key,
 		.prefix = 0,
 		.alg_name = "hmac(sha1)",
 		.ifindex = 0,
@@ -63,7 +63,7 @@ main(void)
 		.keyflags = 0,
 		.key = KEY1,
 		.keylen = sizeof(KEY1) - 1,
-	};
+	);
 	struct sockaddr_in6 addr6 =
 		{.sin6_family = AF_INET6, .sin6_addr = IN6ADDR_ANY_INIT};
 	memcpy(&key->addr, &addr6, sizeof(addr6));
@@ -81,7 +81,7 @@ main(void)
 	       fd, sizeof(KEY1) - 1, sizeof(*key) + 1, errstr);
 
 #define KEY2 "\x7a\x66\x25\xc9\x80\xdb\x68\x95\xf5\xaf\x84\x1b\xd6\x50\x29\xe1"
-	*key = (struct tcp_ao_add) {
+	SET_STRUCT(struct tcp_ao_add, key,
 		.prefix = 32,
 		.alg_name = "cmac(aes)",
 		.ifindex = 0,
@@ -93,7 +93,7 @@ main(void)
 		.keyflags = TCP_AO_KEYF_IFINDEX|TCP_AO_KEYF_EXCLUDE_OPT,
 		.key = KEY2,
 		.keylen = sizeof(KEY2) - 1,
-	};
+	);
 	struct sockaddr_in addr = {
 		.sin_family = AF_INET,
 		.sin_addr = { htonl(INADDR_LOOPBACK) }
