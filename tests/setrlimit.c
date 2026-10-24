@@ -39,11 +39,12 @@ main(void)
 		printf("setrlimit(%s, NULL) = %s\n", xlat->str, sprintrc(rc));
 # endif
 
-		struct rlimit libc_rlim = {};
-		if (getrlimit((int) res, &libc_rlim))
+# ifdef __NR_ugetrlimit
+		if (syscall(__NR_ugetrlimit, res, rlimit))
+# else
+		if (syscall(__NR_getrlimit, res, rlimit))
+# endif
 			continue;
-		rlimit[0] = libc_rlim.rlim_cur;
-		rlimit[1] = libc_rlim.rlim_max;
 
 		rc = syscall(__NR_setrlimit, res, rlimit);
 		const char *errstr = sprintrc(rc);
