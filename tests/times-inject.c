@@ -22,7 +22,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct tms, tbuf);
 	/* Include rounding ties and the second boundary at 1024 Hz.  */
 	static const uint64_t values[] = {
-		0, 1, 3, 31, 32, 33, 96, 1023, 1024, 1056,
+		0, 1, 3, 31, 32, 33, 64, 96, 192, 1023, 1024, 1056,
 		UINT64_C(0x20000000000001), INT64_MAX,
 	};
 
