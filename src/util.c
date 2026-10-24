@@ -248,6 +248,7 @@ print_clock_t(uint64_t val)
 {
 	static long clk_tck;
 	static int frac_width;
+	static unsigned int scale = 1;
 
 	if (!clk_tck) {
 		errno = 0;
@@ -256,11 +257,31 @@ print_clock_t(uint64_t val)
 			debug_func_perror_msg("sysconf(_SC_CLK_TCK)");
 		if (clk_tck == 0)
 			clk_tck = -1;
-		if (clk_tck > 0)
-			frac_width = MIN(ilog10(clk_tck), 9);
+		if (clk_tck > 1)
+			frac_width = MIN(ilog10(clk_tck - 1) + 1, 9);
+		for (int i = 0; i < frac_width; ++i)
+			scale *= 10;
 	}
 
-	print_ticks(val, clk_tck, frac_width);
+	PRINT_VAL_U(val);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
+	    && clk_tck > 0 && val > 0) {
+		/* Round the fractional second, with ties to even.  */
+		const double scaled = (double) (val % clk_tck) * scale / clk_tck;
+		unsigned int frac = scaled;
+		const double remainder = scaled - frac;
+
+		if (remainder > 0.5 || (remainder == 0.5 && (frac & 1)))
+			++frac;
+
+		const uint64_t sec = val / clk_tck + frac / scale;
+
+		if (frac_width)
+			tprintf_comment("%" PRIu64 ".%0*u s",
+					sec, frac_width, frac % scale);
+		else
+			tprintf_comment("%" PRIu64 " s", sec);
+	}
 }
 
 #if !defined HAVE_STPCPY

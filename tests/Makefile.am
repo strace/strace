@@ -474,6 +474,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	threads-execve-q \
 	threads-execve-qq \
 	threads-execve-qqq \
+	times-inject \
+	times-inject-Xraw \
+	times-inject-Xverbose \
 	tkill--pidns-translation \
 	tracer_ppid_pgid_sid \
 	trie_test \

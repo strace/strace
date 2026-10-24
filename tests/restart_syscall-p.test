@@ -18,9 +18,9 @@ tracee_pid=$!
 
 run_strace -qq -a14 -e trace=restart_syscall,exit_group -p $tracee_pid
 
-# On mips the interrupted syscall number is not available on attach.
+# On alpha and mips the interrupted syscall number is unavailable on attach.
 case "$STRACE_ARCH" in
-mips)	syscall='system call' ;;
+alpha|mips)	syscall='system call' ;;
 *)	syscall=nanosleep ;;
 esac
 
