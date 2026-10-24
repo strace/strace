@@ -17,6 +17,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Prevented CLONE_UNTRACED children from escaping --seccomp-bpf tracing
     and inheriting a seccomp filter without a tracer.
   * Fixed syscall identification when attaching to Alpha tracees.
+  * Fixed scaling of fractional seconds in clock tick comments.
 
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================
