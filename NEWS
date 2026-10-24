@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Bug fixes
   * Fixed syscall identification when attaching to Alpha tracees.
+  * Fixed clock tick comments on architectures with a non-decimal clock rate.
 
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================

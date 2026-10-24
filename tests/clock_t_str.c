@@ -21,15 +21,23 @@ clock_t_str(uint64_t val, char *str, size_t str_size)
 
 	if (!clk_tck) {
 		clk_tck = sysconf(_SC_CLK_TCK);
-		precision = clk_tck > 1 ? MIN((int) ceil(log10(clk_tck - 1)), 9)
-					: 0;
+		for (long n = clk_tck - 1; n > 0 && precision < 9; n /= 10)
+			++precision;
 	}
 
 	if ((clk_tck > 0) && val) {
-		snprintf(str, str_size, "%" PRIu64 " /* %" PRIu64 ".%0*u s */",
-			 val, val / clk_tck, precision,
-			 (unsigned) round(((double) (val % clk_tck) / clk_tck)
-					  * pow(10, precision)));
+		const unsigned int scale = pow(10, precision);
+		const unsigned int frac = nearbyint((double) (val % clk_tck)
+						   * scale / clk_tck);
+		const uint64_t sec = val / clk_tck + frac / scale;
+
+		if (precision)
+			snprintf(str, str_size,
+				 "%" PRIu64 " /* %" PRIu64 ".%0*u s */",
+				 val, sec, precision, frac % scale);
+		else
+			snprintf(str, str_size, "%" PRIu64 " /* %" PRIu64 " s */",
+				 val, sec);
 	} else {
 		snprintf(str, str_size, "%" PRIu64, val);
 	}

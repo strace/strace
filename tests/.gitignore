@@ -1294,6 +1294,9 @@ times-Xabbrev
 times-Xraw
 times-Xverbose
 times-fail
+times-inject
+times-inject-Xraw
+times-inject-Xverbose
 tkill
 tkill--pidns-translation
 tracer_ppid_pgid_sid
