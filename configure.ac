@@ -810,6 +810,7 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 strace.spec
 		 tests/Makefile
+		 tests-privileged/Makefile
 		 tests-m32/Makefile
 		 tests-mx32/Makefile])
 AC_OUTPUT

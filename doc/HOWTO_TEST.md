@@ -951,6 +951,19 @@ new helper source file to the framework itself.
 make -j$(nproc) check
 ```
 
+### Optional privileged tests
+
+```bash
+RUN_PRIVILEGED_TESTS=1 make check
+RUN_PRIVILEGED_TESTS=1 make distcheck
+```
+
+The `tests-privileged` suite links executables from `tests/` and runs its
+tests under passwordless sudo when enabled and available.  Its results are
+recorded in `tests-privileged/test-suite.log`, separately from the regular
+test suite.  Skips are permitted; other failures fail the check.  The CI
+coverage and distcheck jobs enable these optional tests.
+
 ### Run specific test
 
 ```bash

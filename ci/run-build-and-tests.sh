@@ -90,7 +90,7 @@ j2="-j$((2*nproc))"
 case "${CHECK-}" in
 	coverage)
 		make -k $j all VERBOSE=${VERBOSE-} CFLAGS='-g -Og'
-		make -k $j2 check VERBOSE=${VERBOSE-}
+		RUN_PRIVILEGED_TESTS=1 make -k $j2 check VERBOSE=${VERBOSE-}
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 		echo 'END OF TEST SUITE INFORMATION'
@@ -110,7 +110,8 @@ case "${CHECK-}" in
 		[ "$rc" -eq 0 ]
 		;;
 	*)
-		make -k $j2 distcheck VERBOSE=${VERBOSE-}
+		RUN_PRIVILEGED_TESTS=1 \
+			make -k $j2 distcheck VERBOSE=${VERBOSE-}
 		;;
 esac
 

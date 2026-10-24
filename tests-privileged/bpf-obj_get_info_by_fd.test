@@ -1,0 +1,3 @@
+#!/bin/sh -efu
+# shellcheck disable=SC2154
+. "$srcdir/bpf-obj_get_info_by_fd.gen.test"
