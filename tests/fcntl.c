@@ -19,6 +19,7 @@
 # if (defined(F_SETLK64) && (!defined(F_GETOWN_EX) || F_GETOWN_EX != F_SETLK64)) || \
      (defined(F_SETLKW64) && (!defined(__mips64) || F_GETLK != F_SETLKW64)) || \
      (defined(F_GETLK64) && (!defined(F_SETOWN_EX) || F_SETOWN_EX != F_GETLK64))
+#  if (F_SETLK != F_SETLK64) && (F_SETLKW != F_SETLKW64) && (F_GETLK != F_GETLK64)
 static void
 test_flock64_undecoded(const int cmd, const char *name)
 {
@@ -32,6 +33,7 @@ test_flock64_undecoded(const int cmd, const char *name)
 	printf("%s(0, %s, %p) = %s\n",
 	       TEST_SYSCALL_STR, name, &fl, errstr);
 }
+#  endif
 # endif
 
 # define TEST_FLOCK64_UNDECODED(cmd) test_flock64_undecoded(cmd, #cmd)
@@ -43,14 +45,17 @@ test_flock64_lk64(void)
  * F_[GS]ETOWN_EX had conflicting values with F_[GS]ETLK64
  * in kernel revisions v2.6.32-rc1~96..v2.6.32-rc7~23.
  */
-# if defined(F_SETLK64) && (!defined(F_GETOWN_EX) || F_GETOWN_EX != F_SETLK64)
+# if defined(F_SETLK64) && (!defined(F_GETOWN_EX) || F_GETOWN_EX != F_SETLK64) && \
+	(F_SETLK != F_SETLK64)
 	TEST_FLOCK64_UNDECODED(F_SETLK64);
 # endif
 /* F_GETLK and F_SETLKW64 have conflicting values on mips64 */
-# if defined(F_SETLKW64) && (!defined(__mips64) || F_GETLK != F_SETLKW64)
+# if defined(F_SETLKW64) && (!defined(__mips64) || F_GETLK != F_SETLKW64) && \
+	(F_SETLKW != F_SETLKW64)
 	TEST_FLOCK64_UNDECODED(F_SETLKW64);
 # endif
-# if defined(F_GETLK64) && (!defined(F_SETOWN_EX) || F_SETOWN_EX != F_GETLK64)
+# if defined(F_GETLK64) && (!defined(F_SETOWN_EX) || F_SETOWN_EX != F_GETLK64) && \
+	(F_GETLK != F_GETLK64)
 	TEST_FLOCK64_UNDECODED(F_GETLK64);
 # endif
 }
