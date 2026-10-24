@@ -43,7 +43,7 @@ do_default_action(void)
 	strcpy(ocomm, comm);
 
 	pid_t pid  = getpid();
-	pid_t ppid = getppid();
+	pid_t ppid = syscall(__NR_getppid);
 
 	printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
 	fflush(stdout);
@@ -53,7 +53,7 @@ do_default_action(void)
 		perror_msg_and_fail("fork");
 	else if (child == 0) {
 		pid = getpid();
-		ppid = getppid();
+		ppid = syscall(__NR_getppid);
 		printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
 
 		const char *names[] = {
@@ -66,7 +66,7 @@ do_default_action(void)
 			prctl(PR_SET_NAME, comm);
 			prctl(PR_GET_NAME, comm);
 
-			ppid = getppid();
+			ppid = syscall(__NR_getppid);
 			printf("%u<", pid);
 			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
 			printf("> getppid() = %d<%s>\n", ppid, ocomm);
@@ -98,7 +98,7 @@ do_default_action(void)
 		}
 		printf("%u<exe> +++ exited with 0 +++\n", child);
 
-		ppid = getppid();
+		ppid = syscall(__NR_getppid);
 		printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
 		printf("%u<%s> +++ exited with 0 +++\n", pid, comm);
 		return WEXITSTATUS(status);
