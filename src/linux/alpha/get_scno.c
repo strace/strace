@@ -11,6 +11,10 @@ arch_get_scno(struct tcb *tcp)
 {
 	kernel_ulong_t scno = 0;
 
+	/* r0 is a reliable syscall number only on entering.  */
+	if (ptrace_get_syscall_info_supported && !ptrace_syscall_info_is_entry())
+		return 0;
+
 	if (upeek(tcp, REG_A3, &alpha_a3) < 0)
 		return -1;
 	if (upeek(tcp, REG_R0, &scno) < 0)

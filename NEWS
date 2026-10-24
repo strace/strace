@@ -16,6 +16,7 @@ Noteworthy changes in release ?.? (????-??-??)
     process in kcmp and pidfd_getfd.
   * Prevented CLONE_UNTRACED children from escaping --seccomp-bpf tracing
     and inheriting a seccomp filter without a tracer.
+  * Fixed syscall identification when attaching to Alpha tracees.
 
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================
