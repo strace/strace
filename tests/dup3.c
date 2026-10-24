@@ -81,7 +81,7 @@ main(void)
 	k_dup3(7, 7, O_CLOEXEC);
 	printf("dup3(7" FD7_PATH ", 7" FD7_PATH ", O_CLOEXEC) = %s\n", errstr);
 
-	k_dup3(-7, -7, O_WRONLY | O_RDWR);
+	k_dup3(-7, -7, 3);
 #ifndef PATH_TRACING
 	printf("dup3(-7, -7, 0x3 /* O_??? */) = %s\n", errstr);
 #endif
