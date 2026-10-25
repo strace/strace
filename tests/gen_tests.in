@@ -62,12 +62,14 @@ clone3	-a16
 clone3-Xabbrev	-a16 -Xabbrev  -e trace=clone3
 clone3-Xraw	-a16 -Xraw     -e trace=clone3
 clone3-Xverbose	-a16 -Xverbose -e trace=clone3
+clone3-report-ns-id	--trace=clone3 -a35 --namespace=new
 clone3-success	-einject=clone3:retval=42 -etrace=clone3 -a10
 clone3-success-Xabbrev	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xabbrev
 clone3-success-Xraw	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xraw
 clone3-success-Xverbose	-einject=clone3:retval=42 -etrace=clone3 -a16 -Xverbose
+clone3_untraced	+clone_untraced.sh
+clone3_untraced-inject	+clone_untraced-inject.sh
 clone_parent +clone_ptrace.test
-clone3-report-ns-id	--trace=clone3 -a35 --namespace=new
 clone_parent--quiet-exit +clone_ptrace.test --quiet=exit,personality
 clone_parent-q +clone_ptrace.test -q
 clone_parent-qq +clone_ptrace.test -qq
@@ -75,6 +77,8 @@ clone_ptrace--quiet-attach +clone_ptrace.test --quiet=attach,personality
 clone_ptrace--quiet-exit +clone_ptrace.test --quiet=exit,personality
 clone_ptrace-q +clone_ptrace.test -q
 clone_ptrace-qq +clone_ptrace.test -qq
+clone_untraced	+clone_untraced.sh
+clone_untraced-inject	+clone_untraced-inject.sh
 close_range	-a21 7>>/dev/full
 copy_file_range
 creat	-a16
@@ -765,6 +769,8 @@ nlattr_tcamsg-Xraw		+netlink_sock_diag.test -Xraw
 nlattr_tcamsg-Xverbose		+netlink_sock_diag.test -Xverbose
 nlattr_tcmsg			+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test
+no_getregset_clone3_untraced	+legacy_poke_arg.sh
+no_getregset_clone_untraced	+legacy_poke_arg.sh
 no_getregset_poke_arg_a1v_badfd	+legacy_poke_arg.sh
 no_getregset_poke_arg_a2v_zero	+legacy_poke_arg.sh
 no_getregset_poke_arg_a3v_badfd	+legacy_poke_arg.sh
@@ -774,6 +780,8 @@ no_getregset_poke_arg_a5v_error	+legacy_poke_arg.sh
 no_getregset_poke_arg_a5v_len	+legacy_poke_arg.sh
 no_getregset_poke_arg_a5v_retval	+legacy_poke_arg.sh
 no_getregset_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_getsi_clone3_untraced	+legacy_poke_arg.sh
+no_getsi_clone_untraced	+legacy_poke_arg.sh
 no_getsi_poke_arg_a1a6v_max32	+legacy_poke_arg.sh
 no_getsi_poke_arg_a1a6v_max64	+legacy_poke_arg.sh
 no_getsi_poke_arg_a1a6v_neg	+legacy_poke_arg.sh
@@ -789,6 +797,8 @@ no_getsi_poke_arg_a5v_error	+legacy_poke_arg.sh
 no_getsi_poke_arg_a5v_len	+legacy_poke_arg.sh
 no_getsi_poke_arg_a5v_retval	+legacy_poke_arg.sh
 no_getsi_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_setregset_clone3_untraced	+legacy_poke_arg.sh
+no_setregset_clone_untraced	+legacy_poke_arg.sh
 no_setregset_poke_arg_a1v_badfd	+legacy_poke_arg.sh
 no_setregset_poke_arg_a2v_zero	+legacy_poke_arg.sh
 no_setregset_poke_arg_a3v_badfd	+legacy_poke_arg.sh
@@ -798,6 +808,8 @@ no_setregset_poke_arg_a5v_error	+legacy_poke_arg.sh
 no_setregset_poke_arg_a5v_len	+legacy_poke_arg.sh
 no_setregset_poke_arg_a5v_retval	+legacy_poke_arg.sh
 no_setregset_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_setsi_clone3_untraced	+legacy_poke_arg.sh
+no_setsi_clone_untraced	+legacy_poke_arg.sh
 no_setsi_poke_arg_a1a6v_max32	+legacy_poke_arg.sh
 no_setsi_poke_arg_a1a6v_max64	+legacy_poke_arg.sh
 no_setsi_poke_arg_a1a6v_neg	+legacy_poke_arg.sh
