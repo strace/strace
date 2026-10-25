@@ -194,6 +194,7 @@ filter_seccomp-flag
 filter_seccomp-perf
 finit_module
 flock
+follow-threads
 fork--pidns-translation
 fork-f
 fsconfig
