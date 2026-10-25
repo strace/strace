@@ -7,6 +7,10 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of BPF_OBJ_GET_INFO_BY_FD for BPF links created by
     BPF_LINK_CREATE.
 
+* Bug fixes
+  * Prevented CLONE_UNTRACED children from escaping --seccomp-bpf tracing
+    and inheriting a seccomp filter without a tracer.
+
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================
 

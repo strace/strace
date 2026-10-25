@@ -1,0 +1,34 @@
+#!/bin/sh -efu
+#
+# Check that CLONE_UNTRACED is sanitized in clone3 under --seccomp-bpf.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+
+check_prog grep
+
+run_prog
+run_strace --seccomp-bpf -f -e trace=clone3,chdir ../$NAME > /dev/null
+
+grep -qF 'chdir("clone3 child traced"' "$LOG" ||
+	dump_log_and_fail_with "clone3 child was not traced"
+
+if grep -qF 'CLONE_UNTRACED' "$LOG"; then
+	dump_log_and_fail_with "CLONE_UNTRACED was not stripped from decoded flags"
+fi
+
+grep -qF '(SANITIZED)' "$LOG" ||
+	dump_log_and_fail_with "SANITIZED annotation is missing"
+
+if grep -qF 'INJECTED' "$LOG"; then
+	dump_log_and_fail_with "CLONE_UNTRACED handling was labelled as user injection"
+fi
+
+if grep -qF 'SIGTRAP' "$LOG"; then
+	dump_log_and_fail_with "untraced child inherited a seccomp filter and received SIGTRAP"
+fi

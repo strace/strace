@@ -1,0 +1,24 @@
+#!/bin/sh -efu
+#
+# Check that explicit clone injection produces INJECTED annotation.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+
+check_prog grep
+
+NAME=clone_untraced
+run_prog
+run_strace --seccomp-bpf -f -e trace=clone,chdir \
+	-e inject=clone:error=EPERM ../$NAME > /dev/null
+
+grep -qF 'INJECTED' "$LOG" ||
+	dump_log_and_fail_with "explicit clone injection was not applied"
+
+grep -qF 'chdir("clone skipped"' "$LOG" ||
+	dump_log_and_fail_with "clone injection did not reach the program"

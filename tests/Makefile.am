@@ -131,6 +131,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	caps-abbrev \
 	check_sigblock \
 	check_sigign \
+	clone_untraced \
+	clone3_untraced \
 	clone3-success \
 	clone3-success-Xabbrev \
 	clone3-success-Xraw \
@@ -658,6 +660,11 @@ MISC_TESTS = \
 	attach-p-eperm-tracer-outside-pidns.test \
 	attach-p-eperm-yama.test \
 	bexecve.test \
+	clone_untraced.test \
+	clone_untraced-inject.test \
+	clone_untraced-legacy.test \
+	clone3_untraced.test \
+	clone3_untraced-inject.test \
 	clone_ptrace.test \
 	count-f.test \
 	count_unknown-S.test \
