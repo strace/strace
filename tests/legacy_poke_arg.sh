@@ -67,6 +67,25 @@ case "$STRACE_ARCH" in
 		;;
 	arc|riscv64)
 		case "$NAME" in
+			clone_untraced)
+				. "${srcdir=.}/filter_seccomp.sh"
+				run_prog "../$NAME"
+				> "$LOG" || framework_failure_
+				$STRACE -o "$LOG" --seccomp-bpf -f \
+					--trace=clone,chdir "../$NAME" \
+					2> "${LOG}.err" ||:
+				grep -qF 'syscall_entering_trace: failed to block CLONE_UNTRACED' \
+					"${LOG}.err" ||
+					dump_log_and_fail_with \
+						"expected 'failed to block CLONE_UNTRACED' error on $STRACE_ARCH"
+				grep -qF 'CLONE_UNTRACED' "$LOG" ||
+					dump_log_and_fail_with \
+						"CLONE_UNTRACED should not have been stripped on $STRACE_ARCH"
+				grep -qF '(SANITIZED)' "$LOG" &&
+					dump_log_and_fail_with \
+						"sanitation should not have succeeded on $STRACE_ARCH"
+				exit 0
+				;;
 			poke_arg_a1*)
 				. "${srcdir=.}/scno_tampering.sh"
 				run_prog "../$NAME" > /dev/null

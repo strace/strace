@@ -78,6 +78,7 @@ clone3-success
 clone3-success-Xabbrev
 clone3-success-Xraw
 clone3-success-Xverbose
+clone3_untraced
 clone_parent
 clone_parent--quiet-exit
 clone_parent-q
@@ -87,6 +88,7 @@ clone_ptrace--quiet-attach
 clone_ptrace--quiet-exit
 clone_ptrace-q
 clone_ptrace-qq
+clone_untraced
 close_range
 copy_file_range
 count-f

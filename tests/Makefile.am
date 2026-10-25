@@ -135,6 +135,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone3-success-Xabbrev \
 	clone3-success-Xraw \
 	clone3-success-Xverbose \
+	clone3_untraced \
 	clone_parent \
 	clone_parent--quiet-exit \
 	clone_parent-q \
@@ -144,6 +145,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone_ptrace--quiet-exit \
 	clone_ptrace-q \
 	clone_ptrace-qq \
+	clone_untraced \
 	close_range \
 	count-f \
 	count_unknown \
@@ -896,6 +898,8 @@ EXTRA_DIST = \
 	attach-p-cmd.h \
 	clock_adjtime-common.c \
 	clock_xettime-common.c \
+	clone_untraced-inject.sh \
+	clone_untraced.sh \
 	cur_audit_arch.h \
 	fadvise.h \
 	fcntl-common.c \

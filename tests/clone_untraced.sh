@@ -1,0 +1,44 @@
+#!/bin/sh -efu
+#
+# Shared test driver for CLONE_UNTRACED sanitation under --seccomp-bpf.
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+
+check_prog grep
+
+if [ -z "${STRACE_POKE_LEGACY-}" ]; then
+	$STRACE -d -enone --fault=chdir / > /dev/null 2> "$LOG" ||:
+	grep -qx "[^:]*strace: PTRACE_SET_SYSCALL_INFO works" "$LOG" ||
+		skip_ 'PTRACE_SET_SYSCALL_INFO does not work'
+fi
+
+: "${NAME:=${0##*/}}"
+NAME="${NAME%.gen.test}"
+CLONE="${NAME%_untraced}"
+
+run_prog "../$NAME"
+run_strace --seccomp-bpf -f --trace="$CLONE",chdir ../$NAME
+
+grep -qF "chdir(\"$CLONE child traced\"" "$LOG" ||
+	dump_log_and_fail_with "$CLONE child was not traced"
+
+if grep -qF 'CLONE_UNTRACED' "$LOG"; then
+	dump_log_and_fail_with "CLONE_UNTRACED was not stripped from $CLONE"
+fi
+
+grep -qF '(SANITIZED)' "$LOG" ||
+	dump_log_and_fail_with "SANITIZED annotation is missing"
+
+if grep -qF 'INJECTED' "$LOG"; then
+	dump_log_and_fail_with "CLONE_UNTRACED handling was labelled as user injection"
+fi
+
+if grep -qF 'SIGTRAP' "$LOG"; then
+	dump_log_and_fail_with "untraced child inherited a seccomp filter and received SIGTRAP"
+fi

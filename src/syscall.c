@@ -13,6 +13,7 @@
  */
 
 #include "defs.h"
+#include "filter_seccomp.h"
 #include "get_personality.h"
 #include "mmap_notify.h"
 #include "native_defs.h"
@@ -31,6 +32,9 @@
 
 /* for PR_SET_NAME */
 #include <linux/prctl.h>
+
+/* For CLONE_* */
+#include <linux/sched.h>
 
 /* for __X32_SYSCALL_BIT */
 #include "scno.h"
@@ -620,6 +624,8 @@ syscall_entering_decode(struct tcb *tcp)
 	return 1;
 }
 
+static int sanitize_clone_untraced(struct tcb *tcp);
+
 int
 syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 {
@@ -646,16 +652,22 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		}
 	}
 
-	if (hide_log(tcp) || !traced(tcp)
-	    || ((tracing_paths || tracing_fds) && !pathtrace_match(tcp))) {
+	const bool skip_output = hide_log(tcp) || !traced(tcp) ||
+		((tracing_paths || tracing_fds) && !pathtrace_match(tcp));
+
+	if (!skip_output && inject(tcp))
+		tamper_with_syscall_entering(tcp, sig);
+
+	/* A replaced syscall cannot create an untraced child. */
+	if (!hide_log(tcp) && seccomp_filtering && !syscall_tampered(tcp) &&
+	    sanitize_clone_untraced(tcp) < 0)
+		error_func_msg("failed to block CLONE_UNTRACED");
+
+	if (skip_output) {
 		tcp->flags |= TCB_FILTERED;
 		return 0;
 	}
-
 	tcp->flags &= ~TCB_FILTERED;
-
-	if (inject(tcp))
-		tamper_with_syscall_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
 		return 0;
@@ -776,6 +788,8 @@ print_injected_note(struct tcb *tcp)
 		tprints_sysret_string("inject", "INJECTED");
 	if (syscall_tampered_delayed(tcp))
 		tprints_sysret_string("delay", "DELAYED");
+	if (syscall_tampered_sanitized(tcp))
+		tprints_sysret_string("sanitize", "SANITIZED");
 }
 
 static void
@@ -1051,7 +1065,8 @@ syscall_exiting_finish(struct tcb *tcp)
 {
 	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT |
 			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED |
-			TCB_TAMPERED_POKED | TCB_DECODED_SUBCALL);
+			TCB_TAMPERED_POKED | TCB_DECODED_SUBCALL |
+			TCB_TAMPERED_SANITIZED);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 
@@ -1677,6 +1692,49 @@ set_error(struct tcb *tcp, unsigned long new_error)
 			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
 					 SYSCALL_NEVER_FAILS));
 	}
+}
+
+/* Keep a child from inheriting our seccomp filter without ptrace. */
+static int
+sanitize_clone_untraced(struct tcb *tcp)
+{
+	switch (tcp_sysent(tcp)->sen) {
+	case SEN_clone: {
+#if defined S390 || defined S390X
+		const unsigned int flags_arg = 1;
+#else
+		const unsigned int flags_arg = 0;
+#endif
+		const kernel_ulong_t flags = tcp->u_arg[flags_arg];
+		if (!(flags & CLONE_UNTRACED))
+			return 0;
+		tcp->u_arg[flags_arg] = flags & ~CLONE_UNTRACED;
+		if (set_syscall_args(tcp, 1U << flags_arg, tcp->u_arg) < 0) {
+			tcp->u_arg[flags_arg] = flags;
+			return -1;
+		}
+		tcp->flags |= TCB_TAMPERED_SANITIZED;
+		break;
+	}
+	case SEN_clone3: {
+		uint64_t flags;
+		static_assert(offsetof(struct clone_args, flags) == 0,
+			      "clone3 flags must be the first field");
+		if (tcp->u_arg[1] < sizeof(flags) ||
+		    umove(tcp, tcp->u_arg[0], &flags) < 0 ||
+		    !(flags & CLONE_UNTRACED))
+			return 0;
+		flags &= ~((uint64_t) CLONE_UNTRACED);
+		if (upoken(tcp, tcp->u_arg[0], sizeof(flags), &flags) != sizeof(flags))
+			return -1;
+		invalidate_umove_cache();
+		tcp->flags |= TCB_TAMPERED_SANITIZED;
+		break;
+	}
+	default:
+		break;
+	}
+	return 0;
 }
 
 static void
