@@ -113,6 +113,7 @@ dup3	-a13 7>>/dev/full
 dup3-P	-a13 --trace=dup3 -P /dev/full 7>>/dev/full
 dup3-y	-a15 --trace=dup3 -y 7>>/dev/full
 dup3-yy	-a15 --trace=dup3 -yy 7>>/dev/full
+dyxlat_test	run_prog
 epoll_create	-a17
 epoll_create1	-a28
 epoll_ctl

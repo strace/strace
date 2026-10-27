@@ -153,6 +153,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	count_unknown_mixed \
 	delay \
 	detach-vfork \
+	dyxlat_test \
 	env-i \
 	execve-v \
 	execveat-v \
@@ -564,6 +565,11 @@ endif
 stack_fcall_mangled_SOURCES = stack-fcall-mangled.c \
 	stack-fcall-mangled-0.c stack-fcall-mangled-1.c \
 	stack-fcall-mangled-2.c stack-fcall-mangled-3.c
+
+dyxlat_test_SOURCES = dyxlat_test.c dyxlat_for_tests.c
+dyxlat_test_CPPFLAGS = $(AM_CPPFLAGS) $(CODE_COVERAGE_CPPFLAGS)
+dyxlat_test_CFLAGS = $(AM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+dyxlat_test_LDADD = $(LDADD) $(CODE_COVERAGE_LIBS)
 
 trie_test_SOURCES = trie_test.c trie_for_tests.c
 trie_test_CPPFLAGS = $(AM_CPPFLAGS) $(CODE_COVERAGE_CPPFLAGS)
