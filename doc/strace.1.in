@@ -1680,6 +1680,13 @@ and
 \fBpoke_enter\fR=\fI@arg1=0000DEAD0000BEEF\fR).
 The \fBpoke_enter\fR option modifies memory on system call enter,
 while \fBpoke_exit\fR does so on system call exit.
+Each argument may be specified only once per option;
+for example, \fBpoke_enter=@arg1=DEAD,@arg1=BEEF\fR is invalid.
+The same argument may be specified in both
+.B poke_enter
+and
+.B poke_exit
+options, though.
 .IP
 The injection actions are independent.
 For example, specifying only
@@ -1775,10 +1782,15 @@ or return value specification (i.e., either
 .BR error =
 or
 .BR retval =)
-and at most one
-.BR signal =
-specification.
-If an injection expression contains multiple
+and at most one occurrence of each of
+.BR signal =,
+.BR syscall =,
+.BR delay_enter =,
+.BR delay_exit =,
+.BR poke_enter =,
+and
+.BR poke_exit =
+specifications.  If an injection expression contains multiple
 .BR when =
 specifications, the last one takes precedence.
 .IP
