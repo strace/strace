@@ -52,7 +52,7 @@ dyxlat_add_pair(struct dyxlat *const dyxlat, const uint64_t val,
 	for (size_t i = 0; i < dyxlat->xlat.size; ++i) {
 		if (dyxlat->data[i].val == val) {
 			if (strncmp(dyxlat->data[i].str, str, len) == 0
-			    && dyxlat->data[i].str[len] == '\0')
+			    && strlen(dyxlat->data[i].str) <= len)
 				return;
 
 			free((void *) dyxlat->data[i].str);
