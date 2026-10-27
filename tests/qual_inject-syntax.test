@@ -118,7 +118,6 @@ for arg in $valid_scno chdir \
 	   chdir:when=65535..65535 \
 	   chdir:when=65535..65535+ \
 	   chdir:poke_enter= \
-	   chdir:poke_exit= \
 	   chdir:poke_enter=invalid \
 	   chdir:poke_enter=@arg8= \
 	   chdir:poke_enter=@arg0= \
@@ -128,7 +127,21 @@ for arg in $valid_scno chdir \
 	   chdir:poke_enter=@arg1=nothex \
 	   chdir:poke_enter=@arg1=$zeroes \
 	   chdir:poke_enter=@arg1=5374726163652100,@arg1=5374726163652100 \
+	   chdir:poke_enter=@arg2=DEAD,@arg3=BEEF,@arg4=FACE,@arg3=FEED \
 	   chdir:poke_enter=@arg1=5374726163652100:poke_enter=@arg1=5374726163652100 \
+	   chdir:poke_enter=@arg5=123456:poke_enter=@arg6=ABCDEF \
+	   chdir:poke_exit= \
+	   chdir:poke_exit=@arg8= \
+	   chdir:poke_exit=@arg0= \
+	   chdir:poke_exit=@arg1 \
+	   chdir:poke_exit=@arg1= \
+	   chdir:poke_exit=@arg1=000 \
+	   chdir:poke_exit=@arg1=nothex \
+	   chdir:poke_exit=@arg1=$zeroes \
+	   chdir:poke_exit=@arg1=5374726163652100,@arg1=5374726163652100 \
+	   chdir:poke_exit=@arg2=DEAD,@arg3=BEEF,@arg4=FACE,@arg3=FEED \
+	   chdir:poke_exit=@arg1=5374726163652100:poke_exit=@arg1=5374726163652100 \
+	   chdir:poke_exit=@arg5=123456:poke_exit=@arg6=ABCDEF \
 	   ; do
 	$STRACE -e inject="$arg" true 2> "$LOG" &&
 		fail_with "$arg"
