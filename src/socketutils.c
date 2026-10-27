@@ -24,6 +24,7 @@
 # define UNIX_PATH_MAX sizeof_field(struct sockaddr_un, sun_path)
 #endif
 
+#include "dyxlat.h"
 #include "xstring.h"
 
 #define XLAT_MACROS_ONLY

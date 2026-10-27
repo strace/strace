@@ -108,6 +108,7 @@ libstrace_a_SOURCES =	\
 	dm.c		\
 	dup.c		\
 	dyxlat.c	\
+	dyxlat.h	\
 	empty.h		\
 	epoll.c		\
 	epoll_ioctl.c	\

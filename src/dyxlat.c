@@ -5,6 +5,7 @@
  */
 
 #include "defs.h"
+#include "dyxlat.h"
 
 struct dyxlat {
 	size_t allocated;
