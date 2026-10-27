@@ -22,6 +22,7 @@ Task-oriented step-by-step guides for common development tasks.
 - [HOWTO_ADD_NETLINK.md](HOWTO_ADD_NETLINK.md) — Adding netlink protocol decoders
 - [HOWTO_UPDATE_XLAT_AFTER_UAPI.md](HOWTO_UPDATE_XLAT_AFTER_UAPI.md) — Updating xlat tables after kernel UAPI changes
 - [HOWTO_TEST.md](HOWTO_TEST.md) — Writing, running, and debugging tests
+- [HOWTO_TEST_UNIT.md](HOWTO_TEST_UNIT.md) — Writing unit tests for internal functions and data structures
 - [COMMIT-MESSAGES.md](COMMIT-MESSAGES.md) — Commit message format requirements (required reading for contributors)
 
 ## Architecture and Reference
