@@ -915,6 +915,9 @@ times-Xabbrev
 times-Xraw
 times-Xverbose
 times-fail
+times-inject
+times-inject-Xraw
+times-inject-Xverbose
 tkill
 truncate
 truncate64

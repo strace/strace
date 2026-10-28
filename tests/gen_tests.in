@@ -1295,6 +1295,9 @@ times-Xabbrev	-esignal=none -e trace=times -Xabbrev
 times-Xraw	-esignal=none -e trace=times -Xraw
 times-Xverbose	-esignal=none -e trace=times -Xverbose
 times-fail	-a12 -e trace=times
+times-inject	-einject=times:retval=42 -etrace=times -a0
+times-inject-Xraw	-einject=times:retval=42 -etrace=times -a0 -Xraw
+times-inject-Xverbose	-einject=times:retval=42 -etrace=times -a0 -Xverbose
 tkill	-a12 --signal='!cont'
 tkill--pidns-translation       test_pidns --signal='!cont' -a12 -e trace=tkill
 trace_clock	test_trace_expr 'clock_nanosleep|times|times-.*|printclockname-.*' -e%clock

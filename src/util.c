@@ -219,27 +219,52 @@ ilog10(uint64_t val)
 	return ret;
 }
 
+static void
+print_ticks_comment(uint64_t val, long freq, unsigned int precision,
+		    bool negative)
+{
+	uint64_t scale = 1;
+
+	for (unsigned int i = 0; i < precision; ++i)
+		scale *= 10;
+
+	uint64_t sec = val / freq;
+	const uint64_t num = val % freq * scale;
+	uint64_t frac = num / freq;
+	const uint64_t rem2 = num % freq * 2;
+
+	/* Round the fractional second, with ties to even.  */
+	if (rem2 > (uint64_t) freq
+	    || (rem2 == (uint64_t) freq
+		&& ((scale == 1 ? sec : frac) & 1)))
+		++frac;
+	sec += frac / scale;
+
+	if (precision)
+		tprintf_comment("%s%" PRIu64 ".%0*" PRIu64 " s",
+				negative ? "-" : "", sec, precision, frac % scale);
+	else
+		tprintf_comment("%s%" PRIu64 " s", negative ? "-" : "", sec);
+}
+
 void
 print_ticks(uint64_t val, long freq, unsigned int precision)
 {
 	PRINT_VAL_U(val);
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
-	    && freq > 0 && val > 0) {
-		tprintf_comment("%" PRIu64 ".%0*" PRIu64 " s",
-				val / freq, precision, val % freq);
-	}
+	    && freq > 0 && val > 0)
+		print_ticks_comment(val, freq, precision, false);
 }
 
 void
 print_ticks_d(int64_t val, long freq, unsigned int precision)
 {
 	PRINT_VAL_D(val);
-	/* freq > 1 to avoid special casing for val ==  */
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
 	    && freq > 1 && val != 0) {
-		tprintf_comment("%s%lld.%0*lld s",
-				val < 0 ? "-" : "", llabs(val / freq),
-				precision, llabs(val % freq));
+		const uint64_t magnitude = val < 0 ? -(uint64_t) val : (uint64_t) val;
+
+		print_ticks_comment(magnitude, freq, precision, val < 0);
 	}
 }
 
@@ -256,8 +281,8 @@ print_clock_t(uint64_t val)
 			debug_func_perror_msg("sysconf(_SC_CLK_TCK)");
 		if (clk_tck == 0)
 			clk_tck = -1;
-		if (clk_tck > 0)
-			frac_width = MIN(ilog10(clk_tck), 9);
+		if (clk_tck > 1)
+			frac_width = MIN(ilog10(clk_tck - 1) + 1, 9);
 	}
 
 	print_ticks(val, clk_tck, frac_width);

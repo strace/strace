@@ -18,9 +18,17 @@ tracee_pid=$!
 
 run_strace -qq -a14 -e trace=restart_syscall,exit_group -p $tracee_pid
 
-# On mips the interrupted syscall number is not available on attach.
+# On Alpha, the expectation depends on the ptrace API used by strace.
+check_prog grep
 case "$STRACE_ARCH" in
 mips)	syscall='system call' ;;
+alpha)
+	if $STRACE -d -enone / 2>&1 >/dev/null |
+	   grep -qx '[^:]*strace: PTRACE_GET_SYSCALL_INFO works'; then
+		syscall='system call'
+	else
+		skip_ 'unreliable Alpha attach without PTRACE_GET_SYSCALL_INFO'
+	fi ;;
 *)	syscall=nanosleep ;;
 esac
 
