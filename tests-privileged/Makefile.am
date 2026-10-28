@@ -15,7 +15,8 @@ TESTS = \
 	bpf-obj_get_info_by_fd-link.test \
 	bpf-obj_get_info_by_fd-prog.test \
 	bpf-obj_get_info_by_fd-prog-v.test \
-	bpf-obj_get_info_by_fd-v.test
+	bpf-obj_get_info_by_fd-v.test \
+	dev-tun-yy.test
 
 privileged_programs = $(TESTS:.test=)
 

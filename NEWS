@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     names (including syscall summaries) to manual pages on man7.org.
   * Implemented decoding of BPF_OBJ_GET_INFO_BY_FD for BPF links created by
     BPF_LINK_CREATE.
+  * Implemented printing of network interface name for /dev/net/tun in -yy mode.
 
 Noteworthy changes in release 7.3 (2026-10-22)
 ==============================================
