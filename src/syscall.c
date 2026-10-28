@@ -299,6 +299,7 @@ decode_socket_subcall(struct tcb *tcp)
 	for (unsigned int i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
 				? ((uint32_t *) (void *) buf)[i] : buf[i];
+	tcp->flags |= TCB_DECODED_SUBCALL;
 }
 #endif /* SYS_socket_subcall */
 
@@ -338,6 +339,7 @@ decode_ipc_subcall(struct tcb *tcp)
 	const unsigned int n = n_args(tcp);
 	for (unsigned int i = 0; i < n; ++i)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
+	tcp->flags |= TCB_DECODED_SUBCALL;
 }
 #endif /* SYS_ipc_subcall */
 
@@ -1047,7 +1049,8 @@ void
 syscall_exiting_finish(struct tcb *tcp)
 {
 	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT |
-			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED | TCB_TAMPERED_POKED);
+			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED |
+			TCB_TAMPERED_POKED | TCB_DECODED_SUBCALL);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 

@@ -373,6 +373,8 @@ struct tcb {
 						 * attached.
 						 */
 # define TCP_AFTER_KVM_RUN		0x80000	/* The process has returned from KVM_RUN ioctl */
+/* Current syscall arguments were transformed by successful subcall decoding. */
+# define TCB_DECODED_SUBCALL		0x100000
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -403,6 +405,7 @@ struct tcb {
 # define syscall_tampered_poked(tcp)	((tcp)->flags & TCB_TAMPERED_POKED)
 # define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
 # define has_seccomp_filter(tcp)	((tcp)->flags & TCB_SECCOMP_FILTER)
+# define decoded_subcall(tcp)	((tcp)->flags & TCB_DECODED_SUBCALL)
 
 extern const struct_sysent stub_sysent;
 # define tcp_sysent(tcp) (tcp->s_ent ?: &stub_sysent)

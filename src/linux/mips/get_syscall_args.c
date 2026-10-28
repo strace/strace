@@ -86,5 +86,6 @@ decode_syscall_subcall(struct tcb *tcp)
 			   &tcp->u_arg[MAX_ARGS - 1]) < 0)
 		tcp->u_arg[MAX_ARGS - 1] = 0;
 	}
+	tcp->flags |= TCB_DECODED_SUBCALL;
 }
 #endif /* SYS_syscall_subcall */
