@@ -502,6 +502,8 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 	if (!recovering(tcp)) {
 		if (opts->data.flags & INJECT_F_SIGNAL)
 			*signo = opts->data.signo;
+		if (opts->data.flags & INJECT_F_POKE_ENTER)
+			poke_tcb(tcp, opts->data.poke_idx, true);
 		if (opts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL)) {
 			kernel_long_t scno =
 				(opts->data.flags & INJECT_F_SYSCALL)
@@ -524,8 +526,6 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 #endif
 			}
 		}
-		if (opts->data.flags & INJECT_F_POKE_ENTER)
-			poke_tcb(tcp, opts->data.poke_idx, true);
 		if (opts->data.flags & INJECT_F_POKE_EXIT)
 			tcp->flags |= TCB_INJECT_POKE_EXIT;
 		if (opts->data.flags & INJECT_F_DELAY_ENTER)
