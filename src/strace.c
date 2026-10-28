@@ -71,6 +71,7 @@ static const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
 bool followfork;
+bool followthread;
 bool output_separately;
 static unsigned int ptrace_setoptions =
 	PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT;
@@ -340,6 +341,8 @@ Tracing:\n\
                  run tracer process in a separate session\n\
   -f, --follow-forks\n\
                  follow forks\n\
+  --follow-threads\n\
+                 follow threads\n\
   -ff, --follow-forks --output-separately\n\
                  follow forks with output into separate files\n\
   -I INTERRUPTIBLE, --interruptible=INTERRUPTIBLE\n\
@@ -1523,7 +1526,7 @@ attach_tcb(struct tcb *const tcp)
 	DIR *dir;
 	unsigned int ntid = 0, nerr = 0;
 
-	if (followfork && tcp->pid != strace_child &&
+	if ((followfork || followthread) && tcp->pid != strace_child &&
 	    xsprintf(procdir, task_path, get_proc_pid(tcp->pid)) > 0 &&
 	    (dir = opendir(procdir)) != NULL) {
 		struct_dirent *de;
@@ -2457,6 +2460,7 @@ init(int argc, char *argv[])
 		GETOPT_DAEMONIZE,
 		GETOPT_HEX_STR,
 		GETOPT_FOLLOWFORKS,
+		GETOPT_FOLLOWTHREADS,
 		GETOPT_KILL_ON_EXIT,
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_PIDNS_TRANSLATION,
@@ -2499,6 +2503,7 @@ init(int argc, char *argv[])
 		{ "daemonized",		optional_argument, 0, GETOPT_DAEMONIZE },
 		{ "env",		required_argument, 0, 'E' },
 		{ "follow-forks",	no_argument,	   0, GETOPT_FOLLOWFORKS },
+		{ "follow-threads",	no_argument,	   0, GETOPT_FOLLOWTHREADS },
 		{ "output-separately",	no_argument,	   0,
 			GETOPT_OUTPUT_SEPARATELY },
 		{ "help",		no_argument,	   0, 'h' },
@@ -2628,6 +2633,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_FOLLOWFORKS:
 			followfork = true;
+			break;
+		case GETOPT_FOLLOWTHREADS:
+			followthread = true;
 			break;
 		case GETOPT_OUTPUT_SEPARATELY:
 			output_separately = true;
@@ -2998,6 +3006,9 @@ init(int argc, char *argv[])
 		if (followfork) {
 			error_msg_and_die("-f and --follow-forks cannot"
 					  " be provided simultaneously");
+		} else if (followthread) {
+			error_msg_and_die("-f and --follow-threads cannot"
+					  " be provided simultaneously");
 		} else if (followfork_short >= 2 && output_separately) {
 			error_msg_and_die("-ff and --output-separately cannot"
 					  " be provided simultaneously");
@@ -3005,6 +3016,11 @@ init(int argc, char *argv[])
 			followfork = true;
 			output_separately = followfork_short >= 2;
 		}
+	}
+
+	if (followfork && followthread) {
+		error_msg_and_die("--follow-forks and --follow-threads cannot"
+				  " be provided simultaneously");
 	}
 
 	if (seccomp_filtering && !followfork) {
@@ -3171,6 +3187,9 @@ init(int argc, char *argv[])
 				     PTRACE_O_TRACEFORK |
 				     PTRACE_O_TRACEVFORK;
 
+	if (followthread)
+		ptrace_setoptions |= PTRACE_O_TRACECLONE;
+
 	if (seccomp_filtering)
 		check_seccomp_filter();
 	if (seccomp_filtering) {
@@ -3319,11 +3338,12 @@ init(int argc, char *argv[])
 	/* Do we want pids printed in our -o OUTFILE?
 	 * -ff: no (every pid has its own file); or
 	 * -f: yes (there can be more pids in the future); or
+	 * --follow-threads: yes (there can be more tids in the future);
 	 * -p PID1,PID2: yes (there are already more than one pid)
 	 * --always-show-pid: yes
 	 */
 	print_pid_pfx = (outfname && !output_separately &&
-			 (followfork || nprocs > 1)) ||
+			 (followfork || followthread || nprocs > 1)) ||
 			always_show_pid;
 }
 
@@ -3494,7 +3514,7 @@ maybe_allocate_tcb(const int pid, int status)
 		}
 		return NULL;
 	}
-	if (followfork) {
+	if (followfork || followthread) {
 		/* We assume it's a fork/vfork/clone child */
 		struct tcb *tcp = alloctcb(pid);
 		after_successful_attach(tcp, post_attach_sigstop);

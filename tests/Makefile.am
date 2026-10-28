@@ -159,6 +159,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	filter-unavailable \
 	filter_seccomp-flag \
 	filter_seccomp-perf \
+	follow-threads \
 	fork--pidns-translation \
 	fork-f \
 	fsync-y \
@@ -498,6 +499,7 @@ bpf_obj_get_info_by_fd_prog_v_LDADD = $(clock_LIBS) $(LDADD)
 count_f_LDADD = -lpthread $(LDADD)
 delay_LDADD = $(clock_LIBS) $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
+follow_threads_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64

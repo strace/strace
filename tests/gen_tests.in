@@ -211,6 +211,7 @@ filter_seccomp	. "${srcdir=.}/filter_seccomp.sh"; test_prog_set --seccomp-bpf -f
 filter_seccomp-flag	../$NAME
 finit_module	-a25
 flock	-a25 --arg-names
+follow-threads	-a26 -qq --follow-threads -e signal=none -e trace=chdir
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fsconfig	-s300 -y
 fsconfig-P	-s300 -y -P /dev/full -e trace=fsconfig
