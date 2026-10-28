@@ -50,11 +50,13 @@ noinst_PROGRAMS = \
 	disable_ptrace	\
 	disable_ptrace_get_syscall_info	\
 	disable_ptrace_getregset	\
+	disable_ptrace_setregset	\
 	disable_ptrace_set_syscall_info	\
 	#
 disable_ptrace_LDADD = $(strace_LDADD)
 disable_ptrace_get_syscall_info_LDADD = $(strace_LDADD)
 disable_ptrace_getregset_LDADD = $(strace_LDADD)
+disable_ptrace_setregset_LDADD = $(strace_LDADD)
 disable_ptrace_set_syscall_info_LDADD = $(strace_LDADD)
 
 noinst_LIBRARIES = libstrace.a
