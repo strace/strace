@@ -33,6 +33,8 @@ Noteworthy changes in release 7.3 (2026-10-22)
   * Updated lists of ioctl commands from Linux 7.3.
 
 * Bug fixes
+  * Fixed -b execve detaching too late to preserve set-user-ID,
+    set-group-ID, and file-capability transitions in child processes.
   * Fixed the argument names printed by -N/--arg-names for getresgid,
     setfsgid, setgid, setregid, and setresgid syscalls.
   * Limited nested NLMSG_ERROR netlink decoding to prevent stack exhaustion.
