@@ -744,6 +744,7 @@ renameat
 renameat2
 request_key
 riscv_flush_icache
+riscv_hwprobe
 rmdir
 rseq
 rseq_slice_yield
