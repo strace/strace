@@ -1,0 +1,36 @@
+#!/bin/sh -efu
+#
+# Check that CLONE_UNTRACED is sanitized under --seccomp-bpf
+# when PTRACE_SET_SYSCALL_INFO is not available (syscall_skip fallback).
+#
+# Copyright (c) 2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+
+check_prog grep
+
+$STRACE -d -enone --fault=chdir / > /dev/null 2> "$LOG" ||:
+if grep -qx "[^:]*strace: PTRACE_SET_SYSCALL_INFO works" "$LOG"; then
+	helper='../../src/disable_ptrace_set_syscall_info'
+	$helper true ||
+		skip_ "$helper does not work"
+	STRACE="$helper $STRACE"
+fi
+
+NAME=clone_untraced
+run_prog
+run_strace --seccomp-bpf -f -e trace=clone,chdir ../$NAME > /dev/null
+
+grep -qF 'chdir("clone skipped"' "$LOG" ||
+	dump_log_and_fail_with "clone was not blocked with ENOSYS"
+
+grep -qF '(SANITIZED)' "$LOG" ||
+	dump_log_and_fail_with "SANITIZED annotation is missing"
+
+if grep -qF 'INJECTED' "$LOG"; then
+	dump_log_and_fail_with "CLONE_UNTRACED handling was labelled as user injection"
+fi

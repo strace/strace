@@ -18,6 +18,7 @@
 #include "filter_seccomp.h"
 #include "number_set.h"
 #include "scno.h"
+#include "sen.h"
 
 bool seccomp_filtering;
 bool seccomp_before_sysentry;
@@ -260,6 +261,14 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 		(stack_trace_mode ? MEMORY_MAPPING_CHANGE : 0) |
 		(is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
 		 COMM_CHANGE : 0);
+	switch (sysent_vec[p][scno].sen) {
+	case SEN_clone:
+	case SEN_clone3:
+		if (followfork)
+			return true;
+		break;
+	}
+
 	return sysent_vec[p][scno].sys_flags & always_trace_flags ||
 		is_number_in_set_array(scno, trace_set, p);
 }
