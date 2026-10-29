@@ -9,9 +9,12 @@
 # define STRACE_POKE_H
 
 struct poke_payload {
-	char *data;		/* data to be injected */
-	uint16_t data_len;	/* length of the data, max 1024 */
-	uint8_t arg_no;		/* number of the argument containing the pointer */
+	union {
+		char *data;		/* memory poke: data_len > 0 */
+		kernel_ulong_t arg_val;	/* argument value: data_len == 0 */
+	};
+	uint16_t data_len;	/* "data" length, max 1024; 0 means "arg_val" */
+	uint8_t arg_no;		/* number of the argument */
 	uint8_t is_enter;	/* when to poke -- on entering or on exiting */
 	struct list_item l;
 };

@@ -66,6 +66,10 @@ poke_tcb(struct tcb *tcp, uint16_t poke_idx, bool is_enter)
 
 	bool poked = false;
 	struct poke_payload *i;
+
+	unsigned int arg_mask = 0;
+	kernel_ulong_t args[MAX_ARGS] = {};
+
 	list_foreach(i, &poke_data_vec[poke_idx], l) {
 		if (i->is_enter != is_enter)
 			continue;
@@ -78,14 +82,43 @@ poke_tcb(struct tcb *tcp, uint16_t poke_idx, bool is_enter)
 				       n_args(tcp));
 			continue;
 		}
-		unsigned int nwritten = upoken(tcp, tcp->u_arg[i->arg_no - 1],
-					       i->data_len, i->data);
-		if (!nwritten)
+		if (!i->data_len) {
+			arg_mask |= 1U << (i->arg_no - 1);
+			args[i->arg_no - 1] = i->arg_val;
+		}
+	}
+
+	if (arg_mask) {
+		if (decoded_subcall(tcp))
 			error_func_msg("Failed to tamper with process %d:"
-				       " couldn't poke",
+				       " argument value pokes are not supported"
+				       " for decoded multiplexed system calls",
+				       tcp->pid);
+		else if (set_syscall_args(tcp, arg_mask, args) < 0)
+			error_func_msg("Failed to tamper with process %d:"
+				       " couldn't set argument(s)",
 				       tcp->pid);
 		else
 			poked = true;
+	}
+
+	list_foreach(i, &poke_data_vec[poke_idx], l) {
+		if (i->is_enter != is_enter)
+			continue;
+		if (n_args(tcp) < i->arg_no)
+			continue;
+		if (i->data_len) {
+			unsigned int nwritten =
+				upoken(tcp, tcp->u_arg[i->arg_no - 1],
+				       i->data_len, i->data);
+			if (!nwritten)
+				error_func_msg("Failed to tamper with"
+					       " process %d:"
+					       " couldn't poke",
+					       tcp->pid);
+			else
+				poked = true;
+		}
 	}
 
 	if (poked)
