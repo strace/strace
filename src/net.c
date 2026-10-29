@@ -1097,6 +1097,17 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case IP_PROTOCOL:
 			print_ip_protocol(tcp, addr, rlen);
 			return;
+		case SO_ORIGINAL_DST:
+			decode_sockaddr(tcp, addr, rlen);
+			return;
+		}
+		break;
+
+	case SOL_IPV6:
+		switch (name) {
+		case IP6T_SO_ORIGINAL_DST:
+			decode_sockaddr(tcp, addr, rlen);
+			return;
 		}
 		break;
 
