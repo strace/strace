@@ -427,6 +427,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	sleep \
 	sleep-timing \
 	so_peercred--pidns-translation \
+	sockopt-orig_dst-success \
 	sockopt-sol_socket-success \
 	sockopt-sol_socket-success-Xabbrev \
 	sockopt-sol_socket-success-Xraw \

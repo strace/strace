@@ -858,6 +858,7 @@ sockaddr_xlat-Xraw-y
 sockaddr_xlat-Xverbose
 sockaddr_xlat-Xverbose-y
 socketcall
+sockopt-orig_dst
 sockopt-sol_netlink
 sockopt-sol_socket
 sockopt-sol_socket-Xabbrev

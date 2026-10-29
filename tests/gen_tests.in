@@ -1174,6 +1174,8 @@ sockaddr_xlat-Xraw-y		-Xraw -y -e trace=connect -a22 </dev/null 7>/dev/zero
 sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
 sockaddr_xlat-Xverbose-y	-Xverbose -y -e trace=connect -a22 </dev/null 7>/dev/zero
 socketcall	-a20
+sockopt-orig_dst		-e trace=getsockopt -a1
+sockopt-orig_dst-success	-einject=getsockopt:retval=42 -etrace=getsockopt -a1
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 sockopt-sol_socket			-e trace=getsockopt,setsockopt
 sockopt-sol_socket-Xabbrev		-e trace=getsockopt,setsockopt -Xabbrev
