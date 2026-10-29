@@ -459,6 +459,7 @@ static void set_success(struct tcb *, kernel_long_t);
 static int arch_get_scno(struct tcb *);
 static int arch_check_scno(struct tcb *);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
+static int arch_set_syscall_args(struct tcb *, unsigned int, kernel_ulong_t []);
 static int arch_get_syscall_args(struct tcb *);
 static void arch_get_error(struct tcb *, bool);
 static int arch_set_error(struct tcb *);
@@ -1128,11 +1129,6 @@ ptrace_syscall_info_is_exit(void)
 #endif
 
 #include "getregs_old.h"
-#ifdef HAVE_GETREGS_OLD
-/* Either getregs_old() or set_regs() */
-# undef ARCH_MIGHT_USE_SET_REGS
-# define ARCH_MIGHT_USE_SET_REGS 0
-#endif
 
 #undef ptrace_getregset_or_getregs
 #undef ptrace_setregset_or_setregs
@@ -1209,6 +1205,9 @@ ptrace_setregs(pid_t pid)
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
 static long get_regs_error = -1;
+#ifdef HAVE_GETREGS_OLD
+static int use_getregs_old;
+#endif
 
 void
 clear_regs(struct tcb *tcp)
@@ -1230,7 +1229,6 @@ get_regs(struct tcb *const tcp)
 	 * Try PTRACE_GETREGSET/PTRACE_GETREGS first,
 	 * fallback to getregs_old.
 	 */
-	static int use_getregs_old;
 	if (use_getregs_old < 0) {
 		return get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
 	} else if (use_getregs_old == 0) {
@@ -1589,6 +1587,54 @@ set_scno(struct tcb *tcp, kernel_ulong_t scno)
 	return arch_set_scno(tcp, scno);
 }
 
+/*
+ * Returns:
+ * 1: PTRACE_SET_SYSCALL_INFO succeeded
+ * 0: arch_set_syscall_args succeeded
+ * -1: failed
+ */
+int
+set_syscall_args(struct tcb *tcp, unsigned int arg_mask,
+		 kernel_ulong_t args[MAX_ARGS])
+{
+	/*
+	 * Setting syscall arguments on exiting syscall is not supported
+	 * by PTRACE_SET_SYSCALL_INFO and is not properly defined on all
+	 * architectures.
+	 */
+	if (exiting(tcp))
+		return -1;
+
+	for (unsigned int i = 0; i < MAX_ARGS; ++i) {
+		if (arg_mask & (1U << i))
+			args[i] = truncate_kulong_to_current_klongsize(args[i]);
+	}
+
+	int rc;
+	if (ptrace_set_syscall_info_supported &&
+	    ptrace_syscall_info_is_entry()) {
+		for (unsigned int i = 0; i < MAX_ARGS; ++i) {
+			if (arg_mask & (1U << i))
+				ptrace_sci.entry.args[i] = args[i];
+		}
+		const size_t size = sizeof(ptrace_sci);
+		if (ptrace(PTRACE_SET_SYSCALL_INFO, tcp->pid,
+			   (void *) size, &ptrace_sci) != 0)
+			return -1;
+		rc = 1;
+	} else {
+		if (arch_set_syscall_args(tcp, arg_mask, args) != 0)
+			return -1;
+		rc = 0;
+	}
+
+	for (unsigned int i = 0; i < MAX_ARGS; ++i) {
+		if (arg_mask & (1U << i))
+			tcp->u_arg[i] = args[i];
+	}
+	return rc;
+}
+
 static void
 set_error(struct tcb *tcp, unsigned long new_error)
 {
@@ -1678,6 +1724,7 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 #include "check_scno.c"
 #include "set_scno.c"
 #include "get_syscall_args.c"
+#include "set_syscall_args.c"
 #ifndef ptrace_getregset_or_getregs
 # include "get_syscall_result.c"
 #endif

@@ -846,6 +846,10 @@ extern void invalidate_umove_cache(void);
 extern int upeek(struct tcb *tcp, unsigned long, kernel_ulong_t *);
 extern int upoke(struct tcb *tcp, unsigned long, kernel_ulong_t);
 
+extern int
+set_syscall_args(struct tcb *, unsigned int arg_mask,
+		 kernel_ulong_t args[MAX_ARGS]);
+
 # if HAVE_ARCH_GETRVAL2
 extern long getrval2(struct tcb *);
 # endif

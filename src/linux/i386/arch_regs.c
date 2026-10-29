@@ -12,4 +12,4 @@ static struct user_regs_struct i386_regs;
 #define ARCH_SP_REG i386_regs.esp
 
 #undef ARCH_MIGHT_USE_SET_REGS
-#define ARCH_MIGHT_USE_SET_REGS 0
+#define ARCH_MIGHT_USE_SET_REGS 1

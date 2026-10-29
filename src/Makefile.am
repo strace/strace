@@ -521,6 +521,7 @@ EXTRA_DIST =				\
 	linux/aarch64/raw_syscall.h	\
 	linux/aarch64/set_error.c	\
 	linux/aarch64/set_scno.c	\
+	linux/aarch64/set_syscall_args.c	\
 	linux/aarch64/shuffle_scno.c	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
@@ -538,6 +539,7 @@ EXTRA_DIST =				\
 	linux/alpha/raw_syscall.h	\
 	linux/alpha/set_error.c		\
 	linux/alpha/set_scno.c		\
+	linux/alpha/set_syscall_args.c		\
 	linux/alpha/signalent.h		\
 	linux/alpha/syscallent.h	\
 	linux/alpha/userent.h		\
@@ -551,6 +553,7 @@ EXTRA_DIST =				\
 	linux/arc/raw_syscall.h		\
 	linux/arc/set_error.c		\
 	linux/arc/set_scno.c		\
+	linux/arc/set_syscall_args.c		\
 	linux/arc/syscallent.h		\
 	linux/arm/arch_defs_.h		\
 	linux/arm/arch_prstatus_regset.c \
@@ -566,6 +569,7 @@ EXTRA_DIST =				\
 	linux/arm/raw_syscall.h		\
 	linux/arm/set_error.c		\
 	linux/arm/set_scno.c		\
+	linux/arm/set_syscall_args.c		\
 	linux/arm/shuffle_scno.c	\
 	linux/arm/syscallent.h		\
 	linux/arm/userent.h		\
@@ -579,6 +583,7 @@ EXTRA_DIST =				\
 	linux/avr32/raw_syscall.h	\
 	linux/avr32/set_error.c		\
 	linux/avr32/set_scno.c		\
+	linux/avr32/set_syscall_args.c		\
 	linux/avr32/syscallent.h	\
 	linux/avr32/userent.h		\
 	linux/bfin/arch_defs_.h		\
@@ -593,6 +598,7 @@ EXTRA_DIST =				\
 	linux/bfin/rt_sigframe.h	\
 	linux/bfin/set_error.c		\
 	linux/bfin/set_scno.c		\
+	linux/bfin/set_syscall_args.c		\
 	linux/bfin/syscallent.h		\
 	linux/bfin/userent.h		\
 	linux/csky/arch_defs_.h		\
@@ -605,6 +611,7 @@ EXTRA_DIST =				\
 	linux/csky/raw_syscall.h	\
 	linux/csky/set_error.c		\
 	linux/csky/set_scno.c		\
+	linux/csky/set_syscall_args.c		\
 	linux/csky/syscallent.h		\
 	linux/generic/arch_fpregset.c		\
 	linux/generic/arch_fpregset.h		\
@@ -647,6 +654,7 @@ EXTRA_DIST =				\
 	linux/hppa/rt_sigframe.h	\
 	linux/hppa/set_error.c		\
 	linux/hppa/set_scno.c		\
+	linux/hppa/set_syscall_args.c		\
 	linux/hppa/signalent.h		\
 	linux/hppa/syscallent.h		\
 	linux/hppa/userent.h		\
@@ -668,6 +676,7 @@ EXTRA_DIST =				\
 	linux/i386/rt_sigframe.h	\
 	linux/i386/set_error.c		\
 	linux/i386/set_scno.c		\
+	linux/i386/set_syscall_args.c		\
 	linux/i386/syscallent.h		\
 	linux/i386/userent.h		\
 	linux/i386/userent0.h		\
@@ -685,6 +694,7 @@ EXTRA_DIST =				\
 	linux/ia64/rt_sigframe.h	\
 	linux/ia64/set_error.c		\
 	linux/ia64/set_scno.c		\
+	linux/ia64/set_syscall_args.c		\
 	linux/ia64/shuffle_scno.c	\
 	linux/ia64/syscallent.h		\
 	linux/ia64/syscallent_base_nr.h	\
@@ -703,6 +713,7 @@ EXTRA_DIST =				\
 	linux/loongarch64/raw_syscall.h	\
 	linux/loongarch64/set_error.c	\
 	linux/loongarch64/set_scno.c	\
+	linux/loongarch64/set_syscall_args.c	\
 	linux/loongarch64/syscallent.h	\
 	linux/m68k/arch_defs_.h		\
 	linux/m68k/arch_regs.c		\
@@ -717,6 +728,7 @@ EXTRA_DIST =				\
 	linux/m68k/rt_sigframe.h	\
 	linux/m68k/set_error.c		\
 	linux/m68k/set_scno.c		\
+	linux/m68k/set_syscall_args.c		\
 	linux/m68k/syscallent.h		\
 	linux/m68k/userent.h		\
 	linux/metag/arch_defs_.h	\
@@ -730,6 +742,7 @@ EXTRA_DIST =				\
 	linux/metag/raw_syscall.h	\
 	linux/metag/set_error.c		\
 	linux/metag/set_scno.c		\
+	linux/metag/set_syscall_args.c		\
 	linux/metag/syscallent.h	\
 	linux/microblaze/arch_defs_.h	\
 	linux/microblaze/arch_regs.c	\
@@ -743,6 +756,7 @@ EXTRA_DIST =				\
 	linux/microblaze/raw_syscall.h	\
 	linux/microblaze/set_error.c	\
 	linux/microblaze/set_scno.c	\
+	linux/microblaze/set_syscall_args.c	\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
 	linux/mips/arch_defs_.h		\
@@ -763,6 +777,7 @@ EXTRA_DIST =				\
 	linux/mips/rt_sigframe.h	\
 	linux/mips/set_error.c		\
 	linux/mips/set_scno.c		\
+	linux/mips/set_syscall_args.c		\
 	linux/mips/signalent.h		\
 	linux/mips/syscallent-compat.h	\
 	linux/mips/syscallent-n32.h	\
@@ -780,6 +795,7 @@ EXTRA_DIST =				\
 	linux/nios2/raw_syscall.h	\
 	linux/nios2/set_error.c		\
 	linux/nios2/set_scno.c		\
+	linux/nios2/set_syscall_args.c		\
 	linux/nios2/syscallent.h	\
 	linux/or1k/arch_defs_.h		\
 	linux/or1k/arch_regs.c		\
@@ -791,6 +807,7 @@ EXTRA_DIST =				\
 	linux/or1k/raw_syscall.h	\
 	linux/or1k/set_error.c		\
 	linux/or1k/set_scno.c		\
+	linux/or1k/set_syscall_args.c		\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
 	linux/powerpc/arch_defs_.h	\
@@ -812,6 +829,7 @@ EXTRA_DIST =				\
 	linux/powerpc/raw_syscall.h	\
 	linux/powerpc/set_error.c	\
 	linux/powerpc/set_scno.c	\
+	linux/powerpc/set_syscall_args.c	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
 	linux/powerpc64/arch_defs_.h	\
@@ -837,6 +855,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/rt_sigframe.h	\
 	linux/powerpc64/set_error.c	\
 	linux/powerpc64/set_scno.c	\
+	linux/powerpc64/set_syscall_args.c	\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
@@ -858,6 +877,7 @@ EXTRA_DIST =				\
 	linux/powerpc64le/rt_sigframe.h	\
 	linux/powerpc64le/set_error.c	\
 	linux/powerpc64le/set_scno.c	\
+	linux/powerpc64le/set_syscall_args.c	\
 	linux/powerpc64le/syscallent.h	\
 	linux/powerpc64le/userent.h	\
 	linux/riscv64/arch_defs_.h		\
@@ -872,6 +892,7 @@ EXTRA_DIST =				\
 	linux/riscv64/raw_syscall.h	\
 	linux/riscv64/set_error.c		\
 	linux/riscv64/set_scno.c		\
+	linux/riscv64/set_syscall_args.c		\
 	linux/riscv64/syscallent.h	\
 	linux/s390/arch_defs_.h		\
 	linux/s390/arch_prstatus_regset.c \
@@ -888,6 +909,7 @@ EXTRA_DIST =				\
 	linux/s390/rt_sigframe.h	\
 	linux/s390/set_error.c		\
 	linux/s390/set_scno.c		\
+	linux/s390/set_syscall_args.c		\
 	linux/s390/syscallent.h		\
 	linux/s390/userent.h		\
 	linux/s390/userent0.h		\
@@ -910,6 +932,7 @@ EXTRA_DIST =				\
 	linux/s390x/rt_sigframe.h	\
 	linux/s390x/set_error.c		\
 	linux/s390x/set_scno.c		\
+	linux/s390x/set_syscall_args.c		\
 	linux/s390x/syscallent.h	\
 	linux/s390x/syscallent1.h	\
 	linux/s390x/userent.h		\
@@ -924,6 +947,7 @@ EXTRA_DIST =				\
 	linux/sh/raw_syscall.h		\
 	linux/sh/set_error.c		\
 	linux/sh/set_scno.c		\
+	linux/sh/set_syscall_args.c		\
 	linux/sh/syscallent.h		\
 	linux/sh/userent.h		\
 	linux/sh/userent0.h		\
@@ -938,6 +962,7 @@ EXTRA_DIST =				\
 	linux/sh64/rt_sigframe.h	\
 	linux/sh64/set_error.c		\
 	linux/sh64/set_scno.c		\
+	linux/sh64/set_syscall_args.c		\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
 	linux/sparc/arch_defs_.h	\
@@ -957,6 +982,7 @@ EXTRA_DIST =				\
 	linux/sparc/rt_sigframe.h	\
 	linux/sparc/set_error.c		\
 	linux/sparc/set_scno.c		\
+	linux/sparc/set_syscall_args.c		\
 	linux/sparc/signalent.h		\
 	linux/sparc/syscallent.h	\
 	linux/sparc/userent.h		\
@@ -982,6 +1008,7 @@ EXTRA_DIST =				\
 	linux/sparc64/rt_sigframe.h	\
 	linux/sparc64/set_error.c	\
 	linux/sparc64/set_scno.c	\
+	linux/sparc64/set_syscall_args.c	\
 	linux/sparc64/signalent.h	\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
@@ -1001,6 +1028,7 @@ EXTRA_DIST =				\
 	linux/tile/rt_sigframe.h	\
 	linux/tile/set_error.c		\
 	linux/tile/set_scno.c		\
+	linux/tile/set_syscall_args.c		\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
@@ -1028,6 +1056,7 @@ EXTRA_DIST =				\
 	linux/x32/rt_sigframe.h		\
 	linux/x32/set_error.c		\
 	linux/x32/set_scno.c		\
+	linux/x32/set_syscall_args.c		\
 	linux/x32/shuffle_scno.c	\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
@@ -1058,6 +1087,7 @@ EXTRA_DIST =				\
 	linux/x86_64/rt_sigframe.h	\
 	linux/x86_64/set_error.c	\
 	linux/x86_64/set_scno.c		\
+	linux/x86_64/set_syscall_args.c		\
 	linux/x86_64/shuffle_scno.c	\
 	linux/x86_64/syscallent.h	\
 	linux/x86_64/syscallent1.h	\
@@ -1073,6 +1103,7 @@ EXTRA_DIST =				\
 	linux/xtensa/raw_syscall.h	\
 	linux/xtensa/set_error.c	\
 	linux/xtensa/set_scno.c		\
+	linux/xtensa/set_syscall_args.c		\
 	linux/xtensa/syscallent.h	\
 	linux/xtensa/userent.h		\
 	mpers.awk			\

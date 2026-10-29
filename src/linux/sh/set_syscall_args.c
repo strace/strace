@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2026 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+static int
+arch_set_syscall_args(struct tcb *tcp, unsigned int arg_mask,
+		      kernel_ulong_t args[])
+{
+	static const unsigned int syscall_regs[MAX_ARGS] = { 4, 5, 6, 7, 0, 1 };
+
+	if (ptrace_syscall_info_is_valid() && get_regs(tcp) < 0)
+		return -1;
+	for (unsigned int i = 0; i < MAX_ARGS; ++i) {
+		if (arg_mask & (1U << i))
+			sh_regs.regs[syscall_regs[i]] = args[i];
+	}
+	return set_regs(tcp->pid);
+}
