@@ -1596,7 +1596,7 @@ The default is to summarize the system time.
 .SS Tampering
 .ad l
 .TP 12
-\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR]\:[:\fBsignal\fR=\,\fIsig\/\fR]\:[:\fBsyscall\fR=\,\fIsyscall\/\fR]\:[:\fBdelay_enter\fR=\,\fIdelay\/\fR]\:[:\fBdelay_exit\fR=\,\fIdelay\/\fR]\:[:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBwhen\fR=\,\fIexpr\/\fR] \{
+\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR]\:[:\fBsignal\fR=\,\fIsig\/\fR]\:[:\fBsyscall\fR=\,\fIsyscall\/\fR]\:[:\fBdelay_enter\fR=\,\fIdelay\/\fR]\:[:\fBdelay_exit\fR=\,\fIdelay\/\fR]\:[:\fBpoke_enter\fR=\,\fI@argN=DATAN,argN=VAL...\/\fR]\:[:\fBpoke_exit\fR=\,\fI@argN=DATAN...\/\fR]\:[:\fBwhen\fR=\,\fIexpr\/\fR] \{
 .ad b
 Performs system call tampering for the specified set of system calls.
 .IP
@@ -1662,26 +1662,56 @@ The format of
 specification is described in section
 .IR "Time specification format description".
 .IP
-If the \fBpoke_enter\fR=\fI@argN=DATAN,@argM=DATAM...\fR
-or \fBpoke_exit\fR=\fI@argN=DATAN,@argM=DATAM...\fR options are specified,
-tracee's memory at locations, pointed to by system call arguments
-.IR argN
-and
-.IR argM
+If the \fBpoke_enter\fR or \fBpoke_exit\fR options are specified,
+they modify system call arguments on system call enter or exit,
+respectively.
+.IP
+The \fBpoke_exit\fR option supports only the memory poke form
+(\fB@\fIargN\fB=\fIDATA\fR), while \fBpoke_enter\fR supports
+both memory poke and argument value forms:
+.RS
+.TP
+\fB@\fIargN\fB=\fIDATA\fR
+Overwrites tracee's memory at the location pointed to by argument
+.I argN
 (going from
-.IR arg1
+.I arg1
 to
-.IR arg7 )
-is overwritten by data
-.IR DATAN
-and
-.IR DATAM
-(specified in hexadecimal format; for example
-\fBpoke_enter\fR=\fI@arg1=0000DEAD0000BEEF\fR).
-The \fBpoke_enter\fR option modifies memory on system call enter,
-while \fBpoke_exit\fR does so on system call exit.
+.IR arg7 ).
+.I DATA
+is specified in hexadecimal format; for example
+\fBpoke_enter\fR=\fI@arg1=0000DEAD0000BEEF\fR.
+Available in both \fBpoke_enter\fR and \fBpoke_exit\fR.
+.TP
+\fIargN\fB=\fIVAL\fR
+Sets the value of argument
+.I argN
+(going from
+.I arg1
+to
+.IR arg6 )
+to the C\-style integer value
+.I VAL
+(decimal, hexadecimal with \fB0x\fR prefix, or octal with \fB0\fR prefix;
+for example \fBpoke_enter\fR=\fIarg1=42\fR or
+\fBpoke_enter\fR=\fIarg1=0xff\fR).
+Negative values are accepted.
+Available in \fBpoke_enter\fR only.
+Argument value changes are not supported for decoded subcalls of
+.BR socketcall (2),
+.BR ipc (2),
+or the MIPS o32
+.B syscall
+multiplexor.
+Such value changes are rejected with a diagnostic;
+memory pokes and other injection actions are still performed.
+.RE
+.IP
+Both forms can be mixed in a single \fBpoke_enter\fR option,
+separated by commas.
 Each argument may be specified only once per option;
-for example, \fBpoke_enter=@arg1=DEAD,@arg1=BEEF\fR is invalid.
+for example, \fBpoke_enter=@arg1=DEAD,@arg1=BEEF\fR
+and \fBpoke_enter=arg1=42,@arg1=DEAD\fR are invalid.
 The same argument may be specified in both
 .B poke_enter
 and

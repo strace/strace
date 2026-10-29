@@ -182,27 +182,53 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 		poke->is_enter = isenter;
 
 		const char *val = STR_STRIP_PREFIX(token, "@arg");
-		if (val == token)
-			goto err;
-		if ((val[0] >= '1') && (val[0] <= '7')) {
-			poke->arg_no = val[0] - '0';
-		} else {
-			goto err;
+		bool is_mem_poke = (val != token);
+		if (!is_mem_poke) {
+			if (!isenter)
+				goto err;
+			val = STR_STRIP_PREFIX(token, "arg");
+			if (val == token)
+				goto err;
 		}
+		if (val[0] < '1'
+		    || val[0] > (is_mem_poke ? '7' : '6'))
+			goto err;
+		poke->arg_no = val[0] - '0';
 		if (val[1] != '=')
 			goto err;
 		val += 2;
 
-		size_t data_len = strlen(val);
-		if ((data_len == 0) || (data_len % 2) || (data_len > 2048))
-			goto err;
-		data_len /= 2;
-		poke->data_len = data_len;
-		poke->data = xmalloc(data_len);
-
-		for (size_t i = 0; i < data_len; i++)
-			if (sscanf(&val[2 * i], "%2hhx", &poke->data[i]) != 1)
+		if (is_mem_poke) {
+			size_t data_len = strlen(val);
+			if (!data_len || (data_len % 2)
+			    || (data_len > 2048))
 				goto err;
+			data_len /= 2;
+			poke->data_len = data_len;
+			poke->data = xmalloc(data_len);
+			for (size_t i = 0; i < data_len; i++)
+				if (sscanf(&val[2 * i], "%2hhx",
+					   &poke->data[i]) != 1)
+					goto err;
+		} else {
+			char *endptr;
+			unsigned long long ullval;
+			errno = 0;
+			if (val[0] == '-') {
+				const long long llval =
+					strtoll(val, &endptr, 0);
+				if (*endptr || errno || val == endptr
+				    || (kernel_long_t) llval != llval)
+					goto err;
+				ullval = llval;
+			} else {
+				ullval = strtoull(val, &endptr, 0);
+				if (*endptr || errno || val == endptr
+				    || (kernel_ulong_t) ullval != ullval)
+					goto err;
+			}
+			poke->arg_val = (kernel_ulong_t) ullval;
+		}
 
 		if (poke_add(fopts->data.poke_idx, poke))
 			goto err;
@@ -213,7 +239,8 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 	return true;
 
 err:
-	free(poke->data);
+	if (poke->data_len)
+		free(poke->data);
 	free(poke);
 	free(str_tokenized);
 	return false;

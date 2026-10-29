@@ -522,13 +522,13 @@ Stop condition:\n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
             [:delay_enter=DELAY][:delay_exit=DELAY]\n\
-            [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
-            [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+            [:poke_enter=@argN=DATAN,argN=VAL...]\n\
+            [:poke_exit=@argN=DATAN...]\n\
             [:when=WHEN],\n\
   --inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
            [:delay_enter=DELAY][:delay_exit=DELAY]\n\
-           [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
-           [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+           [:poke_enter=@argN=DATAN,argN=VAL...]\n\
+           [:poke_exit=@argN=DATAN...]\n\
            [:when=WHEN],\n\
                  perform syscall tampering for the syscalls in SET\n\
      delay:      microseconds or NUMBER{s|ms|us|ns}\n\
