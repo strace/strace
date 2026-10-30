@@ -1,5 +1,5 @@
 #From include/uapi/linux/netfilter_ipv6/ip6_tables.h
-#Prefix IP6T_SO_GET_
+#Prefix IP6T_SO_GET_ IP6T_SO_ORIGINAL_
 /*
  * Options specific to getsockopt(SOL_IPV6).
  * Common {g,s}etsockopt(SOL_IPV6) options
@@ -10,3 +10,5 @@ IP6T_SO_GET_INFO
 IP6T_SO_GET_ENTRIES
 IP6T_SO_GET_REVISION_MATCH
 IP6T_SO_GET_REVISION_TARGET
+
+IP6T_SO_ORIGINAL_DST	80
