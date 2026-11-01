@@ -28,6 +28,13 @@ case "$STRACE_ARCH" in
 	*)	valid_scno=42 ;;
 esac
 
+invalid_syscall_arg_values_32=
+if [ "$STRACE_NATIVE_ARCH" = "$STRACE_ARCH" ] &&
+   [ "$SIZEOF_KERNEL_LONG_T" -eq 4 ]; then
+	invalid_syscall_arg_values_32='chdir:poke_enter=arg1=4294967296
+chdir:poke_enter=arg1=-2147483649'
+fi
+
 for arg in $valid_scno chdir \
 	   chdir:$valid_scno \!chdir:$valid_scno \
 	   chdir:$valid_scno:when=7 \
@@ -142,11 +149,37 @@ for arg in $valid_scno chdir \
 	   chdir:poke_exit=@arg2=DEAD,@arg3=BEEF,@arg4=FACE,@arg3=FEED \
 	   chdir:poke_exit=@arg1=5374726163652100:poke_exit=@arg1=5374726163652100 \
 	   chdir:poke_exit=@arg5=123456:poke_exit=@arg6=ABCDEF \
+	   chdir:poke_enter=arg0=1 \
+	   chdir:poke_enter=arg7=1 \
+	   chdir:poke_enter=arg1= \
+	   chdir:poke_enter=arg1=abc \
+	   chdir:poke_enter=arg1=08 \
+	   chdir:poke_enter=arg1=0x \
+	   chdir:poke_enter=arg1=18446744073709551616 \
+	   chdir:poke_enter=arg1=-9223372036854775809 \
+	   chdir:poke_enter=arg1=1,@arg1=DEAD \
+	   chdir:poke_enter=arg1=42,arg1=43 \
+	   chdir:poke_enter=arg1=1:poke_enter=arg1=2 \
+	   chdir:poke_exit=arg1=1 \
+	   $invalid_syscall_arg_values_32 \
 	   ; do
 	$STRACE -e inject="$arg" true 2> "$LOG" &&
 		fail_with "$arg"
 	LC_ALL=C grep -F 'invalid inject argument' < "$LOG" > /dev/null ||
 		fail_with "$arg"
+done
+
+valid_syscall_arg_values='-2147483648 4294967295'
+if [ "$STRACE_NATIVE_ARCH" = "$STRACE_ARCH" ] &&
+   [ "$SIZEOF_KERNEL_LONG_T" -eq 8 ]; then
+	valid_syscall_arg_values="$valid_syscall_arg_values -9223372036854775808
+18446744073709551615"
+fi
+for value in $valid_syscall_arg_values; do
+	inject_arg="--inject=chdir:poke_enter=arg1=$value"
+	$STRACE --trace=none "$inject_arg" true 2> "$LOG" ||
+		dump_log_and_fail_with \
+			"$STRACE $inject_arg failed to handle a valid argument properly"
 done
 
 exit 0

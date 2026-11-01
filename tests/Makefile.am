@@ -912,10 +912,13 @@ EXTRA_DIST = \
 	kernel_old_timex.h \
 	kill-on-exit.sh \
 	ksysent.sed \
+	legacy_poke_arg.sh \
 	lstatx.c \
 	nlattr_ifla.h \
 	nlattr_ifla_af_inet6.h \
 	nsyscalls.h \
+	poke_arg.c \
+	poke_arg.sh \
 	print_user_desc.c \
 	printclockname.c \
 	printsignal.c \

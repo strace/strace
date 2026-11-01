@@ -765,6 +765,54 @@ nlattr_tcamsg-Xraw		+netlink_sock_diag.test -Xraw
 nlattr_tcamsg-Xverbose		+netlink_sock_diag.test -Xverbose
 nlattr_tcmsg			+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test
+no_getregset_poke_arg_a1v_badfd	+legacy_poke_arg.sh
+no_getregset_poke_arg_a2v_zero	+legacy_poke_arg.sh
+no_getregset_poke_arg_a3v_badfd	+legacy_poke_arg.sh
+no_getregset_poke_arg_a4v_zero	+legacy_poke_arg.sh
+no_getregset_poke_arg_a5v_a2m	+legacy_poke_arg.sh
+no_getregset_poke_arg_a5v_error	+legacy_poke_arg.sh
+no_getregset_poke_arg_a5v_len	+legacy_poke_arg.sh
+no_getregset_poke_arg_a5v_retval	+legacy_poke_arg.sh
+no_getregset_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_getsi_poke_arg_a1a6v_max32	+legacy_poke_arg.sh
+no_getsi_poke_arg_a1a6v_max64	+legacy_poke_arg.sh
+no_getsi_poke_arg_a1a6v_neg	+legacy_poke_arg.sh
+no_getsi_poke_arg_a1v_badfd	+legacy_poke_arg.sh
+no_getsi_poke_arg_a2a6v_max32	+legacy_poke_arg.sh
+no_getsi_poke_arg_a2a6v_max64	+legacy_poke_arg.sh
+no_getsi_poke_arg_a2a6v_neg	+legacy_poke_arg.sh
+no_getsi_poke_arg_a2v_zero	+legacy_poke_arg.sh
+no_getsi_poke_arg_a3v_badfd	+legacy_poke_arg.sh
+no_getsi_poke_arg_a4v_zero	+legacy_poke_arg.sh
+no_getsi_poke_arg_a5v_a2m	+legacy_poke_arg.sh
+no_getsi_poke_arg_a5v_error	+legacy_poke_arg.sh
+no_getsi_poke_arg_a5v_len	+legacy_poke_arg.sh
+no_getsi_poke_arg_a5v_retval	+legacy_poke_arg.sh
+no_getsi_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_setregset_poke_arg_a1v_badfd	+legacy_poke_arg.sh
+no_setregset_poke_arg_a2v_zero	+legacy_poke_arg.sh
+no_setregset_poke_arg_a3v_badfd	+legacy_poke_arg.sh
+no_setregset_poke_arg_a4v_zero	+legacy_poke_arg.sh
+no_setregset_poke_arg_a5v_a2m	+legacy_poke_arg.sh
+no_setregset_poke_arg_a5v_error	+legacy_poke_arg.sh
+no_setregset_poke_arg_a5v_len	+legacy_poke_arg.sh
+no_setregset_poke_arg_a5v_retval	+legacy_poke_arg.sh
+no_setregset_poke_arg_a6v_zero	+legacy_poke_arg.sh
+no_setsi_poke_arg_a1a6v_max32	+legacy_poke_arg.sh
+no_setsi_poke_arg_a1a6v_max64	+legacy_poke_arg.sh
+no_setsi_poke_arg_a1a6v_neg	+legacy_poke_arg.sh
+no_setsi_poke_arg_a1v_badfd	+legacy_poke_arg.sh
+no_setsi_poke_arg_a2a6v_max32	+legacy_poke_arg.sh
+no_setsi_poke_arg_a2a6v_max64	+legacy_poke_arg.sh
+no_setsi_poke_arg_a2a6v_neg	+legacy_poke_arg.sh
+no_setsi_poke_arg_a2v_zero	+legacy_poke_arg.sh
+no_setsi_poke_arg_a3v_badfd	+legacy_poke_arg.sh
+no_setsi_poke_arg_a4v_zero	+legacy_poke_arg.sh
+no_setsi_poke_arg_a5v_a2m	+legacy_poke_arg.sh
+no_setsi_poke_arg_a5v_error	+legacy_poke_arg.sh
+no_setsi_poke_arg_a5v_len	+legacy_poke_arg.sh
+no_setsi_poke_arg_a5v_retval	+legacy_poke_arg.sh
+no_setsi_poke_arg_a6v_zero	+legacy_poke_arg.sh
 old_mmap	-a11 -e trace=mmap
 old_mmap-P	-e trace=mmap -P "/dev/full" 9>>/dev/full
 old_mmap-Xabbrev	-a11 -e trace=mmap -Xabbrev
@@ -830,6 +878,21 @@ pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
 pkey_mprotect	-a37
+poke_arg_a1a6v_max32	+poke_arg.sh
+poke_arg_a1a6v_max64	+poke_arg.sh
+poke_arg_a1a6v_neg	+poke_arg.sh
+poke_arg_a1v_badfd	+poke_arg.sh
+poke_arg_a2a6v_max32	+poke_arg.sh
+poke_arg_a2a6v_max64	+poke_arg.sh
+poke_arg_a2a6v_neg	+poke_arg.sh
+poke_arg_a2v_zero	+poke_arg.sh
+poke_arg_a3v_badfd	+poke_arg.sh
+poke_arg_a4v_zero	+poke_arg.sh
+poke_arg_a5v_a2m	+poke_arg.sh
+poke_arg_a5v_error	+poke_arg.sh
+poke_arg_a5v_len	+poke_arg.sh
+poke_arg_a5v_retval	+poke_arg.sh
+poke_arg_a6v_zero	+poke_arg.sh
 poke-sendfile	--inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff --trace=/sendfile
 ppoll				-s2
 ppoll-P				-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
