@@ -776,11 +776,11 @@ get_finfo_for_dev(pid_t pid, int fd, const char *path, struct finfo *finfo)
 }
 
 static bool
-printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
+printdev(pid_t pid, int fd, const char *path, const struct finfo *finfo)
 {
 	struct finfo finfo_buf;
 	if (!finfo)
-		finfo = get_finfo_for_dev(tcp->pid, fd, path, &finfo_buf);
+		finfo = get_finfo_for_dev(pid, fd, path, &finfo_buf);
 
 	switch (finfo->type) {
 	case FINFO_DEV_BLK:
@@ -1019,7 +1019,7 @@ printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *f
 		    printsocket(tcp, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
-		    printdev(tcp, fd, path, finfo))
+		    printdev(pid, fd, path, finfo))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_EVENTFD, decode_fd_set) &&
 		    printeventfd(pid, fd, path))

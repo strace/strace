@@ -11,6 +11,8 @@ Noteworthy changes in release ?.? (????-??-??)
     BPF_LINK_CREATE.
 
 * Bug fixes
+  * Fixed -yy PTY endpoint annotations for file descriptors belonging to another
+    process in kcmp and pidfd_getfd.
   * Prevented CLONE_UNTRACED children from escaping --seccomp-bpf tracing
     and inheriting a seccomp filter without a tracer.
 
