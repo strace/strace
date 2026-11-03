@@ -395,6 +395,9 @@ keyword is supported, which includes
 and
 .BR execveat (2)
 system calls.
+For these syscalls, detachment happens on entry, before the kernel applies
+set-user-ID or set-group-ID bits, or file capabilities.
+Consequently, tracing also stops if the syscall fails.
 This option is useful for tracing a multi-threaded process with
 .BR \-f
 without also tracing its (potentially very complex) child processes.
