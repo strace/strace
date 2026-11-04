@@ -240,7 +240,7 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 			memcpy(&gid, open_session.clnt_uuid, sizeof(gid));
 			tprint_struct_next();
 			tprints_field_name("clnt_uuid");
-			printuid(gid);
+			printgid(gid);
 			break;
 		default:
 			tprint_struct_next();

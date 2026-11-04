@@ -23,7 +23,7 @@ SYS_FUNC(fchownat)
 
 	/* group */
 	tprints_arg_next_name("group");
-	printuid(tcp->u_arg[3]);
+	printgid(tcp->u_arg[3]);
 
 	/* flags */
 	tprints_arg_next_name("flags");

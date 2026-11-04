@@ -90,9 +90,13 @@ tun_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 
 	case TUNSETOWNER:
-	case TUNSETGROUP:
 		tprints_arg_next_name("argp");
 		printuid(arg);
+		return RVAL_IOCTL_DECODED;
+
+	case TUNSETGROUP:
+		tprints_arg_next_name("argp");
+		printgid(arg);
 		return RVAL_IOCTL_DECODED;
 
 	case TUNSETLINK:

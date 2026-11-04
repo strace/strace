@@ -92,8 +92,24 @@ print_fs_qfilestatv(const struct fs_qfilestatv *const p)
 	tprint_struct_end();
 }
 
+static void
+print_quota_id(const uint32_t type, const uint32_t id)
+{
+	switch (type) {
+	case USRQUOTA:
+		printuid(id);
+		break;
+	case GRPQUOTA:
+		printgid(id);
+		break;
+	default:
+		PRINT_VAL_ID(id);
+	}
+}
+
 static int
-decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
+decode_cmd_data(struct tcb *tcp, uint32_t type, uint32_t id, uint32_t cmd,
+		kernel_ulong_t data)
 {
 	switch (cmd) {
 	case Q_QUOTAOFF:
@@ -109,7 +125,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
 			tprints_arg_next_name("id");
-			printuid(id);
+			print_quota_id(type, id);
 
 			return 0;
 		}
@@ -121,7 +137,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprints_arg_next_name("id");
-			printuid(id);
+			print_quota_id(type, id);
 		}
 
 		tprints_arg_next_name("addr");
@@ -160,7 +176,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprints_arg_next_name("id");
-			printuid(id);
+			print_quota_id(type, id);
 
 			return 0;
 		}
@@ -203,7 +219,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_XGETNEXTQUOTA:
 		if (entering(tcp)) {
 			tprints_arg_next_name("id");
-			printuid(id);
+			print_quota_id(type, id);
 
 			return 0;
 		}
@@ -215,7 +231,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (entering(tcp)) {
 			tprints_arg_next_name("id");
-			printuid(id);
+			print_quota_id(type, id);
 		}
 
 		tprints_arg_next_name("addr");
@@ -418,7 +434,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	}
 	default:
 		tprints_arg_next_name("id");
-		printuid(id);
+		print_quota_id(type, id);
 		tprints_arg_next_name("addr");
 		printaddr(data);
 		break;
@@ -472,7 +488,7 @@ SYS_FUNC(quotactl)
 		tprints_arg_next_name("special");
 		printpath(tcp, tcp->u_arg[1]);
 	}
-	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
+	return decode_cmd_data(tcp, QCMD_TYPE(qcmd), id, cmd, tcp->u_arg[3]);
 }
 
 SYS_FUNC(quotactl_fd)
@@ -492,5 +508,6 @@ SYS_FUNC(quotactl_fd)
 		print_qcmd(qcmd);
 	}
 
-	return decode_cmd_data(tcp, id, QCMD_CMD(qcmd), addr);
+	return decode_cmd_data(tcp, QCMD_TYPE(qcmd), id, QCMD_CMD(qcmd),
+			       addr);
 }

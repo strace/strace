@@ -159,7 +159,7 @@ keyctl_chown_key(struct tcb *tcp, key_serial_t id, unsigned user,
 	printuid(user);
 
 	tprints_arg_next_name("gid");
-	printuid(group);
+	printgid(group);
 }
 
 static void

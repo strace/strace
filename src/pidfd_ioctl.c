@@ -72,25 +72,25 @@ pidfd_ioctl_print_pidfd_info_fields(struct tcb *tcp,
 		printuid(info->ruid);
 		tprint_struct_next();
 		tprints_field_name("rgid");
-		printuid(info->rgid);
+		printgid(info->rgid);
 		tprint_struct_next();
 		tprints_field_name("euid");
 		printuid(info->euid);
 		tprint_struct_next();
 		tprints_field_name("egid");
-		printuid(info->egid);
+		printgid(info->egid);
 		tprint_struct_next();
 		tprints_field_name("suid");
 		printuid(info->suid);
 		tprint_struct_next();
 		tprints_field_name("sgid");
-		printuid(info->sgid);
+		printgid(info->sgid);
 		tprint_struct_next();
 		tprints_field_name("fsuid");
 		printuid(info->fsuid);
 		tprint_struct_next();
 		tprints_field_name("fsgid");
-		printuid(info->fsgid);
+		printgid(info->fsgid);
 	}
 
 	if ((m & PIDFD_INFO_EXIT)

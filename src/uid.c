@@ -19,6 +19,7 @@
 # define SIZEIFY_(x, size)	SIZEIFY__(x, size)
 # define SIZEIFY__(x, size)	x ## size
 
+# define printgid	SIZEIFY(printgid)
 # define printuid	SIZEIFY(printuid)
 # define sys_chown	SIZEIFY(sys_chown)
 # define sys_fchown	SIZEIFY(sys_fchown)
@@ -54,6 +55,11 @@
 # define uid_t_(size)	uid_t__(size)
 # define uid_t__(size)	uint ## size ## _t
 
+# undef gid_t
+# define gid_t		gid_t_(STRACE_UID_SIZE)
+# define gid_t_(size)	gid_t__(size)
+# define gid_t__(size)	uint ## size ## _t
+
 SYS_FUNC(getuid)
 {
 	return RVAL_DECODED;
@@ -81,7 +87,7 @@ SYS_FUNC(setfsgid)
 {
 	/* fsgid */
 	tprints_arg_name("fsgid");
-	printuid(tcp->u_arg[0]);
+	printgid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }
@@ -90,7 +96,7 @@ SYS_FUNC(setgid)
 {
 	/* gid */
 	tprints_arg_name("gid");
-	printuid(tcp->u_arg[0]);
+	printgid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }
@@ -103,6 +109,18 @@ get_print_uid(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!umove_or_printaddr(tcp, addr, &uid)) {
 		tprint_indirect_begin();
 		printuid(uid);
+		tprint_indirect_end();
+	}
+}
+
+static void
+get_print_gid(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	gid_t gid;
+
+	if (!umove_or_printaddr(tcp, addr, &gid)) {
+		tprint_indirect_begin();
+		printgid(gid);
 		tprint_indirect_end();
 	}
 }
@@ -164,15 +182,15 @@ SYS_FUNC(getresgid)
 
 	/* rgid */
 	tprints_arg_name("rgid");
-	get_print_uid(tcp, tcp->u_arg[0]);
+	get_print_gid(tcp, tcp->u_arg[0]);
 
 	/* egid */
 	tprints_arg_next_name("egid");
-	get_print_uid(tcp, tcp->u_arg[1]);
+	get_print_gid(tcp, tcp->u_arg[1]);
 
 	/* sgid */
 	tprints_arg_next_name("sgid");
-	get_print_uid(tcp, tcp->u_arg[2]);
+	get_print_gid(tcp, tcp->u_arg[2]);
 
 	return 0;
 }
@@ -181,11 +199,11 @@ SYS_FUNC(setregid)
 {
 	/* rgid */
 	tprints_arg_name("rgid");
-	printuid(tcp->u_arg[0]);
+	printgid(tcp->u_arg[0]);
 
 	/* egid */
 	tprints_arg_next_name("egid");
-	printuid(tcp->u_arg[1]);
+	printgid(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -194,15 +212,15 @@ SYS_FUNC(setresgid)
 {
 	/* rgid */
 	tprints_arg_name("rgid");
-	printuid(tcp->u_arg[0]);
+	printgid(tcp->u_arg[0]);
 
 	/* egid */
 	tprints_arg_next_name("egid");
-	printuid(tcp->u_arg[1]);
+	printgid(tcp->u_arg[1]);
 
 	/* sgid */
 	tprints_arg_next_name("sgid");
-	printuid(tcp->u_arg[2]);
+	printgid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -219,7 +237,7 @@ SYS_FUNC(chown)
 
 	/* group */
 	tprints_arg_next_name("group");
-	printuid(tcp->u_arg[2]);
+	printgid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -236,7 +254,7 @@ SYS_FUNC(fchown)
 
 	/* group */
 	tprints_arg_next_name("group");
-	printuid(tcp->u_arg[2]);
+	printgid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -247,10 +265,16 @@ printuid(const unsigned int uid)
 	PRINT_VAL_ID((uid_t) uid);
 }
 
+void
+printgid(const unsigned int gid)
+{
+	PRINT_VAL_ID((gid_t) gid);
+}
+
 static bool
 print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	printuid((*(uid_t *) elem_buf));
+	printgid((*(gid_t *) elem_buf));
 
 	return true;
 }
@@ -268,7 +292,7 @@ print_groups(struct tcb *const tcp, const unsigned int len,
 		return;
 	}
 
-	uid_t gid;
+	gid_t gid;
 	print_array(tcp, addr, len, &gid, sizeof(gid),
 		    tfetch_mem, print_gid, 0);
 }
