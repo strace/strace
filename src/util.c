@@ -651,7 +651,7 @@ getfdinode(struct tcb *tcp, int fd)
 }
 
 static void
-print_string_in_angle_brackets(const char *str)
+print_fd_info_type_string(const char *type, const char *str)
 {
 	tprint_associated_info_begin();
 	tprints_string(str);
@@ -666,7 +666,7 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 		return false;
 
 	const char *details = get_sockaddr_by_inode(tcp, fd, inode);
-	print_string_in_angle_brackets(details ?: path);
+	print_fd_info_type_string("socket", details ?: path);
 
 	return true;
 }
@@ -948,7 +948,7 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 		printpid(NULL, pid, PT_TID);
 		tprint_associated_info_end();
 	} else {
-		print_string_in_angle_brackets(path);
+		print_fd_info_type_string("pidfd", path);
 	}
 
 	return true;
@@ -1091,16 +1091,20 @@ printeventfd(pid_t pid_of_fd, int fd, const char *path)
 		tprint_struct_end();
 		tprint_associated_info_end();
 	} else
-		print_string_in_angle_brackets(path);
+		print_fd_info_type_string("eventfd", path);
 
 	return true;
 }
 
-static void
-print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
+void
+print_assoc_type_string(const char *type, const char *str, const size_t len,
+			const bool deleted)
 {
+	if (!len)
+		return;
+
 	tprint_associated_info_begin();
-	print_quoted_string_ex(str, strlen(str),
+	print_quoted_string_ex(str, len,
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
 	tprint_associated_info_end();
 
@@ -1134,8 +1138,8 @@ printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *f
 		    printsignalfd(pid, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
-			print_quoted_string_in_angle_brackets(path,
-							      finfo? finfo->deleted: deleted);
+			print_assoc_type_string("fd_info", path, strlen(path),
+						finfo? finfo->deleted: deleted);
 printed:	;
 	}
 

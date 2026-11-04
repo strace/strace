@@ -1334,6 +1334,9 @@ printfd_with_finfo(struct tcb *tcp, int fd, const struct finfo *finfo)
 	printfd_pid_with_finfo(tcp, tcp->pid, fd, finfo);
 }
 
+extern void print_assoc_type_string(const char *type, const char *str,
+				    size_t len, bool deleted);
+
 /**
  * Helper function, converts pid to string, or to "self" for pid == 0.
  * Uses static buffer for operation.

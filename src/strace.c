@@ -862,17 +862,6 @@ set_current_tcp(const struct tcb *tcp)
 		set_personality(current_tcp->currpers);
 }
 
-static void
-print_comm_str(const char *str, const size_t len)
-{
-	if (!len)
-		return;
-	tprint_associated_info_begin();
-	print_quoted_string_ex(str, len,
-			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-	tprint_associated_info_end();
-}
-
 void
 printleader(struct tcb *tcp)
 {
@@ -919,7 +908,7 @@ printleader(struct tcb *tcp)
 			tprintf_string("pid %5u", tcp->pid);
 		}
 
-		print_comm_str(tcp->comm, len);
+		print_assoc_type_string("pid_info", tcp->comm, len, false);
 
 		if (!print_pid_pfx)
 			tprint_attribute_end();
@@ -1059,7 +1048,7 @@ print_pid_comm(int pid)
 {
 	char buf[PROC_COMM_LEN];
 	load_pid_comm(pid, buf, sizeof(buf));
-	print_comm_str(buf, strlen(buf));
+	print_assoc_type_string("pid_info", buf, strlen(buf), false);
 }
 
 void
