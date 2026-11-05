@@ -9,7 +9,6 @@
  */
 
 #include "defs.h"
-#include "auxiliary_clock.h"
 #include "kernel_fcntl.h"
 #include <signal.h>
 #include <sys/timex.h>
@@ -242,6 +241,10 @@ SYS_FUNC(adjtimex64)
 #include "xlat/clocknames.h"
 #include "xlat/cpuclocknames.h"
 
+#define XLAT_MACROS_ONLY
+# include "xlat/auxiliary_clocks.h"
+#undef XLAT_MACROS_ONLY
+
 #ifndef CPUCLOCK_CLOCK_MASK
 # define CPUCLOCK_CLOCK_MASK	3
 #endif
@@ -298,7 +301,7 @@ printclockname(int clockid)
 		tprint_fn_end();
 		tprint_comment_end();
 
-	} else if (is_auxiliary_clock(clockid)) {
+	} else if (clockid >= CLOCK_AUX && clockid <= CLOCK_AUX_LAST) {
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 			PRINT_VAL_X(clockid);
 
@@ -307,15 +310,11 @@ printclockname(int clockid)
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
-		else
-			STRACE_PRINT_COLOR_SEQ(COLOR_CONST);
 
-		STRACE_PRINTS("CLOCK_AUX");
-
-		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE)
-			STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
-
-		STRACE_PRINTF(" + %u", auxiliary_clock_num(clockid));
+		/* The surrounding code handles raw and verbose output. */
+		print_xlat_ex(CLOCK_AUX, "CLOCK_AUX", XLAT_STYLE_ABBREV);
+		tprint_plus();
+		PRINT_VAL_U(clockid - CLOCK_AUX);
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();

@@ -69,8 +69,6 @@ libstrace_a_SOURCES =	\
 	alarm.c		\
 	alpha.c		\
 	arch_defs.h	\
-	auxiliary_clock.c \
-	auxiliary_clock.h \
 	basic_filters.c	\
 	bind.c		\
 	bjm.c		\

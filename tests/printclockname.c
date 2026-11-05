@@ -61,10 +61,15 @@ main(void)
 		       dyn_clock_ids[i].str, errstr);
 	}
 
-	const unsigned int beyond_aux_clock = clock_aux_last_for_tests() + 1;
-	k_clock_getres(beyond_aux_clock, NULL);
-	printf("clock_getres(" XLAT_UNKNOWN_FMT("%#x", "CLOCK_???")
-	       ", NULL) = %s\n", beyond_aux_clock, errstr);
+	const unsigned int unknown_clock_ids[] = {
+		clock_aux_first_for_tests() - 1,
+		clock_aux_last_for_tests() + 1,
+	};
+	for (unsigned int i = 0; i < ARRAY_SIZE(unknown_clock_ids); ++i) {
+		k_clock_getres(unknown_clock_ids[i], NULL);
+		printf("clock_getres(" XLAT_UNKNOWN_FMT("%#x", "CLOCK_???")
+		       ", NULL) = %s\n", unknown_clock_ids[i], errstr);
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

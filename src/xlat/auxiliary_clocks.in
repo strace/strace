@@ -1,0 +1,4 @@
+#From include/uapi/linux/time.h
+#Prefix CLOCK_AUX
+CLOCK_AUX	16
+CLOCK_AUX_LAST	23

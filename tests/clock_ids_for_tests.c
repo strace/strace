@@ -33,12 +33,18 @@ clock_ids_for_tests(unsigned int *count)
 		CLOCK_TEST_ID(CLOCK_BOOTTIME_ALARM),
 		CLOCK_TEST_ID(CLOCK_SGI_CYCLE),
 		CLOCK_TEST_ID(CLOCK_TAI),
-		CLOCK_TEST_ID(CLOCK_AUX + 0),
-		CLOCK_TEST_ID(CLOCK_AUX + 7),
+		CLOCK_TEST_ID(CLOCK_AUX+0),
+		CLOCK_TEST_ID(CLOCK_AUX+7),
 	};
 
 	*count = sizeof(ids) / sizeof(ids[0]);
 	return ids;
+}
+
+unsigned int
+clock_aux_first_for_tests(void)
+{
+	return CLOCK_AUX;
 }
 
 unsigned int
