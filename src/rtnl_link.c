@@ -1310,8 +1310,7 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_U(vsi, vsi_mgr_id);
 	tprint_struct_next();
-	PRINT_FIELD_STRING(vsi, vsi_type_id, sizeof(vsi.vsi_type_id),
-			   QUOTE_FORCE_HEX);
+	PRINT_FIELD_HEX_ARRAY(vsi, vsi_type_id);
 	tprint_struct_next();
 	PRINT_FIELD_U(vsi, vsi_type_version);
 

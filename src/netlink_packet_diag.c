@@ -98,7 +98,7 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	tprint_struct_next();
 	PRINT_FIELD_U(*dml, pdmc_alen);
 	tprint_struct_next();
-	PRINT_FIELD_STRING(*dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
+	PRINT_FIELD_HEX_ARRAY_UPTO(*dml, pdmc_addr, alen);
 	tprint_struct_end();
 
 	return true;

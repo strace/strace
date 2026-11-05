@@ -21,9 +21,8 @@ decode_fsuuid2(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_begin();
 		PRINT_FIELD_U(uuid, len);
 		tprint_struct_next();
-		PRINT_FIELD_STRING(uuid, uuid,
-				   MIN(uuid.len, sizeof(uuid.uuid)),
-				   QUOTE_FORCE_HEX);
+		PRINT_FIELD_HEX_ARRAY_UPTO(uuid, uuid,
+					   MIN(uuid.len, sizeof(uuid.uuid)));
 		tprint_struct_end();
 	}
 }
