@@ -59,6 +59,8 @@
 
 # endif /* !IN_STRACE */
 
+# define structured_output 0
+
 static inline void
 tprints_object_type(const char *type)
 {
