@@ -16,6 +16,7 @@
 # if HAVE_ARCH_UID16_SYSCALLS
 extern SYS_FUNC(chown16);
 extern SYS_FUNC(fchown16);
+extern SYS_FUNC(getgid16);
 extern SYS_FUNC(getgroups16);
 extern SYS_FUNC(getresgid16);
 extern SYS_FUNC(getresuid16);

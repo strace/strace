@@ -469,6 +469,8 @@ extern const struct xlat whence_codes[];
 # define RVAL_SID	012	/* session ID */
 # define RVAL_TGID	013	/* thread group ID */
 # define RVAL_PGID	014	/* process group ID */
+# define RVAL_UID	015	/* user ID */
+# define RVAL_GID	016	/* group ID */
 # define RVAL_MASK	017	/* mask for these values */
 
 # define RVAL_STR	020	/* Print `auxstr' field after return val */

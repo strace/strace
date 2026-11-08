@@ -1001,7 +1001,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	PRINT_FIELD_U(info, load_time);
 	print_boottime(info.load_time);
 	tprint_struct_next();
-	PRINT_FIELD_ID(info, created_by_uid);
+	PRINT_FIELD_UID(info, created_by_uid);
 
 	tprint_struct_next();
 	tprints_field_name("nr_map_ids");

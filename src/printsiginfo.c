@@ -65,7 +65,7 @@ printsigsource(struct tcb *tcp, const siginfo_t *sip)
 	tprint_struct_next();
 	PRINT_FIELD_TGID(*sip, si_pid, tcp);
 	tprint_struct_next();
-	PRINT_FIELD_ID(*sip, si_uid);
+	PRINT_FIELD_UID(*sip, si_uid);
 }
 
 static void

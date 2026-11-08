@@ -35,18 +35,18 @@ print_ipc_perm(const typeof_field(shmid_ds_t, shm_perm) *const p,
 	       const unsigned int cmd)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_ID(*p, uid);
+	PRINT_FIELD_UID(*p, uid);
 	tprint_struct_next();
-	PRINT_FIELD_ID(*p, gid);
+	PRINT_FIELD_GID(*p, gid);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_U(*p, mode, print_numeric_ll_umode_t);
 	if (cmd != IPC_SET) {
 		tprint_struct_next();
 		PRINT_FIELD_U(*p, key);
 		tprint_struct_next();
-		PRINT_FIELD_ID(*p, cuid);
+		PRINT_FIELD_UID(*p, cuid);
 		tprint_struct_next();
-		PRINT_FIELD_ID(*p, cgid);
+		PRINT_FIELD_GID(*p, cgid);
 	}
 	tprint_struct_end();
 }

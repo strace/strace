@@ -60,9 +60,9 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data,
 	tprint_struct_begin();
 	PRINT_FIELD_TGID(*uc, pid, tcp);
 	tprint_struct_next();
-	PRINT_FIELD_ID(*uc, uid);
+	PRINT_FIELD_UID(*uc, uid);
 	tprint_struct_next();
-	PRINT_FIELD_ID(*uc, gid);
+	PRINT_FIELD_GID(*uc, gid);
 	tprint_struct_end();
 }
 

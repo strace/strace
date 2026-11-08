@@ -698,9 +698,9 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
 			      uc, pid, len, PRINT_FIELD_TGID, tcp);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      uc, uid, len, PRINT_FIELD_ID);
+			      uc, uid, len, PRINT_FIELD_UID);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      uc, gid, len, PRINT_FIELD_ID);
+			      uc, gid, len, PRINT_FIELD_GID);
 	tprint_struct_end();
 }
 

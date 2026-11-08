@@ -23,6 +23,7 @@
 # define printuid	SIZEIFY(printuid)
 # define sys_chown	SIZEIFY(sys_chown)
 # define sys_fchown	SIZEIFY(sys_fchown)
+# define sys_getgid	SIZEIFY(sys_getgid)
 # define sys_getgroups	SIZEIFY(sys_getgroups)
 # define sys_getresgid	SIZEIFY(sys_getresgid)
 # define sys_getresuid	SIZEIFY(sys_getresuid)
@@ -62,7 +63,12 @@
 
 SYS_FUNC(getuid)
 {
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_UID;
+}
+
+SYS_FUNC(getgid)
+{
+	return RVAL_DECODED | RVAL_GID;
 }
 
 SYS_FUNC(setfsuid)
@@ -71,7 +77,7 @@ SYS_FUNC(setfsuid)
 	tprints_arg_name("fsuid");
 	printuid(tcp->u_arg[0]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_UID;
 }
 
 SYS_FUNC(setuid)
@@ -89,7 +95,7 @@ SYS_FUNC(setfsgid)
 	tprints_arg_name("fsgid");
 	printgid(tcp->u_arg[0]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_GID;
 }
 
 SYS_FUNC(setgid)
@@ -262,13 +268,13 @@ SYS_FUNC(fchown)
 void
 printuid(const unsigned int uid)
 {
-	PRINT_VAL_ID((uid_t) uid);
+	PRINT_VAL_UID((uid_t) uid);
 }
 
 void
 printgid(const unsigned int gid)
 {
-	PRINT_VAL_ID((gid_t) gid);
+	PRINT_VAL_GID((gid_t) gid);
 }
 
 static bool
