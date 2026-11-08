@@ -237,6 +237,12 @@ tprint_sysret_interrupted(void)
 			zero_extend_signed_to_ull(val_));		\
 	} while (0)
 
+# define PRINT_VAL_FD(val_)						\
+	do {								\
+		tprints_object_type("fd");				\
+		tprintf_object_field_string("raw", "%d", (val_));	\
+	} while (0)
+
 # define PRINT_VAL_ID(val_)						\
 	do {								\
 		if (sign_extend_unsigned_to_ll(val_) == -1LL)		\

@@ -1118,7 +1118,7 @@ print_assoc_type_string(const char *type, const char *str, const size_t len,
 void
 printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo)
 {
-	PRINT_VAL_D(fd);
+	PRINT_VAL_FD(fd);
 
 	char patha[PATH_MAX + 1];
 	bool deleted;
