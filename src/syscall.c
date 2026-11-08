@@ -801,7 +801,7 @@ static void
 print_erestart(unsigned long u_error, const char *err_long)
 {
 	tprints_sysret_next("retval");
-	tprint_sysret_pseudo_rval();
+	tprint_sysret_interrupted();
 
 	print_sysret_errno(u_error, err_long);
 }

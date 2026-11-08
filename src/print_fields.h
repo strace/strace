@@ -188,6 +188,12 @@ tprint_sysret_pseudo_rval(void)
 	STRACE_PRINTS("?");
 }
 
+static inline void
+tprint_sysret_interrupted(void)
+{
+	STRACE_PRINTS("?");
+}
+
 # define PRINT_VAL_D(val_)						\
 	do {								\
 		tprints_object_type("decimal");				\
