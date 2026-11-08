@@ -76,6 +76,16 @@ tprintf_object_field_string(const char *field, const char *fmt, ...)
 	va_end(args);
 }
 
+static inline void
+tprint_object_begin(void)
+{
+}
+
+static inline void
+tprint_object_end(void)
+{
+}
+
 extern void tprint_struct_begin(void);
 extern void tprint_struct_next(void);
 extern void tprint_struct_end(void);
