@@ -9,7 +9,9 @@
 #ifndef STRACE_PRINT_FIELDS_H
 # define STRACE_PRINT_FIELDS_H
 
+# include "gcc_compat.h"
 # include "static_assert.h"
+# include <stdarg.h>
 # include <string.h>
 
 # ifdef IN_STRACE
@@ -24,6 +26,7 @@
  * shared between strace and its tests.
  */
 #  define STRACE_PRINTF tprintf_string
+#  define STRACE_PRINTV(fmt_, args_) tvprintf(fmt_, args_)
 
 # else /* !IN_STRACE */
 
@@ -36,6 +39,7 @@
  * shared between strace and its tests.
  */
 #  define STRACE_PRINTF printf
+#  define STRACE_PRINTV(fmt_, args_) vprintf(fmt_, args_)
 
 #  define COLOR_ARGNAME 0
 #  define COLOR_ARGVAL 0
@@ -55,6 +59,22 @@
 
 # endif /* !IN_STRACE */
 
+static inline void
+tprints_object_type(const char *type)
+{
+	(void) type;
+}
+
+static inline void ATTRIBUTE_FORMAT((printf, 2, 3))
+tprintf_object_field_string(const char *field, const char *fmt, ...)
+{
+	va_list args;
+
+	(void) field;
+	va_start(args, fmt);
+	STRACE_PRINTV(fmt, args);
+	va_end(args);
+}
 
 extern void tprint_struct_begin(void);
 extern void tprint_struct_next(void);
@@ -156,21 +176,41 @@ tprint_sysret_pseudo_rval(void)
 	STRACE_PRINTS("?");
 }
 
-# define PRINT_VAL_D(val_)	\
-	STRACE_PRINTF("%lld", sign_extend_unsigned_to_ll(val_))
+# define PRINT_VAL_D(val_)						\
+	do {								\
+		tprints_object_type("decimal");				\
+		tprintf_object_field_string("raw", "%lld",		\
+			sign_extend_unsigned_to_ll(val_));		\
+	} while (0)
 
-# define PRINT_VAL_U(val_)	\
-	STRACE_PRINTF("%llu", zero_extend_signed_to_ull(val_))
+# define PRINT_VAL_U(val_)						\
+	do {								\
+		tprints_object_type("unsigned");			\
+		tprintf_object_field_string("raw", "%llu",		\
+			zero_extend_signed_to_ull(val_));		\
+	} while (0)
 
-# define PRINT_VAL_X(val_)	\
-	STRACE_PRINTF("%#llx", zero_extend_signed_to_ull(val_))
+# define PRINT_VAL_X(val_)						\
+	do {								\
+		tprints_object_type("hex");				\
+		tprintf_object_field_string("raw", "%#llx",		\
+			zero_extend_signed_to_ull(val_));		\
+	} while (0)
 
-# define PRINT_VAL_03O(val_)	\
-	STRACE_PRINTF("%#03llo", zero_extend_signed_to_ull(val_))
+# define PRINT_VAL_03O(val_)						\
+	do {								\
+		tprints_object_type("octal");				\
+		tprintf_object_field_string("raw", "%#03llo",		\
+			zero_extend_signed_to_ull(val_));		\
+	} while (0)
 
 # define PRINT_VAL_0X(val_)						\
-	STRACE_PRINTF("%#0*llx", (int) sizeof(val_) * 2,		\
-		      zero_extend_signed_to_ull(val_))
+	do {								\
+		tprints_object_type("hex");				\
+		tprintf_object_field_string("raw", "%#0*llx",		\
+			(int) sizeof(val_) * 2,				\
+			zero_extend_signed_to_ull(val_));		\
+	} while (0)
 
 # define PRINT_VAL_ID(val_)						\
 	do {								\

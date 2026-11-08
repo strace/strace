@@ -1814,6 +1814,7 @@ extern void printleader(struct tcb *);
 extern void line_ended(void);
 extern void tabto(void);
 extern void tprintf_string(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
+extern void tvprintf(const char *fmt, va_list args) ATTRIBUTE_FORMAT((printf, 1, 0));
 extern void tprints_string(const char *str);
 extern bool tprints_string_uncol(const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
