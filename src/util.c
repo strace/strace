@@ -428,7 +428,7 @@ printaddr64(const uint64_t addr)
 	if (!addr)
 		tprint_null();
 	else
-		PRINT_VAL_X(addr);
+		PRINT_VAL_ADDR(addr);
 }
 
 #define DEF_PRINTNUM(name, type, fmt) \

@@ -224,6 +224,13 @@ tprint_sysret_pseudo_rval(void)
 			zero_extend_signed_to_ull(val_));		\
 	} while (0)
 
+# define PRINT_VAL_ADDR(val_)						\
+	do {								\
+		tprints_object_type("addr");				\
+		tprintf_object_field_string("raw", "%#llx",		\
+			zero_extend_signed_to_ull(val_));		\
+	} while (0)
+
 # define PRINT_VAL_ID(val_)						\
 	do {								\
 		if (sign_extend_unsigned_to_ll(val_) == -1LL)		\
