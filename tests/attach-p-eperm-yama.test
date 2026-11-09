@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check hint_yama: scope >= 1 prints a hint; scope = 0 and missing file do not.
+# Check capability-dependent YAMA hints for strace -p EPERM diagnostics.
 #
 # Copyright (c) 2026 The strace developers.
 # All rights reserved.
@@ -13,8 +13,18 @@ helper='../../src/disable_ptrace'
 $helper true > /dev/null 2>&1 ||
 	skip_ "$helper does not work"
 
+[ -f /proc/self/status ] ||
+        framework_skip_ '/proc/self/status is not available'
+
+# CAP_SYS_PTRACE is bit 19, the high bit of the fifth hex digit from the right.
+# Use the helper to check capabilities in the same context as the inner strace.
+$helper grep -q '^CapEff:.*[89a-fA-F][[:xdigit:]]\{4\}$' /proc/self/status &&
+	cap_sys_ptrace=true ||
+	cap_sys_ptrace=false
+
 sleep "$TIMEOUT_DURATION" &
 victim_pid=$!
+trap 'kill "$victim_pid" 2> /dev/null; wait "$victim_pid" 2> /dev/null' 0
 
 check_eperm() {
 	grep -qE \
@@ -43,7 +53,7 @@ check_eperm ||
 grep -qF 'yama' "$LOG" &&
 	dump_log_and_fail_with "ptrace_scope == 0: unexpected YAMA hint"
 
-# Scenario 3: scope > 0 => YAMA hint emitted
+# Scenario 3: scope > 0 => hint unless CAP_SYS_PTRACE bypasses the restriction
 for i in 1 2 3; do
 	echo $i > "$OUT.scope"
 	$STRACE -o "$OUT.trace" --signal=none \
@@ -52,11 +62,16 @@ for i in 1 2 3; do
 		"$helper" "$STRACE_EXE" -p "$victim_pid" < "$OUT.scope" 2>"$LOG"
 	check_eperm ||
 		dump_log_and_fail_with "ptrace_scope == $i: missing EPERM message"
-	grep -qF "$STRACE_EXE: sysctl kernel.yama.ptrace_scope = $i may be restricting this attach" \
-		"$LOG" ||
-		dump_log_and_fail_with "ptrace_scope == $i: missing YAMA hint"
+	if [ "$i" -lt 3 ] && $cap_sys_ptrace; then
+		grep -qF 'yama' "$LOG" &&
+			dump_log_and_fail_with \
+				"ptrace_scope == $i: unexpected YAMA hint"
+	else
+		hint="$STRACE_EXE: sysctl kernel.yama.ptrace_scope = $i"
+		grep -qF "$hint may be restricting this attach" "$LOG" ||
+			dump_log_and_fail_with \
+				"ptrace_scope == $i: missing YAMA hint"
+	fi
 done
 
-kill "$victim_pid" 2>/dev/null
-wait "$victim_pid" 2>/dev/null
 exit 0
