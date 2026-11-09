@@ -408,12 +408,50 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 	free(buf);
 }
 
+struct iov_netlink_ctx {
+	int fd;
+	kernel_ulong_t pending_len;
+};
+
 static void
 iov_decode_netlink(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size,
 		   void *opaque_data)
 {
-	const int *const fdp = opaque_data;
-	decode_netlink(tcp, *fdp, addr, size);
+	struct iov_netlink_ctx *const ctx = opaque_data;
+
+	if (ctx->pending_len == DECODE_NETLINK_FRAMING_UNKNOWN) {
+		printstr_ex(tcp, addr, size, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (ctx->pending_len) {
+		kernel_ulong_t consumed = MIN(ctx->pending_len, size);
+		ctx->pending_len -= consumed;
+
+		const bool has_more = (size > consumed);
+		const bool can_advance = addr && addr + consumed >= addr;
+		if (has_more && can_advance)
+			tprint_array_begin();
+
+		printstr_ex(tcp, addr, consumed, QUOTE_FORCE_HEX);
+
+		if (!has_more)
+			return;
+		if (!can_advance) {
+			ctx->pending_len = DECODE_NETLINK_FRAMING_UNKNOWN;
+			return;
+		}
+		tprint_array_next();
+
+		addr += consumed;
+		size -= consumed;
+		ctx->pending_len = decode_netlink(tcp, ctx->fd, addr, size);
+
+		tprint_array_end();
+		return;
+	}
+
+	ctx->pending_len = decode_netlink(tcp, ctx->fd, addr, size);
 }
 
 void
@@ -431,6 +469,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
 	/* Assume that the descriptor is the 1st syscall argument. */
 	int fd = tcp->u_arg[0];
+	struct iov_netlink_ctx ctx = { .fd = fd, .pending_len = 0 };
 	const enum sock_proto proto =
 		(family == -1) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN;
 	const print_obj_by_addr_size_fn print_func =
@@ -448,7 +487,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprint_struct_next();
 	tprints_field_name("msg_iov");
 	tprint_iov_upto(tcp, msg->msg_iovlen,
-			ptr_to_kulong(msg->msg_iov), data_size, print_func, &fd);
+			ptr_to_kulong(msg->msg_iov), data_size, print_func, &ctx);
 	tprint_struct_next();
 	PRINT_FIELD_U(*msg, msg_iovlen);
 

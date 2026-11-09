@@ -697,7 +697,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	}
 }
 
-void
+kernel_ulong_t
 decode_netlink(struct tcb *const tcp,
 	       const int fd,
 	       kernel_ulong_t addr,
@@ -707,18 +707,24 @@ decode_netlink(struct tcb *const tcp,
 
 	if (family == NETLINK_KOBJECT_UEVENT) {
 		decode_netlink_kobject_uevent(tcp, addr, len);
-		return;
+		return 0;
 	}
 
 	struct nlmsghdr nlmsghdr;
 	bool is_array = false;
+	kernel_ulong_t pending_len = 0;
 
-	for (unsigned int elt = 0;
-	     fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
-	     ++elt) {
+	for (unsigned int elt = 0; ; ++elt) {
+		if (!fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array)) {
+			if (len)
+				pending_len = DECODE_NETLINK_FRAMING_UNKNOWN;
+			break;
+		}
+
 		/* elt starts with 0, hence elt + 1 */
 		if (sequence_truncation_needed(tcp, elt + 1)) {
 			tprint_more_data_follows();
+			pending_len = DECODE_NETLINK_FRAMING_UNKNOWN;
 			break;
 		}
 
@@ -726,11 +732,22 @@ decode_netlink(struct tcb *const tcp,
 		kernel_ulong_t next_addr = 0;
 		kernel_ulong_t next_len = 0;
 
-		if (nlmsghdr.nlmsg_len >= NLMSG_HDRLEN) {
-			next_len = (len >= nlmsg_len) ? len - nlmsg_len : 0;
-
-			if (next_len && addr + nlmsg_len > addr)
-				next_addr = addr + nlmsg_len;
+		if (nlmsghdr.nlmsg_len >= NLMSG_HDRLEN
+		    && nlmsg_len >= nlmsghdr.nlmsg_len) {
+			if (len >= nlmsg_len) {
+				next_len = len - nlmsg_len;
+				if (next_len) {
+					if (addr + nlmsg_len > addr)
+						next_addr = addr + nlmsg_len;
+					else
+						pending_len =
+							DECODE_NETLINK_FRAMING_UNKNOWN;
+				}
+			} else {
+				pending_len = nlmsg_len - len;
+			}
+		} else {
+			pending_len = DECODE_NETLINK_FRAMING_UNKNOWN;
 		}
 
 		if (!is_array && next_addr) {
@@ -752,4 +769,6 @@ decode_netlink(struct tcb *const tcp,
 	if (is_array) {
 		tprint_array_end();
 	}
+
+	return pending_len;
 }
