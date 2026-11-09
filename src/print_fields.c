@@ -21,6 +21,7 @@ tprint_struct_begin(void)
 void
 tprint_struct_next(void)
 {
+	tprint_object_end();
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS(", ");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
@@ -29,6 +30,7 @@ tprint_struct_next(void)
 void
 tprint_struct_end(void)
 {
+	tprint_object_end();
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS("}");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
@@ -45,6 +47,7 @@ tprint_union_begin(void)
 void
 tprint_union_next(void)
 {
+	tprint_object_end();
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS(", ");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
@@ -53,6 +56,7 @@ tprint_union_next(void)
 void
 tprint_union_end(void)
 {
+	tprint_object_end();
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS("}");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
@@ -348,6 +352,7 @@ tprints_field_name(const char *name)
 	STRACE_PRINT_COLOR_SEQ(COLOR_PUNCT);
 	STRACE_PRINTS("=");
 	STRACE_PRINT_COLOR_SEQ(COLOR_ARGVAL);
+	tprint_object_begin();
 }
 
 void
