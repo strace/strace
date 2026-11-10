@@ -80,7 +80,7 @@ SYS_FUNC(llseek)
 	} else {
 		/* result */
 		tprints_arg_next_name("result");
-		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
+		printnum_int64_u(tcp, tcp->u_arg[3]);
 
 		/* whence */
 		tprints_arg_next_name("whence");

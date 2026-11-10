@@ -283,7 +283,7 @@ bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
 		return decode_bitset(tcp, arg, evdev_ff_types,
 				     FF_MAX, "FF_???");
 	case EV_PWR:
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 	case EV_FF_STATUS:
 		return decode_bitset(tcp, arg, evdev_ff_status,
@@ -301,10 +301,10 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 	/* fixed-number fixed-length commands */
 	switch (code) {
 	case EVIOCGVERSION:
-		printnum_int(tcp, arg, "%#x");
+		printnum_int_x(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 	case EVIOCGEFFECTS:
-		printnum_int(tcp, arg, "%u");
+		printnum_int_u(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 	case EVIOCGID:
 		return getid_ioctl(tcp, arg);
@@ -377,7 +377,7 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_VAL_U(arg);
 		return RVAL_IOCTL_DECODED;
 	case EVIOCSCLOCKID:
-		printnum_int(tcp, arg, "%u");
+		printnum_int_u(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 	}
 

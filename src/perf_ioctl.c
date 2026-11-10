@@ -92,7 +92,7 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 
 	case PERF_EVENT_IOC_PERIOD:
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIu64);
+		printnum_int64_u(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 
@@ -124,7 +124,7 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 			return 0;
 
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIu64);
+		printnum_int64_u(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 

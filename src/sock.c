@@ -277,7 +277,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCSIFENCAP:
 	case SIOCSPGRP:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	case SIOCBRADDIF:

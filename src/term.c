@@ -414,15 +414,15 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case FIONBIO:
 	case FIOASYNC:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 	case TIOCPKT:
 		tprints_arg_next_name("mode");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 	case TIOCSPTLCK:
 		tprints_arg_next_name("lock");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	/* ioctls with an indirect parameter displayed as a char */

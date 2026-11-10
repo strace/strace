@@ -55,7 +55,7 @@ watchdog_ioctl(struct tcb *const tcp, const unsigned int code,
 	case WDIOC_SETTIMEOUT:
 	case WDIOC_SETPRETIMEOUT:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 	case WDIOC_SETOPTIONS:
 		tprints_arg_next_name("argp");

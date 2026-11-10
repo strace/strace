@@ -431,10 +431,9 @@ printaddr64(const uint64_t addr)
 		PRINT_VAL_X(addr);
 }
 
-#define DEF_PRINTNUM(name, type) \
+#define DEF_PRINTNUM(name, type, fmt) \
 bool									\
-printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
-		  const char *const fmt)				\
+printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr)	\
 {									\
 	type num;							\
 	if (umove_or_printaddr(tcp, addr, &num))			\
@@ -474,11 +473,15 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	return true;							\
 }
 
-DEF_PRINTNUM(int, int)
+DEF_PRINTNUM(int_d, int, "%d")
+DEF_PRINTNUM(int_u, int, "%u")
+DEF_PRINTNUM(int_x, int, "%#x")
 DEF_PRINTNUM_ADDR(int, unsigned int)
 DEF_PRINTPAIR(int, int)
-DEF_PRINTNUM(short, short)
-DEF_PRINTNUM(int64, uint64_t)
+DEF_PRINTNUM(short_u, short, "%hu")
+DEF_PRINTNUM(int64_d, uint64_t, "%" PRId64)
+DEF_PRINTNUM(int64_u, uint64_t, "%" PRIu64)
+DEF_PRINTNUM(int64_x, uint64_t, "%#" PRIx64)
 DEF_PRINTNUM_ADDR(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 

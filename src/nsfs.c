@@ -61,7 +61,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%#" PRIx64);
+		printnum_int64_x(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 	case NS_GET_PID_FROM_PIDNS:
 		tprints_arg_next_name("argp");

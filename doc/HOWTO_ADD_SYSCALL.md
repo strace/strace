@@ -90,7 +90,7 @@ SYS_FUNC(syscall_name)
 - `tprints_arg_next_name("name")` - Print next argument with name
 - `tprint_value_changed()` - Indicate value changed between phases
 - `print_timespec64(tcp, addr)` - Print timespec64 structure
-- `printnum_int(tcp, addr, format)` - Print integer from address
+- `printnum_int_d(tcp, addr)` - Print int in decimal from address
 
 **Example (simple syscall):**
 ```c

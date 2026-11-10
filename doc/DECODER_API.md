@@ -432,13 +432,26 @@ int print_quoted_cstring(const char *str, unsigned int size)
 Fetch single numeric value from tracee memory and print it:
 
 ```c
-void printnum_int(struct tcb *tcp, kernel_ulong_t addr,
-                  const char *fmt)
-    /* Fetch and print int with format string */
+void printnum_int_d(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int in decimal */
 
-void printnum_int64(struct tcb *tcp, kernel_ulong_t addr,
-                    const char *fmt)
-    /* Fetch and print int64 with format string */
+void printnum_int_u(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int in unsigned decimal */
+
+void printnum_int_x(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int in hexadecimal */
+
+void printnum_short_u(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print short in unsigned decimal */
+
+void printnum_int64_d(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int64 in decimal */
+
+void printnum_int64_u(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int64 in unsigned decimal */
+
+void printnum_int64_x(struct tcb *tcp, kernel_ulong_t addr)
+    /* Fetch and print int64 in hexadecimal */
 
 void printnum_fd(struct tcb *tcp, kernel_ulong_t addr)
     /* Fetch and print file descriptor */

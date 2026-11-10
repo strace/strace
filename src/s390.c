@@ -1292,7 +1292,7 @@ SYS_FUNC(s390_sthyi)
 		}
 
 		tprints_arg_next_name("return_code");
-		printnum_int64(tcp, return_code_ptr, "%" PRIu64);
+		printnum_int64_u(tcp, return_code_ptr);
 
 		tprints_arg_next_name("flags");
 		PRINT_VAL_X(flags);

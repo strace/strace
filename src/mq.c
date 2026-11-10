@@ -90,7 +90,7 @@ do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		PRINT_VAL_U(tcp->u_arg[2]);
 
 		tprints_arg_next_name("msg_prio");
-		printnum_int(tcp, tcp->u_arg[3], "%u");
+		printnum_int_u(tcp, tcp->u_arg[3]);
 
 		/*
 		 * Since the timeout parameter is read by the kernel

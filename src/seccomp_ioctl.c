@@ -142,7 +142,7 @@ seccomp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR:
 	case SECCOMP_IOCTL_NOTIF_ID_VALID:
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%#" PRIx64);
+		printnum_int64_x(tcp, arg);
 
 		return RVAL_IOCTL_DECODED;
 

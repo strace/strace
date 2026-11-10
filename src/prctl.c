@@ -232,7 +232,7 @@ print_get_uint_arg(struct tcb *tcp, const kernel_ulong_t addr, const char *name)
 		return 0;
 
 	tprints_arg_next_name(name);
-	printnum_int(tcp, addr, "%u");
+	printnum_int_u(tcp, addr);
 
 	return RVAL_DECODED;
 }
@@ -689,7 +689,7 @@ SYS_FUNC(prctl)
 			if (syserror(tcp))
 				printaddr(arg5);
 			else
-				printnum_int64(tcp, arg5, "%#" PRIx64);
+				printnum_int64_x(tcp, arg5);
 		}
 
 		return RVAL_DECODED;

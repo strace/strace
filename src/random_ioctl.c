@@ -33,7 +33,7 @@ random_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 	case RNDADDTOENTCNT:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	case RNDADDENTROPY:

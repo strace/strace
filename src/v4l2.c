@@ -1677,7 +1677,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%#" PRIx64);
+		printnum_int64_x(tcp, arg);
 		break;
 
 	case VIDIOC_ENUMSTD: /* RW */
@@ -1706,7 +1706,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%u");
+		printnum_int_u(tcp, arg);
 		break;
 
 	case VIDIOC_CROPCAP: /* RW */

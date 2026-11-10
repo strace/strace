@@ -299,7 +299,7 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 	case MEMGETBADBLOCK:
 	case MEMSETBADBLOCK:
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIu64);
+		printnum_int64_u(tcp, arg);
 		break;
 
 	case MEMGETINFO:
@@ -334,14 +334,14 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%u");
+		printnum_int_u(tcp, arg);
 		break;
 
 	case MEMGETREGIONCOUNT:
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	case MEMGETREGIONINFO:

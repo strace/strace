@@ -90,7 +90,7 @@ SYS_FUNC(name_to_handle_at)
 
 		/* mount_id */
 		tprints_arg_next_name("mount_id");
-		printnum_int(tcp, tcp->u_arg[3], "%d");
+		printnum_int_d(tcp, tcp->u_arg[3]);
 
 		/* flags */
 		tprints_arg_next_name("flags");

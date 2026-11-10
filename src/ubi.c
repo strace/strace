@@ -49,7 +49,7 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!syserror(tcp)) {
 		tprint_value_changed();
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -156,7 +156,7 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!syserror(tcp)) {
 		tprint_value_changed();
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -214,7 +214,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	case UBI_IOCVOLUP:
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIi64);
+		printnum_int64_d(tcp, arg);
 		break;
 
 	case UBI_IOCDET:
@@ -225,7 +225,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UBI_IOCRPEB:
 	case UBI_IOCSPEB:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	case UBI_IOCVOLCRBLK:

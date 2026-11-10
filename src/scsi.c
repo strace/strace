@@ -133,7 +133,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SG_SET_RESERVED_SIZE:
 	case SG_SET_TIMEOUT:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	/* returns a signed int by pointer */
@@ -151,7 +151,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	/* takes an integer by value */

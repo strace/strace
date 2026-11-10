@@ -554,7 +554,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_DEFAULT_SUBVOL: /* W */
 	case BTRFS_IOC_WAIT_SYNC: /* W */
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIu64);
+		printnum_int64_u(tcp, arg);
 		break;
 
 	/* u64 but describe a flags bitfield; we can make that symbolic */

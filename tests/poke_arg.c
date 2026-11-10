@@ -289,7 +289,7 @@ main(int argc, char *argv[])
 	 * arg5=0xdeadbeef, arg6=0xf
 	 *
 	 * printfd truncates to int;
-	 * printnum_int64 with invalid address prints printaddr;
+	 * printnum_int64_d with invalid address prints printaddr;
 	 * PRINT_VAL_U zero-extends to unsigned long long;
 	 * printflags truncates to unsigned int.
 	 */
@@ -326,7 +326,7 @@ main(int argc, char *argv[])
 	 * arg1=-1, arg2=-2, arg3=-3, arg4=-4, arg5=-5, arg6=-6
 	 *
 	 * printfd truncates to int: -1, -3;
-	 * printnum_int64 with invalid address: printaddr of
+	 * printnum_int64_d with invalid address: printaddr of
 	 * kernel_ulong_t value;
 	 * PRINT_VAL_U zero-extends kernel_ulong_t to ull;
 	 * printflags truncates to unsigned int.

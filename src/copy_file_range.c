@@ -16,7 +16,7 @@ SYS_FUNC(copy_file_range)
 
 	/* loff_t *off_in */
 	tprints_arg_next_name("off_in");
-	printnum_int64(tcp, tcp->u_arg[1], "%" PRId64);
+	printnum_int64_d(tcp, tcp->u_arg[1]);
 
 	/* int fd_out */
 	tprints_arg_next_name("fd_out");
@@ -24,7 +24,7 @@ SYS_FUNC(copy_file_range)
 
 	/* loff_t *off_out */
 	tprints_arg_next_name("off_out");
-	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
+	printnum_int64_d(tcp, tcp->u_arg[3]);
 
 	/* size_t len */
 	tprints_arg_next_name("len");

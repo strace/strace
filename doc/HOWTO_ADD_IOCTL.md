@@ -470,7 +470,7 @@ the argument, `SYS_FUNC(ioctl)` prints it instead:
 ```c
 case SUBSYS_GET_VALUE:
 	tprints_arg_next_name("argp");
-	printnum_int(tcp, arg, "%d");
+	printnum_int_d(tcp, arg);
 	break;
 ```
 
@@ -548,7 +548,7 @@ case SUBSYS_READ_VALUE:
 	ATTRIBUTE_FALLTHROUGH;
 case SUBSYS_WRITE_VALUE:
 	tprints_arg_next_name("argp");
-	printnum_int(tcp, arg, "%d");
+	printnum_int_d(tcp, arg);
 	break;
 ```
 

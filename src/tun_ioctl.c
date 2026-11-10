@@ -116,7 +116,7 @@ tun_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TUNSETVNETBE:
 	case TUNSETCARRIER:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 
 	/* pointer-to-fd write ioctls */
@@ -147,7 +147,7 @@ tun_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 
 	/* pointer-to-uint read ioctl (flags) */

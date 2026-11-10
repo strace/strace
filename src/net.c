@@ -1082,7 +1082,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_INQ:
 		case SO_RIGHTS_NOTRUNC:
 			if (rlen >= (int) sizeof(int))
-				printnum_int(tcp, addr, "%d");
+				printnum_int_d(tcp, addr);
 			else
 				printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
 			return;
@@ -1137,7 +1137,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			break;
 			}
 		default:
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 			break;
 		}
 		return;
@@ -1151,7 +1151,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			print_tipc_group_join(tcp, addr, rlen);
 			break;
 		default:
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 			break;
 		}
 		return;
@@ -1161,7 +1161,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 
 	if (verbose(tcp)) {
 		if (rlen == sizeof(int)) {
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 		} else {
 			printstrn(tcp, addr, rlen);
 		}
@@ -1410,7 +1410,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 			if (len < (int) sizeof(int))
 				printaddr(addr);
 			else
-				printnum_int(tcp, addr, "%d");
+				printnum_int_d(tcp, addr);
 			return;
 		}
 		break;
@@ -1471,7 +1471,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		if (len < (int) sizeof(int))
 			printaddr(addr);
 		else
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 		return;
 
 	case SOL_TCP:
@@ -1491,7 +1491,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 			print_tipc_group_join(tcp, addr, len);
 			break;
 		default:
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 			break;
 		}
 		return;
@@ -1501,7 +1501,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 	if (verbose(tcp)) {
 		if (len == sizeof(int)) {
-			printnum_int(tcp, addr, "%d");
+			printnum_int_d(tcp, addr);
 		} else {
 			printstrn(tcp, addr, len);
 		}

@@ -12,11 +12,11 @@ SYS_FUNC(getcpu)
 	if (exiting(tcp)) {
 		/* cpu */
 		tprints_arg_name("cpu");
-		printnum_int(tcp, tcp->u_arg[0], "%u");
+		printnum_int_u(tcp, tcp->u_arg[0]);
 
 		/* node */
 		tprints_arg_next_name("node");
-		printnum_int(tcp, tcp->u_arg[1], "%u");
+		printnum_int_u(tcp, tcp->u_arg[1]);
 
 		/* tcache */
 		tprints_arg_next_name("tcache");

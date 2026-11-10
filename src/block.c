@@ -74,7 +74,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_short(tcp, arg, "%hu");
+		printnum_short_u(tcp, arg);
 		break;
 
 	/* return a signed int */
@@ -89,7 +89,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKROSET:
 	case BLKBSZSET:
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%d");
+		printnum_int_d(tcp, arg);
 		break;
 
 	/* return an unsigned int */
@@ -102,7 +102,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int(tcp, arg, "%u");
+		printnum_int_u(tcp, arg);
 		break;
 
 	/* return a signed long */
@@ -128,7 +128,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		if (entering(tcp))
 			return 0;
 		tprints_arg_next_name("argp");
-		printnum_int64(tcp, arg, "%" PRIu64);
+		printnum_int64_u(tcp, arg);
 		break;
 
 	/* takes a pair of uint64_t */

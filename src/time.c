@@ -467,7 +467,7 @@ SYS_FUNC(timer_create)
 	} else {
 		/* timerid */
 		tprints_arg_next_name("timerid");
-		printnum_int(tcp, tcp->u_arg[2], "%d");
+		printnum_int_d(tcp, tcp->u_arg[2]);
 	}
 	return 0;
 }

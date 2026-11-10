@@ -17,7 +17,7 @@ print_args_size_flags(struct tcb *const tcp, const kernel_ulong_t p_size,
 		      const uint32_t flags, const bool raw_flags)
 {
 	tprints_arg_next_name("size");
-	printnum_int(tcp, p_size, "%u");
+	printnum_int_u(tcp, p_size);
 
 	tprints_arg_next_name("flags");
 	if (raw_flags)
