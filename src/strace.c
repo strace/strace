@@ -3960,19 +3960,32 @@ next_event(void)
 				} else if (sig == syscall_trap_sig) {
 					wd->te = TE_SYSCALL_STOP;
 				} else {
-					/*
-					 * True if tracee is stopped by signal
-					 * (as opposed to "tracee received
-					 * signal").
-					 * TODO: shouldn't we check for
-					 * errno == EINVAL too?
-					 * We can get ESRCH instead, you know...
-					 */
-					bool stopped = ptrace(PTRACE_GETSIGINFO,
-						pid, 0, &wd->si) < 0;
-
-					wd->te = stopped ? TE_GROUP_STOP
-							 : TE_SIGNAL_DELIVERY_STOP;
+					if (ptrace(PTRACE_GETSIGINFO,
+						   pid, 0, &wd->si) == 0) {
+						wd->te =
+							TE_SIGNAL_DELIVERY_STOP;
+					} else if (errno == EINVAL) {
+						/*
+						 * The kernel returns EINVAL if
+						 * last_siginfo is NULL, as in a
+						 * legacy group-stop.
+						 */
+						wd->te = TE_GROUP_STOP;
+					} else if (errno == ESRCH) {
+						/*
+						 * The task may still exist but
+						 * not be in ptrace-stop, or
+						 * have a fatal signal pending.
+						 * Ignore this stale stop and
+						 * wait for the next event, not
+						 * restart the tracee.
+						 */
+						wd->te = TE_NEXT;
+					} else {
+						perror_msg_and_die(
+							"PTRACE_GETSIGINFO: %d",
+							pid);
+					}
 				}
 				break;
 			case PTRACE_EVENT_STOP:

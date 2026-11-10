@@ -920,6 +920,7 @@ EXTRA_DIST = \
 	gen_tests.in \
 	gen_tests.sh \
 	getresugid.c \
+	getsiginfo-esrch.sh \
 	init_delete_module.h \
 	ioctl_kvm_run_common.c \
 	kernel_old_timespec.h \

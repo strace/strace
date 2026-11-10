@@ -291,6 +291,8 @@ getrlimit	-a27 'QUIRK:START-OF-TEST-OUTPUT:getrlimit(0x10 /* RLIMIT_??? */, NULL
 getrusage	-v
 getsid	-a10
 getsid--pidns-translation	test_pidns -e trace=getsid -a10
+getsiginfo-esrch	+getsiginfo-esrch.sh
+getsiginfo-esrch--seccomp-bpf	+getsiginfo-esrch.sh --seccomp-bpf
 getsockname	-a27
 getsockname--secontext	-a27 --secontext -e trace=getsockname
 getsockname--secontext_full	-a27 --secontext=full -e trace=getsockname
