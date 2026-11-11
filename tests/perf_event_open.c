@@ -521,7 +521,8 @@ main(void)
 	static const size_t attr_v8_size = PERF_ATTR_SIZE_VER8;
 	static const size_t attr_v8_5_size = PERF_ATTR_SIZE_VER8 + 4;
 	static const size_t attr_v9_size = PERF_ATTR_SIZE_VER9;
-	static const size_t attr_big_size = PERF_ATTR_SIZE_VER9 + 32;
+	static const size_t attr_v10_size = PERF_ATTR_SIZE_VER10;
+	static const size_t attr_big_size = PERF_ATTR_SIZE_VER10 + 32;
 
 	static const struct strval64 attr_types[] = {
 		{ ARG_STR(PERF_TYPE_HARDWARE) },
@@ -677,6 +678,23 @@ main(void)
 		ATTR_REC(attr_v8_size),
 		ATTR_REC(attr_v8_5_size),
 		ATTR_REC(attr_v9_size),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 1),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 2),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 3),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 4),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 5),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 6),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 7),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 8),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 9),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 12),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 13),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 16),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 17),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 24),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 25),
+		ATTR_REC(PERF_ATTR_SIZE_VER9 + 31),
+		ATTR_REC(attr_v10_size),
 		ATTR_REC(attr_big_size),
 	};
 
@@ -767,18 +785,30 @@ main(void)
 		if (((i % 23) == 7) && (size >= 120))
 			((uint32_t *) attr)[116 / sizeof(uint32_t)] = 0;
 
+		if (((i % 3) == 0) && (size >= 146))
+			attr->sample_simd_regs_enabled = 0;
+
+		if (((i % 5) == 0) && (size >= 152))
+			attr->__reserved_4 = 0;
+
 		if (i == 0)
 			attr->size = size + 8;
 
 		if (i == 1)
 			attr->size = 0;
 
+		/* The declared structure extends into an inaccessible page. */
+		if (i == 2)
+			attr->size = attr_v10_size;
+
+		const uint32_t declared_size = attr->size;
+
 		rc = syscall(__NR_perf_event_open, attr, args[args_idx].pid,
 			     args[args_idx].cpu, args[args_idx].group_fd,
 			     args[args_idx].flags);
 
 		printf("perf_event_open(");
-		print_event_attr(attr, i ? ((i == 1) ? 0 : size) : size + 8,
+		print_event_attr(attr, declared_size,
 				 attr_types[type_idx].str,
 				 attr_configs[type_idx][config_idx].str,
 				 sample_types[sample_type_idx].str,
