@@ -106,6 +106,15 @@ struct perf_event_attr {
 	/* End of ver 8 - 136 bytes */
 	uint64_t config4;
 	/* End of ver 9 - 144 bytes */
+	uint16_t sample_simd_regs_enabled;
+	uint16_t sample_simd_pred_reg_qwords;
+	uint16_t sample_simd_vec_reg_qwords;
+	uint16_t __reserved_4;
+	uint32_t sample_simd_pred_reg_intr;
+	uint32_t sample_simd_pred_reg_user;
+	uint64_t sample_simd_vec_reg_intr;
+	uint64_t sample_simd_vec_reg_user;
+	/* End of ver 10 - 176 bytes */
 };
 
 struct perf_event_query_bpf {

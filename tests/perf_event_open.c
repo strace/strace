@@ -118,13 +118,13 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	const char *clockid, uint32_t available_size)
 {
 	/*
-	 * Currently, strace supports version 5 of the structure, which is
-	 * 112 bytes in size.
+	 * Currently, strace supports version 10 of the structure, which is
+	 * 176 bytes in size.
 	 */
 	enum {
 		STRACE_PEA_ABBREV_SIZE =
 			offsetof(struct perf_event_attr, wakeup_events),
-		STRACE_PEA_SIZE = 144,
+		STRACE_PEA_SIZE = 176,
 	};
 
 	uint32_t read_size;
@@ -389,6 +389,71 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 
 	val = attr->config4;
 	printf(", config4=%#" PRIx64, (uint64_t) val);
+
+	if (size <= 144) {
+		cutoff = 144;
+		goto end;
+	}
+
+	printf(", sample_simd_regs_enabled=%" PRIu16,
+	       (uint16_t) attr->sample_simd_regs_enabled);
+
+	if (size <= 146) {
+		cutoff = 146;
+		goto end;
+	}
+
+	printf(", sample_simd_pred_reg_qwords=%" PRIu16,
+	       (uint16_t) attr->sample_simd_pred_reg_qwords);
+
+	if (size <= 148) {
+		cutoff = 148;
+		goto end;
+	}
+
+	printf(", sample_simd_vec_reg_qwords=%" PRIu16,
+	       (uint16_t) attr->sample_simd_vec_reg_qwords);
+
+	if (size <= 150) {
+		cutoff = 150;
+		goto end;
+	}
+
+	if (attr->__reserved_4)
+		printf(" /* bytes 150..151: %#" PRIx16 " */",
+		       (uint16_t) attr->__reserved_4);
+
+	if (size <= 152) {
+		cutoff = 152;
+		goto end;
+	}
+
+	printf(", sample_simd_pred_reg_intr=%#" PRIx32,
+	       (uint32_t) attr->sample_simd_pred_reg_intr);
+
+	if (size <= 156) {
+		cutoff = 156;
+		goto end;
+	}
+
+	printf(", sample_simd_pred_reg_user=%#" PRIx32,
+	       (uint32_t) attr->sample_simd_pred_reg_user);
+
+	if (size <= 160) {
+		cutoff = 160;
+		goto end;
+	}
+
+	printf(", sample_simd_vec_reg_intr=%#" PRIx64,
+	       (uint64_t) attr->sample_simd_vec_reg_intr);
+
+	if (size <= 168) {
+		cutoff = 168;
+		goto end;
+	}
+
+	printf(", sample_simd_vec_reg_user=%#" PRIx64,
+	       (uint64_t) attr->sample_simd_vec_reg_user);
 
 	cutoff = STRACE_PEA_SIZE;
 
