@@ -26,6 +26,8 @@
 #include "xlat/uring_register_opcodes.h"
 #include "xlat/uring_register_opcode_flags.h"
 #include "xlat/uring_register_rsrc_flags.h"
+#include "xlat/uring_rsrc_update_flags.h"
+#include "xlat/uring_regbuf_types.h"
 #include "xlat/uring_restriction_opcodes.h"
 #include "xlat/uring_napi_ops.h"
 #include "xlat/uring_napi_tracking_strategies.h"
@@ -416,9 +418,39 @@ print_io_uring_restrictions(struct tcb *tcp, const kernel_ulong_t addr,
 		    tfetch_mem, print_io_uring_restriction, NULL);
 }
 
+static bool
+print_io_uring_regbuf_desc(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	const struct io_uring_regbuf_desc *desc = elem_buf;
+	CHECK_TYPE_SIZE(*desc, 80);
+	CHECK_TYPE_SIZE(desc->__resv, 6 * sizeof(uint64_t));
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*desc, type, uring_regbuf_types, "IO_REGBUF_TYPE_???");
+	tprint_struct_next();
+	PRINT_FIELD_X(*desc, flags);
+	tprint_struct_next();
+	PRINT_FIELD_U(*desc, size);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*desc, uaddr);
+	tprint_struct_next();
+	PRINT_FIELD_FD(*desc, dmabuf_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_FD(*desc, target_fd, tcp);
+	if (!IS_ARRAY_ZERO(desc->__resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*desc, __resv, tcp, print_xint_array_member);
+	}
+	tprint_struct_end();
+
+	return true;
+}
+
 static void
 print_io_uring_rsrc_data(struct tcb *tcp, const uint64_t data,
-			 const unsigned int nr, const unsigned int opcode)
+			const unsigned int nr, const unsigned int opcode,
+			const unsigned int flags)
 {
 	int fd_buf;
 
@@ -444,7 +476,15 @@ print_io_uring_rsrc_data(struct tcb *tcp, const uint64_t data,
 		break;
 	case IORING_REGISTER_BUFFERS2:
 	case IORING_REGISTER_BUFFERS_UPDATE:
-		tprint_iov(tcp, nr, data, iov_decode_addr);
+		if (opcode == IORING_REGISTER_BUFFERS_UPDATE &&
+		    (flags & IORING_RSRC_UPDATE_EXTENDED)) {
+			struct io_uring_regbuf_desc desc;
+
+			print_array(tcp, data, nr, &desc, sizeof(desc),
+				    tfetch_mem, print_io_uring_regbuf_desc, NULL);
+		} else {
+			tprint_iov(tcp, nr, data, iov_decode_addr);
+		}
 		break;
 	}
 }
@@ -490,7 +530,7 @@ print_io_uring_register_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_X(arg, resv2);
 	}
 
-	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode);
+	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode, 0);
 
 	print_io_uring_rsrc_tags(tcp, arg.tags, arg.nr);
 
@@ -523,9 +563,10 @@ print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_U(arg, offset);
 
 	tprint_struct_next();
-	PRINT_FIELD_X(arg, flags);
+	PRINT_FIELD_FLAGS(arg, flags, uring_rsrc_update_flags,
+			  "IORING_RSRC_UPDATE_???");
 
-	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode);
+	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode, arg.flags);
 
 	print_io_uring_rsrc_tags(tcp, arg.tags, arg.nr);
 

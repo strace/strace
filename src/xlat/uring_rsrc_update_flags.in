@@ -1,0 +1,4 @@
+#unconditional
+#From include/uapi/linux/io_uring.h
+#Prefix IORING_RSRC_UPDATE_
+IORING_RSRC_UPDATE_EXTENDED

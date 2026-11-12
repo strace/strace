@@ -787,7 +787,10 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 				       XLAT_SEL(rsrc_upd_ops[i].val,
 						rsrc_upd_ops[i].str),
 				       j % 3 ? "0" : "3735943886",
-				       j & 64 ? "0xbadc0ded" : "0");
+				       j & 64
+					 ? XLAT_UNKNOWN(0xbadc0ded,
+							"IORING_RSRC_UPDATE_???")
+					 : "0");
 				print_rsrc_data(arg_iov, iov, arg_fds, fds,
 						i, j, endptr, true);
 				print_rsrc_tags(arg_tags, tags, i, j,
@@ -810,6 +813,158 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 			}
 		}
 	}
+
+static void
+print_regbuf_desc(const struct io_uring_regbuf_desc *desc, int fd_null,
+		  int fd_full)
+{
+	static const char *const types[] = {
+		XLAT_KNOWN(0, "IO_REGBUF_TYPE_EMPTY"),
+		XLAT_KNOWN(0x1, "IO_REGBUF_TYPE_UADDR"),
+		XLAT_KNOWN(0x2, "IO_REGBUF_TYPE_DMABUF"),
+		XLAT_UNKNOWN(0x3, "IO_REGBUF_TYPE_???"),
+	};
+
+	printf("{type=%s, flags=%#x, size=%" PRIu64 ", uaddr=",
+	       types[desc->type], desc->flags, (uint64_t) desc->size);
+	if (desc->uaddr)
+		printf("%#" PRIx64, (uint64_t) desc->uaddr);
+	else
+		printf("NULL");
+	printf(", dmabuf_fd=");
+	if (desc->dmabuf_fd >= 0)
+		printf("%d<%s>", fd_null, path_null);
+	else
+		printf("%d", desc->dmabuf_fd);
+	printf(", target_fd=");
+	if (desc->target_fd >= 0)
+		printf("%d<%s>", fd_full, path_full);
+	else
+		printf("%d", desc->target_fd);
+	if (desc->__resv[0])
+		printf(", __resv=[0xdeadbeef, 0, 0, 0, 0, 0xfacefeed]");
+	printf("}");
+}
+
+static void
+test_IORING_REGISTER_BUFFERS_UPDATE_EXTENDED(int fd_null, int fd_full)
+{
+	static const struct strval32 flags[] = {
+		{ ARG_XLAT_KNOWN(0x2, "IORING_RSRC_UPDATE_EXTENDED") },
+		{ ARG_XLAT_KNOWN(0x3, "IORING_RSRC_UPDATE_EXTENDED|0x1") },
+		{ ARG_XLAT_KNOWN(0x80000002,
+				 "IORING_RSRC_UPDATE_EXTENDED|0x80000000") },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct io_uring_rsrc_update2, up);
+	struct io_uring_regbuf_desc *const desc =
+		tail_alloc((DEFAULT_STRLEN + 1) * sizeof(*desc));
+	struct io_uring_regbuf_desc *const end = desc + DEFAULT_STRLEN + 1;
+
+	memset(desc, 0, (DEFAULT_STRLEN + 1) * sizeof(*desc));
+	for (unsigned int i = 0; i <= DEFAULT_STRLEN; ++i) {
+		desc[i].type = i % 4;
+		desc[i].dmabuf_fd = -1;
+		desc[i].target_fd = -2;
+		switch (desc[i].type) {
+		case IO_REGBUF_TYPE_UADDR:
+			desc[i].uaddr = 0xfacefeedcafef00dULL;
+			desc[i].size = 0xdeadfacebeefcafeULL;
+			break;
+		case IO_REGBUF_TYPE_DMABUF:
+			desc[i].dmabuf_fd = fd_null;
+			desc[i].target_fd = fd_full;
+			break;
+		case __IO_REGBUF_TYPE_MAX:
+			desc[i].flags = 0xbadc0ded;
+			desc[i].__resv[0] = 0xdeadbeef;
+			desc[i].__resv[5] = 0xfacefeed;
+			break;
+		}
+	}
+
+	const struct {
+		const void *data;
+		unsigned int nr;
+		unsigned int readable;
+	} args[] = {
+		{ NULL, 1, 0 },
+		{ end, 1, 0 },
+		{ (const char *) end - sizeof(*desc) + 1, 1, 0 },
+		{ end, 0, 0 },
+		{ desc, 4, 4 },
+		{ end - 4, 5, 4 },
+		{ desc, DEFAULT_STRLEN + 1, DEFAULT_STRLEN },
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); ++i) {
+		for (unsigned int j = 0; j < ARRAY_SIZE(args); ++j) {
+			for (unsigned int k = 0; k <= !!BIG_ADDR_MASK; ++k) {
+				*up = (struct io_uring_rsrc_update2) {
+					.offset = 0xdeadface,
+					.flags = flags[i].val,
+					.data = (uintptr_t) args[j].data
+						| (k ? BIG_ADDR_MASK : 0),
+					.nr = args[j].nr,
+				};
+				sys_io_uring_register(fd_null,
+						      IORING_REGISTER_BUFFERS_UPDATE,
+						      up, sizeof(*up));
+				printf("io_uring_register(%d<%s>, "
+				       XLAT_KNOWN(0x10,
+						  "IORING_REGISTER_BUFFERS_UPDATE")
+				       ", {offset=3735943886, flags=%s, data=",
+				       fd_null, path_null, flags[i].str);
+				if (k)
+					printf("%#" PRIx64 " or ",
+					       (uint64_t) up->data);
+				if (!args[j].data) {
+					printf("NULL");
+				} else if (args[j].nr && !args[j].readable) {
+					printf("%p", args[j].data);
+				} else {
+					const struct io_uring_regbuf_desc *p =
+						args[j].data;
+
+					printf("[");
+					for (unsigned int n = 0;
+					     n < args[j].readable; ++n) {
+						if (n)
+							printf(", ");
+						print_regbuf_desc(p + n,
+								  fd_null,
+								  fd_full);
+					}
+					if (args[j].nr > DEFAULT_STRLEN)
+						printf(", ...");
+					else if (args[j].nr > args[j].readable)
+						printf(", ... /* %p */",
+						       (const void *) end);
+					printf("]");
+				}
+				printf(", tags=NULL, nr=%u}, %zu) = %s\n",
+				       up->nr, sizeof(*up), errstr);
+			}
+		}
+	}
+
+	/* The extended bit must not change file-update data into descriptors. */
+	const int fds[] = { fd_null, fd_full, -1, -2 };
+	up->data = (uintptr_t) fds;
+	up->nr = ARRAY_SIZE(fds);
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); ++i) {
+		up->flags = flags[i].val;
+		sys_io_uring_register(fd_null, IORING_REGISTER_FILES_UPDATE2,
+				      up, sizeof(*up));
+		printf("io_uring_register(%d<%s>, "
+		       XLAT_KNOWN(0xe, "IORING_REGISTER_FILES_UPDATE2")
+		       ", {offset=3735943886, flags=%s, data=[%d<%s>, %d<%s>"
+		       ", -1, " XLAT_KNOWN(-2, "IORING_REGISTER_FILES_SKIP")
+		       "], tags=NULL, nr=4}, %zu) = %s\n",
+		       fd_null, path_null, flags[i].str,
+		       fd_null, path_null, fd_full, path_full,
+		       sizeof(*up), errstr);
+	}
+}
 
 static void
 test_IORING_REGISTER_IOWQ_AFF(int fd_null)
@@ -3075,6 +3230,7 @@ main(void)
 							  ARRAY_SIZE(iov),
 							  arg_fds, fds,
 							  ARRAY_SIZE(fds));
+	test_IORING_REGISTER_BUFFERS_UPDATE_EXTENDED(fd_null, fd_full);
 	test_IORING_REGISTER_IOWQ_AFF(fd_null);
 	test_IORING_REGISTER_IOWQ_MAX_WORKERS(fd_null);
 	test_IORING_REGISTER_RING_FDS(fd_null, fds, paths, ARRAY_SIZE(fds));
