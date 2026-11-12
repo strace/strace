@@ -767,7 +767,7 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 			rsrc_upd->nr += !!(j & 16);
 			rsrc_upd->nr &= ~-!(j & 32);
 
-			rsrc_upd->resv = j & 64 ? 0xbadc0ded : 0;
+			rsrc_upd->flags = j & 64 ? 0xbadc0ded : 0;
 			rsrc_upd->resv2 = j & 128 ? 0xfacecafe : 0;
 
 			rsrc_upd->offset = j % 3 ? 0 : 0xdeadface;
@@ -782,12 +782,12 @@ test_IORING_REGISTER_FILES_UPDATE2_BUFFERS_UPDATE(int fd_null,
 						      sizeof(*rsrc_upd)
 						      + (k / 2) * 8);
 				printf("io_uring_register(%u<%s>, " XLAT_FMT
-				       ", {offset=%s%s",
+				       ", {offset=%s, flags=%s",
 				       fd_null, path_null,
 				       XLAT_SEL(rsrc_upd_ops[i].val,
 						rsrc_upd_ops[i].str),
 				       j % 3 ? "0" : "3735943886",
-				       j & 64 ? ", resv=0xbadc0ded" : "");
+				       j & 64 ? "0xbadc0ded" : "0");
 				print_rsrc_data(arg_iov, iov, arg_fds, fds,
 						i, j, endptr, true);
 				print_rsrc_tags(arg_tags, tags, i, j,

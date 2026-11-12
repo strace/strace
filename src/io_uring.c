@@ -508,7 +508,7 @@ print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 {
 	struct io_uring_rsrc_update2 arg;
 	CHECK_TYPE_SIZE(arg, 32);
-	CHECK_TYPE_SIZE(arg.resv, sizeof(uint32_t));
+	CHECK_TYPE_SIZE(arg.flags, sizeof(uint32_t));
 	CHECK_TYPE_SIZE(arg.resv2, sizeof(uint32_t));
 
 	if (size < 32) {
@@ -522,10 +522,8 @@ print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_U(arg, offset);
 
-	if (arg.resv) {
-		tprint_struct_next();
-		PRINT_FIELD_X(arg, resv);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(arg, flags);
 
 	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode);
 
