@@ -2309,33 +2309,44 @@ test_IORING_REGISTER_QUERY(int fd_null)
 	memset(opcode_data, 0, sizeof(*opcode_data));
 	opcode_data->nr_request_opcodes = 50;
 	opcode_data->nr_register_opcodes = 20;
-	opcode_data->feature_flags = IORING_FEAT_SINGLE_MMAP;
 	opcode_data->ring_setup_flags = IORING_SETUP_SQPOLL;
 	opcode_data->enter_flags = IORING_ENTER_GETEVENTS;
 	opcode_data->sqe_flags = IOSQE_IO_DRAIN;
 	opcode_data->nr_query_opcodes = 3;
 	opcode_data->__pad = 0;
 
-	sys_io_uring_register(fd_null, query_ops.val, hdr, 0);
-	printf("io_uring_register(%u<%s>, " XLAT_FMT
-	       ", {query_data=%p, query_op=" XLAT_FMT ", size=%u, result=0"
-	       ", query_data={nr_request_opcodes=%u, nr_register_opcodes=%u"
-	       ", feature_flags=" XLAT_FMT ", ring_setup_flags=" XLAT_FMT
-	       ", enter_flags=" XLAT_FMT ", sqe_flags=" XLAT_FMT
-	       ", nr_query_opcodes=%u}, next_entry=NULL}, 0) = %s\n",
-	       fd_null, path_null,
-	       XLAT_SEL(query_ops.val, query_ops.str),
-	       opcode_data,
-	       XLAT_ARGS(IO_URING_QUERY_OPCODES),
-	       (unsigned int) sizeof(*opcode_data),
-	       opcode_data->nr_request_opcodes,
-	       opcode_data->nr_register_opcodes,
-	       XLAT_ARGS(IORING_FEAT_SINGLE_MMAP),
-	       XLAT_ARGS(IORING_SETUP_SQPOLL),
-	       XLAT_ARGS(IORING_ENTER_GETEVENTS),
-	       XLAT_ARGS(IOSQE_IO_DRAIN),
-	       opcode_data->nr_query_opcodes,
-	       errstr);
+	static const struct strval32 features[] = {
+		{ ARG_XLAT_KNOWN(0x1, "IORING_FEAT_SINGLE_MMAP") },
+		{ ARG_XLAT_KNOWN(0x40000, "IORING_FEAT_REGBUF_TYPES") },
+		{ ARG_XLAT_UNKNOWN(0x80000, "IORING_FEAT_???") },
+		{ ARG_XLAT_KNOWN(0xc0001,
+				 "IORING_FEAT_SINGLE_MMAP"
+				 "|IORING_FEAT_REGBUF_TYPES|0x80000") },
+	};
+	for (unsigned int i = 0; i < ARRAY_SIZE(features); ++i) {
+		opcode_data->feature_flags = features[i].val;
+		sys_io_uring_register(fd_null, query_ops.val, hdr, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT
+		       ", {query_data=%p, query_op=" XLAT_FMT ", size=%u, result=0"
+		       ", query_data={nr_request_opcodes=%u"
+		       ", nr_register_opcodes=%u"
+		       ", feature_flags=%s, ring_setup_flags=" XLAT_FMT
+		       ", enter_flags=" XLAT_FMT ", sqe_flags=" XLAT_FMT
+		       ", nr_query_opcodes=%u}, next_entry=NULL}, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(query_ops.val, query_ops.str),
+		       opcode_data,
+		       XLAT_ARGS(IO_URING_QUERY_OPCODES),
+		       (unsigned int) sizeof(*opcode_data),
+		       opcode_data->nr_request_opcodes,
+		       opcode_data->nr_register_opcodes,
+		       features[i].str,
+		       XLAT_ARGS(IORING_SETUP_SQPOLL),
+		       XLAT_ARGS(IORING_ENTER_GETEVENTS),
+		       XLAT_ARGS(IOSQE_IO_DRAIN),
+		       opcode_data->nr_query_opcodes,
+		       errstr);
+	}
 
 	/* Test 5: Single entry with IO_URING_QUERY_ZCRX */
 	memset(hdr, 0, sizeof(*hdr));
