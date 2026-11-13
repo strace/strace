@@ -462,6 +462,8 @@ struct bpf_link_info_struct {
 		} xdp;
 		struct {
 			uint32_t map_id;
+			uint32_t pad_; /* skip check */
+			uint64_t ATTRIBUTE_ALIGNED(8) cgroup_id;
 		} struct_ops;
 		struct {
 			uint32_t pf;
