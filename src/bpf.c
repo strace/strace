@@ -34,6 +34,8 @@
 #include "xlat/bpf_link_create_uprobe_multi_flags.h"
 #include "xlat/bpf_link_type.h"
 #include "xlat/bpf_perf_event_type.h"
+#include "xlat/bpf_stream_ids.h"
+#include "xlat/bpf_stream_open_flags.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -2551,12 +2553,27 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_STREAM_READ_BY_FD)
 	tprint_struct_next();
 	PRINT_FIELD_U(attr, stream_buf_len);
 	tprint_struct_next();
-	PRINT_FIELD_U(attr, stream_id);
+	PRINT_FIELD_XVAL(attr, stream_id, bpf_stream_ids, "BPF_STREAM_???");
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, prog_fd, tcp);
 	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
+
+BEGIN_BPF_CMD_DECODER(BPF_PROG_STREAM_OPEN)
+{
+	/* Introduced by Linux commit v7.4-rc1~121^2~95^2~3. */
+	tprint_struct_begin();
+	tprints_field_name("prog_stream_open");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(attr, prog_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, stream_id, bpf_stream_ids, "BPF_STREAM_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, flags, bpf_stream_open_flags, "BPF_F_STREAM_???");
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 static void
 print_prog_assoc_struct_ops(struct tcb *const tcp,
@@ -2625,6 +2642,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_TOKEN_CREATE),
 		BPF_CMD_ENTRY(BPF_PROG_STREAM_READ_BY_FD),
 		BPF_CMD_ENTRY(BPF_PROG_ASSOC_STRUCT_OPS),
+		BPF_CMD_ENTRY(BPF_PROG_STREAM_OPEN),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

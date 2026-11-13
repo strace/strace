@@ -764,4 +764,14 @@ struct BPF_PROG_ASSOC_STRUCT_OPS_struct {
 	offsetofend(struct BPF_PROG_ASSOC_STRUCT_OPS_struct, prog_assoc_struct_ops)
 # define expected_BPF_PROG_ASSOC_STRUCT_OPS_struct_size 12
 
+struct BPF_PROG_STREAM_OPEN_struct /* prog_stream_open */ {
+	uint32_t prog_fd;
+	uint32_t stream_id;
+	uint32_t flags;
+};
+
+# define BPF_PROG_STREAM_OPEN_struct_size \
+	sizeof(struct BPF_PROG_STREAM_OPEN_struct)
+# define expected_BPF_PROG_STREAM_OPEN_struct_size 12
+
 #endif /* !STRACE_BPF_ATTR_H */
