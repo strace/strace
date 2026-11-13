@@ -299,6 +299,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	move_pages--pidns-translation \
 	msg_control-v \
 	net-accept-connect \
+	net-packet_fanout-success \
+	net-packet_fanout-success-Xabbrev \
+	net-packet_fanout-success-Xraw \
+	net-packet_fanout-success-Xverbose \
 	net-sockaddr--pidns-translation \
 	net-tpacket_stats-success \
 	netlink_audit--pidns-translation \
