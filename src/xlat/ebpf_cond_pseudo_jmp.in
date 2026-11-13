@@ -1,0 +1,5 @@
+#unconditional
+#value_indexed
+#From include/uapi/linux/bpf.h
+BPF_MAY_GOTO
+BPF_UNWIND_GOTO

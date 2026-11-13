@@ -751,7 +751,7 @@ unsigned char *signature_ptr;
 #if VERBOSE
 # define INSNS_FMT \
 	"[{code=BPF_JMP|BPF_K|BPF_EXIT, dst_reg=BPF_REG_10" \
-	", src_reg=0xb /* BPF_REG_??? */, off=%d, imm=%#x}]"
+	", src_reg=0xb /* BPF_??? */, off=%d, imm=%#x}]"
 # define INSNS_ARG insns[0].off, insns[0].imm
 #else
 # define INSNS_FMT "%p"
@@ -851,6 +851,51 @@ print_BPF_PROG_LOAD_attr_signature(const struct bpf_attr_check *check,
 	       ", signature_size=%zu, keyring_id=123",
 	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
 	       license, sizeof(signature_data));
+}
+
+static const struct bpf_insn selector_insns[] = {
+	{ .code = BPF_JMP | BPF_JCOND, .src_reg = BPF_MAY_GOTO },
+	{ .code = BPF_JMP | BPF_JCOND, .src_reg = BPF_UNWIND_GOTO },
+	{ .code = BPF_JMP | BPF_JCOND, .src_reg = 2 },
+	{ .code = BPF_JMP | BPF_EXIT, .src_reg = 0 },
+	{ .code = BPF_JMP | BPF_EXIT, .src_reg = BPF_UNWIND_EXIT },
+	{ .code = BPF_JMP | BPF_EXIT, .src_reg = 2 },
+	{ .code = BPF_ALU64 | BPF_MOV, .src_reg = BPF_REG_1 },
+};
+
+static void
+init_BPF_PROG_LOAD_selectors(struct bpf_attr_check *check, size_t idx)
+{
+	check->data.BPF_PROG_LOAD_data.insns =
+		(uintptr_t) &selector_insns[idx];
+}
+
+static void
+print_BPF_PROG_LOAD_selectors(const struct bpf_attr_check *check,
+			      unsigned long addr, size_t idx)
+{
+	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=1, insns=");
+#if VERBOSE
+	static const char *const codes[] = {
+		"BPF_JMP|BPF_K|BPF_JCOND",
+		"BPF_JMP|BPF_K|BPF_JCOND",
+		"BPF_JMP|BPF_K|BPF_JCOND",
+		"BPF_JMP|BPF_K|BPF_EXIT",
+		"BPF_JMP|BPF_K|BPF_EXIT",
+		"BPF_JMP|BPF_K|BPF_EXIT",
+		"BPF_ALU64|BPF_K|BPF_MOV",
+	};
+	static const char *const selectors[] = {
+		"BPF_MAY_GOTO", "BPF_UNWIND_GOTO", "0x2 /* BPF_??? */",
+		"BPF_REG_0", "BPF_UNWIND_EXIT", "0x2 /* BPF_??? */",
+		"BPF_REG_1",
+	};
+	printf("[{code=%s, dst_reg=BPF_REG_0, src_reg=%s, off=0, imm=0}]",
+	       codes[idx], selectors[idx]);
+#else
+	printf("%p", &selector_insns[idx]);
+#endif
+	printf(", license=NULL");
 }
 
 static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 33,
@@ -1176,6 +1221,13 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		       ", keyring_id=-1"
 	},
 	{ /* 12 */
+		.data = { .BPF_PROG_LOAD_data = { .insn_cnt = 1 } },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, license),
+		.iters = ARRAY_SIZE(selector_insns),
+		.init_fn = init_BPF_PROG_LOAD_selectors,
+		.print_fn = print_BPF_PROG_LOAD_selectors,
+	},
+	{ /* 13 */
 		.data = { .BPF_PROG_LOAD_data = {
 			.insn_cnt = ARRAY_SIZE(insns),
 			.keyring_id = 123

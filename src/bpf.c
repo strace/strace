@@ -36,6 +36,8 @@
 #include "xlat/bpf_perf_event_type.h"
 #include "xlat/bpf_stream_ids.h"
 #include "xlat/bpf_stream_open_flags.h"
+#include "xlat/ebpf_cond_pseudo_jmp.h"
+#include "xlat/ebpf_pseudo_exit.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -147,7 +149,16 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 	printxval(ebpf_regs, insn->dst_reg, "BPF_REG_???");
 	tprint_struct_next();
 	tprints_field_name("src_reg");
-	printxval(ebpf_regs, insn->src_reg, "BPF_REG_???");
+	/*
+	 * Unwind selectors were introduced by Linux commit
+	 * v7.4-rc1~121^2~4^2~5.
+	 */
+	if (insn->code == (BPF_JMP | BPF_JCOND))
+		printxval(ebpf_cond_pseudo_jmp, insn->src_reg, "BPF_???");
+	else if (insn->code == (BPF_JMP | BPF_EXIT) && insn->src_reg)
+		printxval(ebpf_pseudo_exit, insn->src_reg, "BPF_???");
+	else
+		printxval(ebpf_regs, insn->src_reg, "BPF_REG_???");
 
 	tprint_struct_next();
 	PRINT_FIELD_D(*insn, off);
