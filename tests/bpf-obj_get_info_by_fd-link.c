@@ -43,6 +43,75 @@ sys_bpf(kernel_ulong_t cmd, void *attr, kernel_ulong_t size)
 	return rc;
 }
 
+static void
+test_struct_ops_info(int link_fd, const char *link_fd_path)
+{
+	static const unsigned int sizes[] = {
+		offsetof(struct bpf_link_info_struct, struct_ops.cgroup_id),
+		offsetof(struct bpf_link_info_struct, struct_ops.cgroup_id) + 1,
+		/* A complete field containing zero, then a nonzero value. */
+		offsetofend(struct bpf_link_info_struct, struct_ops.cgroup_id),
+		offsetofend(struct bpf_link_info_struct, struct_ops.cgroup_id),
+		bpf_link_info_struct_size,
+		bpf_link_info_struct_size + 1,
+	};
+	unsigned char *buf = tail_alloc(bpf_link_info_struct_size + 1);
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(sizes); ++i) {
+		struct bpf_link_info_struct info = {
+			.type = BPF_LINK_TYPE_STRUCT_OPS,
+			.id = 42,
+			.struct_ops = {
+				.map_id = 0xfacefeed,
+				.pad_ = -1U,
+				.cgroup_id = i == 2 ? 0 : 0xfedcba9876543210ULL,
+			},
+		};
+		union {
+			struct BPF_OBJ_GET_INFO_BY_FD_struct attr;
+			unsigned char bytes[
+				BPF_OBJ_GET_INFO_BY_FD_struct_size + 1];
+		} data = {
+			.attr = {
+				.bpf_fd = link_fd,
+				.info_len = sizes[i],
+				.info = (uintptr_t) buf,
+			},
+		};
+
+		memcpy(buf, &info, bpf_link_info_struct_size);
+		buf[bpf_link_info_struct_size] = 0xab;
+		/*
+		 * Reject the syscall before the kernel overwrites the synthetic
+		 * info, while retaining a real BPF link FD for object detection.
+		 */
+		data.bytes[BPF_OBJ_GET_INFO_BY_FD_struct_size] = 1;
+		if (sys_bpf(BPF_OBJ_GET_INFO_BY_FD, &data,
+			    BPF_OBJ_GET_INFO_BY_FD_struct_size + 1) != -1)
+			error_msg_and_fail("invalid attribute tail accepted");
+
+		struct bpf_link_info_struct expected = {};
+
+		memcpy(&expected, buf, MIN(sizes[i], sizeof(expected)));
+		printf("bpf(BPF_OBJ_GET_INFO_BY_FD"
+		       ", {info={bpf_fd=%d<%s>, info_len=%u"
+		       ", info={type=BPF_LINK_TYPE_STRUCT_OPS"
+		       ", id=42, prog_id=0"
+		       ", struct_ops={map_id=4207869677",
+		       link_fd, link_fd_path, sizes[i]);
+		if (sizes[i] > offsetof(struct bpf_link_info_struct,
+					struct_ops.cgroup_id))
+			printf(", cgroup_id=%" PRIu64,
+			       expected.struct_ops.cgroup_id);
+		printf("}");
+		if (sizes[i] > bpf_link_info_struct_size)
+			printf(", extra_data=\"\\xab\" /* bytes 64..64 */");
+		printf("}}, extra_data=\"\\x01\" /* bytes 16..16 */}"
+		       ", %zu) = %s\n",
+		       BPF_OBJ_GET_INFO_BY_FD_struct_size + 1, errstr);
+	}
+}
+
 int
 main(void)
 {
@@ -161,6 +230,7 @@ main(void)
 	printxval(bpf_attach_type, link_info->cgroup.attach_type, "BPF_???");
 	printf("}}}}, %zu) = %s\n", sizeof(get_info_attr), errstr);
 
+	test_struct_ops_info(link_fd, link_fd_path);
 	free(link_fd_path);
 	puts("+++ exited with 0 +++");
 	return 0;

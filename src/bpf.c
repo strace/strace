@@ -1294,10 +1294,19 @@ print_bpf_link_info_xdp(
 static void
 print_bpf_link_info_struct_ops(
 		const typeof_field(struct bpf_link_info_struct,
-				   struct_ops) *const p)
+				   struct_ops) *const p,
+		const unsigned int len)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, map_id);
+	/*
+	 * cgroup_id was introduced by Linux commit
+	 * v7.4-rc1~121^2~142^2~6.
+	 */
+	if (len > offsetof(struct bpf_link_info_struct, struct_ops.cgroup_id)) {
+		tprint_struct_next();
+		PRINT_FIELD_U(*p, cgroup_id);
+	}
 	tprint_struct_end();
 }
 
@@ -1575,7 +1584,7 @@ print_bpf_link_info(struct tcb * const tcp, uint32_t bpf_fd,
 	case BPF_LINK_TYPE_STRUCT_OPS:
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(info, struct_ops,
-				    print_bpf_link_info_struct_ops);
+				    print_bpf_link_info_struct_ops, len);
 		break;
 	case BPF_LINK_TYPE_NETFILTER:
 		tprint_struct_next();
@@ -1767,6 +1776,12 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(attr, attach_flags, bpf_attach_flags,
 				  "BPF_F_???");
+
+		/* Introduced by Linux commit v7.4-rc1~121^2~142^2~6. */
+		if (len > offsetof(struct BPF_PROG_QUERY_struct, type_id)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(attr, type_id);
+		}
 
 		tprint_struct_next();
 		tprints_field_name("prog_ids");
@@ -2132,7 +2147,10 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	tprint_struct_begin();
 	tprints_field_name("link_create");
 	tprint_struct_begin();
-	PRINT_FIELD_FD(attr, prog_fd, tcp);
+	if (attr.attach_type == BPF_STRUCT_OPS)
+		PRINT_FIELD_FD(attr, map_fd, tcp);
+	else
+		PRINT_FIELD_FD(attr, prog_fd, tcp);
 	tprint_struct_next();
 	/*
 	 * target_ifindex union member was added in Linux commit
@@ -2153,6 +2171,21 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 
 	/* Trying to guess the union decoding based on the attach type */
 	switch (attr.attach_type) {
+	case BPF_STRUCT_OPS:
+		/* Introduced by Linux commit v7.4-rc1~121^2~142^2~6. */
+		tprint_struct_next();
+		tprints_field_name("cgroup");
+		tprint_struct_begin();
+		if (attr.flags & BPF_F_ID)
+			PRINT_FIELD_U(attr.cgroup, relative_id);
+		else
+			PRINT_FIELD_FD(attr.cgroup, relative_fd, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_X(attr.cgroup, expected_revision);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), cgroup.expected_revision);
+		break;
+
 	/* see include/linux/bpf-cgroup.h:to_cgroup_bpf_attach_type() */
 	case BPF_CGROUP_INET_INGRESS:
 	case BPF_CGROUP_INET_EGRESS:

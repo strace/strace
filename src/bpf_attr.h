@@ -262,7 +262,7 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t attach_flags;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_ids;
 	uint32_t prog_cnt;
-	uint32_t pad_; /* skip check */
+	uint32_t type_id;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_attach_flags;
 	uint64_t ATTRIBUTE_ALIGNED(8) link_ids;
 	uint64_t ATTRIBUTE_ALIGNED(8) link_attach_flags;
@@ -574,7 +574,10 @@ struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
 # define BPF_MAP_DELETE_BATCH_struct_size BPF_MAP_LOOKUP_BATCH_struct_size
 
 struct BPF_LINK_CREATE_struct /* link_create */ {
-	uint32_t prog_fd;
+	union {
+		uint32_t prog_fd;
+		uint32_t map_fd;
+	};
 	union {
 		uint32_t target_fd;
 		uint32_t target_ifindex;
