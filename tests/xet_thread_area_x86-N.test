@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Check decoding of set_thread_area and get_thread_area syscalls on x86
+# with argument names.
+#
+# Copyright (c) 2018-2026 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+set -- -a29 -N "$@"
+. "${srcdir=.}/xet_thread_area_x86.test"

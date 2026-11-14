@@ -24,6 +24,10 @@
 
 # include "print_user_desc.c"
 
+# ifndef ARG_NAMES
+#  define ARG_NAMES 0
+# endif
+
 long errnum;
 
 static void
@@ -54,7 +58,7 @@ set_thread_area(kernel_ulong_t ptr_val, const char *ptr_str, bool valid,
 
 	rc = syscall(__NR_set_thread_area, ptr_val);
 	saved_errno = errno;
-	printf("set_thread_area(");
+	printf("set_thread_area(%s", ARG_NAMES ? "u_info=" : "");
 
 	if (valid)
 		print_user_desc(ptr, entry_number_str);
@@ -97,7 +101,7 @@ get_thread_area(kernel_ulong_t ptr_val, const char *ptr_str, bool valid,
 	rc = syscall(__NR_get_thread_area, ptr_val);
 	saved_errno = errno;
 
-	printf("get_thread_area(");
+	printf("get_thread_area(%s", ARG_NAMES ? "u_info=" : "");
 
 	if (valid && !rc) {
 		if (!set_rc) {

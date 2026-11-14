@@ -659,6 +659,7 @@ DECODER_TESTS = \
 	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
 	xet_thread_area_x86.test \
+	xet_thread_area_x86-N.test \
 	# end of DECODER_TESTS
 
 MISC_TESTS = \

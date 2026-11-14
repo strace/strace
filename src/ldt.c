@@ -181,9 +181,12 @@ SYS_FUNC(set_thread_area)
 
 SYS_FUNC(get_thread_area)
 {
-	tprints_arg_name("u_info");
-	print_user_desc(tcp, tcp->u_arg[0],
-			entering(tcp) ? USER_DESC_ENTERING : USER_DESC_EXITING);
+	if (entering(tcp)) {
+		tprints_arg_name("u_info");
+		print_user_desc(tcp, tcp->u_arg[0], USER_DESC_ENTERING);
+	} else {
+		print_user_desc(tcp, tcp->u_arg[0], USER_DESC_EXITING);
+	}
 	return 0;
 }
 
