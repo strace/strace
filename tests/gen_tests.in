@@ -1358,6 +1358,7 @@ symlinkat
 sync	-a7
 sync_file_range
 sync_file_range2
+syncfs	-a11
 sysctl	-a16 --trace=_sysctl
 sysinfo	-a14
 syslog	-a35
