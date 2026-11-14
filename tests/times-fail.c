@@ -11,11 +11,15 @@
 #include <unistd.h>
 #include "scno.h"
 
+#ifndef ARG_NAMES
+# define ARG_NAMES 0
+#endif
+
 int
 main(void)
 {
 	assert(syscall(__NR_times, 0x42) == -1);
-	printf("times(0x42)" RVAL_EFAULT);
+	printf("times(%s0x42)" RVAL_EFAULT, ARG_NAMES ? "buf=" : "");
 	puts("+++ exited with 0 +++");
 
 	return 0;

@@ -1317,6 +1317,7 @@ times-Xabbrev
 times-Xraw
 times-Xverbose
 times-fail
+times-fail-N
 times-inject
 times-inject-Xraw
 times-inject-Xverbose

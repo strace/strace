@@ -1378,6 +1378,7 @@ times-Xabbrev	-esignal=none -e trace=times -Xabbrev
 times-Xraw	-esignal=none -e trace=times -Xraw
 times-Xverbose	-esignal=none -e trace=times -Xverbose
 times-fail	-a12 -e trace=times
+times-fail-N	-a16 -e trace=times -N
 times-inject	-einject=times:retval=42 -etrace=times -a0
 times-inject-Xraw	-einject=times:retval=42 -etrace=times -a0 -Xraw
 times-inject-Xverbose	-einject=times:retval=42 -etrace=times -a0 -Xverbose
