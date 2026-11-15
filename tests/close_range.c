@@ -46,8 +46,10 @@ main(void)
 
 	k_close_range(0, -4U, -1);
 	printf("close_range(0, %u"
-	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|%#x) = %s\n",
-	       -4U, (-1U & ~(CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC)),
+	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|CLOSE_RANGE_EXCEPT"
+	       "|CLOSE_RANGE_CLOEXEC_ONLY|%#x) = %s\n",
+	       -4U, (-1U & ~(CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC
+			     | CLOSE_RANGE_EXCEPT | CLOSE_RANGE_CLOEXEC_ONLY)),
 	       errstr);
 
 	k_close_range(-5U, 7, 0);
@@ -57,8 +59,11 @@ main(void)
 	printf("close_range(7, %u, 0x1 /* CLOSE_RANGE_??? */) = %s\n",
 	       -6U, errstr);
 
-	k_close_range(7, 7, 8);
-	printf("close_range(7, 7, 0x8 /* CLOSE_RANGE_??? */) = %s\n", errstr);
+	k_close_range(7, 6, CLOSE_RANGE_EXCEPT);
+	printf("close_range(7, 6, CLOSE_RANGE_EXCEPT) = %s\n", errstr);
+
+	k_close_range(7, 6, CLOSE_RANGE_CLOEXEC_ONLY);
+	printf("close_range(7, 6, CLOSE_RANGE_CLOEXEC_ONLY) = %s\n", errstr);
 
 	k_close_range(-7U, -7U, 7);
 	printf("close_range(%u, %u"
