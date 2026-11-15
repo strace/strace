@@ -1055,6 +1055,7 @@ process_vm_readv--pidns-translation	test_pidns -s5 -a37 -e trace=process_vm_read
 process_vm_writev	-s5 -a38
 process_vm_writev--pidns-translation	test_pidns -s5 -a38 -e trace=process_vm_writev
 pselect6
+pselect6-success	--inject=/^pselect6:retval=2 --trace=/^pselect6 -a36
 pselect6_time64
 ptrace	-a23 -s64 -e signal=none
 ptrace-Xabbrev	-a23 -s64 -e signal=none -e trace=ptrace -Xabbrev

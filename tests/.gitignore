@@ -999,6 +999,7 @@ process_vm_readv--pidns-translation
 process_vm_writev
 process_vm_writev--pidns-translation
 pselect6
+pselect6-success
 pselect6_time64
 ptrace
 ptrace-Xabbrev
