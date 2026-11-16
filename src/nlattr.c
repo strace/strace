@@ -225,7 +225,14 @@ DECL_NLA(uid)
 
 DECL_NLA(gid)
 {
-	return decode_nla_uid(tcp, addr, len, opaque_data);
+	uint32_t gid;
+
+	if (len < sizeof(gid))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &gid))
+		printgid(gid);
+
+	return true;
 }
 
 DECL_NLA(clock_t)
