@@ -446,7 +446,7 @@ keyctl_pkey_op(struct tcb *const tcp,
 			return 0;
 		}
 
-		tprints_arg_next_name("in2");
+		tprints_arg_next_name(out ? "out" : "in2");
 		if (ret)
 			printstrn(tcp, op2, params.in2_len);
 		else
