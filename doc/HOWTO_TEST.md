@@ -180,6 +180,20 @@ The script receives arguments via `$@`. Both `.sh` helper scripts and
 Test fault injection with `--inject=`. `ARG0` is `-einject=...` or
 `--inject=...`.
 
+**The injection option must be the first argument after the test name**,
+before any other strace options. `gen_tests.sh` checks only `ARG0` to
+recognize an injection test; it does not search the remaining arguments.
+Putting another option first selects the standard test pattern instead,
+so the generated script does not source `scno_tampering.sh` and bypasses
+the checks that skip unsupported architecture/kernel combinations. It
+also uses `run_strace_match_diff` rather than the explicit
+`run_strace`/`match_diff` calls normally used for injection tests without
+`-y`.
+
+This ordering requirement applies to the injection test pattern, not to
+arbitrary commands or delegated scripts, which must arrange any required
+tampering checks themselves.
+
 **Example**:
 ```
 bpf-success -einject=bpf:retval=42 -etrace=bpf -a20

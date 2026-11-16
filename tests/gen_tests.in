@@ -197,10 +197,10 @@ fcntl64--pidns-translation	test_pidns -a8 -e trace=fcntl64
 fdatasync	-a14
 file_getattr	-a33
 file_getattr-P	-a33 --trace=file_getattr -P /dev/full
-file_getattr-success	-a33 --inject=file_getattr:retval=42 --trace=file_getattr
-file_getattr-success-Xabbrev	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xabbrev
-file_getattr-success-Xraw	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xraw
-file_getattr-success-Xverbose	-a33 --inject=file_getattr:retval=42 --trace=file_getattr -Xverbose
+file_getattr-success	--inject=file_getattr:retval=42 --trace=file_getattr -a33
+file_getattr-success-Xabbrev	--inject=file_getattr:retval=42 --trace=file_getattr -Xabbrev -a33
+file_getattr-success-Xraw	--inject=file_getattr:retval=42 --trace=file_getattr -Xraw -a33
+file_getattr-success-Xverbose	--inject=file_getattr:retval=42 --trace=file_getattr -Xverbose -a33
 file_getattr-y	-a34 --trace=file_getattr -y
 file_getattr-yy	-a34 --trace=file_getattr -yy
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
