@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented decoding of the PACKET_FANOUT socket option.
   * Implemented --hyperlink[=WHEN] option to add hyperlinks from system call
     names (including syscall summaries) to manual pages on man7.org.
   * Enhanced poke_enter option for --inject to allow setting syscall argument

@@ -984,6 +984,91 @@ print_tipc_group_join(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	tprint_struct_end();
 }
 
+#include "xlat/packet_fanout_types.h"
+#include "xlat/packet_fanout_flags.h"
+
+static void
+print_packet_fanout_int(const struct fanout_args *const args)
+{
+	unsigned int type = args->type_flags & 0xff;
+	unsigned int flags = args->type_flags & ~0xffU;
+
+	tprint_indirect_begin();
+	tprint_flags_begin();
+	PRINT_VAL_U(args->id);
+	tprint_flags_or();
+
+	tprint_shift_begin();
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		PRINT_VAL_X(args->type_flags);
+	} else {
+		if (!flags) {
+			printxval(packet_fanout_types, type, "PACKET_FANOUT_???");
+		} else {
+			tprints_string("(");
+			printxval(packet_fanout_types, type, "PACKET_FANOUT_???");
+			tprint_flags_or();
+			printflags_in(packet_fanout_flags, flags,
+				      "PACKET_FANOUT_FLAG_???");
+			tprints_string(")");
+		}
+	}
+	tprint_shift();
+	PRINT_VAL_U(16);
+	tprint_shift_end();
+
+	tprint_flags_end();
+	tprint_indirect_end();
+}
+
+static void
+print_packet_fanout_struct(const struct fanout_args *const args)
+{
+	unsigned short type = args->type_flags & 0xff;
+	unsigned short flags = args->type_flags & ~0xffU;
+
+	tprint_struct_begin();
+	tprints_field_name("id");
+	PRINT_VAL_U(args->id);
+	tprint_struct_next();
+	tprints_field_name("type_flags");
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		PRINT_VAL_X(args->type_flags);
+	} else {
+		tprint_flags_begin();
+		printxval(packet_fanout_types, type, "PACKET_FANOUT_???");
+		if (flags) {
+			tprint_flags_or();
+			printflags_in(packet_fanout_flags, flags,
+				      "PACKET_FANOUT_FLAG_???");
+		}
+		tprint_flags_end();
+	}
+	tprint_struct_next();
+	tprints_field_name("max_num_members");
+	PRINT_VAL_U(args->max_num_members);
+	tprint_struct_end();
+}
+
+static void
+print_packet_fanout(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+{
+	struct fanout_args args = {};
+
+	if (len != (int) sizeof(int) && len != (int) sizeof(args)) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umoven_or_printaddr(tcp, addr, len, &args))
+		return;
+
+	if (len == (int) sizeof(int))
+		print_packet_fanout_int(&args);
+	else
+		print_packet_fanout_struct(&args);
+}
+
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
@@ -1115,6 +1200,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case PACKET_STATISTICS:
 			print_tpacket_stats(tcp, addr, rlen);
+			return;
+		case PACKET_FANOUT:
+			print_packet_fanout(tcp, addr, rlen);
 			return;
 		}
 		break;
@@ -1455,6 +1543,9 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case PACKET_ADD_MEMBERSHIP:
 		case PACKET_DROP_MEMBERSHIP:
 			print_packet_mreq(tcp, addr, len);
+			return;
+		case PACKET_FANOUT:
+			print_packet_fanout(tcp, addr, len);
 			return;
 		}
 		break;

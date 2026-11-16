@@ -680,6 +680,14 @@ net--decode-fds-none-netlink	+net-yy-netlink.test --decode-fds=none -a9
 net--decode-fds-path-netlink	+net-yy-netlink.test --decode-fds=path
 net--decode-fds-socket-netlink	+net-yy-netlink.test --decode-fds=socket
 net-icmp_filter	-e trace=getsockopt,setsockopt
+net-packet_fanout			-e trace=getsockopt,setsockopt
+net-packet_fanout-Xabbrev		-e trace=getsockopt,setsockopt -Xabbrev
+net-packet_fanout-Xraw			-e trace=getsockopt,setsockopt -Xraw -a32
+net-packet_fanout-Xverbose		-e trace=getsockopt,setsockopt -Xverbose
+net-packet_fanout-success		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt
+net-packet_fanout-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xabbrev
+net-packet_fanout-success-Xraw		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a32
+net-packet_fanout-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
 net-packet_mreq -e trace=setsockopt
 net-packet_mreq-Xabbrev	-e trace=setsockopt -Xabbrev
 net-packet_mreq-Xraw	-e trace=setsockopt -Xraw
