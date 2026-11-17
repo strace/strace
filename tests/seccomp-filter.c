@@ -35,12 +35,12 @@ main(void)
 	       "SECCOMP_FILTER_FLAG_NEW_LISTENER|"
 	       "SECCOMP_FILTER_FLAG_TSYNC_ESRCH|"
 	       "SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV|"
-	       "0xffffffc0",
+	       "SECCOMP_FILTER_FLAG_RESTART_BEFORE_RECV|0xffffff80",
 	       prog->len, prog->filter, sprintrc(rc));
 
-	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -64L, efault);
+	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -128L, efault);
 	printf("seccomp(SECCOMP_SET_MODE_FILTER, %s, %p) = %s\n",
-	       "0xffffffc0 /* SECCOMP_FILTER_FLAG_??? */",
+	       "0xffffff80 /* SECCOMP_FILTER_FLAG_??? */",
 	       efault, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");

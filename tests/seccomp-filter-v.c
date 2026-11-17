@@ -114,7 +114,7 @@ main(void)
 		"SECCOMP_FILTER_FLAG_NEW_LISTENER|"
 		"SECCOMP_FILTER_FLAG_TSYNC_ESRCH|"
 		"SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV|"
-		"0xffffffc0",
+		"SECCOMP_FILTER_FLAG_RESTART_BEFORE_RECV|0xffffff80",
 		prog->len);
 	for (unsigned int i = 0; i < BPF_MAXINSNS; ++i) {
 		if (i)
