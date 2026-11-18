@@ -615,3 +615,19 @@ SO_RIGHTS_NOTRUNC	16467
 #else
 SO_RIGHTS_NOTRUNC	85
 #endif
+
+#if defined __sparc__
+SO_PASSPIDFD_THREAD	95
+#elif defined __hppa__
+SO_PASSPIDFD_THREAD	16468
+#else
+SO_PASSPIDFD_THREAD	86
+#endif
+
+#if defined __sparc__
+SO_PEERPIDFD_THREAD	96
+#elif defined __hppa__
+SO_PEERPIDFD_THREAD	16469
+#else
+SO_PEERPIDFD_THREAD	87
+#endif

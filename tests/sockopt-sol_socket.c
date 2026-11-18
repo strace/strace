@@ -160,6 +160,7 @@ main(void)
 		{ ARG_STR(SO_PASSRIGHTS), .optsz = sizeof(int) },
 		{ ARG_STR(SO_INQ), .optsz = sizeof(int) },
 		{ ARG_STR(SO_RIGHTS_NOTRUNC), .optsz = sizeof(int) },
+		{ ARG_STR(SO_PASSPIDFD_THREAD) },
 		/* SO_PEERPIDFD - see so_peerpidfd test */
 		{ 78, NULL },
 		{ -1, NULL },
@@ -176,6 +177,11 @@ main(void)
 		perror_msg_and_skip("socket AF_UNIX SOCK_RAW");
 
 	snprintf(sol_str, sizeof(sol_str), XLAT_FMT, XLAT_ARGS(SOL_SOCKET));
+
+	*len = 0;
+	get_sockopt(fd, SO_PEERPIDFD_THREAD, NULL, len);
+	printf("getsockopt(%d, %s, " XLAT_FMT ", NULL, [0]) = %s" INJSTR "\n",
+	       fd, sol_str, XLAT_ARGS(SO_PEERPIDFD_THREAD), errstr);
 
 	for (size_t i = 0; i < ARRAY_SIZE(names); ++i) {
 		static char so_str[64];

@@ -18,7 +18,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of BPF struct_ops queries and links, program stream IDs,
     and eBPF unwind instruction selectors.
   * Updated lists of AUDIT_*, CLOSE_RANGE_*, IORING_*, OPEN_TREE_*, PERF_*,
-    and SECCOMP_* constants.
+    SECCOMP_*, and SO_* constants.
 
 * Bug fixes
   * Fixed a tracing failure during process termination caused by mistaking
