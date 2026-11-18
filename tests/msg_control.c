@@ -685,6 +685,23 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	test_scm_timestampns_new(mh, page);
 	test_scm_timestamping_new(mh, page);
 
+	unsigned char sym = 'A';
+	struct cmsghdr *cmsg = get_cmsghdr(page, CMSG_LEN(sizeof(sym)));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(sym));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_PIDFD_THREAD;
+	memcpy(CMSG_DATA(cmsg), &sym, sizeof(sym));
+	mh->msg_control = cmsg;
+	mh->msg_controllen = cmsg->cmsg_len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=SOL_SOCKET"
+	       ", cmsg_type=SCM_PIDFD_THREAD, cmsg_data=\"\\x41\"}]"
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len, (unsigned) mh->msg_controllen,
+	       sprintrc(rc));
+
 	test_unknown_type(mh, page, ARG_STR(SOL_SOCKET), "SCM_???");
 }
 
