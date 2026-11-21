@@ -107,14 +107,15 @@ main(void)
 	static const struct strval32 ifa_flags_ext[] = {
 		{ 0, "0" },
 		{ ARG_XLAT_KNOWN(0x1, "IFA_F_SECONDARY") },
-		{ ARG_XLAT_UNKNOWN(0x1000, "IFA_F_???") },
+		{ ARG_XLAT_KNOWN(0x1000, "IFA_F_GLOBAL") },
+		{ ARG_XLAT_UNKNOWN(0x2000, "IFA_F_???") },
 		{ ARG_XLAT_KNOWN(0xffffffff,
 				 "IFA_F_SECONDARY|IFA_F_NODAD|IFA_F_OPTIMISTIC"
 				 "|IFA_F_DADFAILED|IFA_F_HOMEADDRESS"
 				 "|IFA_F_DEPRECATED|IFA_F_TENTATIVE"
 				 "|IFA_F_PERMANENT|IFA_F_MANAGETEMPADDR"
 				 "|IFA_F_NOPREFIXROUTE|IFA_F_MCAUTOJOIN"
-				 "|IFA_F_STABLE_PRIVACY|0xfffff000") },
+				 "|IFA_F_STABLE_PRIVACY|IFA_F_GLOBAL|0xffffe000") },
 	};
 	static const char address4[] = "12.34.56.78";
 	static const char address6[] = "12:34:56:78:90:ab:cd:ef";
