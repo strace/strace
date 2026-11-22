@@ -240,6 +240,28 @@ test_rtnl_link(const int fd)
 			       PRINT_FIELD_X(ifinfo, ifi_change);
 			       printf("}"));
 	}
+
+	const struct {
+		struct ifinfomsg ifinfo;
+		struct nlattr attr;
+		unsigned char data[4];
+	} src = {
+		.ifinfo = ifinfo,
+		.attr = {
+			.nla_len = NLA_HDRLEN + 4,
+			.nla_type = IFLA_PACING_OFFLOAD,
+		},
+		.data = { 0xab, 0xcd, 0xef, 0 },
+	};
+	void *const nlh1 = midtail_alloc(NLMSG_HDRLEN, sizeof(src));
+	TEST_NETLINK_(fd, nlh1, RTM_GETLINK, "RTM_GETLINK",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(src), &src, sizeof(src),
+		      printf("{ifi_family=AF_UNIX, ifi_type=ARPHRD_LOOPBACK"
+			     ", ifi_index=" IFINDEX_LO_STR
+			     ", ifi_flags=IFF_UP, ifi_change=0xfabcdeba}, "
+			     "[{nla_len=8, nla_type=IFLA_PACING_OFFLOAD}, "
+			     "\"\\xab\\xcd\\xef\\x00\"]"));
 }
 
 static void
