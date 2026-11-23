@@ -508,6 +508,18 @@ main(void)
 		  sizeof(int32_t), XARG_STR(KEY_SPEC_THREAD_KEYRING), "%d",
 		  sizeof(int), 3141592653U, NULL, "%d", NULL,
 		  0UL);
+	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
+		  sizeof(int32_t), XARG_STR(KEY_SPEC_BPF_KEYRING), "%d",
+		  sizeof(int), ARG_STR(0), NULL, 0UL);
+	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
+		  sizeof(int32_t), XARG_STR(KEY_SPEC_DM_VERITY_KEYRING), "%d",
+		  sizeof(int), ARG_STR(0), NULL, 0UL);
+	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
+		  sizeof(int32_t), XARG_STR(KEY_SPEC_FS_VERITY_KEYRING), "%d",
+		  sizeof(int), ARG_STR(0), NULL, 0UL);
+	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
+		  sizeof(int32_t), ARG_STR(-12), NULL,
+		  sizeof(int), ARG_STR(0), NULL, 0UL);
 
 
 	/* KEYCTL_JOIN_SESSION_KEYRING */

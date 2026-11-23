@@ -18,8 +18,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of BPF struct_ops queries and links, program stream IDs,
     and eBPF unwind instruction selectors.
   * Updated lists of AUDIT_*, CLOSE_RANGE_*, ETHTOOL_*, IFA_*, IFLA_*,
-    IORING_*, NL80211_*, NL_POLICY_*, OPEN_TREE_*, PERF_*, SCM_*, SECCOMP_*,
-    and SO_* constants.
+    IORING_*, KEY_*, NL80211_*, NL_POLICY_*, OPEN_TREE_*, PERF_*, SCM_*,
+    SECCOMP_*, and SO_* constants.
 
 * Bug fixes
   * Fixed a tracing failure during process termination caused by mistaking
