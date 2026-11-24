@@ -52,6 +52,10 @@
 # include "xlat.h"
 # include "xlat/kvm_cpuid_flags.h"
 
+# define XLAT_MACROS_ONLY
+# include "xlat/kvm_cap.h"
+# undef XLAT_MACROS_ONLY
+
 static int
 kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
 {
@@ -362,6 +366,16 @@ main(void)
 			(void *) (uintptr_t) KVM_CAP_USER_MEMORY);
 	printf("ioctl(%d<%s>, KVM_CHECK_EXTENSION, KVM_CAP_USER_MEMORY) = %d\n",
 	       kvm, dev, ret);
+
+	ret = ioctl(kvm, KVM_CHECK_EXTENSION,
+		    (unsigned long) KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES);
+	printf("ioctl(%d<%s>, KVM_CHECK_EXTENSION, "
+	       "KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES) = %s\n",
+	       kvm, dev, sprintrc(ret));
+
+	ret = ioctl(kvm, KVM_CHECK_EXTENSION, 253UL);
+	printf("ioctl(%d<%s>, KVM_CHECK_EXTENSION, 0xfd /* KVM_CAP_??? */) = %s\n",
+	       kvm, dev, sprintrc(ret));
 
 	int vm_fd = KVM_IOCTL(kvm, KVM_CREATE_VM, 0);
 	printf("ioctl(%d<%s>, KVM_CREATE_VM, 0) = %d<%s>\n",
