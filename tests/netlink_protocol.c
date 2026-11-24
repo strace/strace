@@ -521,6 +521,301 @@ test_ack_flags(const int fd)
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
+static void
+test_split_iov(const int fd)
+{
+	long rc;
+
+	/*
+	 * Case 1: A single 48-byte Netlink message split across 2 iovecs.
+	 * iov[0] has 20 bytes (16-byte header + 4-byte payload).
+	 * iov[1] has 28 bytes of remaining payload, with a fake header embedded.
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		char data[4];
+	} msg1_iov0 = {
+		.nlh = {
+			.nlmsg_len = 48,
+			.nlmsg_type = NLMSG_NOOP,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 1,
+			.nlmsg_pid = 0,
+		},
+		.data = { '1', '2', '3', '4' },
+	};
+	struct {
+		struct nlmsghdr fake_nlh;
+		char data[12];
+	} msg1_iov1 = {
+		.fake_nlh = {
+			.nlmsg_len = 16,
+			.nlmsg_type = NLMSG_DONE,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 2,
+			.nlmsg_pid = 0,
+		},
+		.data = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L' },
+	};
+	struct iovec iov1[2] = {
+		{ .iov_base = &msg1_iov0, .iov_len = sizeof(msg1_iov0) },
+		{ .iov_base = &msg1_iov1, .iov_len = sizeof(msg1_iov1) },
+	};
+	struct msghdr mh1 = {
+		.msg_iov = iov1,
+		.msg_iovlen = 2,
+	};
+
+	rc = sendmsg(fd, &mh1, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=48, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0"
+	       ", nlmsg_seq=1, nlmsg_pid=0}, \"\\x31\\x32\\x33\\x34\"]"
+	       ", iov_len=20}, {iov_base=", fd);
+	print_quoted_hex(&msg1_iov1, sizeof(msg1_iov1));
+	printf(", iov_len=28}], msg_iovlen=2, msg_controllen=0, msg_flags=0}"
+	       ", MSG_DONTWAIT) = %s\n", sprintrc(rc));
+
+	/*
+	 * Case 2: A 32-byte message split across 2 iovecs, followed by
+	 * a complete 16-byte NLMSG_DONE message in the remainder of iov[1].
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		char data[4];
+	} msg2_iov0 = {
+		.nlh = {
+			.nlmsg_len = 32,
+			.nlmsg_type = NLMSG_NOOP,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 3,
+			.nlmsg_pid = 0,
+		},
+		.data = { '1', '2', '3', '4' },
+	};
+	struct {
+		char tail[12];
+		struct nlmsghdr nlh2;
+	} msg2_iov1 = {
+		.tail = { '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6' },
+		.nlh2 = {
+			.nlmsg_len = 16,
+			.nlmsg_type = NLMSG_DONE,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 4,
+			.nlmsg_pid = 0,
+		},
+	};
+	struct iovec iov2[2] = {
+		{ .iov_base = &msg2_iov0, .iov_len = sizeof(msg2_iov0) },
+		{ .iov_base = &msg2_iov1, .iov_len = sizeof(msg2_iov1) },
+	};
+	struct msghdr mh2 = {
+		.msg_iov = iov2,
+		.msg_iovlen = 2,
+	};
+
+	rc = sendmsg(fd, &mh2, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=32, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0"
+	       ", nlmsg_seq=3, nlmsg_pid=0}, \"\\x31\\x32\\x33\\x34\"]"
+	       ", iov_len=20}, {iov_base=[\"\\x35\\x36\\x37\\x38\\x39\\x30"
+	       "\\x31\\x32\\x33\\x34\\x35\\x36\", {nlmsg_len=16"
+	       ", nlmsg_type=NLMSG_DONE, nlmsg_flags=0, nlmsg_seq=4"
+	       ", nlmsg_pid=0}], iov_len=28}], msg_iovlen=2, msg_controllen=0"
+	       ", msg_flags=0}, MSG_DONTWAIT) = %s\n",
+	       fd, sprintrc(rc));
+
+	/*
+	 * Case 3: A 40-byte message split across 3 iovecs (20 + 12 + 8),
+	 * followed by a complete 16-byte NLMSG_DONE message in a 4th iovec
+	 * to verify decoding resumes when the continuation ends exactly at
+	 * the previous iovec boundary.
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		char data[4];
+	} msg3_iov0 = {
+		.nlh = {
+			.nlmsg_len = 40,
+			.nlmsg_type = NLMSG_NOOP,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 5,
+			.nlmsg_pid = 0,
+		},
+		.data = { '1', '2', '3', '4' },
+	};
+	char msg3_iov1[12] = { '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6' };
+	char msg3_iov2[8] = { '7', '8', '9', '0', '1', '2', '3', '4' };
+	struct nlmsghdr msg3_iov3 = {
+		.nlmsg_len = 16,
+		.nlmsg_type = NLMSG_DONE,
+		.nlmsg_flags = 0,
+		.nlmsg_seq = 6,
+		.nlmsg_pid = 0,
+	};
+	struct iovec iov3[4] = {
+		{ .iov_base = &msg3_iov0, .iov_len = sizeof(msg3_iov0) },
+		{ .iov_base = msg3_iov1, .iov_len = sizeof(msg3_iov1) },
+		{ .iov_base = msg3_iov2, .iov_len = sizeof(msg3_iov2) },
+		{ .iov_base = &msg3_iov3, .iov_len = sizeof(msg3_iov3) },
+	};
+	struct msghdr mh3 = {
+		.msg_iov = iov3,
+		.msg_iovlen = 4,
+	};
+
+	rc = sendmsg(fd, &mh3, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=40, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0"
+	       ", nlmsg_seq=5, nlmsg_pid=0}, \"\\x31\\x32\\x33\\x34\"]"
+	       ", iov_len=20}, {iov_base=\"\\x35\\x36\\x37\\x38\\x39\\x30"
+	       "\\x31\\x32\\x33\\x34\\x35\\x36\", iov_len=12}, {iov_base="
+	       "\"\\x37\\x38\\x39\\x30\\x31\\x32\\x33\\x34\", iov_len=8}"
+	       ", {iov_base={nlmsg_len=16, nlmsg_type=NLMSG_DONE, nlmsg_flags=0"
+	       ", nlmsg_seq=6, nlmsg_pid=0}, iov_len=16}]"
+	       ", msg_iovlen=4, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = %s\n",
+	       fd, sprintrc(rc));
+
+	/*
+	 * Case 4: A Netlink header itself split across 2 iovecs.
+	 * iov[0] has only 8 bytes (< sizeof(struct nlmsghdr)).
+	 * iov[1] starts with bytes matching a valid struct nlmsghdr; it must
+	 * be printed as raw hex rather than misinterpreted as a top-level header.
+	 */
+	struct nlmsghdr msg4_hdr = {
+		.nlmsg_len = 32,
+		.nlmsg_type = NLMSG_NOOP,
+		.nlmsg_flags = 0,
+		.nlmsg_seq = 6,
+		.nlmsg_pid = 0,
+	};
+	struct {
+		struct nlmsghdr fake_nlh;
+		char data[8];
+	} msg4_iov1 = {
+		.fake_nlh = {
+			.nlmsg_len = 16,
+			.nlmsg_type = NLMSG_DONE,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 7,
+			.nlmsg_pid = 0,
+		},
+		.data = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
+	};
+	struct iovec iov4[2] = {
+		{ .iov_base = &msg4_hdr, .iov_len = 8 },
+		{ .iov_base = &msg4_iov1, .iov_len = sizeof(msg4_iov1) },
+	};
+	struct msghdr mh4 = {
+		.msg_iov = iov4,
+		.msg_iovlen = 2,
+	};
+
+	rc = sendmsg(fd, &mh4, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base=",
+	       fd);
+	print_quoted_hex(&msg4_hdr, 8);
+	printf(", iov_len=8}, {iov_base=");
+	print_quoted_hex(&msg4_iov1, sizeof(msg4_iov1));
+	printf(", iov_len=24}], msg_iovlen=2, msg_controllen=0, msg_flags=0}"
+	       ", MSG_DONTWAIT) = %s\n", sprintrc(rc));
+
+	/*
+	 * Case 5: NLMSG_ALIGN padding crossing an iovec boundary.
+	 * iov[0] has an unaligned 21-byte message (NLMSG_ALIGN(21) == 24).
+	 * iov[1] starts with the 3 bytes of alignment padding followed by
+	 * a complete 16-byte NLMSG_DONE message.
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		char data[5];
+	} msg5_iov0 = {
+		.nlh = {
+			.nlmsg_len = 21,
+			.nlmsg_type = NLMSG_NOOP,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 8,
+			.nlmsg_pid = 0,
+		},
+		.data = { '1', '2', '3', '4', '5' },
+	};
+	struct nlmsghdr msg5_nlh2 = {
+		.nlmsg_len = 16,
+		.nlmsg_type = NLMSG_DONE,
+		.nlmsg_flags = 0,
+		.nlmsg_seq = 9,
+		.nlmsg_pid = 0,
+	};
+	unsigned char msg5_iov1[3 + sizeof(msg5_nlh2)];
+	msg5_iov1[0] = 0xaa;
+	msg5_iov1[1] = 0xbb;
+	msg5_iov1[2] = 0xcc;
+	memcpy(msg5_iov1 + 3, &msg5_nlh2, sizeof(msg5_nlh2));
+	struct iovec iov5[2] = {
+		{ .iov_base = &msg5_iov0, .iov_len = 21 },
+		{ .iov_base = msg5_iov1, .iov_len = sizeof(msg5_iov1) },
+	};
+	struct msghdr mh5 = {
+		.msg_iov = iov5,
+		.msg_iovlen = 2,
+	};
+
+	rc = sendmsg(fd, &mh5, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=21, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0"
+	       ", nlmsg_seq=8, nlmsg_pid=0}, \"\\x31\\x32\\x33\\x34\\x35\"]"
+	       ", iov_len=21}, {iov_base=[\"\\xaa\\xbb\\xcc\", {nlmsg_len=16"
+	       ", nlmsg_type=NLMSG_DONE, nlmsg_flags=0, nlmsg_seq=9"
+	       ", nlmsg_pid=0}], iov_len=19}], msg_iovlen=2, msg_controllen=0"
+	       ", msg_flags=0}, MSG_DONTWAIT) = %s\n",
+	       fd, sprintrc(rc));
+
+	/*
+	 * Case 6: A split message whose continuation iovec has a NULL base
+	 * with iov_len > pending_len.  strace must not advance past NULL or
+	 * resume decoding on subsequent iovecs.
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		char data[4];
+	} msg6_iov0 = {
+		.nlh = {
+			.nlmsg_len = 32,
+			.nlmsg_type = NLMSG_NOOP,
+			.nlmsg_flags = 0,
+			.nlmsg_seq = 10,
+			.nlmsg_pid = 0,
+		},
+		.data = { '1', '2', '3', '4' },
+	};
+	struct nlmsghdr msg6_iov2 = {
+		.nlmsg_len = 16,
+		.nlmsg_type = NLMSG_DONE,
+		.nlmsg_flags = 0,
+		.nlmsg_seq = 11,
+		.nlmsg_pid = 0,
+	};
+	struct iovec iov6[3] = {
+		{ .iov_base = &msg6_iov0, .iov_len = sizeof(msg6_iov0) },
+		{ .iov_base = NULL, .iov_len = 28 },
+		{ .iov_base = &msg6_iov2, .iov_len = sizeof(msg6_iov2) },
+	};
+	struct msghdr mh6 = {
+		.msg_iov = iov6,
+		.msg_iovlen = 3,
+	};
+
+	rc = sendmsg(fd, &mh6, MSG_DONTWAIT);
+	printf("sendmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=32, nlmsg_type=NLMSG_NOOP, nlmsg_flags=0"
+	       ", nlmsg_seq=10, nlmsg_pid=0}, \"\\x31\\x32\\x33\\x34\"]"
+	       ", iov_len=20}, {iov_base=NULL, iov_len=28}, {iov_base=",
+	       fd);
+	print_quoted_hex(&msg6_iov2, sizeof(msg6_iov2));
+	printf(", iov_len=16}], msg_iovlen=3, msg_controllen=0, msg_flags=0}"
+	       ", MSG_DONTWAIT) = %s\n", sprintrc(rc));
+}
+
 int main(void)
 {
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
@@ -536,6 +831,7 @@ int main(void)
 	test_nlmsgerr_nesting(fd);
 	test_nlmsg_done(fd);
 	test_ack_flags(fd);
+	test_split_iov(fd);
 
 	puts("+++ exited with 0 +++");
 	return 0;
