@@ -816,6 +816,90 @@ test_split_iov(const int fd)
 	       ", MSG_DONTWAIT) = %s\n", sprintrc(rc));
 }
 
+static void
+test_split_iov_recvmsg(void)
+{
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+
+	/*
+	 * Send a request with an unknown message type and a fake struct
+	 * nlmsghdr in its payload.  The kernel replies with NLMSG_ERROR
+	 * echoing the full request.  Receive it across 2 iovecs so that
+	 * iov[0] holds the NLMSG_ERROR + echoed request header (36 bytes)
+	 * and iov[1] (with capacity larger than the remaining bytes) starts
+	 * directly at the echoed fake header.
+	 */
+	struct {
+		struct nlmsghdr nlh;
+		struct {
+			struct nlmsghdr fake_nlh;
+			char data[8];
+		} payload;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = 0xffff,
+			.nlmsg_flags = NLM_F_REQUEST,
+			.nlmsg_seq = 42,
+			.nlmsg_pid = 0,
+		},
+		.payload = {
+			.fake_nlh = {
+				.nlmsg_len = 16,
+				.nlmsg_type = NLMSG_DONE,
+				.nlmsg_flags = 0,
+				.nlmsg_seq = 9,
+				.nlmsg_pid = 0,
+			},
+			.data = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' },
+		},
+	};
+
+	if (write(fd, &req, sizeof(req)) != (ssize_t) sizeof(req))
+		perror_msg_and_fail("write");
+
+	struct {
+		struct nlmsghdr nlh;
+		struct nlmsgerr err;
+	} err_hdr;
+	char tail_buf[64];
+	struct iovec iov[2] = {
+		{ .iov_base = &err_hdr, .iov_len = sizeof(err_hdr) },
+		{ .iov_base = tail_buf, .iov_len = sizeof(tail_buf) },
+	};
+	struct msghdr mh = {
+		.msg_iov = iov,
+		.msg_iovlen = 2,
+	};
+
+	ssize_t ret = recvmsg(fd, &mh, MSG_DONTWAIT);
+	if (ret != (ssize_t) (sizeof(err_hdr) + sizeof(req.payload)))
+		perror_msg_and_fail("recvmsg");
+	if (memcmp(tail_buf, &req.payload, sizeof(req.payload)))
+		error_msg_and_fail("recvmsg did not echo the request payload");
+
+	printf("recvmsg(%d, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="
+	       "[{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR, nlmsg_flags=0"
+	       ", nlmsg_seq=%u, nlmsg_pid=%d}, {error=-%s, msg={nlmsg_len=%u"
+	       ", nlmsg_type=0xffff /* SOCK_DIAG_??? */"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=%u, nlmsg_pid=0}}]"
+	       ", iov_len=%zu}, {iov_base=",
+	       fd,
+	       err_hdr.nlh.nlmsg_len,
+	       err_hdr.nlh.nlmsg_seq,
+	       (int) err_hdr.nlh.nlmsg_pid,
+	       errno2name(-err_hdr.err.error),
+	       err_hdr.err.msg.nlmsg_len,
+	       err_hdr.err.msg.nlmsg_seq,
+	       sizeof(err_hdr));
+	print_quoted_hex(tail_buf, (size_t) ret - sizeof(err_hdr));
+	printf(", iov_len=%zu}], msg_iovlen=2, msg_controllen=0, msg_flags=0}"
+	       ", MSG_DONTWAIT) = %s\n",
+	       sizeof(tail_buf), sprintrc(ret));
+
+	close(fd);
+}
+
 int main(void)
 {
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
@@ -832,6 +916,7 @@ int main(void)
 	test_nlmsg_done(fd);
 	test_ack_flags(fd);
 	test_split_iov(fd);
+	test_split_iov_recvmsg();
 
 	puts("+++ exited with 0 +++");
 	return 0;
