@@ -20,8 +20,8 @@ int
 main(void)
 {
 	const int fd = -1;
-	const off64_t offset = 0xdeadbeefbadc0ded;
-	const off64_t nbytes = 0xfacefeedcafef00d;
+	const off_t offset = 0xdeadbeefbadc0ded;
+	const off_t nbytes = 0xfacefeedcafef00d;
 	const unsigned int flags = -1;
 
 	int rc = sync_file_range(fd, offset, nbytes, flags);

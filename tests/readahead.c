@@ -42,7 +42,7 @@ static const int fds[] = {
 	0x7fffffff,
 };
 
-static const off64_t offsets[] = {
+static const off_t offsets[] = {
 	-0x8000000000000000LL,
 	-0x5060708090a0b0c0LL,
 	-1LL,
