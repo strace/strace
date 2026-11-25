@@ -66,4 +66,11 @@ if LC_ALL=C grep -E -v -x "$pattern_all" "$LOG" > /dev/null; then
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 fi
 
+# Detach on entry even if execve is going to fail.
+run_strace_redir --quiet=personality -bexecve -enone /bin/sh -c \
+	'exec / >/dev/null 2>&1' ||
+	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
+LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args: output mismatch"
+
 exit 0

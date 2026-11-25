@@ -152,6 +152,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	count_unknown_many \
 	count_unknown_mixed \
 	delay \
+	detach-on-execve-setgid-helper \
 	detach-vfork \
 	dyxlat_test \
 	env-i \
@@ -679,6 +680,7 @@ MISC_TESTS = \
 	count_unknown_many.test \
 	count_unknown_mixed.test \
 	delay.test \
+	detach-on-execve-setgid.test \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
