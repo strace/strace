@@ -79,9 +79,18 @@ main(void)
 	       ", LANDLOCK_ADD_RULE_QUIET) = %s\n",
 	       attr_path + 1, errstr);
 
-	sys_landlock_add_rule(1729, 3, attr_path + 1, 0xffffffff);
-	printf("landlock_add_rule(1729, 0x3 /* LANDLOCK_RULE_??? */, %p"
+	sys_landlock_add_rule(1729, LANDLOCK_RULE_NAMESPACE, attr_path + 1,
+			      0xffffffff);
+	printf("landlock_add_rule(1729, LANDLOCK_RULE_NAMESPACE, %p"
 	       ", LANDLOCK_ADD_RULE_QUIET|0xfffffffe) = %s\n",
+	       attr_path + 1, errstr);
+
+	sys_landlock_add_rule(1729, LANDLOCK_RULE_CAPABILITY, attr_path + 1, 0);
+	printf("landlock_add_rule(1729, LANDLOCK_RULE_CAPABILITY, %p, 0) = %s\n",
+	       attr_path + 1, errstr);
+
+	sys_landlock_add_rule(1729, 5, attr_path + 1, 0);
+	printf("landlock_add_rule(1729, 0x5 /* LANDLOCK_RULE_??? */, %p, 0) = %s\n",
 	       attr_path + 1, errstr);
 
 	/* Invalid pointer */
