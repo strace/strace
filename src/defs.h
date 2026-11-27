@@ -1416,7 +1416,17 @@ extern void
 iov_decode_str(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size,
 	       void *opaque_data);
 
-extern void
+/*
+ * decode_netlink() returns:
+ *   0: no continuation needed;
+ *   positive value: remaining unconsumed bytes of the last message,
+ *                   including NLMSG_ALIGN padding;
+ *   DECODE_NETLINK_FRAMING_UNKNOWN: framing is unknown and subsequent
+ *                                   iovec buffers should be printed as
+ *                                   raw bytes.
+ */
+#define DECODE_NETLINK_FRAMING_UNKNOWN ((kernel_ulong_t) -1)
+extern kernel_ulong_t
 decode_netlink(struct tcb *, int fd, kernel_ulong_t addr, kernel_ulong_t len);
 
 extern void tprint_open_modes(unsigned int);

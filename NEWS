@@ -22,6 +22,7 @@ Noteworthy changes in release ?.? (????-??-??)
     SCM_*, SECCOMP_*, SO_*, and V4L2_* constants.
 
 * Bug fixes
+  * Fixed decoding of Netlink messages split across multiple iovec buffers.
   * Fixed a tracing failure during process termination caused by mistaking
     an unavailable signal-delivery-stop for a group-stop.
   * Fixed -yy PTY endpoint annotations for file descriptors belonging to another
