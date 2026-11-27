@@ -667,6 +667,14 @@ net--decode-fds-path-netlink
 net--decode-fds-socket-netlink
 net-accept-connect
 net-icmp_filter
+net-packet_fanout
+net-packet_fanout-Xabbrev
+net-packet_fanout-Xraw
+net-packet_fanout-Xverbose
+net-packet_fanout-success
+net-packet_fanout-success-Xabbrev
+net-packet_fanout-success-Xraw
+net-packet_fanout-success-Xverbose
 net-packet_mreq
 net-packet_mreq-Xabbrev
 net-packet_mreq-Xraw
