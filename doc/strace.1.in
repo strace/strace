@@ -453,6 +453,24 @@ is multi-threaded, using
 attaches to all of its threads, not just the one with
 .IR thread_id " = " PID .
 .TP
+.B \-\-follow\-threads
+Traces threads (clone-created tasks) as they are created
+by currently traced processes as a result of the
+.BR clone (2)
+system call, but does not trace child processes
+created by
+.BR fork (2)
+or
+.BR vfork (2).
+Note that if process
+.I PID
+is multi-threaded, using
+.B \-\-follow\-threads
+.B \-p
+.I PID
+attaches to all of its threads, not just the one with
+.IR thread_id " = " PID .
+.TP
 .B \-\-output\-separately
 If the
 .BR \-\-output = \fIfilename\fR
